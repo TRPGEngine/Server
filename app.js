@@ -40,6 +40,17 @@ app.use(session({
   store: new FileStore()
 }));
 
+// 开启socket.io
+let core = require('trpg-core')({});
+
+app.use(function(req, res, next) {
+  if(core) {
+    req.db = core.db;
+    req.playerList = core.playerList;
+  }
+  next();
+})
+
 app.use('/', require('./routes/index'));
 
 // error handler

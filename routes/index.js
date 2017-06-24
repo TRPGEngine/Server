@@ -1,9 +1,42 @@
 const express = require('express');
 const router = express.Router();
+const md5 = require('../components/md5')
 
 router.get('/', function(req, res, next) {
-  let template = require('../views/login.marko');
-  res.marko(template, {});
+  let template = require('../views/index.marko');
+  let playerCount = 0;
+  if(req.playerList) {
+    playerCount = req.playerList.length;
+  }
+  res.marko(template, {playerCount});
+});
+
+router.post('/_login', function(req, res, next) {
+  try {
+    let username = req.body.username;
+    let password = req.body.password;
+    password = md5(password);
+
+    req.db.connect(function(db) {
+      db.models.core_user.one({username, password}, function(err, user) {
+        if(err) {
+          res.send({err});
+          next();
+        }
+
+        let result = false;
+        if(user){
+          result = true;
+          user.last_login = new Date();
+          user.save();
+        }
+
+        res.send({result});
+      })
+    });
+  }catch(err) {
+    console.error(err);
+  }
 });
 
 router.get('/lobby', function(req, res, next) {

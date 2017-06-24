@@ -1,11 +1,8 @@
 <html>
 <head>
-  <meta charset="UTF-8">
+  <include("./include/common-head.marko")></include>
   <title>登录</title>
-  <link rel='stylesheet' href='/css/common.css'/>
   <link rel='stylesheet' href='/css/index.css'/>
-  <script type="text/javascript" src="//cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
-  <script src="https://cdn.bootcss.com/socket.io/2.0.3/socket.io.js"></script>
   <script type="text/javascript" src="/js/index.js"></script>
   <script type="text/javascript" src="/js/bg.js"></script>
 </head>
@@ -21,11 +18,11 @@
         <include("./notice.marko")></include>
       </div>
     </div>
-    <form class="login-panel">
-      <input type="text" placeholder="用户名" maxlength="16"/>
-      <input type="password" placeholder="密码" maxlength="16"/>
-      <input type="button" value="登录"/>
-      <div class="stat">当前在线人数：2333</div>
+    <form id="login-form" class="login-panel">
+      <input name="username" type="text" placeholder="用户名" maxlength="16"/>
+      <input name="password" type="password" placeholder="密码" maxlength="16"/>
+      <input type="button" id="login-btn" value="登录"/>
+      <div class="stat">当前在线人数：${data.playerCount}</div>
       <a href="#">注册账号</a>
     </form>
   </div>
