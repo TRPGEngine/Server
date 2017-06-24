@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/TRPGEngine/Server#readme",
   "dependencies": {
+    "body-parser": "^1.17.2",
     "config": "^1.26.1",
+    "cookie-parser": "^1.4.3",
     "express": "^4.15.3",
     "express-session": "^1.15.3",
     "log4js": "^1.1.1",

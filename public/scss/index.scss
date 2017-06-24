@@ -1,0 +1,64 @@
+.main {
+  display: flex;
+  padding: 100px 0;
+  height: 100%;
+  width: 100%;
+
+  #container {
+    z-index: -1;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  $block-background: rgba(white, 0.5);
+  .notice {
+    flex: 1;
+    margin: 20px 16px;
+    padding: 20px;
+    background-color: $block-background;
+    border-radius: 2px;
+
+    .title {
+      text-align: center;
+      font-size: 24px;
+      letter-spacing: 6px;
+    }
+  }
+
+  .login-panel {
+    width: 400px;
+    margin: 20px 16px;
+    padding: 20px;
+    background-color: $block-background;
+    border-radius: 2px;
+
+    input {
+      width: 100%;
+      line-height: 24px;
+      font-size: 24px;
+      margin: 10px 0;
+      border-radius: 2px;
+      border-width: 0;
+      padding: 8px 16px;
+    }
+
+    input[type="button"] {
+      padding: 12px 6px;
+    }
+
+    a{
+      color: #508CEE;
+      text-decoration: none;
+      float: right;
+    }
+
+    .stat {
+      float: left;
+      color: #333333;
+    }
+  }
+
+}

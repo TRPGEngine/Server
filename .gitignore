@@ -1,3 +1,7 @@
+sessions/
+db/
+public/css/
+
 # Logs
 logs
 *.log
@@ -56,4 +60,3 @@ typings/
 
 # dotenv environment variables file
 .env
-

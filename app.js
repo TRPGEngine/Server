@@ -1,6 +1,8 @@
 require('marko/node-require');
 
 const express = require('express');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const uuid = require('uuid');
 const session = require('express-session');
 const sessConfig = require('config').get('session');
@@ -13,6 +15,14 @@ if (app.get('env') !== 'production') {
   require('marko/compiler').defaultOptions.writeToDisk = false;
 }
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(require('marko/express')());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(cookieParser());
+
+if (app.get('env') === 'development') {
+  app.use(require('connect-livereload')({port: 35729}));
+}
 
 // use session
 const FileStore = require('session-file-store')(session);
@@ -29,6 +39,8 @@ app.use(session({
   secret: 'trpg engine',
   store: new FileStore()
 }));
+
+app.use('/', require('./routes/index'));
 
 // error handler
 // const pageErrors = require('./views/errors.marko')
