@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dbreset": "node tasks/reset"
   },
   "repository": {
     "type": "git",
@@ -23,12 +24,14 @@
     "body-parser": "^1.17.2",
     "config": "^1.26.1",
     "cookie-parser": "^1.4.3",
+    "crypto": "0.0.3",
     "express": "^4.15.3",
     "express-session": "^1.15.3",
     "log4js": "^1.1.1",
     "marko": "^4.4.15",
     "session-file-store": "^1.0.0",
-    "trpg-core": "git+https://github.com/TRPGEngine/Core.git",
+    "sqlite3": "^3.1.8",
+    "trpg-core": "github:trpgengine/Core",
     "uuid": "^3.1.0"
   },
   "devDependencies": {
