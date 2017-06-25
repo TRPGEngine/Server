@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const md5 = require('../components/md5')
+const auth = require('../components/middleware').auth;
 
 router.get('/', function(req, res, next) {
   let template = require('../views/index.marko');
@@ -27,6 +28,7 @@ router.post('/_login', function(req, res, next) {
         let result = false;
         if(user){
           result = true;
+          req.session.user = user;
           user.last_login = new Date();
           user.save();
         }
@@ -39,7 +41,7 @@ router.post('/_login', function(req, res, next) {
   }
 });
 
-router.get('/lobby', function(req, res, next) {
+router.get('/lobby', auth, function(req, res, next) {
   let template = require('../views/lobby.marko');
   res.marko(template, {});
 });

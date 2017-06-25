@@ -4,6 +4,9 @@ $(function() {
 
     $.post('/_login', data, function(data, textStatus, xhr) {
       console.log(data);
+      if(data.result) {
+        location.href = "/lobby";
+      }
     });
   });
 });

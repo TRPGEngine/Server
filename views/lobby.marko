@@ -1,1 +1,52 @@
-lobby
+<html>
+<head>
+  <include("./include/common-head.marko")></include>
+  <title>大厅</title>
+  <link rel='stylesheet' href='/css/lobby.css'/>
+  <script type="text/javascript" src="/js/lobby.js"></script>
+  <script type="text/javascript" src="/js/bg.js"></script>
+</head>
+<body>
+  <div class="main">
+    <div id="container">
+      <div id="anitOut"></div>
+    </div>
+
+    <div class="actor">
+      <div class="title">选择人物</div>
+      <div class="actor-info">
+        <img src="/img/coc-avatar.png" />
+        <div class="actor-name">玩家名</div>
+      </div>
+      <ul class="actor-list">
+        <li><img src="/img/coc-avatar.png" />玩家1</li>
+        <li><img src="/img/coc-avatar.png" />玩家2</li>
+        <li><img src="/img/coc-avatar.png" />玩家3</li>
+        <li><img src="/img/coc-avatar.png" />玩家4</li>
+      </ul>
+    </div>
+
+    <div class="room">
+      <div class="title">房间列表</div>
+      <table class="room-list" cellspacing="0">
+        <thead>
+          <tr>
+            <td>#</td>
+            <td>房间名</td>
+            <td>房主</td>
+            <td>密码</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>测试房间</td>
+            <td>demo</td>
+            <td><i class="fa fa-key"></i></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
