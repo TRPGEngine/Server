@@ -4,7 +4,7 @@
     "corePort": 23256
   },
   "session": {
-    "maxAge": 1800000,
+    "maxAge": 86400000,
     "hosts": "127.0.0.1:11211"
   }
 }
