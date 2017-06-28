@@ -45,6 +45,7 @@ router.get('/lobby', auth, function(req, res, next) {
   let template = require('../views/lobby.marko');
   res.marko(template, {});
 });
+
 router.get('/:roomId/lobby', function(req, res, next) {
   let template = require('../views/room.marko');
   let roomId = req.query.roomId;

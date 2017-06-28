@@ -1,4 +1,3 @@
-
 module.exports = {
   auth: function(req, res, next) {
     var session = req.session;

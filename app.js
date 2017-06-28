@@ -42,6 +42,7 @@ app.use(session({
 
 // 开启socket.io
 let core = require('trpg-core')({});
+require('./components/socketEvent').init(core);
 
 app.use(function(req, res, next) {
   if(core) {

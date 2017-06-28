@@ -81,4 +81,14 @@
       }
     }
   }
+
+  .roomInfo {
+    background-color: $block-background;
+    border-radius: 2px;
+    margin: 20px 16px;
+
+    & > div {
+      padding: 20px;
+    }
+  }
 }

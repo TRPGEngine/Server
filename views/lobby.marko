@@ -5,6 +5,18 @@
   <link rel='stylesheet' href='/css/lobby.css'/>
   <script type="text/javascript" src="/js/lobby.js"></script>
   <script type="text/javascript" src="/js/bg.js"></script>
+  <script id="roomInfoTpl" type="text/x-handlebars-template">
+    <div>
+      <div>房间编号：{{roomId}}</div>
+      <div>房间名：{{roomName}}</div>
+      <div>房间人数：{{roomNum}}/{{roomMaxNum}}</div>
+      <div>房间是否有密码：
+        {{#if roomPassword}}
+        <i class="fa fa-key"></i>
+        {{/if}}
+      </div>
+    </div>
+  </script>
 </head>
 <body>
   <div class="main">
@@ -38,7 +50,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr class="room-item" data-room-id="1">
             <td>1</td>
             <td>测试房间</td>
             <td>demo</td>
@@ -46,6 +58,10 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="roomInfo">
+
     </div>
   </div>
 </body>
