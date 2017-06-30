@@ -19,7 +19,7 @@ gulp.task('server', function() {
   gulp.watch(['public/**/*.css', 'public/**/*.html', 'public/**/*.js'], function (file) {
     server.notify.apply(server, [file]);
   });
-  gulp.watch(['app.js', 'routes/**/*.js', 'views/**/*.marko'], function() {
+  gulp.watch(['app.js', 'routes/**/*.js', 'components/**/*.js' , 'views/**/*.marko'], function() {
     console.log('gulp check code has been changed, restart server......');
     server.start.bind(server)().then(function(){
       console.log("server restarted!!!");
