@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const md5 = require('../components/md5')
 const auth = require('../components/middleware').auth;
+const authAjax = require('../components/middleware').authAjax;
 
 router.get('/', function(req, res, next) {
   let template = require('../views/index.marko');
@@ -38,6 +39,7 @@ router.post('/_login', function(req, res, next) {
     });
   }catch(err) {
     console.error(err);
+    res.send({result: false});
   }
 });
 
@@ -51,6 +53,33 @@ router.get('/:roomId/lobby', function(req, res, next) {
   let roomId = req.query.roomId;
 
   res.marko(template, {roomId});
+});
+
+router.get('/player/_info', authAjax, function(req, res, next) {
+  let user = req.user;
+  res.send({
+    result: true,
+    user
+  });
+});
+
+router.get('/player/actor/_list', authAjax, function(req, res, next) {
+  try{
+    let user = req.user;
+    req.db.connect(function(db) {
+      // console.log(db.models);
+
+      res.send({
+        result: true,
+        user
+      });
+    });
+  }catch(err) {
+    console.error(err);
+    res.send({result: false});
+  }
+
+
 });
 
 module.exports = router;

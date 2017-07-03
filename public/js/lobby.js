@@ -2,10 +2,21 @@ $(function() {
   var wsurl = window.location.protocol + "//" + window.location.hostname + ":23256";
   var socket = io.connect(wsurl);
   var roomInfoTpl = Handlebars.compile($('#roomInfoTpl').html());
+  var user;
 
   socket.on('connect',function(){
     // 连接成功
     console.log('连接成功');
+
+    // 获取人物列表
+    $.getJSON('/player/actor/_list', function(data) {
+      if(!data.result) {
+        return;
+      }
+
+      user = data.user;
+    });
+
 
     socket.on('core::chat', function(msg) {
       console.log(msg);
