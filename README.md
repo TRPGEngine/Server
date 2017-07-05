@@ -17,3 +17,9 @@ npm install --production
 ```bash
 npm start
 ```
+
+## 创建/重建数据库
+```bash
+npm run dbreset
+```
+初始账号密码:admin/admin
