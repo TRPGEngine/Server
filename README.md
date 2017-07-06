@@ -17,3 +17,8 @@ npm install --production
 ```bash
 npm start
 ```
+
+**重置数据库**
+```bash
+npm run dbreset
+```
