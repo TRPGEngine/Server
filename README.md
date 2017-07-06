@@ -18,7 +18,8 @@ npm install --production
 npm start
 ```
 
-**重置数据库**
+## 创建/重建数据库
 ```bash
 npm run dbreset
 ```
+初始账号密码:admin/admin
