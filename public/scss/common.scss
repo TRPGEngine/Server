@@ -5,3 +5,23 @@
 body, html {
   margin: 0;
 }
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background-color: transparent;
+}
+
+::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(52,73,94,.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(52,73,94,.8);
+  border-radius: 4px;
+}

@@ -50,7 +50,7 @@ router.get('/lobby', auth, function(req, res, next) {
 
 router.get('/room/:roomId', auth, function(req, res, next) {
   let template = require('../views/room.marko');
-  let roomId = req.query.roomId;
+  let roomId = req.params.roomId;
 
   res.marko(template, {roomId});
 });
