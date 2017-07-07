@@ -13,5 +13,13 @@ module.exports = {
         roomOwner: 'admin'
       })
     });
+
+    core.addEventListener('core::joinRoom', function(data, fn) {
+      let socket = this;
+      let roomName = 'room_' + data.roomId;
+      socket.join(roomName);
+      socket.broadcast.to(roomName).emit('core::joinRoom', {name:'demo'});// TODO
+      fn(roomName);
+    });
   }
 }
