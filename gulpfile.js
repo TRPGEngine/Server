@@ -5,7 +5,7 @@ const sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('default', ['server']);
 
-gulp.task('server', function() {
+gulp.task('server', ['scss'], function() {
   var server = gls(
     ['bin/www'],
     {env: {NODE_ENV: 'development'}}
