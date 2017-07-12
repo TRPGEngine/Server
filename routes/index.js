@@ -29,6 +29,7 @@ router.post('/_login', function(req, res, next) {
         let result = false;
         if(user){
           result = true;
+          delete user.password;
           req.session.user = user;
           user.last_login = new Date();
           user.save();
@@ -51,8 +52,9 @@ router.get('/lobby', auth, function(req, res, next) {
 router.get('/room/:roomId', auth, function(req, res, next) {
   let template = require('../views/room.marko');
   let roomId = req.params.roomId;
+  let playerInfo = req.user;
 
-  res.marko(template, {roomId});
+  res.marko(template, {roomId, playerInfo});
 });
 
 router.get('/player/_info', authAjax, function(req, res, next) {

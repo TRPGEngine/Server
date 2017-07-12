@@ -9,7 +9,7 @@ $(function() {
       isReceived = false;
     }
 
-    $('.chat .message-log').append(msgTpl({
+    return $('.chat .message-log').append(msgTpl({
       content: msg,
       isReceived: isReceived
     })).animate({scrollTop: $(document).height()}, 300);
@@ -18,13 +18,17 @@ $(function() {
   socket.on('connect',function(){
     // 连接成功
     console.log('连接成功');
-
-    socket.emit('core::joinRoom', {roomId:roomInfo.roomId}, function(roomName) {
-      console.log('加入房间成功' + roomName);
+    socket.emit('login', roomInfo.playerInfo, function() {
+      console.log('登录成功');
     });
 
-    socket.on('core::chat', function(msg) {
-      addMessage(msg, true);
+    socket.emit('core::joinRoom', {roomId:roomInfo.roomId}, function(roomName) {
+      console.log('加入房间成功', roomName);
+    });
+
+    socket.on('core::chat', function(data) {
+      console.log(data.roomId);
+      addMessage(data.msg, true);
     });
 
     socket.on('core::joinRoom', function(data) {
@@ -51,6 +55,7 @@ $(function() {
 
       console.log(msg);
       addMessage(msg);
+      socket.emit('core::chat', {roomId:roomInfo.roomId, msg: msg});
     }else {
       $('#msg-input').focus();
     }

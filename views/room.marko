@@ -4,7 +4,7 @@
   <title>房间</title>
   <link rel='stylesheet' href='/css/room.css'/>
   <script type="text/javascript" src="/js/bg.js"></script>
-  <script type="text/javascript" src="/js/room.js" data="${JSON.stringify({roomId:data.roomId})}"></script>
+  <script type="text/javascript" src="/js/room.js" data="${JSON.stringify({roomId:data.roomId, playerInfo:data.playerInfo})}"></script>
   <script id="msgTpl" type="text/x-handlebars-template">
     {{#if received}}
     <div class="message received">
