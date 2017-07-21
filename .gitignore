@@ -2,6 +2,7 @@ sessions/
 db/
 public/css/
 mods/
+.DS_Store
 
 # Logs
 logs

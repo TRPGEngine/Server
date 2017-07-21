@@ -3,8 +3,18 @@ const Player =
 module.exports = {
   init: function(core) {
     let io = core.io;
-    core.addEventListener('core::setInfo', function(data, info) {
+    core.addEventListener('core::setInfo', function(data, fn) {
+      let socket = this;
+      let player = core.getPlayer(socket);
+      player.setInfo(data);
       console.log('set info', data);
+    });
+
+    core.addEventListener('core::getActorList', function(data, fn) {
+      let socket = this;
+      let player = core.getPlayer(socket);
+      let actorList = player.getAllActor();
+      fn(actorList);
     });
 
     core.addEventListener('core::getRoomInfo', function(data, fn) {
@@ -40,7 +50,7 @@ module.exports = {
     core.addEventListener('core::chat', function(data, fn) {
       let socket = this;
       let player = core.getPlayer(socket);
-      
+
       if(data && data.roomId) {
         let roomId = data.roomId
         let roomName = 'room_' + roomId;
