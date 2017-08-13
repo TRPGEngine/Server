@@ -8,7 +8,7 @@ gulp.task('default', ['server']);
 gulp.task('server', ['scss'], function() {
   var server = gls(
     ['bin/www'],
-    {env: {NODE_ENV: 'development'}}
+    {env: {NODE_ENV: 'development', DEBUG: 'trpg:*'}}
   );
   server.start();
 

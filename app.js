@@ -41,13 +41,13 @@ app.use(session({
 }));
 
 // 开启socket.io
-let core = require('trpg-core')({});
-require('./components/socketEvent').init(core);
+let trpg = require('./components/trpg');
+trpg.run();
 
 app.use(function(req, res, next) {
-  if(core) {
-    req.db = core.db;
-    req.playerList = core.playerList;
+  if(trpg) {
+    req.trpg = trpg;
+    req.storage = trpg.storage;
   }
   next();
 })

@@ -7,8 +7,9 @@ const authAjax = require('../components/middleware').authAjax;
 router.get('/', function(req, res, next) {
   let template = require('../views/index.marko');
   let playerCount = 0;
-  if(req.playerList) {
-    playerCount = req.playerList.length;
+  if(req.trpg && req.trpg.player) {
+    playerCount = req.trpg.player.list.list.length;
+    console.log(playerCount);
   }
   res.marko(template, {playerCount});
 });
@@ -19,8 +20,8 @@ router.post('/_login', function(req, res, next) {
     let password = req.body.password;
     password = md5(password);
 
-    req.db.connect(function(db) {
-      db.models.core_user.one({username, password}, function(err, user) {
+    req.storage.connect(function(db) {
+      db.models.player_user.one({username, password}, function(err, user) {
         if(err) {
           res.send({err});
           next();
