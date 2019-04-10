@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <title>绑定${data.result ? '成功' : '失败'}</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      .container {
+        margin: 40px auto;
+        width: 600px;
+        box-shadow: 0 0 5px #888888;
+        padding: 40px;
+      }
+
+      a.btn {
+        height: 40px;
+        margin: 8px 0 5px;
+        font-size: 16px;
+        border: 0;
+        cursor: pointer;
+        color: white;
+        border-radius: 3px;
+        background-color: #705949;
+        padding: 6px 18px;
+        outline: 0;
+        user-select: none;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <if(data.result)>
+        $ {
+          let username = data.user.username;
+          username = username.substr(0, 2) + '**' + username.substr(-2, 2);
+        }
+        <h2>绑定成功</h2>
+        <p>您的邮箱${data.email}已经成功绑定了账号${username}, 您可以通过该邮箱来找回您的密码</p>
+      </if>
+      <else>
+        <h2>绑定失败</h2>
+        <p>${data.errorMsg}</p>
+      </else>
+      <p><a class="btn" href="javascript:window.opener=null;window.open('','_self');window.close();">关闭页面</a></p>
+    </div>
+  </body>
+</html>

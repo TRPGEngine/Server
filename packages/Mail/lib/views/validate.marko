@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>${data.title}</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      .body {
+        margin: 40px auto;
+        width: 600px;
+        box-shadow: 0 0 5px #888888;
+        padding: 40px;
+      }
+
+      .body h2 {
+        line-height: 40px;
+        font-weight: normal;
+        margin-top:  0;
+      }
+
+      .body h2 img {
+        width: 40px;
+        height: 40px;
+        vertical-align: bottom;
+        margin-right: 20px;
+      }
+
+      .body h4 {
+        font-weight: normal;
+      }
+
+      .body a.btn {
+        height: 40px;
+        margin: 8px 0 5px;
+        font-size: 16px;
+        border: 0;
+        cursor: pointer;
+        color: white;
+        border-radius: 3px;
+        background-color: #705949;
+        padding: 6px 18px;
+        outline: 0;
+        user-select: none;
+        text-decoration: none;
+      }
+
+      .footer {
+        text-align: right;
+        color: #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="body">
+      <h2><img src="https://avatars2.githubusercontent.com/u/29349860?s=200&v=4" />请确认你的邮箱地址</h2>
+      <h4>点击下方按钮或复制下面的链接进行邮箱验证, 该链接10分钟内有效：</h4>
+      <p><a href="${data.link}" target="_blank">${data.link}</a></p>
+      <a class="btn" href="${data.link}" target="_blank">马上验证</a>
+      <hr />
+      <p class="footer">
+        <span>来自TRPG Engine团队</span>
+        &nbsp;
+        <span>${new Date().Format('yyyy-MM-dd hh:mm')}</span>
+      </p>
+    </div>
+  </body>
+</html>

@@ -1,9 +1,14 @@
 {
   "name": "trpg-server",
   "version": "1.0.0",
-  "description": "## 安装环境",
+  "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
+    "start": "npm run dev",
+    "dev": "cross-env DEBUG=trpg:* NODE_ENV=development npm run run:standard",
+    "pro": "cross-env NODE_ENV=production npm run run:standard",
+    "run:standard": "node standard.js",
+    "packages:install": "sh packages/foreach.sh 'npm install'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,5 +27,8 @@
   "dependencies": {
     "config": "^3.1.0",
     "crypto-random-string": "^2.0.0"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0"
   }
 }
