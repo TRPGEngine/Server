@@ -10,6 +10,8 @@
     "run:standard": "node standard.js",
     "packages:install": "sh packages/foreach.sh 'npm install'",
     "prettier:all": "prettier --write \"./**/*.js\"",
+    "db:migrate:generate": "makemigration --models-path ./db/models.js --migrations-path ./db/migrations",
+    "db:migrate:run": "runmigration --models-path ./db/models.js --migrations-path ./db/migrations",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -31,6 +33,7 @@
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
-    "prettier": "^1.16.4"
+    "prettier": "^1.16.4",
+    "sequelize-auto-migrations": "^1.0.3"
   }
 }

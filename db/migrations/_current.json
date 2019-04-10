@@ -1,0 +1,1970 @@
+{
+    "tables": {
+        "player_user": {
+            "tableName": "player_user",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "allowNull": false,
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV4"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "username": {
+                    "required": true,
+                    "uniq": true,
+                    "allowNull": false,
+                    "field": "username",
+                    "seqType": "Sequelize.STRING"
+                },
+                "password": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "password",
+                    "seqType": "Sequelize.STRING"
+                },
+                "nickname": {
+                    "required": false,
+                    "field": "nickname",
+                    "seqType": "Sequelize.STRING"
+                },
+                "avatar": {
+                    "required": false,
+                    "defaultValue": {
+                        "value": ""
+                    },
+                    "field": "avatar",
+                    "seqType": "Sequelize.STRING"
+                },
+                "last_login": {
+                    "field": "last_login",
+                    "seqType": "Sequelize.DATE"
+                },
+                "last_ip": {
+                    "field": "last_ip",
+                    "seqType": "Sequelize.STRING"
+                },
+                "token": {
+                    "field": "token",
+                    "seqType": "Sequelize.STRING"
+                },
+                "app_token": {
+                    "field": "app_token",
+                    "seqType": "Sequelize.STRING"
+                },
+                "sex": {
+                    "defaultValue": {
+                        "value": "保密"
+                    },
+                    "field": "sex",
+                    "seqType": "Sequelize.ENUM('男', '女', '其他', '保密')"
+                },
+                "sign": {
+                    "field": "sign",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "player_friends": {
+            "tableName": "player_friends",
+            "schema": {
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "playerUserId": {
+                    "primaryKey": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "CASCADE",
+                    "onUpdate": "CASCADE",
+                    "field": "playerUserId",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "friendId": {
+                    "primaryKey": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "CASCADE",
+                    "onUpdate": "CASCADE",
+                    "field": "friendId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "player_invite": {
+            "tableName": "player_invite",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "required": false,
+                    "unique": true,
+                    "field": "uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "from_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "from_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "to_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "to_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "is_agree": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_agree",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "is_refuse": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_refuse",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "player_login_log": {
+            "tableName": "player_login_log",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "user_uuid": {
+                    "field": "user_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "user_name": {
+                    "field": "user_name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "type": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('standard', 'token', 'app_standard', 'app_token')"
+                },
+                "channel": {
+                    "field": "channel",
+                    "seqType": "Sequelize.STRING"
+                },
+                "ip": {
+                    "field": "ip",
+                    "seqType": "Sequelize.STRING"
+                },
+                "ip_address": {
+                    "field": "ip_address",
+                    "seqType": "Sequelize.STRING"
+                },
+                "platform": {
+                    "field": "platform",
+                    "seqType": "Sequelize.STRING"
+                },
+                "device_info": {
+                    "field": "device_info",
+                    "seqType": "Sequelize.JSON"
+                },
+                "is_success": {
+                    "field": "is_success",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "token": {
+                    "field": "token",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "player_settings": {
+            "tableName": "player_settings",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "user_uuid": {
+                    "unique": true,
+                    "field": "user_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "user_settings": {
+                    "field": "user_settings",
+                    "seqType": "Sequelize.JSON"
+                },
+                "system_settings": {
+                    "field": "system_settings",
+                    "seqType": "Sequelize.JSON"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "file_avatar": {
+            "tableName": "file_avatar",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "require": true,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "size": {
+                    "require": true,
+                    "field": "size",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "width": {
+                    "field": "width",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "height": {
+                    "field": "height",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "type": {
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('actor', 'user', 'group')"
+                },
+                "has_thumbnail": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "has_thumbnail",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "attach_uuid": {
+                    "field": "attach_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "file_chatimg": {
+            "tableName": "file_chatimg",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "require": true,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "url": {
+                    "field": "url",
+                    "seqType": "Sequelize.STRING"
+                },
+                "size": {
+                    "require": true,
+                    "field": "size",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "width": {
+                    "field": "width",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "height": {
+                    "field": "height",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "type": {
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('file', 'url')"
+                },
+                "has_thumbnail": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "has_thumbnail",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "mimetype": {
+                    "field": "mimetype",
+                    "seqType": "Sequelize.STRING"
+                },
+                "encoding": {
+                    "field": "encoding",
+                    "seqType": "Sequelize.STRING"
+                },
+                "ext": {
+                    "field": "ext",
+                    "seqType": "Sequelize.JSON"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "file_file": {
+            "tableName": "file_file",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "require": true,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "originalname": {
+                    "require": true,
+                    "field": "originalname",
+                    "seqType": "Sequelize.STRING"
+                },
+                "size": {
+                    "require": true,
+                    "field": "size",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "encoding": {
+                    "field": "encoding",
+                    "seqType": "Sequelize.STRING"
+                },
+                "mimetype": {
+                    "field": "mimetype",
+                    "seqType": "Sequelize.STRING"
+                },
+                "ext": {
+                    "field": "ext",
+                    "seqType": "Sequelize.STRING"
+                },
+                "type": {
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('file')"
+                },
+                "can_preview": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "can_preview",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "is_persistence": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_persistence",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "is_expired": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_expired",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "owner_uuid": {
+                    "field": "owner_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "actor_actor": {
+            "tableName": "actor_actor",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "require": true,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "desc": {
+                    "field": "desc",
+                    "seqType": "Sequelize.STRING"
+                },
+                "avatar": {
+                    "field": "avatar",
+                    "seqType": "Sequelize.STRING"
+                },
+                "template_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "template_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "info": {
+                    "field": "info",
+                    "seqType": "Sequelize.JSON"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "actor_template": {
+            "tableName": "actor_template",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "require": true,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "desc": {
+                    "field": "desc",
+                    "seqType": "Sequelize.STRING"
+                },
+                "avatar": {
+                    "field": "avatar",
+                    "seqType": "Sequelize.STRING"
+                },
+                "info": {
+                    "field": "info",
+                    "seqType": "Sequelize.TEXT"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "creatorId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "creatorId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "chat_log": {
+            "tableName": "chat_log",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "required": true,
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV4"
+                    },
+                    "allowNull": false,
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "sender_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "sender_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "to_uuid": {
+                    "field": "to_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "converse_uuid": {
+                    "field": "converse_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "message": {
+                    "field": "message",
+                    "seqType": "Sequelize.STRING(1000)"
+                },
+                "type": {
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('normal', 'system', 'ooc', 'speak', 'action', 'cmd', 'card', 'tip', 'file')"
+                },
+                "data": {
+                    "field": "data",
+                    "seqType": "Sequelize.JSON"
+                },
+                "is_group": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_group",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "is_public": {
+                    "defaultValue": {
+                        "value": true
+                    },
+                    "field": "is_public",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "date": {
+                    "field": "date",
+                    "seqType": "Sequelize.DATE"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "chat_converse": {
+            "tableName": "chat_converse",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV4"
+                    },
+                    "required": true,
+                    "allowNull": false,
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "type": {
+                    "defaultValue": {
+                        "value": "user"
+                    },
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('user', 'channel', 'group', 'system')"
+                },
+                "name": {
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "icon": {
+                    "field": "icon",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "chat_converse_participants": {
+            "tableName": "chat_converse_participants",
+            "schema": {
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "playerUserId": {
+                    "primaryKey": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "CASCADE",
+                    "onUpdate": "CASCADE",
+                    "field": "playerUserId",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "chatConverseId": {
+                    "primaryKey": true,
+                    "references": {
+                        "model": "chat_converse",
+                        "key": "id"
+                    },
+                    "onDelete": "CASCADE",
+                    "onUpdate": "CASCADE",
+                    "field": "chatConverseId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "dice_log": {
+            "tableName": "dice_log",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "sender_uuid": {
+                    "required": false,
+                    "field": "sender_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "to_uuid": {
+                    "required": false,
+                    "field": "to_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "is_group": {
+                    "field": "is_group",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "is_private": {
+                    "field": "is_private",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "dice_request": {
+                    "field": "dice_request",
+                    "seqType": "Sequelize.STRING"
+                },
+                "dice_expression": {
+                    "field": "dice_expression",
+                    "seqType": "Sequelize.STRING(1000)"
+                },
+                "dice_result": {
+                    "field": "dice_result",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "date": {
+                    "field": "date",
+                    "seqType": "Sequelize.DATE"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "group_group": {
+            "tableName": "group_group",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "type": {
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('group', 'channel', 'test')"
+                },
+                "name": {
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "sub_name": {
+                    "field": "sub_name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "desc": {
+                    "field": "desc",
+                    "seqType": "Sequelize.STRING"
+                },
+                "avatar": {
+                    "defaultValue": {
+                        "value": ""
+                    },
+                    "field": "avatar",
+                    "seqType": "Sequelize.STRING"
+                },
+                "creator_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "creator_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "owner_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "owner_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "managers_uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.Array"
+                    },
+                    "field": "managers_uuid",
+                    "seqType": "Sequelize.JSON"
+                },
+                "maps_uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.Array"
+                    },
+                    "field": "maps_uuid",
+                    "seqType": "Sequelize.JSON"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "group_group_members": {
+            "tableName": "group_group_members",
+            "schema": {
+                "selected_group_actor_uuid": {
+                    "field": "selected_group_actor_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "playerUserId": {
+                    "primaryKey": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "CASCADE",
+                    "onUpdate": "CASCADE",
+                    "field": "playerUserId",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "groupGroupId": {
+                    "primaryKey": true,
+                    "references": {
+                        "model": "group_group",
+                        "key": "id"
+                    },
+                    "onDelete": "CASCADE",
+                    "onUpdate": "CASCADE",
+                    "field": "groupGroupId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "group_invite": {
+            "tableName": "group_invite",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "group_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "group_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "from_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "from_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "to_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "to_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "is_agree": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_agree",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "is_refuse": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_refuse",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "group_actor": {
+            "tableName": "group_actor",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "actor_uuid": {
+                    "field": "actor_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "actor_info": {
+                    "field": "actor_info",
+                    "seqType": "Sequelize.JSON"
+                },
+                "avatar": {
+                    "field": "avatar",
+                    "seqType": "Sequelize.TEXT"
+                },
+                "passed": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "passed",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "enabled": {
+                    "defaultValue": {
+                        "value": true
+                    },
+                    "field": "enabled",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "actorId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "actor_actor",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "actorId",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "groupId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "group_group",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "groupId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "group_request": {
+            "tableName": "group_request",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "group_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "group_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "from_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "from_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "is_agree": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_agree",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "is_refuse": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_refuse",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "note_note": {
+            "tableName": "note_note",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "title": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "title",
+                    "seqType": "Sequelize.STRING"
+                },
+                "content": {
+                    "field": "content",
+                    "seqType": "Sequelize.TEXT"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "help_feedback": {
+            "tableName": "help_feedback",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "username": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "username",
+                    "seqType": "Sequelize.STRING"
+                },
+                "contact": {
+                    "field": "contact",
+                    "seqType": "Sequelize.STRING"
+                },
+                "content": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "content",
+                    "seqType": "Sequelize.STRING(1000)"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "oauth_qq_access_info": {
+            "tableName": "oauth_qq_access_info",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "access_token": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "access_token",
+                    "seqType": "Sequelize.STRING"
+                },
+                "expires_in": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "expires_in",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "refresh_token": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "refresh_token",
+                    "seqType": "Sequelize.STRING"
+                },
+                "openid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "openid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "relatedUserId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "relatedUserId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "report_error": {
+            "tableName": "report_error",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "ip": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "ip",
+                    "seqType": "Sequelize.STRING"
+                },
+                "ua": {
+                    "field": "ua",
+                    "seqType": "Sequelize.STRING"
+                },
+                "version": {
+                    "field": "version",
+                    "seqType": "Sequelize.STRING"
+                },
+                "message": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "message",
+                    "seqType": "Sequelize.STRING"
+                },
+                "stack": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "stack",
+                    "seqType": "Sequelize.STRING(1000)"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "report_register_daily": {
+            "tableName": "report_register_daily",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "start": {
+                    "field": "start",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "end": {
+                    "field": "end",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "report_register_weekly": {
+            "tableName": "report_register_weekly",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "start": {
+                    "field": "start",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "end": {
+                    "field": "end",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "report_register_monthly": {
+            "tableName": "report_register_monthly",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "start": {
+                    "field": "start",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "end": {
+                    "field": "end",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "report_chatlog_daily": {
+            "tableName": "report_chatlog_daily",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "start": {
+                    "time": false,
+                    "field": "start",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "end": {
+                    "time": false,
+                    "field": "end",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "report_chatlog_weekly": {
+            "tableName": "report_chatlog_weekly",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "start": {
+                    "time": false,
+                    "field": "start",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "end": {
+                    "time": false,
+                    "field": "end",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "report_chatlog_monthly": {
+            "tableName": "report_chatlog_monthly",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "start": {
+                    "time": false,
+                    "field": "start",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "end": {
+                    "time": false,
+                    "field": "end",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "report_login_times_daily": {
+            "tableName": "report_login_times_daily",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "login_count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "login_count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "user_count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "user_count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "start": {
+                    "field": "start",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "end": {
+                    "field": "end",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "report_login_times_weekly": {
+            "tableName": "report_login_times_weekly",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "login_count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "login_count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "user_count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "user_count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "start": {
+                    "field": "start",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "end": {
+                    "field": "end",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "report_login_times_monthly": {
+            "tableName": "report_login_times_monthly",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "login_count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "login_count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "user_count": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "user_count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "start": {
+                    "field": "start",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "end": {
+                    "field": "end",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "mail_list": {
+            "tableName": "mail_list",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "user_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "user_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "email_address": {
+                    "required": true,
+                    "validate": {
+                        "isEmail": true
+                    },
+                    "allowNull": false,
+                    "field": "email_address",
+                    "seqType": "Sequelize.STRING"
+                },
+                "email_user": {
+                    "field": "email_user",
+                    "seqType": "Sequelize.STRING"
+                },
+                "email_provider": {
+                    "field": "email_provider",
+                    "seqType": "Sequelize.STRING"
+                },
+                "enabled": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "enabled",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "mail_record": {
+            "tableName": "mail_record",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "user_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "user_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "from": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "from",
+                    "seqType": "Sequelize.STRING"
+                },
+                "to": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "to",
+                    "seqType": "Sequelize.STRING"
+                },
+                "subject": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "subject",
+                    "seqType": "Sequelize.STRING"
+                },
+                "body": {
+                    "field": "body",
+                    "seqType": "Sequelize.TEXT"
+                },
+                "host": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "host",
+                    "seqType": "Sequelize.STRING"
+                },
+                "port": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "port",
+                    "seqType": "Sequelize.STRING"
+                },
+                "secure": {
+                    "defaultValue": {
+                        "value": true
+                    },
+                    "field": "secure",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "is_success": {
+                    "defaultValue": {
+                        "value": true
+                    },
+                    "field": "is_success",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "data": {
+                    "field": "data",
+                    "seqType": "Sequelize.JSON"
+                },
+                "error": {
+                    "field": "error",
+                    "seqType": "Sequelize.STRING(1000)"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        }
+    },
+    "revision": 1
+}
