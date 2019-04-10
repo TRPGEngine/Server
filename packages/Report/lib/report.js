@@ -10,8 +10,8 @@ module.exports = function ReportComponent(app) {
 
   return {
     name: 'ReportComponent',
-  }
-}
+  };
+};
 
 function initStorage() {
   let app = this;
@@ -24,7 +24,7 @@ function initStorage() {
       i++;
     }
     return i; // 返回注册数
-  }
+  };
 
   storage.registerModel(require('./models/error'));
   let count = 1;
@@ -65,8 +65,8 @@ function initTimer() {
       debug(' - execute task:', k);
       let report = reports[k];
       try {
-        report.daily && await report.daily.call(app, start, end, db);
-      }catch(err) {
+        report.daily && (await report.daily.call(app, start, end, db));
+      } catch (err) {
         app.error(err);
       }
     }
@@ -83,8 +83,8 @@ function initTimer() {
       debug(' - execute task:', k);
       let report = reports[k];
       try {
-        report.weekly && await report.weekly.call(app, start, end, db);
-      }catch(err) {
+        report.weekly && (await report.weekly.call(app, start, end, db));
+      } catch (err) {
         app.error(err);
       }
     }
@@ -102,8 +102,8 @@ function initTimer() {
       debug(' - execute task:', k);
       let report = reports[k];
       try {
-        report.monthly && await report.monthly.call(app, start, end, db);
-      }catch(err) {
+        report.monthly && (await report.monthly.call(app, start, end, db));
+      } catch (err) {
         app.error(err);
       }
     }
@@ -117,5 +117,5 @@ function initTimer() {
     dailyReport.cancel();
     weeklyReport.cancel();
     monthlyReport.cancel();
-  })
+  });
 }

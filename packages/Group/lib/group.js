@@ -11,13 +11,9 @@ module.exports = function GroupComponent(app) {
 
   return {
     name: 'GroupComponent',
-    require: [
-      'PlayerComponent',
-      'ChatComponent',
-      'ActorComponent',
-    ],
-  }
-}
+    require: ['PlayerComponent', 'ChatComponent', 'ActorComponent'],
+  };
+};
 
 function initStorage() {
   let app = this;
@@ -38,52 +34,54 @@ function initFunction() {
   let db = app.storage.db;
   app.group = {
     addGroupMemberAsync: async function(groupUUID, userUUID) {
-      if(!groupUUID || !userUUID) {
-        debug('add group need 2 uuid: receive %o', {groupUUID, userUUID});
+      if (!groupUUID || !userUUID) {
+        debug('add group need 2 uuid: receive %o', { groupUUID, userUUID });
         return;
       }
 
       try {
         // 检查是否已加入
-        let group = await db.models.group_group.oneAsync({uuid: groupUUID});
-        let user = await db.models.player_user.oneAsync({uuid: userUUID});
-        if(group && user) {
+        let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+        let user = await db.models.player_user.oneAsync({ uuid: userUUID });
+        if (group && user) {
           let members = await group.getMembers();
           for (let u of members) {
-            if(u.uuid === user.uuid) {
+            if (u.uuid === user.uuid) {
               return false;
             }
           }
           let res = await group.addMember(user);
 
           // 检查是否在线, 如果在线则发送一条更新通知
-          if(app.player) {
+          if (app.player) {
             let player = app.player.list.get(user.uuid);
-            if(player) {
-              player.socket.emit('group::addGroupSuccess', {group});
+            if (player) {
+              player.socket.emit('group::addGroupSuccess', { group });
               app.player.joinSocketRoom(user.uuid, group.uuid);
             }
           }
 
           return res;
-        }else {
-          throw new Error(`团信息不全或添加的成员信息不全: ${groupUUID} ${userUUID}`);
+        } else {
+          throw new Error(
+            `团信息不全或添加的成员信息不全: ${groupUUID} ${userUUID}`
+          );
         }
-      }catch(err){
+      } catch (err) {
         console.error('[addGroupMemberAsync]', err);
         throw err;
       }
     },
     getGroupManagersUUIDAsync: async function(groupUUID) {
       try {
-        let group = await db.models.group_group.oneAsync({uuid: groupUUID});
-        return [group.owner_uuid, ...group.managers_uuid]
-      }catch(err) {
+        let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+        return [group.owner_uuid, ...group.managers_uuid];
+      } catch (err) {
         console.error('[getGroupManagers]', err);
         return [];
       }
     },
-  }
+  };
 }
 
 function initSocket() {
@@ -107,8 +105,14 @@ function initSocket() {
   app.registerEvent('group::agreeGroupActor', event.agreeGroupActor);
   app.registerEvent('group::refuseGroupActor', event.refuseGroupActor);
   app.registerEvent('group::updateGroupActorInfo', event.updateGroupActorInfo);
-  app.registerEvent('group::setPlayerSelectedGroupActor', event.setPlayerSelectedGroupActor);
-  app.registerEvent('group::getPlayerSelectedGroupActor', event.getPlayerSelectedGroupActor);
+  app.registerEvent(
+    'group::setPlayerSelectedGroupActor',
+    event.setPlayerSelectedGroupActor
+  );
+  app.registerEvent(
+    'group::getPlayerSelectedGroupActor',
+    event.getPlayerSelectedGroupActor
+  );
   app.registerEvent('group::quitGroup', event.quitGroup);
   app.registerEvent('group::dismissGroup', event.dismissGroup);
   app.registerEvent('group::tickMember', event.tickMember);
@@ -124,39 +128,42 @@ function initTimer() {
   app.registerStatJob('groupCount', async () => {
     let res = await db.models.group_group.countAsync();
     return res;
-  })
+  });
 }
 
 function initReset() {
   let app = this;
   app.register('resetStorage', async function(storage, db) {
     debug('start reset group storage');
-    if(!app.player) {
+    if (!app.player) {
       throw new Error('[GroupComponent] require component [PlayerComponent]');
     }
-    if(!app.actor) {
+    if (!app.actor) {
       throw new Error('[GroupComponent] require component [ActorComponent]');
     }
 
     const modelUser = db.models.player_user;
     const modelGroup = db.models.group_group;
-    let groups = await modelGroup.bulkCreate([{
-      type: 'group',
-      name: '测试团',
-      avatar: '',
-      creator_uuid: 'system',
-      owner_uuid: 'system',
-      managers_uuid: [],
-      maps_uuid: [],
-    }, {
-      type: 'group',
-      name: '测试团2',
-      avatar: 'http://www.jf258.com/uploads/2014-08-02/112428572.jpg',
-      creator_uuid: 'system',
-      owner_uuid: 'system',
-      managers_uuid: [],
-      maps_uuid: [],
-    }])
+    let groups = await modelGroup.bulkCreate([
+      {
+        type: 'group',
+        name: '测试团',
+        avatar: '',
+        creator_uuid: 'system',
+        owner_uuid: 'system',
+        managers_uuid: [],
+        maps_uuid: [],
+      },
+      {
+        type: 'group',
+        name: '测试团2',
+        avatar: 'http://www.jf258.com/uploads/2014-08-02/112428572.jpg',
+        creator_uuid: 'system',
+        owner_uuid: 'system',
+        managers_uuid: [],
+        maps_uuid: [],
+      },
+    ]);
     let group = groups[0];
     let user = await modelUser.findByPk(1);
     let user2 = await modelUser.findByPk(2);
@@ -176,9 +183,9 @@ function initReset() {
       actor_info: {},
       avatar: '',
       passed: false, // 测试
-    })
+    });
     await groupActor.setOwner(user);
     await groupActor.setActor(actor);
     await groupActor.setGroup(group);
-  })
+  });
 }

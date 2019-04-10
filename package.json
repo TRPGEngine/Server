@@ -9,6 +9,7 @@
     "pro": "cross-env NODE_ENV=production npm run run:standard",
     "run:standard": "node standard.js",
     "packages:install": "sh packages/foreach.sh 'npm install'",
+    "prettier:all": "prettier --write \"./**/*.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,6 +30,7 @@
     "crypto-random-string": "^2.0.0"
   },
   "devDependencies": {
-    "cross-env": "^5.2.0"
+    "cross-env": "^5.2.0",
+    "prettier": "^1.16.4"
   }
 }

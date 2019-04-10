@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 module.exports = function(str) {
-  if(typeof str != 'string') {
+  if (typeof str != 'string') {
     str = String(str);
   }
 
@@ -9,4 +9,4 @@ module.exports = function(str) {
   md5sum.update(str);
   str = md5sum.digest('hex');
   return str;
-}
+};

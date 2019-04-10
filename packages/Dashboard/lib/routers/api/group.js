@@ -12,14 +12,14 @@ router.get('/_list', async (ctx, next) => {
   let data = await db.models.group_group.findAll({
     offset: (page - 1) * limit,
     limit,
-  })
+  });
 
   ctx.body = {
     code: 0,
-    msg: "",
+    msg: '',
     count: count,
-    data: data
-  }
+    data: data,
+  };
 });
 
 module.exports = router;

@@ -1,4 +1,8 @@
-exports.generateReportModels = function generateReportModels(name, struct, options) {
+exports.generateReportModels = function generateReportModels(
+  name,
+  struct,
+  options
+) {
   return {
     daily(Sequelize, db) {
       return db.define(name + '_daily', struct(Sequelize), options);
@@ -8,6 +12,6 @@ exports.generateReportModels = function generateReportModels(name, struct, optio
     },
     monthly(Sequelize, db) {
       return db.define(name + '_monthly', struct(Sequelize), options);
-    }
-  }
-}
+    },
+  };
+};

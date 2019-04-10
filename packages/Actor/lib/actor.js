@@ -12,8 +12,8 @@ module.exports = function ActorComponent(app) {
   return {
     name: 'ActorComponent',
     require: ['PlayerComponent', 'FileComponent'],
-  }
-}
+  };
+};
 
 function initStorage() {
   let app = this;
@@ -63,10 +63,30 @@ function initReset() {
     template.insertCell(at.getInitCell('耐力').setValue('12'));
     template.insertCell(at.getInitCell('智力').setValue('8'));
     template.insertCell(at.getInitCell('魅力').setValue('11'));
-    template.insertCell(at.getInitCell('生命值').setFunc('expression').setDefault('({{力量}}*0.5 + {{耐力}}*2)*10'));
-    template.insertCell(at.getInitCell('魔法值').setFunc('expression').setDefault('({{魅力}}*0.5 + {{智力}}*2)*10'));
-    template.insertCell(at.getInitCell('物理攻击力').setFunc('expression').setDefault('{{力量}}*3 + {{敏捷}}*1'));
-    template.insertCell(at.getInitCell('魔法攻击力').setFunc('expression').setDefault('{{智力}}*4'));
+    template.insertCell(
+      at
+        .getInitCell('生命值')
+        .setFunc('expression')
+        .setDefault('({{力量}}*0.5 + {{耐力}}*2)*10')
+    );
+    template.insertCell(
+      at
+        .getInitCell('魔法值')
+        .setFunc('expression')
+        .setDefault('({{魅力}}*0.5 + {{智力}}*2)*10')
+    );
+    template.insertCell(
+      at
+        .getInitCell('物理攻击力')
+        .setFunc('expression')
+        .setDefault('{{力量}}*3 + {{敏捷}}*1')
+    );
+    template.insertCell(
+      at
+        .getInitCell('魔法攻击力')
+        .setFunc('expression')
+        .setDefault('{{智力}}*4')
+    );
 
     try {
       let _template = await db.models.actor_template.createAsync({
@@ -79,14 +99,16 @@ function initReset() {
       template.eval();
       let _actor = await db.models.actor_actor.createAsync({
         name: '测试人物卡',
-        desc: '测试人物卡描述测试人物卡描述测试人物卡描述测试人物卡描述测试人物卡描述',
-        avatar: 'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2290997136,1993186762&fm=27&gp=0.jpg',
+        desc:
+          '测试人物卡描述测试人物卡描述测试人物卡描述测试人物卡描述测试人物卡描述',
+        avatar:
+          'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2290997136,1993186762&fm=27&gp=0.jpg',
         template_uuid: _template.uuid,
         info: template.getData(),
         ownerId: 1,
       });
-    }catch(err) {
+    } catch (err) {
       throw new Error(err);
     }
-  })
+  });
 }

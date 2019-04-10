@@ -10,11 +10,9 @@ module.exports = function QQConnectComponent(app) {
 
   return {
     name: 'QQConnectComponent',
-    require: [
-      'PlayerComponent',
-    ],
-  }
-}
+    require: ['PlayerComponent'],
+  };
+};
 
 function initStorage() {
   let app = this;
@@ -30,26 +28,30 @@ function initStorage() {
 function initWebService() {
   const app = this;
   const webservice = app.webservice;
-  if(app.get('env') === 'development') {
+  if (app.get('env') === 'development') {
     webservice.use(serve(__dirname + '/public'));
     // 用于清理view相关缓存的require缓存
     webservice.use(async (ctx, next) => {
       let reqModules = Object.keys(require.cache);
-      let viewModules = reqModules.filter((item) => /.*\/QQConnect\/lib\/views\//.test(item));
+      let viewModules = reqModules.filter((item) =>
+        /.*\/QQConnect\/lib\/views\//.test(item)
+      );
       for (let modulePath of viewModules) {
         delete require.cache[modulePath];
       }
       await next();
-    })
-  }else {
-    webservice.use(serve(__dirname + '/public', {maxage: 1000 * 60 * 60 * 24}));
+    });
+  } else {
+    webservice.use(
+      serve(__dirname + '/public', { maxage: 1000 * 60 * 60 * 24 })
+    );
   }
 
   // 增加一个读取配置的中间件
   webservice.use(async (ctx, next) => {
     ctx.QQConnectConfig = ctx.trpgapp.get('oauth.qqconnect');
     await next();
-  })
+  });
 }
 
 function initRouters() {

@@ -8,7 +8,7 @@ function IOSessionMiddleware(webapp, opt) {
     if (!socket.handshake.headers.cookie) {
       return next(new Error('no cookie'));
     }
-    if(socket.websession) {
+    if (socket.websession) {
       return next();
     }
 
@@ -18,8 +18,8 @@ function IOSessionMiddleware(webapp, opt) {
     socket.iosession = new SessionContext(`io:${socket.id}`, store);
     socket.websession = new SessionContext(`web:${sid}`, store);
 
-    return next()
-  }
+    return next();
+  };
 }
 
 function WebSessionMiddleware(webapp, opt) {
@@ -28,7 +28,7 @@ function WebSessionMiddleware(webapp, opt) {
 
   return async function(ctx, next) {
     const socketId = ctx.cookies.get('io');
-    if(!ctx.iosession && socketId) {
+    if (!ctx.iosession && socketId) {
       // 创建iosession并将数据合并到session中
       ctx.iosession = new SessionContext(`io:${socketId}`, store);
       const iodata = await ctx.iosession.get();
@@ -36,12 +36,12 @@ function WebSessionMiddleware(webapp, opt) {
       await ctx.session.save();
     }
     return next();
-  }
+  };
 }
 
 module.exports = {
   IOSessionMiddleware,
-  WebSessionMiddleware
+  WebSessionMiddleware,
 };
 
 function SessionContext(sid, store) {
@@ -52,23 +52,23 @@ function SessionContext(sid, store) {
 // 如果path为空则返回所有
 SessionContext.prototype.get = async function(path) {
   const session = await this.store.get(this.sid);
-  if(path && typeof path === 'string') {
-    return _.get(session, path)
+  if (path && typeof path === 'string') {
+    return _.get(session, path);
   }
 
   return session;
-}
+};
 
 SessionContext.prototype.set = async function(path = '', value) {
   let session = await this.store.get(this.sid);
-  if(!session) {
+  if (!session) {
     session = {};
   }
   _.set(session, path, value);
   await this.store.set(this.sid, session);
   return session;
-}
+};
 
 SessionContext.prototype.destroy = function() {
   return this.store.destroy(this.sid);
-}
+};

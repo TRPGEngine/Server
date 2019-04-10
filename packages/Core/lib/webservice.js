@@ -9,7 +9,7 @@ const session = require('koa-session');
 const Router = require('koa-router');
 const fs = require('fs-extra');
 const path = require('path');
-const {WebSessionMiddleware} = require('./utils/iosession');
+const { WebSessionMiddleware } = require('./utils/iosession');
 const debug = require('debug')('trpg:webservice');
 const koaDebug = require('debug')('trpg:webservice:koa');
 const appLogger = require('./logger')('application');
@@ -48,16 +48,16 @@ function WebService(opts) {
   this.sessionOpt = {
     key: 'koa:trpg:sess',
     store: new SessionStore(this.trpgapp),
-    maxAge: 86400000,// 24小时
+    maxAge: 86400000, // 24小时
     overwrite: true,
     httpOnly: true,
     signed: true,
     rolling: false,
     prefix: 'web:',
-  }
+  };
 
   // check public dir
-  if(!fs.existsSync(publicDir)) {
+  if (!fs.existsSync(publicDir)) {
     debug('create public dir at:', publicDir);
     appLogger.info('create public dir at:', publicDir);
     fs.mkdirSync(publicDir);
@@ -71,105 +71,107 @@ function WebService(opts) {
 }
 
 function initConfig(opts) {
-  if(opts && opts.port && typeof opts.port === 'number') {
+  if (opts && opts.port && typeof opts.port === 'number') {
     this.port = opts.port;
   }
-  if(opts && opts.webApi && typeof opts.webApi === 'object') {
+  if (opts && opts.webApi && typeof opts.webApi === 'object') {
     this.webApi = opts.webApi;
   }
-  if(opts && opts.homepage && typeof opts.homepage === 'string') {
+  if (opts && opts.homepage && typeof opts.homepage === 'string') {
     this.homepage = opts.homepage;
   }
 }
 
 function initMiddleware() {
   this._app.keys = ['trpg'];
-  this.use(logger((str) => {
-    koaDebug(str.trim());
-  }));
+  this.use(
+    logger((str) => {
+      koaDebug(str.trim());
+    })
+  );
   this.use(cors());
   this.use(bodyParser());
   this.use(serve(publicDir));
-  this.use(session(this.sessionOpt, this._app))
+  this.use(session(this.sessionOpt, this._app));
 
-  if(this.trpgapp.get('env') === 'development') {
+  if (this.trpgapp.get('env') === 'development') {
     // 开发环境
     this.use((ctx, next) => {
       for (let moduleName in require.cache) {
-        if(moduleName.indexOf('.marko') >= 0) {
+        if (moduleName.indexOf('.marko') >= 0) {
           delete require.cache[moduleName];
         }
       }
       return next();
-    })
+    });
   }
 
   // 错误处理机制
   this.use(async (ctx, next) => {
     try {
       await next();
-      if(ctx.body === undefined) {
+      if (ctx.body === undefined) {
         ctx.status = 404;
         ctx.body = {
           result: false,
           msg: 'Not found',
-        }
+        };
       }
-    }catch(e) {
+    } catch (e) {
       console.error('[WebService]', e);
-      if(ctx.status === 404) {
+      if (ctx.status === 404) {
         // 404为状态默认值
         ctx.status = 500;
       }
       ctx.body = {
         result: false,
         msg: e.toString(),
-      }
+      };
 
-      if(typeof e === 'string') {
+      if (typeof e === 'string') {
         e = `[webservice] ${ctx.request.originalUrl}: ${e}`;
       }
       this.trpgapp.errorWithContext(e, ctx); //汇报错误
     }
   });
-  this.use(WebSessionMiddleware(this._app, this.sessionOpt))
+  this.use(WebSessionMiddleware(this._app, this.sessionOpt));
 }
 
 function initContext() {
-  this.context.render = function (template, data) {
+  this.context.render = function(template, data) {
     this.response.type = 'html';
     this.response.body = template.stream(data);
-  }
+  };
 }
 
 function initRoute() {
   let router = new Router();
   // homepage
-  if(!!this.homepage) {
+  if (!!this.homepage) {
     router.get('/', (ctx) => {
       ctx.redirect(this.homepage);
     });
     debug('set webserver homepage to:' + this.homepage);
     appLogger.info('set webserver homepage to:' + this.homepage);
-  }else {
+  } else {
     router.get('/', (ctx) => {
-      ctx.body = 'server is running!'
+      ctx.body = 'server is running!';
     });
   }
 
   // stat
   router.get('/stat', async (ctx) => {
     ctx.body = await fs.readJson(path.resolve(process.cwd(), './stat.json'));
-  })
+  });
 
   // api
   for (var apiPath in this.webApi) {
     let path = apiPath;
-    if(apiPath[0] !== '/') {
+    if (apiPath[0] !== '/') {
       path = '/' + apiPath;
     }
 
-    router.get('/api'+path, this.webApi[apiPath]);
+    router.get('/api' + path, this.webApi[apiPath]);
     debug('register web api [%s] success!', apiPath);
     appLogger.info('register web api [%s] success!', apiPath);
   }
@@ -179,22 +181,22 @@ function initRoute() {
 function initError() {
   this._app.on('error', function(err) {
     this.trpgapp.report.reportError(err);
-  })
+  });
 }
 
 WebService.prototype.listen = function() {
   debug('start to listen(%d)', this.port);
   appLogger.info('start to listen(%d)', this.port);
   return this.getHttpServer().listen(this.port, () => {
-    console.log('listening on *:'+this.port);
+    console.log('listening on *:' + this.port);
   });
-}
+};
 
 WebService.prototype.getHttpServer = function() {
   return this._server;
-}
+};
 
 WebService.prototype.use = function(...args) {
   this._app.use(...args);
   return this;
-}
+};

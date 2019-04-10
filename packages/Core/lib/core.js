@@ -22,7 +22,7 @@ function createApplication(conf) {
 }
 
 function setConfig(app, conf) {
-  if(!conf) {
+  if (!conf) {
     return;
   }
 

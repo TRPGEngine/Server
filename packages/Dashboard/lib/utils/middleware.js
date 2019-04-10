@@ -1,8 +1,8 @@
 module.exports = {
   auth: async (ctx, next) => {
-    if(ctx.request.ip.indexOf("127.0.0.1") >= 0 || !!ctx.session.tempAuth) {
+    if (ctx.request.ip.indexOf('127.0.0.1') >= 0 || !!ctx.session.tempAuth) {
       await next();
-    }else {
+    } else {
       // ctx.body = {
       //   result: false,
       //   msg: 'No Access Permission'
@@ -11,13 +11,13 @@ module.exports = {
     }
   },
   authAjax: async (ctx, next) => {
-    if(ctx.request.ip.indexOf("127.0.0.1") >= 0 || !!ctx.session.tempAuth) {
+    if (ctx.request.ip.indexOf('127.0.0.1') >= 0 || !!ctx.session.tempAuth) {
       await next();
-    }else {
+    } else {
       ctx.body = {
         result: false,
-        msg: 'No Access Permission'
-      }
+        msg: 'No Access Permission',
+      };
     }
   },
-}
+};

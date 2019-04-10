@@ -10,7 +10,7 @@ const enableDestroy = require('server-destroy');
 const debug = require('debug')('trpg:component:file:koa');
 //文件上传
 // core is CoreComponent
-module.exports = function (core, port) {
+module.exports = function(core, port) {
   let app = new Koa();
   let router = new Router();
 
@@ -34,4 +34,4 @@ module.exports = function (core, port) {
   debug('file component listening on port %d', port);
 
   return server;
-}
+};

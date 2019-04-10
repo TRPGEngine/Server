@@ -9,16 +9,16 @@ router.get('/:noteUUID', async (ctx, next) => {
   let db = await ctx.trpgapp.storage.db;
 
   let note = await db.models.note_note.findOne({
-    where: {uuid: noteUUID}
+    where: { uuid: noteUUID },
   });
-  if(note) {
+  if (note) {
     let user = await db.models.player_user.findByPk(note.owner_id);
     let pkg = {
       author: user,
       note: note,
     };
     ctx.render(noteTemplate, pkg);
-  }else {
+  } else {
     ctx.render(notFoundTemplate);
     ctx.status = 404;
   }

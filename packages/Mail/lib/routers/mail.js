@@ -5,11 +5,7 @@ router.get('/validate/_bind', async (ctx, next) => {
   const template = require('../views/bindResult');
   const trpgapp = ctx.trpgapp;
 
-  let {
-    user_uuid,
-    hash,
-    email_address,
-  } = ctx.query;
+  let { user_uuid, hash, email_address } = ctx.query;
 
   let mailInfo = JSON.parse(trpgapp.mail.decryption(hash));
   ctx.body = {
@@ -17,9 +13,12 @@ router.get('/validate/_bind', async (ctx, next) => {
     email_address,
     hash,
     mailInfo,
-  }
+  };
 
-  if(mailInfo.user_uuid !== user_uuid || mailInfo.email_address !== email_address) {
+  if (
+    mailInfo.user_uuid !== user_uuid ||
+    mailInfo.email_address !== email_address
+  ) {
     // 校验失败
     ctx.render(template, {
       result: false,
@@ -28,7 +27,7 @@ router.get('/validate/_bind', async (ctx, next) => {
     return;
   }
 
-  if(mailInfo.enabled) {
+  if (mailInfo.enabled) {
     // 已绑定
     ctx.render(template, {
       result: false,
@@ -37,7 +36,7 @@ router.get('/validate/_bind', async (ctx, next) => {
     return;
   }
 
-  if(new Date().getTime() - mailInfo.timestamp > 10 * 60 * 1000) {
+  if (new Date().getTime() - mailInfo.timestamp > 10 * 60 * 1000) {
     // 已失效, 有效期十分钟
     ctx.render(template, {
       result: false,
@@ -50,14 +49,16 @@ router.get('/validate/_bind', async (ctx, next) => {
 
   try {
     let mailbox = await db.models.mail_list.findByPk(mailInfo.id);
-    let user = await db.models.player_user.oneAsync({uuid: mailInfo.user_uuid});
-    if(mailbox && user) {
-      if(mailbox.enabled) {
+    let user = await db.models.player_user.oneAsync({
+      uuid: mailInfo.user_uuid,
+    });
+    if (mailbox && user) {
+      if (mailbox.enabled) {
         ctx.render(template, {
           result: false,
           errorMsg: '已绑定该邮箱, 请不要重复操作',
         });
-      }else {
+      } else {
         mailbox.enabled = true;
         await mailbox.save();
         ctx.render(template, {
@@ -66,14 +67,14 @@ router.get('/validate/_bind', async (ctx, next) => {
           user,
         });
       }
-    }else {
+    } else {
       ctx.render(template, {
         result: false,
         errorMsg: '找不到相关信息',
       });
       ctx.status = 404;
     }
-  }catch(e) {
+  } catch (e) {
     console.error(e);
     ctx.render(template, {
       result: false,

@@ -7,23 +7,25 @@ const filesize = require('filesize');
 
 function deleteall(path) {
   var files = [];
-  if(fs.existsSync(path)) {
+  if (fs.existsSync(path)) {
     files = fs.readdirSync(path);
     files.forEach(function(file, index) {
-      var curPath = path + "/" + file;
-      if (fs.statSync(curPath).isDirectory()) { // recurse
+      var curPath = path + '/' + file;
+      if (fs.statSync(curPath).isDirectory()) {
+        // recurse
         deleteall(curPath);
-      } else { // delete file
+      } else {
+        // delete file
         fs.unlinkSync(curPath);
       }
     });
     fs.rmdirSync(path);
   }
-};
+}
 
 async function removeFileAsync(path) {
   let exists = await fs.pathExists(path);
-  if(exists) {
+  if (exists) {
     await fs.remove(path);
     debug('remove file:', path);
   }
@@ -31,10 +33,10 @@ async function removeFileAsync(path) {
 
 function checkDir() {
   const autoMkdir = (path) => {
-    if(!fs.existsSync(path)) {
+    if (!fs.existsSync(path)) {
       fs.mkdirSync(path);
     }
-  }
+  };
 
   autoMkdir('public');
   autoMkdir('public/uploads');
@@ -48,11 +50,11 @@ function checkDir() {
   autoMkdir(chatimgDir);
 }
 
-module.exports = function (isStandalone = false) {
+module.exports = function(isStandalone = false) {
   return function FileComponent(app) {
     let httpserver;
 
-    checkDir();// 创建上传文件夹
+    checkDir(); // 创建上传文件夹
     app.storage.registerModel(require('./models/avatar.js'));
     app.storage.registerModel(require('./models/chatimg.js'));
     app.storage.registerModel(require('./models/file.js'));
@@ -61,23 +63,23 @@ module.exports = function (isStandalone = false) {
       debug('storage has been load 3 file db model');
     });
 
-    if(isStandalone === true) {
+    if (isStandalone === true) {
       httpserver = require('./koa')(app, 23257);
-    }else {
+    } else {
       require('./webservice')(app);
     }
 
     app.on('resetStorage', function() {
-      deleteall("./public/uploads");
-      deleteall("./public/avatar");
+      deleteall('./public/uploads');
+      deleteall('./public/avatar');
       checkDir();
       debug('file disk storage reset completed!');
-    })
+    });
 
     app.on('close', function() {
       httpserver && httpserver.destroy();
-      console.log("file server closed!");
-    })
+      console.log('file server closed!');
+    });
 
     app.registerEvent('file::bindAttachUUID', event.bindAttachUUID);
     app.registerEvent('file::getFileInfo', event.getFileInfo);
@@ -89,12 +91,16 @@ module.exports = function (isStandalone = false) {
       const Op = app.storage.Op;
       try {
         // 清理avatar
-        debug("start clear no-attach file...");
-        let ltdate = new Date(new Date().setTime(new Date().getTime() - 1000 * 60 * 60 * 1));// 只找一小时内没有绑定关联uuid的
-        let list = await db.models.file_avatar.findAll({where: {
-          attach_uuid: null,
-          createdAt: {[Op.lt]: ltdate}
-        }});
+        debug('start clear no-attach file...');
+        let ltdate = new Date(
+          new Date().setTime(new Date().getTime() - 1000 * 60 * 60 * 1)
+        ); // 只找一小时内没有绑定关联uuid的
+        let list = await db.models.file_avatar.findAll({
+          where: {
+            attach_uuid: null,
+            createdAt: { [Op.lt]: ltdate },
+          },
+        });
         let count = list.length;
         for (let fi of list) {
           let filename = fi.name;
@@ -102,13 +108,13 @@ module.exports = function (isStandalone = false) {
           let isExistOther = await db.models.file_avatar.findOne({
             where: {
               name: filename,
-              attach_uuid: {[Op.ne]: null}
-            }
+              attach_uuid: { [Op.ne]: null },
+            },
           });
-          if(!isExistOther) {
-            await removeFileAsync(`./public/avatar/${filename}`);// remove origin image
-            await removeFileAsync(`./public/avatar/thumbnail/${filename}`);// remove thumbnail image
-          }else {
+          if (!isExistOther) {
+            await removeFileAsync(`./public/avatar/${filename}`); // remove origin image
+            await removeFileAsync(`./public/avatar/thumbnail/${filename}`); // remove thumbnail image
+          } else {
             debug('exist other file relation, only remove record:', filename);
           }
 
@@ -117,30 +123,34 @@ module.exports = function (isStandalone = false) {
         debug(`remove ${count} avatar file record success!`);
 
         // 清理uploads文件
-        let ltdate_f = new Date(new Date().setTime(new Date().getTime() - 1000 * 60 * 60 * 24 * 7));// 创建时间超过7天
+        let ltdate_f = new Date(
+          new Date().setTime(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
+        ); // 创建时间超过7天
         let list_f = await db.models.file_file.findAll({
           where: {
             is_expired: false,
-            createdAt: {[Op.lt]: ltdate_f}
-          }
+            createdAt: { [Op.lt]: ltdate_f },
+          },
         });
-        for(let fi of list_f) {
+        for (let fi of list_f) {
           fi.is_expired = true;
           await fi.saveAsync();
         }
-        for(let fi of list_f) {
+        for (let fi of list_f) {
           let filename = fi.name;
           let size = fi.size;
           let isExistOther = await db.models.file_avatar.findOne({
-            where: {name: filename}
+            where: { name: filename },
           });
-          if(!isExistOther) {
-            debug(`start remove temporary file: ${filename}[${filesize(size)}]`);
+          if (!isExistOther) {
+            debug(
+              `start remove temporary file: ${filename}[${filesize(size)}]`
+            );
             await removeFileAsync(`./public/uploads/temporary/${filename}`);
           }
         }
         debug(`clear temporary file success!`);
-      }catch(e) {
+      } catch (e) {
         console.error(e);
         app.error(e);
       }
@@ -148,7 +158,7 @@ module.exports = function (isStandalone = false) {
 
     return {
       name: 'FileComponent',
-      require: ['PlayerComponent']
-    }
-  }
-}
+      require: ['PlayerComponent'],
+    };
+  };
+};

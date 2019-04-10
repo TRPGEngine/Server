@@ -10,8 +10,8 @@ module.exports = function DiceComponent(app) {
   return {
     name: 'DiceComponent',
     require: ['PlayerComponent', 'ChatComponent', 'GroupComponent'],
-  }
-}
+  };
+};
 
 function initStorage() {
   let app = this;
@@ -30,22 +30,22 @@ function initFunction() {
     rollPoint: function rollPoint(maxPoint, minPoint = 1) {
       maxPoint = parseInt(maxPoint);
       minPoint = parseInt(minPoint);
-      if(maxPoint<=1) {
+      if (maxPoint <= 1) {
         maxPoint = 100;
       }
-      if(maxPoint < minPoint) {
+      if (maxPoint < minPoint) {
         maxPoint = minPoint + 1;
       }
 
       var range = maxPoint - minPoint + 1;
       var rand = Math.random();
-      return (minPoint + Math.floor(rand * range));
+      return minPoint + Math.floor(rand * range);
     },
     roll: function roll(requestStr) {
       try {
-        let pattern = /(\d*)\s*d\s*(\d*)/ig;
+        let pattern = /(\d*)\s*d\s*(\d*)/gi;
 
-        requestStr = requestStr.replace(/[^\dd\+-\/\*]+/ig, '');//去除无效或危险字符
+        requestStr = requestStr.replace(/[^\dd\+-\/\*]+/gi, ''); //去除无效或危险字符
         let express = requestStr.replace(pattern, function(tag, num, dice) {
           num = num || 1;
           dice = dice || 100;
@@ -54,55 +54,60 @@ function initFunction() {
             res.push(app.dice.rollPoint(dice));
           }
 
-          if(num > 1) {
-            return "("+res.join('+')+")";
-          }else {
+          if (num > 1) {
+            return '(' + res.join('+') + ')';
+          } else {
             return res.join('+');
           }
         });
 
         let result = eval(express);
-        let str = requestStr + "=" + express + "=" + result;
+        let str = requestStr + '=' + express + '=' + result;
         return {
           result: true,
           str,
-          value: result
+          value: result,
         };
-      }catch(err) {
-        debug('dice error :'+ err);
+      } catch (err) {
+        debug('dice error :' + err);
         return {
           result: false,
-          str:'投骰表达式错误，无法进行运算',
+          str: '投骰表达式错误，无法进行运算',
         };
       }
     },
-    sendDiceResult: async function sendDiceResult(sender_uuid, to_uuid, is_group, roll_msg) {
+    sendDiceResult: async function sendDiceResult(
+      sender_uuid,
+      to_uuid,
+      is_group,
+      roll_msg
+    ) {
       // TODO: 需要修改文本。如:XXX 因为 YYY 投掷了1d100, 而不是照搬
-      if(!!is_group) {
+      if (!!is_group) {
         // 团内投骰
         app.chat.sendMsg('trpgdice', null, {
           message: roll_msg,
-          converse_uuid: is_group ? to_uuid:'',
+          converse_uuid: is_group ? to_uuid : '',
           type: 'tip',
           is_public: true,
-        })
-      }else {
+        });
+      } else {
         // 私人投骰
         app.chat.sendMsg(sender_uuid, to_uuid, {
           message: roll_msg,
           converse_uuid: null,
           type: 'tip',
           is_public: false,
-        })
+        });
         app.chat.sendMsg(to_uuid, sender_uuid, {
           message: roll_msg,
           converse_uuid: null,
           type: 'tip',
           is_public: false,
-        })
+        });
       }
     },
-  }
+  };
 }
 
 function initSocket() {
@@ -122,5 +127,5 @@ function initTimer() {
     const db = app.storage.db;
     let res = await db.models.dice_log.count();
     return res;
-  })
+  });
 }

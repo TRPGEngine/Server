@@ -17,8 +17,8 @@ const defaultDbOptions = {
   timezone: '+08:00',
   define: {
     freezeTableName: true, // 默认sequelize会在数据库表名后自动加上s, 改为true使其不会进行自动添加
-  }
-}
+  },
+};
 
 function Storage(dbconfig) {
   if (!(this instanceof Storage)) return new Storage(dbconfig);
@@ -36,19 +36,19 @@ function redefineDb(db) {
   db.op = Sequelize.Op;
   db.transactionAsync = async (fn) => {
     // TODO: 需要实现一个自动传递transaction的事务方法
-    if(fn) {
-      return await fn()
+    if (fn) {
+      return await fn();
     }
 
     return;
-  }
+  };
 
   let originDefine = db.define;
   db.define = function(name, attributes, options) {
     // 增加required
     for (let field in attributes) {
       let attr = attributes[field];
-      if(attr.required === true) {
+      if (attr.required === true) {
         _set(attr, 'allowNull', false);
       }
     }
@@ -57,53 +57,50 @@ function redefineDb(db) {
     originModelCls = originDefine.call(db, name, attributes, options);
     originModelCls.oneAsync = (function(_) {
       return function(where) {
-        return _.findOne({where});
-      }
-    })(originModelCls)
+        return _.findOne({ where });
+      };
+    })(originModelCls);
     originModelCls.createAsync = originModelCls.create;
     originModelCls.getAsync = originModelCls.findByPk;
     originModelCls.prototype.saveAsync = originModelCls.prototype.save;
     originModelCls.prototype.removeAsync = originModelCls.prototype.destroy;
 
     // 增加methods
-    if(options && options.methods) {
+    if (options && options.methods) {
       for (let methodName in options.methods) {
         originModelCls.prototype[methodName] = options.methods[methodName];
       }
     }
 
-    return originModelCls
-  }
+    return originModelCls;
+  };
 }
 
 // 返回一个db实例
 Storage.prototype.initDb = function(dbconfig) {
   let db;
-  if(typeof dbconfig === 'string') {
-    db = new Sequelize(dbconfig)
-  }else {
-    let {
-      database,
-      username,
-      password,
-      options,
-    } = dbconfig;
+  if (typeof dbconfig === 'string') {
+    db = new Sequelize(dbconfig);
+  } else {
+    let { database, username, password, options } = dbconfig;
 
     options = Object.assign({}, defaultDbOptions, options);
     db = new Sequelize(database, username, password, options);
   }
 
   return db;
-}
+};
 
 Storage.prototype.test = function() {
-  this.db.authenticate()
+  this.db
+    .authenticate()
     .then(() => {
       console.log('连接测试成功.');
-    }).catch(err => {
+    })
+    .catch((err) => {
       console.error('无法连接到数据库:', err);
     });
-}
+};
 // Storage.prototype.getModels = function(db, cb) {
 //   try {
 //     db.settings.set('instance.returnAllErrors', true);
@@ -141,15 +138,17 @@ Storage.prototype.test = function() {
 //   return db;
 // }
 Storage.prototype.registerModel = function(modelFn) {
-  if(typeof modelFn != 'function') {
-    throw new TypeError(`registerModel error: type of model must be Function not ${typeof model}`);
+  if (typeof modelFn != 'function') {
+    throw new TypeError(
+      `registerModel error: type of model must be Function not ${typeof model}`
+    );
   }
 
   debug('register model %o success!', modelFn);
   appLogger.info('register model %o success!', modelFn);
   const model = modelFn(this._Sequelize, this.db);
   this.models.push(model);
-}
+};
 
 Storage.prototype.reset = function(force = false) {
   // if(this.type === 'file') {
@@ -172,15 +171,15 @@ Storage.prototype.reset = function(force = false) {
   //     });
   //   });
   // })
-  return this.db.sync({force});
-}
+  return this.db.sync({ force });
+};
 
 Storage.prototype.resetAsync = async function(cb) {
-  if(this.type === 'file') {
+  if (this.type === 'file') {
     let filepath = path.resolve(process.cwd(), './db/');
     // 创建文件夹
     let dbDirExists = fs.existsSync(filepath);
-    if(!dbDirExists) {
+    if (!dbDirExists) {
       fs.mkdirSync(filepath);
     }
   }
@@ -194,19 +193,19 @@ Storage.prototype.resetAsync = async function(cb) {
     console.log('start reset module db...');
     await cb(db);
     console.log('reset completed!');
-  } catch(err) {
+  } catch (err) {
     console.error('reset error:');
     console.error(err);
     process.exit(1);
   }
-}
+};
 
 Storage.prototype.syncAsync = async function() {
-  if(this.type === 'file') {
+  if (this.type === 'file') {
     let filepath = path.resolve(process.cwd(), './db/');
     // 创建文件夹
     let dbDirExists = fs.existsSync(filepath);
-    if(!dbDirExists) {
+    if (!dbDirExists) {
       fs.mkdirSync(filepath);
     }
   }
@@ -216,12 +215,12 @@ Storage.prototype.syncAsync = async function() {
     console.log('is sync db...');
     await db.syncPromise();
     console.log('sync completed!');
-  } catch(err) {
+  } catch (err) {
     console.error('reset error:');
     console.error(err);
     process.exit(1);
   }
-}
+};
 
 /*
 db.driver.execQuery("SELECT id, email FROM user", function (err, data) { ... })
@@ -236,9 +235,9 @@ Storage.prototype.query = function(sql, params, cb) {
   this.connect(function(db) {
     db.driver.execQuery(sql, params, cb);
   });
-}
+};
 
 // return Promise
 Storage.prototype.close = function() {
   return this.db.close();
-}
+};

@@ -5,19 +5,16 @@ const _ = global._;
 beforeAll(async () => {
   const loginInfo = await emitEvent('player::login', {
     username: 'admin1',
-    password: '21232f297a57a5a743894a0e4a801fc3'
-  })
+    password: '21232f297a57a5a743894a0e4a801fc3',
+  });
   expect(loginInfo.result).toBe(true);
   this.userInfo = loginInfo.info;
-})
+});
 
 afterAll(async () => {
-  let {
-    uuid,
-    token
-  } = this.userInfo;
-  await emitEvent('player::logout', { uuid, token })
-})
+  let { uuid, token } = this.userInfo;
+  await emitEvent('player::logout', { uuid, token });
+});
 
 describe('template event', () => {
   beforeAll(async () => {
@@ -25,45 +22,47 @@ describe('template event', () => {
     this.testTemplate = await db.models.actor_template.create({
       name: 'test template ' + Math.random(),
       info: 'test info',
-      creatorId: this.userInfo.id
-    })
-  })
+      creatorId: this.userInfo.id,
+    });
+  });
 
   afterAll(async () => {
     await this.testTemplate.destroy({
-      force: true
+      force: true,
     });
-  })
+  });
 
   test('getTemplate all should be ok', async () => {
     let ret = await emitEvent('actor::getTemplate');
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('templates');
     expect(Array.isArray(ret.templates)).toBe(true);
-  })
+  });
 
   test('getTemplate specify should be ok', async () => {
-    let ret = await emitEvent('actor::getTemplate', {uuid: this.testTemplate.uuid});
+    let ret = await emitEvent('actor::getTemplate', {
+      uuid: this.testTemplate.uuid,
+    });
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('template');
     expect(ret.template.uuid).toBe(this.testTemplate.uuid);
-  })
+  });
 
   test('findTemplate should be ok', async () => {
-    let ret = await emitEvent('actor::findTemplate', {name: '刀'});
+    let ret = await emitEvent('actor::findTemplate', { name: '刀' });
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('templates');
     expect(ret).toHaveProperty('templates.0.creator_name');
-  })
+  });
 
   test('createTemplate should be ok', async () => {
     let ret = await emitEvent('actor::createTemplate', {
       name: 'test template ' + Math.random(),
       info: JSON.stringify({
         test: 'abc',
-        number: 2
-      })
-    })
+        number: 2,
+      }),
+    });
 
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('template');
@@ -71,11 +70,11 @@ describe('template event', () => {
 
     let uuid = _.get(ret, 'template.uuid');
     let dnum = await db.models.actor_template.destroy({
-      where: {uuid},
+      where: { uuid },
       force: true, // 硬删除，默认是软删除
     });
     expect(dnum).toBeTruthy(); // 删除行数必须大于0
-  })
+  });
 
   test('updateTemplate should be ok', async () => {
     let randomText = 'modified ' + Math.random();
@@ -85,7 +84,7 @@ describe('template event', () => {
       desc: randomText + 'desc',
       avatar: randomText + 'avatar',
       info: randomText + 'info',
-    })
+    });
 
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('template');
@@ -96,24 +95,24 @@ describe('template event', () => {
 
     let dbInstance = await db.models.actor_template.findOne({
       where: {
-        uuid: this.testTemplate.uuid
-      }
+        uuid: this.testTemplate.uuid,
+      },
     });
     expect(dbInstance).toHaveProperty('name', randomText + 'name');
     expect(dbInstance).toHaveProperty('desc', randomText + 'desc');
     expect(dbInstance).toHaveProperty('avatar', randomText + 'avatar');
     expect(dbInstance).toHaveProperty('info', randomText + 'info');
-  })
+  });
 
   test('removeTemplate should be ok', async () => {
     let oldTemplate = await db.models.actor_template.create({
       name: 'test ' + Math.random(),
       info: 'info',
-      creatorId: this.userInfo.id
+      creatorId: this.userInfo.id,
     });
 
     let ret = await emitEvent('actor::removeTemplate', {
-      uuid: oldTemplate.uuid
+      uuid: oldTemplate.uuid,
     });
     expect(ret.result).toBe(true);
 
@@ -121,21 +120,21 @@ describe('template event', () => {
       where: {
         uuid: oldTemplate.uuid,
       },
-      paranoid: false // 搜索包括已经被软删除的行
-    })
+      paranoid: false, // 搜索包括已经被软删除的行
+    });
     expect(newTemplate).toBeTruthy(); // 没有被硬删除
     expect(newTemplate.deletedAt).toBeTruthy(); // 已经被软删除
 
     // 把测试数据硬删除掉
-    await newTemplate.destroy({force: true});
-  })
-})
+    await newTemplate.destroy({ force: true });
+  });
+});
 
 describe('actor event', () => {
   beforeAll(async () => {
     this.testTemplate = await db.models.actor_template.findOne();
     this.testActor = await db.models.actor_actor.findOne();
-  })
+  });
 
   test('createActor should be ok', async () => {
     let ret = await emitEvent('actor::createActor', {
@@ -145,9 +144,9 @@ describe('actor event', () => {
       info: {
         string: 'test',
         number: 1,
-        array: ['a', 'b', 'c']
+        array: ['a', 'b', 'c'],
       },
-      template_uuid: this.testTemplate.uuid
+      template_uuid: this.testTemplate.uuid,
     });
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('actor');
@@ -155,22 +154,22 @@ describe('actor event', () => {
 
     await db.models.actor_actor.destroy({
       where: {
-        uuid: ret.actor.uuid
+        uuid: ret.actor.uuid,
       },
       force: true,
-    })
-  })
+    });
+  });
 
   test('getActor all should be ok', async () => {
     let ret = await emitEvent('actor::getActor');
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('actors');
     expect(Array.isArray(ret.actors)).toBe(true);
-  })
+  });
 
   test('getActor specify should be ok', async () => {
     let ret = await emitEvent('actor::getActor', {
-      uuid: this.testActor.uuid
+      uuid: this.testActor.uuid,
     });
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('actor');
@@ -185,13 +184,13 @@ describe('actor event', () => {
     });
 
     let ret = await emitEvent('actor::removeActor', {
-      uuid: newTestActor.uuid
+      uuid: newTestActor.uuid,
     });
 
     expect(ret.result).toBe(true);
 
-    newTestActor.destroy({force: true});
+    newTestActor.destroy({ force: true });
   });
 
   test.todo('updateActor should be ok');
-})
+});

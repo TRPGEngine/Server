@@ -12,8 +12,8 @@ module.exports = function ChatComponent(app) {
   return {
     name: 'ChatComponent',
     require: ['PlayerComponent'],
-  }
-}
+  };
+};
 
 function initStorage() {
   let app = this;
@@ -32,8 +32,8 @@ function initFunction() {
   const db = app.storage.db;
 
   app.chat = {
-    log: [],// 聊天记录缓存，每10分钟会把记录存储到数据库中
-    converses: {},// 会话信息缓存.用于检测会话是否创建
+    log: [], // 聊天记录缓存，每10分钟会把记录存储到数据库中
+    converses: {}, // 会话信息缓存.用于检测会话是否创建
     addConverse: function(userUUID, converseUUID) {
       let prev = app.chat.converses[userUUID] || [];
       prev.push(converseUUID);
@@ -43,28 +43,32 @@ function initFunction() {
     findMsgAsync: async function(msg_uuid) {
       for (var i = 0; i < app.chat.log.length; i++) {
         let log = app.chat.log[i];
-        if(log.uuid === msg_uuid) {
+        if (log.uuid === msg_uuid) {
           return log;
         }
       }
 
-      let res = await db.models.chat_log.oneAsync({uuid: msg_uuid});
+      let res = await db.models.chat_log.oneAsync({ uuid: msg_uuid });
       return res;
     },
     updateMsgAsync: async function(msg_uuid, payload) {
       // payload需要为完整的聊天记录对象
       let notify = () => {
         let isGroup = payload.is_group;
-        if(isGroup === true) {
+        if (isGroup === true) {
           app.chat.notifyUpdateMsg(payload.converse_uuid, true, payload);
-        }else if(isGroup === false) {
-          app.chat.notifyUpdateMsg([payload.sender_uuid, payload.to_uuid], false, payload);
+        } else if (isGroup === false) {
+          app.chat.notifyUpdateMsg(
+            [payload.sender_uuid, payload.to_uuid],
+            false,
+            payload
+          );
         }
-      }
+      };
 
       for (var i = 0; i < app.chat.log.length; i++) {
         let log = app.chat.log[i];
-        if(log.uuid === msg_uuid) {
+        if (log.uuid === msg_uuid) {
           // 如果在内存数据库中找到则直接通知并返回
           app.chat.log[i] = payload;
           notify();
@@ -72,7 +76,7 @@ function initFunction() {
         }
       }
 
-      let res = await db.models.chat_log.oneAsync({uuid: msg_uuid});
+      let res = await db.models.chat_log.oneAsync({ uuid: msg_uuid });
       Object.assign(res, payload);
       res = await res.saveAsync();
       notify();
@@ -90,27 +94,29 @@ function initFunction() {
         type: info.type || 'normal',
         is_public: info.is_public || false,
         is_group: info.is_group || false,
-        data: info.data || null
+        data: info.data || null,
       };
-      debug('发送消息: [to %s] %o', to_uuid, pkg)
+      debug('发送消息: [to %s] %o', to_uuid, pkg);
 
       let log = event.addChatLog.call(app, pkg);
-      if(!pkg.is_public) {
+      if (!pkg.is_public) {
         let other = app.player.list.get(to_uuid);
-        if(!!other) {
+        if (!!other) {
           other.socket.emit('chat::message', log);
-        }else {
+        } else {
           debug('[用户:%s]: 接收方%s不在线', from_uuid, to_uuid);
         }
-      }else {
+      } else {
         // 群聊
-        if(!pkg.is_group) {
+        if (!pkg.is_group) {
           app.io.sockets.emit('chat::message', log);
-        }else {
+        } else {
           let sender = app.player.list.get(from_uuid);
-          if(sender) {
-            sender.socket.broadcast.to(converse_uuid).emit('chat::message', log);
-          }else {
+          if (sender) {
+            sender.socket.broadcast
+              .to(converse_uuid)
+              .emit('chat::message', log);
+          } else {
             app.io.sockets.in(converse_uuid).emit('chat::message', log);
           }
         }
@@ -124,13 +130,17 @@ function initFunction() {
         type: 'card',
         is_public: false,
         is_group: false,
-        data: Object.assign({}, {
-          type: type,
-          title: title,
-          content: content
-        }, mergeData),
+        data: Object.assign(
+          {},
+          {
+            type: type,
+            title: title,
+            content: content,
+          },
+          mergeData
+        ),
       };
-      if(type == '') {
+      if (type == '') {
         // 如果type为空，则发送普通信息
         pkg.type = 'normal';
         pkg.data = null;
@@ -147,9 +157,9 @@ function initFunction() {
       logList.splice(0, cacheList.length); // 清除cache里的数据
       try {
         let res = await db.models.chat_log.bulkCreate(cacheList);
-        debug("save chat log success!");
+        debug('save chat log success!');
         return res;
-      }catch(err) {
+      } catch (err) {
         console.error('save chat log error', err);
       }
 
@@ -169,23 +179,23 @@ function initFunction() {
     // 如果为团信息, converseUUID是团uuid, 否则将是一个数组[uuid1, uuid2]来进行相互通知
     notifyUpdateMsg: function(converseUUID, isGroup, payload) {
       debug('通知更新聊天内容:', converseUUID, isGroup, payload);
-      if(isGroup) {
+      if (isGroup) {
         // 团聊更新
         app.io.to(converseUUID).emit('chat::updateMessage', {
           converseUUID,
           payload,
-        })
-      }else if(converseUUID instanceof Array) {
-        let [uuid1, uuid2] = converseUUID
+        });
+      } else if (converseUUID instanceof Array) {
+        let [uuid1, uuid2] = converseUUID;
         let player1 = app.player.list.get(uuid1);
         let player2 = app.player.list.get(uuid2);
-        if(player1) {
+        if (player1) {
           player1.socket.emit('chat::updateMessage', {
             converseUUID: uuid2,
             payload,
           });
         }
-        if(player2) {
+        if (player2) {
           player2.socket.emit('chat::updateMessage', {
             converseUUID: uuid1,
             payload,
@@ -206,7 +216,10 @@ function initSocket() {
   app.registerEvent('chat::getUserChatLog', event.getUserChatLog);
   app.registerEvent('chat::getConverseChatLog', event.getConverseChatLog);
   app.registerEvent('chat::getAllUserConverse', event.getAllUserConverse);
-  app.registerEvent('chat::getOfflineUserConverse', event.getOfflineUserConverse);
+  app.registerEvent(
+    'chat::getOfflineUserConverse',
+    event.getOfflineUserConverse
+  );
   app.registerEvent('chat::updateCardChatData', event.updateCardChatData);
   app.registerEvent('chat::startWriting', event.startWriting);
   app.registerEvent('chat::stopWriting', event.stopWriting);
@@ -217,12 +230,12 @@ function initTimer() {
   let timer = setInterval(function saveChat() {
     // event.saveChatLog.call(app);
     app.chat.saveChatLogAsync();
-  }, 1000*60*10);
+  }, 1000 * 60 * 10);
 
   app.registerStatJob('chatLogCount', async () => {
     await app.chat.saveChatLogAsync();
     return await app.chat.getChatLogSumAsync();
-  })
+  });
 
   app.on('close', function() {
     clearInterval(timer);
@@ -239,7 +252,7 @@ async function initData() {
       debug('loaded converse %s', conv.uuid);
       app.chat.converses[conv.uuid] = Object.assign({}, conv);
     }
-  }catch (err) {
+  } catch (err) {
     // 可能是表不存在
     console.error('[chat]加载会话列表失败');
   }
@@ -249,13 +262,13 @@ function initReset() {
   let app = this;
   app.register('resetStorage', async function(storage, db) {
     debug('start reset chat storage');
-    if(!app.player) {
+    if (!app.player) {
       throw new Error('[ChatComponent] require component [PlayerComponent]');
-    }else {
+    } else {
       let users = await db.models.player_user.findAll({
         where: {
-          id:[1,2]
-        }
+          id: [1, 2],
+        },
       });
       let uuid1 = users[0].uuid;
       let uuid2 = users[1].uuid;
@@ -266,53 +279,60 @@ function initReset() {
       const addChatLog = event.addChatLog.bind(app);
       addChatLog({
         sender_uuid: uuid1,
-        to_uuid:uuid2,
+        to_uuid: uuid2,
         converse_uuid,
-        message:'你好啊',
-        type:'normal',
-        is_public:true,
+        message: '你好啊',
+        type: 'normal',
+        is_public: true,
         is_group: false,
       });
       addChatLog({
         sender_uuid: uuid1,
-        to_uuid:uuid2,
+        to_uuid: uuid2,
         converse_uuid,
-        message:'在么',
-        type:'normal',
-        is_public:true,
+        message: '在么',
+        type: 'normal',
+        is_public: true,
         is_group: false,
       });
       addChatLog({
         sender_uuid: uuid2,
-        to_uuid:uuid1,
+        to_uuid: uuid1,
         converse_uuid,
-        message:'你也好啊',
-        type:'normal',
-        is_public:true,
+        message: '你也好啊',
+        type: 'normal',
+        is_public: true,
         is_group: false,
       });
       addChatLog({
         sender_uuid: uuid1,
-        to_uuid:uuid2,
+        to_uuid: uuid2,
         converse_uuid,
-        message:'我们来跑团吧？',
-        type:'normal',
-        is_public:true,
+        message: '我们来跑团吧？',
+        type: 'normal',
+        is_public: true,
         is_group: false,
       });
       addChatLog({
         sender_uuid: uuid2,
-        to_uuid:uuid1,
+        to_uuid: uuid1,
         converse_uuid,
-        message:'好啊好啊',
-        type:'normal',
-        is_public:true,
+        message: '好啊好啊',
+        type: 'normal',
+        is_public: true,
         is_group: false,
       });
 
       // 系统消息
-      let systemMsg = `${users[1].nickname || users[1].username} 想添加您为好友`;
-      app.chat.sendSystemMsg(uuid1, 'friendInvite', '系统请求测试', systemMsg, {});
+      let systemMsg = `${users[1].nickname ||
+        users[1].username} 想添加您为好友`;
+      app.chat.sendSystemMsg(
+        uuid1,
+        'friendInvite',
+        '系统请求测试',
+        systemMsg,
+        {}
+      );
       app.chat.sendSystemMsg(uuid1, '', '系统普通测试', systemMsg, {});
 
       app.registerTimerOnce(function() {
@@ -329,7 +349,7 @@ function initReset() {
             content: systemMsg,
             uuid: uuid2,
           },
-        })
+        });
       }, 20000);
 
       // 增加初始会话
@@ -340,7 +360,7 @@ function initReset() {
       //   icon: '',
       //   owner_id: users[0].id
       // });
-      await app.chat.saveChatLogAsync();// 存储聊天记录
+      await app.chat.saveChatLogAsync(); // 存储聊天记录
     }
   });
 }

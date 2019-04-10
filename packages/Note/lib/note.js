@@ -9,11 +9,9 @@ module.exports = function NoteComponent(app) {
 
   return {
     name: 'NoteComponent',
-    require: [
-      'PlayerComponent',
-    ],
-  }
-}
+    require: ['PlayerComponent'],
+  };
+};
 
 function initStorage() {
   let app = this;

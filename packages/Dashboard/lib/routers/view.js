@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 const auth = require('../utils/middleware').auth;
 
-router.get('/login', function (ctx, next) {
+router.get('/login', function(ctx, next) {
   const template = require('../views/login.marko');
   ctx.render(template);
 });

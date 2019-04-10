@@ -13,11 +13,9 @@ module.exports = function MailComponent(app) {
 
   return {
     name: 'MailComponent',
-    require: [
-      'PlayerComponent',
-    ],
-  }
-}
+    require: ['PlayerComponent'],
+  };
+};
 
 function initStorage() {
   let app = this;
@@ -38,9 +36,9 @@ function initFunction() {
 
   debug(`mail aeskey(${aeskey.length}): ${aeskey}`);
   app.mail = {
-    async sendAsync (userUUID, from, to, subject, html) {
+    async sendAsync(userUUID, from, to, subject, html) {
       // 发送邮件
-      if(!userUUID || !from || !to || !subject || !html) {
+      if (!userUUID || !from || !to || !subject || !html) {
         throw '邮件发送错误, 缺少参数';
       }
 
@@ -60,14 +58,14 @@ function initFunction() {
         host: smtpConfig.host,
         port: smtpConfig.port,
         secure: smtpConfig.secure,
-      }
+      };
 
       // 发送邮件
       try {
         let info = await sendMail.call(app, mailOptions);
         recordData.is_success = true;
         recordData.data = info;
-      }catch(e) {
+      } catch (e) {
         recordData.is_success = false;
         recordData.error = e.toString();
       }
@@ -83,7 +81,7 @@ function initFunction() {
     },
     decryption(data) {
       return utils.decryption(data, aeskey);
-    }
+    },
   };
 }
 
@@ -119,6 +117,6 @@ function sendMail(mailOptions) {
         debug('sendMailSuccess:', info);
         resolve(info);
       }
-    })
-  })
+    });
+  });
 }

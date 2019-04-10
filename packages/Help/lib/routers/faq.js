@@ -5,13 +5,13 @@ router.get('/faq', (ctx, next) => {
   const template = require('../views/faq.marko');
 
   ctx.render(template);
-})
+});
 
 router.get('/feedback', (ctx, next) => {
   const template = require('../views/feedback.marko');
 
   ctx.render(template);
-})
+});
 
 router.post('/feedback/submit', async (ctx, next) => {
   let data = ctx.request.body;
@@ -19,12 +19,12 @@ router.post('/feedback/submit', async (ctx, next) => {
   let contact = data['contact-link'];
   let content = data['feedback-content'];
 
-  if(!username) {
+  if (!username) {
     ctx.body = '请填写用户名';
     return;
   }
 
-  if(!content) {
+  if (!content) {
     ctx.body = '请填写内容';
     return;
   }
@@ -34,14 +34,14 @@ router.post('/feedback/submit', async (ctx, next) => {
     await db.models.help_feedback.createAsync({
       username,
       contact,
-      content
+      content,
     });
 
     ctx.body = '提交成功';
-  } catch(err) {
+  } catch (err) {
     ctx.trpgapp.error(err); // 汇报错误
     ctx.body = '提交失败';
   }
-})
+});
 
 module.exports = router;

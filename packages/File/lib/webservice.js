@@ -11,4 +11,4 @@ module.exports = function initFileService(app) {
   router.use('/file/avatar', avatar.routes());
   router.use('/file/chatimg', chatimg.routes());
   webservice.use(router.routes());
-}
+};

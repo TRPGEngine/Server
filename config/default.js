@@ -13,38 +13,40 @@ module.exports = {
         max: 5,
         min: 0,
         acquire: 30000,
-        idle: 10000
+        idle: 10000,
       },
-    }
+    },
   },
   dashboard: {
     // dashboard模块网页端的账号密码
-    admin: [{
-      username: 'trpgadmin',
-      password: randomString(16)
-    }]
+    admin: [
+      {
+        username: 'trpgadmin',
+        password: randomString(16),
+      },
+    ],
   },
   webserviceHomepage: '/admin/home',
   apihost: 'http://127.0.0.1:23256',
   oauth: {
     // qq互联相关信息 required!
     qqconnect: {
-      "appid": "",
-      "appkey": "",
-      "callback": "/oauth/qq/callback",
-      "scope": ["get_user_info"]
-    }
+      appid: '',
+      appkey: '',
+      callback: '/oauth/qq/callback',
+      scope: ['get_user_info'],
+    },
   },
   mail: {
-    aeskey: "", // 32位秘钥
+    aeskey: '', // 32位秘钥
     smtp: {
-      host: "",
+      host: '',
       port: 465,
       secure: true,
       auth: {
-        user: "",
-        pass: ""
-      }
-    }
-  }
-}
+        user: '',
+        pass: '',
+      },
+    },
+  },
+};

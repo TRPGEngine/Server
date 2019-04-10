@@ -5,11 +5,11 @@ describe('#basic', function() {
   let app = null;
 
   beforeEach(function() {
-    if(!app) {
+    if (!app) {
       app = core();
       app.run();
     }
-  })
+  });
 
   afterEach(function() {
     if (app) {
@@ -23,7 +23,7 @@ describe('#basic', function() {
     app.on('test', function() {
       // flag = true;
       // expect(flag).to.be.ok;
-      done()
+      done();
     });
 
     app.emit('test');
@@ -37,7 +37,7 @@ describe('#basic', function() {
   });
 
   it('base function', function() {
-    expect(app.run).to.be.a('function')
+    expect(app.run).to.be.a('function');
     expect(app.close).to.be.a('function');
     expect(app.set).to.be.a('function');
     expect(app.get).to.be.a('function');
@@ -56,9 +56,9 @@ describe('#basic', function() {
       env: 'development',
       port: '23256',
       verbose: false,
-      webserviceHomepage: "",
+      webserviceHomepage: '',
     });
-  })
+  });
 });
 
 // TODO

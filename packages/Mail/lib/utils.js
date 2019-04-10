@@ -6,8 +6,8 @@ const crypto = require('crypto');
  * @param key 必须为32位私钥
  * @returns {string}
  */
-exports.encryption = function (data, key, iv = '') {
-  iv = iv || "";
+exports.encryption = function(data, key, iv = '') {
+  iv = iv || '';
   var clearEncoding = 'utf8';
   var cipherEncoding = 'base64';
   var cipherChunks = [];
@@ -16,7 +16,7 @@ exports.encryption = function (data, key, iv = '') {
   cipherChunks.push(cipher.update(data, clearEncoding, cipherEncoding));
   cipherChunks.push(cipher.final(cipherEncoding));
   return cipherChunks.join('');
-}
+};
 
 /**
  * aes解密
@@ -24,11 +24,11 @@ exports.encryption = function (data, key, iv = '') {
  * @param key 必须为32位私钥
  * @returns {string}
  */
-exports.decryption = function (data, key = aeskey, iv = '') {
+exports.decryption = function(data, key = aeskey, iv = '') {
   if (!data) {
-      return "";
+    return '';
   }
-  iv = iv || "";
+  iv = iv || '';
   var clearEncoding = 'utf8';
   var cipherEncoding = 'base64';
   var cipherChunks = [];
@@ -37,4 +37,4 @@ exports.decryption = function (data, key = aeskey, iv = '') {
   cipherChunks.push(decipher.update(data, cipherEncoding, clearEncoding));
   cipherChunks.push(decipher.final(clearEncoding));
   return cipherChunks.join('');
-}
+};

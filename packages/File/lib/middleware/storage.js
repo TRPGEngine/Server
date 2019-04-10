@@ -3,9 +3,9 @@ const uuid = require('uuid/v1');
 module.exports = function() {
   return async (ctx, next) => {
     let trpgapp = ctx.trpgapp;
-    if(!ctx.player) {
+    if (!ctx.player) {
       ctx.response.status = 403;
-      throw '用户未找到，请检查登录状态'
+      throw '用户未找到，请检查登录状态';
     }
 
     let filename = ctx.req.file.filename;
@@ -16,11 +16,11 @@ module.exports = function() {
     let db = trpgapp.storage.db;
     let attach_uuid = ctx.header['attach-uuid'] || null;
     await db.transactionAsync(async () => {
-      if(attach_uuid) {
+      if (attach_uuid) {
         // attach_uuid应唯一:一个用户只能有一个对应的头像文件、一个角色只能有一个对应的图片
         // 没有attach_uuid的文件会被定时删除
         let oldAvatars = await db.models.file_avatar.findAll({
-          where: {attach_uuid}
+          where: { attach_uuid },
         });
         for (let oldAvatar of oldAvatars) {
           oldAvatar.attach_uuid = null;
@@ -35,11 +35,11 @@ module.exports = function() {
         width,
         height,
         has_thumbnail,
-        ownerId: ctx.player.user.id
+        ownerId: ctx.player.user.id,
       });
       ctx.avatar = avatar.getObject();
-    })
+    });
 
     return next();
-  }
-}
+  };
+};

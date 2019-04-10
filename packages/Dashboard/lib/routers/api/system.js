@@ -2,35 +2,37 @@ const Router = require('koa-router');
 const router = new Router();
 const os = require('os');
 
-router.post('/_login', async(ctx, next) => {
+router.post('/_login', async (ctx, next) => {
   const { username, password, _captcha } = ctx.request.body;
   const config = ctx.trpgapp.get('dashboard');
-  if(!ctx.session.captcha || _captcha !== ctx.session.captcha) {
+  if (!ctx.session.captcha || _captcha !== ctx.session.captcha) {
     ctx.body = {
       result: false,
-      msg: '验证码出错'
-    }
+      msg: '验证码出错',
+    };
     return;
   }
 
   let accounts = config.admin;
-  let index = accounts.find(account => account.username === username && account.password === password);
+  let index = accounts.find(
+    (account) => account.username === username && account.password === password
+  );
 
-  if(index === -1) {
+  if (index === -1) {
     ctx.body = {
       result: false,
-      msg: '用户名或密码错误'
-    }
+      msg: '用户名或密码错误',
+    };
     return;
   }
 
   ctx.session.tempAuth = true;
   ctx.body = {
-    result: true
-  }
-})
+    result: true,
+  };
+});
 
-router.get('/_info', async(ctx, next) => {
+router.get('/_info', async (ctx, next) => {
   ctx.body = {
     result: true,
     info: {
@@ -43,8 +45,8 @@ router.get('/_info', async(ctx, next) => {
       type: os.type(),
       uptime: os.uptime(),
       loadavg: os.loadavg(),
-    }
-  }
-})
+    },
+  };
+});
 
 module.exports = router;

@@ -1,9 +1,9 @@
 module.exports = {
   limits: {
-    fileSize: 8 * 1024 * 1024// 1MB
+    fileSize: 8 * 1024 * 1024, // 1MB
   },
   path: {
-    chatimgDir: './public/trpg-chat-image/'
+    chatimgDir: './public/trpg-chat-image/',
   },
   svgBg: [
     '#333333',
@@ -24,7 +24,9 @@ module.exports = {
     '#e67e22',
   ],
   getOfficePreviewUrl: function(fileurl) {
-    return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(fileurl)}`;
+    return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(
+      fileurl
+    )}`;
   },
   canPreviewExt: [
     'doc',
@@ -36,5 +38,5 @@ module.exports = {
     '.pdf',
     'jpg',
     'png',
-  ]
-}
+  ],
+};
