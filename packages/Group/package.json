@@ -1,0 +1,27 @@
+{
+  "name": "trpg-group",
+  "version": "1.0.0",
+  "description": "trpg group component",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TRPGEngine/Group.git"
+  },
+  "keywords": [
+    "trpg",
+    "group"
+  ],
+  "author": "moonrailgun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TRPGEngine/Group/issues"
+  },
+  "homepage": "https://github.com/TRPGEngine/Group#readme",
+  "dependencies": {
+    "debug": "^3.1.0",
+    "uuid": "^3.1.0"
+  }
+}

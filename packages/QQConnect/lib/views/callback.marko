@@ -1,0 +1,36 @@
+<script>
+var uuid = "${data.uuid}";
+var token = "${data.token}";
+/*var expires = new Date().getTime() + 1000 * 3600 * 24;
+var setItem = function(key, value) {
+  localStorage.setItem(key, JSON.stringify({
+    expires: expires,
+    rawData: value
+  }))
+}
+
+setItem('uuid', uuid);
+setItem('token', token);*/
+
+var data = {type: 'onOAuthFinished', uuid: uuid, token: token}
+
+if(!!window.opener) {
+  // 能够获取到打开的窗口, 说明是web端
+  window.opener.postMessage(data, 'https://trpg.moonrailgun.com')
+  window.close();
+} else {
+  // 可能是app端
+  document.write('登录成功, 请稍后...');
+  function waitForBridge() {
+    //the react native postMessage has only 1 parameter
+    //while the default one has 2, so check the signature
+    //of the function
+    if (window.postMessage && window.postMessage.length === 1) {
+      window.postMessage(JSON.stringify(data)); // 只接受字符串类型的参数
+    } else {
+      setTimeout(waitForBridge, 200);
+    }
+  }
+  window.onload = waitForBridge;
+}
+</script>

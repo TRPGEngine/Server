@@ -1,12 +1,10 @@
 {
   "name": "trpg-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "## 安装环境",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node bin/www",
-    "dbreset": "node tasks/reset"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -22,23 +20,7 @@
   },
   "homepage": "https://github.com/TRPGEngine/Server#readme",
   "dependencies": {
-    "body-parser": "^1.17.2",
-    "config": "^1.26.1",
-    "cookie-parser": "^1.4.3",
-    "crypto": "0.0.3",
-    "express": "^4.15.3",
-    "express-session": "^1.15.3",
-    "log4js": "^1.1.1",
-    "marko": "^4.4.15",
-    "session-file-store": "^1.0.0",
-    "sqlite3": "^3.1.8",
-    "trpg-core": "github:trpgengine/Core",
-    "uuid": "^3.1.0"
-  },
-  "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-live-server": "0.0.30",
-    "gulp-sass": "^3.1.0",
-    "gulp-sourcemaps": "^2.6.0"
+    "config": "^3.1.0",
+    "crypto-random-string": "^2.0.0"
   }
 }

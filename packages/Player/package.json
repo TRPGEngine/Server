@@ -1,0 +1,30 @@
+{
+  "name": "trpg-player",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "set DEBUG=trpg:* && set NODE_ENV=development && node test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TRPGEngine/Player.git"
+  },
+  "author": "moonrailgun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TRPGEngine/Player/issues"
+  },
+  "homepage": "https://github.com/TRPGEngine/Player#readme",
+  "devDependencies": {
+    "trpg-core": "github:trpgengine/Core"
+  },
+  "dependencies": {
+    "crypto": "0.0.3",
+    "debug": "^3.1.0",
+    "gt3-sdk": "^2.0.0",
+    "koa-router": "^7.4.0",
+    "lodash": "^4.17.11",
+    "uuid": "^3.1.0"
+  }
+}

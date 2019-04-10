@@ -1,0 +1,41 @@
+{
+  "name": "trpg-file",
+  "version": "1.0.0",
+  "description": "file component",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TRPGEngine/File.git"
+  },
+  "keywords": [
+    "file",
+    "trpg"
+  ],
+  "author": "moonrailgun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TRPGEngine/File/issues"
+  },
+  "homepage": "https://github.com/TRPGEngine/File#readme",
+  "dependencies": {
+    "debug": "^3.1.0",
+    "filesize": "^3.6.1",
+    "formidable": "^1.1.1",
+    "fs-extra": "^5.0.0",
+    "images": "^3.0.1",
+    "koa": "^2.3.0",
+    "koa-body": "^2.4.0",
+    "koa-cors": "0.0.16",
+    "koa-logger": "^3.0.1",
+    "koa-multer": "^1.0.2",
+    "koa-router": "^7.2.1",
+    "koa-send": "^5.0.0",
+    "koa-static": "^4.0.1",
+    "md5-file": "^4.0.0",
+    "server-destroy": "^1.0.1",
+    "uuid": "^3.1.0"
+  }
+}

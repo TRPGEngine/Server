@@ -1,0 +1,2 @@
+# Dice
+Dice Component

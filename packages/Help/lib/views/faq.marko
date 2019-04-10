@@ -1,0 +1,19 @@
+import faq from '../../config/faq'
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>FAQ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="/css/faq.css" />
+  </head>
+  <body>
+    <ul class="faq">
+      <li for(item in faq.list)>
+        <p>${item[0]}</p>
+        <p>${item[1]}</p>
+      </li>
+    </ul>
+  </body>
+</html>

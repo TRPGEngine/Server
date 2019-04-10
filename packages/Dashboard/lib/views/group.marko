@@ -1,0 +1,48 @@
+<include("./layout/layout.marko") title="网团模块">
+  <@head>
+    <script src="/js/group.js"></script>
+    <style>
+      .layui-table-cell {
+        height: 40px;
+        line-height: 40px;
+      }
+
+      .layui-table-cell img {
+        height: 40px;
+      }
+    </style>
+  </@head>
+  <@body>
+    <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+      <ul class="layui-tab-title">
+        <li class="layui-this">团列表</li>
+      </ul>
+      <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+          <fieldset class="layui-elem-field layui-field-title site-demo-button" style="margin-top: 30px;">
+            <legend>团列表</legend>
+          </fieldset>
+          <button id="group-table-reload" data-method="offset" data-type="auto" class="layui-btn">刷新</button>
+          <table id="group-list" lay-filter="test"></table>
+          <script type="text/html" id="tableAvatarTpl">
+            {{#  if(d.avatar){ }}
+              <span><img src="{{d.avatar}}" /></span>
+            {{#  } else { }}
+              <span></span>
+            {{#  } }}
+          </script>
+          <script type="text/html" id="tableDateTpl1">
+            <span>
+              {{d.last_login && new Date(d.last_login).format("yyyy-MM-dd HH:mm:ss")}}
+            </span>
+          </script>
+          <script type="text/html" id="tableDateTpl2">
+            <span>
+              {{d.createAt && new Date(d.createAt).format("yyyy-MM-dd HH:mm:ss")}}
+            </span>
+          </script>
+        </div>
+      </div>
+    </div>
+  </@body>
+</include>

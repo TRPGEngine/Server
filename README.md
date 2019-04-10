@@ -13,6 +13,7 @@ npm install
 # 安装生产环境
 npm install --production
 ```
+
 **运行脚本**
 ```bash
 npm start

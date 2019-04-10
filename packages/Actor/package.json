@@ -1,0 +1,28 @@
+{
+  "name": "trpg-actor",
+  "version": "1.0.0",
+  "description": "trpg actor component",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TRPGEngine/Actor.git"
+  },
+  "keywords": [
+    "actor",
+    "trpg"
+  ],
+  "author": "moonrailgun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TRPGEngine/Actor/issues"
+  },
+  "homepage": "https://github.com/TRPGEngine/Actor#readme",
+  "dependencies": {
+    "debug": "^3.1.0",
+    "trpg-actor-template": "^0.1.0",
+    "uuid": "^3.1.0"
+  }
+}

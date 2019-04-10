@@ -1,0 +1,77 @@
+<include("./layout/layout.marko") title="聊天模块">
+  <@head>
+    <script src="/js/chat.js"></script>
+  </@head>
+  <@body>
+    <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+      <ul class="layui-tab-title">
+        <li class="layui-this">聊天记录</li>
+        <li>系统消息</li>
+      </ul>
+      <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+          <fieldset class="layui-elem-field layui-field-title site-demo-button" style="margin-top: 30px;">
+            <legend>聊天记录</legend>
+          </fieldset>
+          <button id="chat-table-reload" data-method="offset" data-type="auto" class="layui-btn">刷新</button>
+          <button id="sync-log-btn2" data-method="offset" data-type="auto" class="layui-btn">同步</button>
+          <table id="chat-log" lay-filter="test"></table>
+          <script type="text/html" id="tableDateTpl">
+            <span>
+              {{new Date(d.date).format("yyyy-MM-dd HH:mm:ss")}}
+            </span>
+          </script>
+          <script type="text/html" id="tableDataTpl">
+            <span>
+              {{d.data?JSON.stringify(d.data):''}}
+            </span>
+          </script>
+        </div>
+        <div class="layui-tab-item">
+          <fieldset class="layui-elem-field layui-field-title site-demo-button" style="margin-top: 30px;">
+            <legend>发送系统消息</legend>
+          </fieldset>
+          <div class="layui-row">
+            <div class="layui-col-md6">
+              <form class="layui-form" action="">
+                <div class="layui-form-item">
+                  <label class="layui-form-label">接受UUID</label>
+                  <div class="layui-input-block">
+                    <input type="text" name="uuid" required lay-verify="required" placeholder="请输入要发送到玩家的UUID" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">消息类型</label>
+                  <div class="layui-input-block">
+                    <select name="type" lay-verify="required">
+                      <option value=""></option>
+                      <option value="msg">简单信息</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">标题</label>
+                  <div class="layui-input-block">
+                    <input type="text" name="title" required lay-verify="required" placeholder="请输入信息标题" autocomplete="off" class="layui-input">
+                  </div>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                  <label class="layui-form-label">内容</label>
+                  <div class="layui-input-block">
+                    <textarea name="content" placeholder="请输入内容" class="layui-textarea"></textarea>
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="sendSystemMsg">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </@body>
+</include>

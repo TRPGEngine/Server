@@ -1,0 +1,20 @@
+import faq from '../../config/faq'
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>帮助反馈</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="/css/feedback.css" />
+  </head>
+  <body>
+    <a href="faq">点击查看常见问题</a>
+    <form action="feedback/submit" method="post">
+      <p><span>账号名:</span><input type="text" name="username" placeholder="必填，TRPG用户名" /></p>
+      <p><span>联系方式:</span><input type="text" name="contact-link" placeholder="可选，qq、微信、电话号均可" /></p>
+      <p><span>反馈内容:</span><textarea type="text" name="feedback-content" placeholder="必填，提交反馈的内容，越详细越好" rows="4"></textarea></p>
+      <input type="submit" value="提交" />
+    </form>
+  </body>
+</html>

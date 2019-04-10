@@ -1,0 +1,27 @@
+{
+  "name": "trpg-dice",
+  "version": "0.0.1",
+  "description": "Dice Component",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TRPGEngine/Dice.git"
+  },
+  "keywords": [
+    "trpg",
+    "dice"
+  ],
+  "author": "moonrailgun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TRPGEngine/Dice/issues"
+  },
+  "homepage": "https://github.com/TRPGEngine/Dice#readme",
+  "dependencies": {
+    "debug": "^3.1.0",
+    "uuid": "^3.1.0"
+  }
+}

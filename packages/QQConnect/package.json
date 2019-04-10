@@ -1,0 +1,30 @@
+{
+  "name": "trpg-qqconnect",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TRPGEngine/QQConnect.git"
+  },
+  "keywords": [
+    "qqconnect",
+    "trpg"
+  ],
+  "author": "moonrailgun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TRPGEngine/QQConnect/issues"
+  },
+  "homepage": "https://github.com/TRPGEngine/QQConnect#readme",
+  "dependencies": {
+    "debug": "^3.1.0",
+    "koa-router": "^7.4.0",
+    "koa-static": "^4.0.3",
+    "marko": "^4.10.0",
+    "uuid": "^3.2.1"
+  }
+}

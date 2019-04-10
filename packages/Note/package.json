@@ -1,0 +1,29 @@
+{
+  "name": "trpg-note",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TRPGEngine/Note.git"
+  },
+  "keywords": [
+    "trpg"
+  ],
+  "author": "moonrailgun",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TRPGEngine/Note/issues"
+  },
+  "homepage": "https://github.com/TRPGEngine/Note#readme",
+  "dependencies": {
+    "debug": "^3.1.0",
+    "koa-router": "^7.4.0",
+    "marko": "^4.13.5",
+    "striptags": "^3.1.1",
+    "xss": "^1.0.3"
+  }
+}

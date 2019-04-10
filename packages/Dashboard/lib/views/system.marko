@@ -1,0 +1,50 @@
+<include("./layout/layout.marko") title="系统信息">
+  <@head>
+    <script id="table-template" type="text/html">
+      {{# var cpus = d.cpus.length}}
+      <tr></tr>
+      <tr>
+        <td>主机名</td>
+        <td>{{d.hostname}}</td>
+      </tr>
+      <tr>
+        <td>平台</td>
+        <td>{{d.platform}} ({{d.arch}} 架构)</td>
+      </tr>
+      <tr>
+        <td>CPU核心数</td>
+        <td>{{cpus}} 个</td>
+      </tr>
+      <tr>
+        <td>内存</td>
+        <td>剩余 {{(d.freemem/1024/1024/1024).toFixed(2)}} GB / 共 {{d.totalmem/1024/1024/1024}} GB</td>
+      </tr>
+      <tr>
+        <td>平均负载</td>
+        <td>
+          最近1分钟: {{(d.loadavg[0]/cpus*100).toFixed(2)}}% |
+          最近5分钟: {{(d.loadavg[1]/cpus*100).toFixed(2)}}% |
+          最近15分钟: {{(d.loadavg[2]/cpus*100).toFixed(2)}}%
+        </td>
+      </tr>
+      <tr>
+        <td>运行时间</td>
+        <td>{{(d.uptime/60/60/24).toFixed(1)}} 天 ( {{(d.uptime/60/60).toFixed(3)}} 小时 )</td>
+      </tr>
+    </script>
+    <script src="/js/system.js"></script>
+  </@head>
+  <@body>
+    <fieldset class="layui-elem-field layui-field-title site-demo-button" style="margin-top: 30px;">
+      <legend>服务器信息</legend>
+    </fieldset>
+    <table class="layui-table" lay-even lay-skin="nob">
+      <colgroup>
+        <col width="150">
+        <col>
+      </colgroup>
+      <tbody id="system-info">
+      </tbody>
+    </table>
+  </@body>
+</include>

@@ -1,0 +1,77 @@
+import xss from 'xss';
+$ {
+  let {
+    note,
+    author,
+  } = data;
+  let authorName = author.nickname ||author.username;
+}
+
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>${note.title} - 来自 ${authorName} 的笔记</title>
+    <style>
+      html, body {
+        margin: 0;
+      }
+
+      body {
+        padding-left: 18px;
+        padding-right: 18px;
+        font-family: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+      }
+
+      .info {
+        margin-bottom: 20px;
+      }
+
+      .title {
+        margin: 15px 0;
+        font-size: 30px;
+        font-weight: 700;
+        line-height: 1.4;
+        color: #2f2f2f;
+      }
+
+      .avatar {
+        display: inline-block;
+        width: 34px;
+        height: 34px;
+        border-radius: 17px;
+        vertical-align: middle;
+      }
+
+      .author {
+        margin: 0 5px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #484848;
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .meta {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #b1b1b1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="info">
+      <div class="title">${note.title}</div>
+      <div>
+        <img class="avatar" src="${author.avatar}" if(author.avatar) />
+        <h3 class="author">${authorName}</h3>
+      </div>
+      <div class="meta">
+        <span>${note.updateAt.Format('yyyy-MM-dd hh:mm')}</span>
+      </div>
+    </div>
+
+    <div class="content">$!{xss(note.content)}</div>
+  </body>
+</html>

@@ -1,0 +1,71 @@
+<include("./layout/layout.marko") title="登录">
+  <@body>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+      <legend>登录系统</legend>
+    </fieldset>
+
+    <form class="layui-form" action="">
+      <div class="layui-form-item">
+        <label class="layui-form-label">用户名</label>
+        <div class="layui-input-inline">
+          <input type="text" name="username" lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-inline">
+          <input type="password" name="password" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">验证码</label>
+        <div class="layui-input-inline">
+          <input type="text" name="_captcha" lay-verify="required" placeholder="请输入验证码" maxlength="4" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-input-inline">
+          <img class="captcha" src="/admin/captcha" />
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-input-block">
+          <button class="layui-btn" lay-submit lay-filter="loginForm">立即提交</button>
+        </div>
+      </div>
+    </form>
+
+    <script>
+    layui.use('form', function(){
+      var form = layui.form;
+      var updateCaptcha = function() {
+        $(".captcha").attr('src', '/admin/captcha?' + Math.random())
+      }
+
+      //监听提交
+      form.on('submit(loginForm)', function(data){
+        $.post('/admin/api/system/_login', {
+          username: data.field.username,
+          password: data.field.password,
+          _captcha: data.field._captcha,
+        }, function(data) {
+          if(data.result) {
+            layer.msg('登录成功');
+            setTimeout(function() {
+              location.href = "/admin/home";
+            }, 1000);
+          }else {
+            layer.msg(data.msg);
+            updateCaptcha();
+          }
+        })
+
+        return false;
+      });
+
+      // 验证码
+      $(".captcha").click(function() {
+        updateCaptcha();
+      })
+    });
+    </script>
+  </@body>
+</include>
