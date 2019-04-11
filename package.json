@@ -12,7 +12,7 @@
     "prettier:all": "prettier --write \"./**/*.js\"",
     "db:migrate:generate": "makemigration --models-path ./db/models.js --migrations-path ./db/migrations",
     "db:migrate:run": "runmigration --models-path ./db/models.js --migrations-path ./db/migrations",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --config=./test/jest.config.js --runInBand"
   },
   "repository": {
     "type": "git",
@@ -29,11 +29,14 @@
   "homepage": "https://github.com/TRPGEngine/Server#readme",
   "dependencies": {
     "config": "^3.1.0",
-    "crypto-random-string": "^2.0.0"
+    "crypto-random-string": "^2.0.0",
+    "debug": "^4.1.1"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
+    "jest": "^24.7.1",
     "prettier": "^1.16.4",
-    "sequelize-auto-migrations": "^1.0.3"
+    "sequelize-auto-migrations": "^1.0.3",
+    "socket.io-client": "^2.2.0"
   }
 }

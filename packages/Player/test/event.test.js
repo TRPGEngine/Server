@@ -121,7 +121,7 @@ describe('user action', () => {
     await inviteInstance.destroy(); // 移除生成的邀请实例
   });
 
-  describe('friend invite action', async () => {
+  describe('friend invite action', () => {
     let inviteUUID = null;
 
     beforeEach(async () => {
