@@ -30,6 +30,7 @@ function initFunction() {
     JPush,
     _client,
     async sendNotifyMsg(userUUID, title, msg, options = {}) {
+      // TODO: 需要做频率限制与在线监测
       const platform = _.get(options, 'platform', JPush.ALL);
       const audience = _.get(options, 'audience', JPush.alias(userUUID));
 
