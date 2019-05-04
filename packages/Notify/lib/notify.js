@@ -4,13 +4,26 @@ const _ = require('lodash');
 const JPush = require('jpush-async').JPushAsync;
 
 module.exports = function NotifyComponent(app) {
+  initStorage.call(app);
   initFunction.call(app);
+  initSocket.call(app);
 
   return {
     name: 'NotifyComponent',
-    require: ['PlayerComponent'],
+    require: ['PlayerComponent', 'ChatComponent'],
   };
 };
+
+function initStorage() {
+  let app = this;
+  let storage = app.storage;
+  storage.registerModel(require('./models/jpush.js'));
+
+  app.on('initCompleted', function(app) {
+    // 数据信息统计
+    debug('storage has been load 1 notify db model');
+  });
+}
 
 function initFunction() {
   const app = this;
@@ -50,4 +63,9 @@ function initFunction() {
         .send();
     },
   };
+}
+
+function initSocket() {
+  let app = this;
+  app.registerEvent('notify::bindNotifyInfo', event.bindNotifyInfo);
 }

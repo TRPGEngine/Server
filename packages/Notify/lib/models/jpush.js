@@ -2,12 +2,19 @@ module.exports = function NotifyJPush(Sequelize, db) {
   let NotifyJPush = db.define(
     'notify_jpush',
     {
+      registration_id: {
+        type: Sequelize.STRING,
+        required: true,
+      },
       user_uuid: {
         type: Sequelize.UUID,
         required: true,
       },
       user_tags: {
         type: Sequelize.JSON,
+      },
+      is_active: {
+        type: Sequelize.BOOLEAN,
       },
     },
     {
