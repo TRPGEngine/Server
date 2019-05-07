@@ -2,6 +2,7 @@ const debug = require('debug')('trpg:component:notify');
 const config = require('config').get('notify');
 const _ = require('lodash');
 const JPush = require('jpush-async').JPushAsync;
+const event = require('./event');
 
 module.exports = function NotifyComponent(app) {
   initStorage.call(app);
