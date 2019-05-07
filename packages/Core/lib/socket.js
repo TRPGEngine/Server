@@ -1,3 +1,4 @@
+const IO = require('socket.io');
 const debug = require('debug')('trpg:socket');
 const logger = require('./logger')();
 const appLogger = require('./logger')('application');
@@ -129,10 +130,8 @@ class SocketService {
   // 向socket注入自定义事件处理
   injectCustomEvents(socket) {
     // 注册事件
-    const wrap = {
-      app: this._app,
-      socket,
-    };
+    const app = this._app;
+    const wrap = { app, socket };
     for (let event of this.events) {
       let eventName = event.name;
       socket.on(eventName, (data, cb) => {
@@ -175,3 +174,5 @@ class SocketService {
     return this.events;
   }
 }
+
+module.exports = SocketService;

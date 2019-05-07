@@ -1,4 +1,3 @@
-const IO = require('socket.io');
 const debug = require('debug')('trpg:application');
 const debugSocket = require('debug')('trpg:socket');
 const schedule = require('node-schedule');
@@ -11,20 +10,20 @@ const Storage = require('./storage');
 const { Cache, RedisCache } = require('./cache');
 const ReportService = require('./report');
 const WebService = require('./webservice');
+const SocketService = require('./socket');
 const logger = require('./logger')();
 const appLogger = require('./logger')('application');
 
 let app = (exports = module.exports = {});
 app.engines = {};
 app.settings = {}; // 设置配置列表
-app.io = null; // websocket服务
 app.storage = null; // 数据库服务列表
 app.cache = null; // 缓存服务
 app.reportservice = null; // 汇报服务
 app.webservice = null; // 网页服务
+app.socketservice = null; // websocket服务
 app.components = []; // 组件列表
 app.events = {}; // 内部事件列表
-app.socketEvents = []; // socket响应列表
 app.timers = []; // 计时器列表
 app.webApi = {}; // 网页服务api
 app.statInfoJob = []; // 统计信息任务
@@ -41,8 +40,7 @@ app.init = function init() {
   this.defaultConfiguration();
   this.initReportService();
   this.initWebService();
-  this.initIO();
-  this.initIOEvent();
+  this.initSocketService();
   this.initStorage();
   this.initCache();
   this.initStatJob();
@@ -96,90 +94,19 @@ app.initWebService = function initWebService() {
   }
 };
 
-app.initIO = function initIO() {
-  try {
-    let port = Number(this.set('port'));
-    let opts = {
-      pingInterval: 20000, // default: 25000
-      pingTimeout: 40000, // default: 60000
-    };
-    if (this.webservice) {
-      applog('start a http socket.io server');
-      this.io = IO(this.webservice.getHttpServer(), opts);
-    } else {
-      applog('start a independent socket.io server');
-      this.io = IO(port, opts);
-    }
-    applog('create io(%d) process success!', port);
-  } catch (err) {
-    applog('create io process error: %O', err);
-    throw err;
-  } finally {
-    return this;
-  }
-};
-app.initIOEvent = function initIOEvent() {
-  let app = this;
-  app.io.use(
+app.initSocketService = function initSocketService() {
+  const socketservice = new SocketService(this);
+  socketservice.use(
     IOSessionMiddleware(this.webservice._app, this.webservice.sessionOpt)
   );
-  app.io.on('connection', function(socket) {
-    applog('a connect is created');
-
-    socket.on('message', function(data, cb) {
-      app.emit('message', data, cb);
-    });
-
-    socket.on('disconnect', function(data, cb) {
-      applog(
-        'socket%s disconnect: %o',
-        app.get('verbose') ? `[${socket.id}]` : '',
-        data
-      );
-      socket.iosession.destroy(); // 离线时移除之前的iosession
-      app.emit('disconnect', socket);
-    });
-    socket.on('hello', function(data, cb) {
-      var res = { data, version: '0.0.1' };
-      cb(res);
-    });
-
-    app.emit('connection', socket);
-    // 注册事件
-    let wrap = { app, socket };
-    for (let event of app.socketEvents) {
-      let eventName = event.name;
-      socket.on(eventName, (data, cb) => {
-        let socketId = wrap.socket.id;
-        let verbose = app.get('verbose');
-        data = JSON.parse(JSON.stringify(data));
-        if (verbose) {
-          debugSocket('[%s]%s <-- %o', socketId, eventName, data);
-        } else {
-          debugSocket('%s <-- %o', eventName, data);
-        }
-        logger.info(eventName, '<--', data);
-
-        event.fn.call(wrap, data, function(res) {
-          cb(res);
-          res = JSON.parse(JSON.stringify(res));
-          if (verbose) {
-            debugSocket('[%s]%s --> %o', socketId, eventName, res);
-          } else {
-            debugSocket('%s --> %o', eventName, res);
-          }
-
-          if (res.result === false) {
-            logger.error(eventName, '-->', res);
-          } else {
-            logger.info(eventName, '-->', res);
-          }
-        });
-      });
-    }
+  socketservice.initIOEvent();
+  this.socketservice = socketservice;
+  this.on('disconnect', (socket) => {
+    // 离线时移除之前的iosession
+    socket.iosession.destroy();
   });
-  applog('bind io event success!');
 };
+
 app.initStorage = function initStorage() {
   let opts = {};
 
@@ -247,62 +174,7 @@ app.register = function(appEventName, eventFn) {
 };
 
 app.registerEvent = function(eventName, eventFn) {
-  let index = this.socketEvents.findIndex((e) => {
-    return e.name === eventName;
-  });
-  if (index >= 0) {
-    applog('register socket event [%s] duplicated', eventName);
-    return;
-  }
-  applog('register socket event [%s]', eventName);
-  this.socketEvents.push({
-    name: eventName,
-    fn: async function(data, cb) {
-      if (!data) {
-        data = {}; // 定义一个默认空对象防止在方法内部因为取不到参数而报错
-      }
-
-      let app = this.app;
-      let db = app.storage.db;
-      try {
-        let ret = await eventFn.call(this, data, cb, db);
-        if (ret !== undefined) {
-          // return 方法返回结果信息
-          if (typeof ret === 'object') {
-            if (!ret.result) {
-              ret.result = true;
-            }
-
-            cb(ret);
-          } else if (typeof ret === 'boolean') {
-            cb({ result: ret });
-          } else {
-            cb({ result: true, data: ret });
-          }
-        }
-      } catch (err) {
-        // 若event.fn内没有进行异常处理，进行统一的异常处理
-        if (cb && typeof cb === 'function') {
-          cb({ result: false, msg: err.toString() || '系统忙' });
-          if (typeof err === 'string') {
-            // 如果不是一个带有堆栈信息的错误。则修改err为一个带其他信息的字符串
-            err = `${err}\nEvent Name: ${eventName}\nReceive:\n${JSON.stringify(
-              data,
-              null,
-              4
-            )}`;
-          }
-          app.reportservice.reportError(err); // 使用汇报服务汇报错误
-        } else {
-          applog(
-            'unhandled error msg return on %s, received %o',
-            event.name,
-            data
-          );
-        }
-      }
-    },
-  });
+  this.socketservice.registerIOEvent(eventName, eventFn);
 };
 
 // loopNum 循环次数,不传则为无限循环
