@@ -8,22 +8,34 @@ const applog = (...args) => {
   appLogger.info(...args);
 };
 
+const ioOpts = {
+  pingInterval: 20000, // default: 25000
+  pingTimeout: 40000, // default: 60000
+};
+
 // socket.io 服务
-// TODO: 尚未实装
 class SocketService {
-  _app = null;
-  _io = null;
-
-  // 成员{name: string, fn: (data, cb) => any, hooks?: {before: any[], after: any[]}}
-  events = [];
-
   constructor(app) {
     if (!app) {
       throw new Error('init socket service error: require app');
     }
 
     this._app = app;
-    this._io = app.io;
+    this.events = []; // 成员{name: string, fn: (data, cb) => any, hooks?: {before: any[], after: any[]}}
+    try {
+      const port = Number(app.get('port'));
+      if (app.webservice) {
+        applog('start a http socket.io server');
+        this._io = IO(app.webservice.getHttpServer(), ioOpts);
+      } else {
+        applog('start a independent socket.io server');
+        this._io = IO(port, ioOpts);
+      }
+      applog('create io(%d) process success!', port);
+    } catch (err) {
+      applog('create io process error: %O', err);
+      throw err;
+    }
   }
 
   initIOEvent() {
@@ -152,6 +164,11 @@ class SocketService {
         });
       });
     }
+  }
+
+  // 应用中间件
+  use(middleware) {
+    this._io.use(middleware);
   }
 
   getAllEvents() {
