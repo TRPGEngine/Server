@@ -14,7 +14,7 @@
                     "allowNull": false,
                     "defaultValue": {
                         "internal": true,
-                        "value": "Sequelize.UUIDV4"
+                        "value": "Sequelize.UUIDV1"
                     },
                     "field": "uuid",
                     "seqType": "Sequelize.UUID"
@@ -1964,7 +1964,61 @@
                 }
             },
             "indexes": []
+        },
+        "notify_jpush": {
+            "tableName": "notify_jpush",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "registration_id": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "registration_id",
+                    "seqType": "Sequelize.STRING"
+                },
+                "user_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "user_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "user_tags": {
+                    "field": "user_tags",
+                    "seqType": "Sequelize.JSON"
+                },
+                "is_active": {
+                    "field": "is_active",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "userId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "userId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
         }
     },
-    "revision": 1
+    "revision": 2
 }

@@ -38,7 +38,7 @@
     "cross-env": "^5.2.0",
     "jest": "^24.7.1",
     "prettier": "^1.16.4",
-    "sequelize-auto-migrations": "^1.0.3",
+    "sequelize-auto-migrations": "github:TRPGEngine/sequelize-auto-migrations",
     "socket.io-client": "^2.2.0"
   }
 }
