@@ -69,8 +69,7 @@ app.defaultConfiguration = function defaultConfiguration() {
 
 app.initReportService = function initReportService() {
   try {
-    let app = this;
-    this.reportservice = new ReportService(app.get('report'));
+    this.reportservice = new ReportService(this.get('report'));
     applog('create report service success!');
   } catch (err) {
     console.error('create report error:');
@@ -142,7 +141,7 @@ app.initStatJob = function initStatJob() {
       applog('statistics completed!');
     } catch (e) {
       console.error('statistics error:', e);
-      app.error(e);
+      this.error(e);
     }
   };
 
