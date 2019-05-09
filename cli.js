@@ -6,6 +6,12 @@ const binPath = path.resolve(__dirname, './node_modules/.bin/');
 const getBinPath = (name) => {
   return path.resolve(binPath, name);
 };
+const exec = (file, args) => {
+  return execa(file, args, {
+    stdout: process.stdout,
+    stderr: process.stderr,
+  });
+};
 
 const yargs = require('yargs');
 yargs
@@ -27,25 +33,26 @@ yargs
         return;
       }
 
-      execa(
-        getBinPath('makemigration'),
-        [
-          '--models-path',
-          './db/models.js',
-          '--migrations-path',
-          './db/migrations',
-          '--name',
-          name,
-          '--comment',
-          comment,
-        ],
-        {
-          stdout: process.stdout,
-          stderr: process.stderr,
-        }
-      );
+      exec(getBinPath('makemigration'), [
+        '--models-path',
+        './db/models.js',
+        '--migrations-path',
+        './db/migrations',
+        '--name',
+        name,
+        '--comment',
+        comment,
+      ]);
     }
   )
+  .command('run-migrate', 'run all db migrate', {}, function handler(args) {
+    exec(getBinPath('runmigration'), [
+      '--models-path',
+      './db/models.js',
+      '--migrations-path',
+      './db/migrations',
+    ]);
+  })
   .help('help')
   .alias('help', 'h')
   .version('version', package.version)
