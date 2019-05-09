@@ -10,7 +10,7 @@
     "run:standard": "node standard.js",
     "packages:install": "sh packages/foreach.sh 'npm install'",
     "prettier:all": "prettier --write \"./**/*.js\"",
-    "db:migrate:generate": "makemigration --models-path ./db/models.js --migrations-path ./db/migrations",
+    "db:migrate:generate": "cli.js generate-migrate",
     "db:migrate:run": "runmigration --models-path ./db/models.js --migrations-path ./db/migrations",
     "test": "jest --config=./test/jest.config.js --runInBand"
   },
@@ -30,7 +30,9 @@
   "dependencies": {
     "config": "^3.1.0",
     "crypto-random-string": "^2.0.0",
-    "debug": "^4.1.1"
+    "debug": "^4.1.1",
+    "execa": "^1.0.0",
+    "yargs": "^13.2.2"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
