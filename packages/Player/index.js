@@ -66,20 +66,6 @@ function initFunction() {
         cb(err, null);
       }
     },
-    find: async function find(uuid, cb) {
-      if (typeof uuid !== 'string') {
-        throw new Error(`uuid must be a string, not a ${typeof uuid}`);
-      }
-
-      try {
-        const user = await db.models.player_user.findOne({
-          where: { uuid },
-        });
-        cb(null, user);
-      } catch (err) {
-        cb(err, null);
-      }
-    },
     getUserInfo: async function getUserInfo(userUUID) {
       // TODO: 需要优化(从redis中获取缓存)
       return await db.models.player_user.findOne({
