@@ -1049,7 +1049,7 @@ exports.getGroupStatus = async function getGroupStatus(data, cb) {
   if (!groupUUID) {
     throw '缺少必要参数';
   }
-  let groupStatus = await app.cache.get(`group:${groupUUID}:status`);
+  let groupStatus = await app.cache.get(`component:group:${groupUUID}:status`);
   return { status: Boolean(groupStatus) };
 };
 

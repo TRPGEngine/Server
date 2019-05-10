@@ -54,16 +54,65 @@ function initFunction() {
         .push()
         .setPlatform(platform)
         .setAudience(audience)
-        .setNotification(
-          'title',
-          JPush.ios(title),
-          JPush.android(title, null, 1)
-        )
+        .setNotification(title, JPush.ios(title), JPush.android(title, null, 1))
         .setMessage(msg)
         .setOptions(null, 60)
         .send();
     },
+    async sendNotifyMsgByRegistrationId(
+      registrationId,
+      title,
+      msg,
+      options = {}
+    ) {
+      // TODO: 需要做频率限制与在线监测
+      const platform = _.get(options, 'platform', JPush.ALL);
+      const audience = _.get(
+        options,
+        'audience',
+        JPush.setAudience(registrationId)
+      );
+
+      // TODO: 增加到history
+
+      return await _client
+        .push()
+        .setPlatform(platform)
+        .setAudience(audience)
+        .setNotification(title, JPush.ios(title), JPush.android(title, null, 1))
+        .setMessage(msg)
+        .setOptions(null, 60)
+        .send();
+    },
+    async getNotifyInfo(userUUID) {
+      return await db.notify_jpush.findOne({
+        where: {
+          user_uuid: userUUID,
+        },
+      });
+    },
   };
+
+  if (_.get(app, 'chat.tryNotify')) {
+    const originTryNotify = app.chat.tryNotify;
+    app.chat.tryNotify = async (pkg) => {
+      originTryNotify(pkg);
+
+      const { message, sender_uuid, to_uuid } = pkg;
+
+      const notifyInfo = await app.notify.getNotifyInfo(to_uuid);
+      if (notifyInfo && notifyInfo.is_active) {
+        // 发送通知
+        const senderInfo = await app.player.getUserInfo(sender_uuid);
+        await app.notify.sendNotifyMsgByRegistrationId(
+          notifyInfo.registration_id,
+          `${senderInfo.nickname || senderInfo.username}:`,
+          message
+        );
+        debug('send chat notify');
+      }
+    };
+  }
 }
 
 function initSocket() {

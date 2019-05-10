@@ -80,6 +80,12 @@ function initFunction() {
         cb(err, null);
       }
     },
+    getUserInfo: async function getUserInfo(userUUID) {
+      // TODO: 需要优化(从redis中获取缓存)
+      return await db.models.player_user.findOne({
+        where: { uuid },
+      });
+    },
     makeFriendAsync: async function(uuid1, uuid2, db) {
       if (!uuid1 || !uuid2) {
         debug('make friend need 2 uuid: receive %o', { uuid1, uuid2 });

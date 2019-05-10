@@ -203,6 +203,9 @@ function initFunction() {
         }
       }
     },
+    tryNotify(messagePkg) {
+      // 尝试通知， 用于被其他组件重写
+    },
   };
 }
 

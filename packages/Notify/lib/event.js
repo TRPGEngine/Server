@@ -26,12 +26,14 @@ exports.bindNotifyInfo = async function(data, cb, db) {
     await db.notify_jpush.create({
       registration_id: registrationID,
       user_uuid: userUUID,
+      is_active: true,
       userId,
     });
   } else {
     // 否则，更新user_uuid
     jpushInfo.user_uuid = userUUID;
     jpushInfo.userId = userId;
+    jpushInfo.is_active = true;
     jpushInfo.save();
   }
 

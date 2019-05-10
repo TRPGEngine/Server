@@ -382,6 +382,7 @@ let message = function message(data, cb) {
             other.socket.emit('chat::message', pkg);
           } else {
             debug('[用户:%s]: 接收方%s不在线', sender_uuid, to_uuid);
+            app.chat.tryNotify()
           }
         }
       } else {
