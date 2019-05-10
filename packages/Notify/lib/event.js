@@ -16,14 +16,14 @@ exports.bindNotifyInfo = async function(data, cb, db) {
     throw '非法操作, UUID不匹配';
   }
 
-  const jpushInfo = await db.notify_jpush.findOne({
+  const jpushInfo = await db.models.notify_jpush.findOne({
     where: {
       registration_id: registrationID,
     },
   });
   if (!jpushInfo) {
     // 如果当前设备没有记录,则创建
-    await db.notify_jpush.create({
+    await db.models.notify_jpush.create({
       registration_id: registrationID,
       user_uuid: userUUID,
       is_active: true,
