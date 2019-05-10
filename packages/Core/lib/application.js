@@ -157,7 +157,7 @@ app.initComponents = function initComponents() {
       let componentInfo = component.call(this, this);
       applog('component info:', componentInfo);
     } catch (e) {
-      console.warn('component init error:\n');
+      console.warn(`component init error when ${component}:\n`);
       throw e;
     }
   }
@@ -254,6 +254,7 @@ app.request = {
 
 // 记录错误
 app.error = function(err) {
+  console.error('Error', err);
   this.reportservice.reportError(err);
 };
 

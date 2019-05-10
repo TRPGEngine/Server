@@ -69,7 +69,7 @@ function initFunction() {
     getUserInfo: async function getUserInfo(userUUID) {
       // TODO: 需要优化(从redis中获取缓存)
       return await db.models.player_user.findOne({
-        where: { uuid },
+        where: { uuid: userUUID },
       });
     },
     makeFriendAsync: async function(uuid1, uuid2, db) {

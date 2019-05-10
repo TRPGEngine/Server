@@ -52,7 +52,7 @@ module.exports = {
   notify: {
     // 极光推送服务端接口需要的秘钥。没有该项将无法注册notify服务
     jpush: {
-      appkey: '',
+      appKey: '',
       masterSecret: '',
     },
   },

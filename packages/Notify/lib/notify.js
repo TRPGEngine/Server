@@ -30,15 +30,21 @@ function initFunction() {
   const app = this;
   const db = app.storage.db;
 
-  const appkey = _.get(config, 'jpush.appkey');
+  const appkey = _.get(config, 'jpush.appKey');
   const masterSecret = _.get(config, 'jpush.masterSecret');
 
   if (!appkey || !masterSecret) {
-    debug('init function failed: need jpush info');
+    app.error('init function failed: need jpush info');
     return;
   }
 
-  const _client = JPush.buildClient(config.jpush);
+  let _client;
+  try {
+    _client = JPush.buildClient(config.jpush);
+  } catch (e) {
+    app.errorWithContext('JPush 初始化失败', e);
+    throw e;
+  }
 
   app.notify = {
     JPush,
@@ -70,7 +76,7 @@ function initFunction() {
       const audience = _.get(
         options,
         'audience',
-        JPush.setAudience(registrationId)
+        JPush.registration_id(registrationId)
       );
 
       // TODO: 增加到history
@@ -85,7 +91,7 @@ function initFunction() {
         .send();
     },
     async getNotifyInfo(userUUID) {
-      return await db.notify_jpush.findOne({
+      return await db.models.notify_jpush.findOne({
         where: {
           user_uuid: userUUID,
         },
@@ -100,6 +106,7 @@ function initFunction() {
 
       const { message, sender_uuid, to_uuid } = pkg;
 
+      // TODO: 这里要做一步缓存
       const notifyInfo = await app.notify.getNotifyInfo(to_uuid);
       if (notifyInfo && notifyInfo.is_active) {
         // 发送通知
@@ -109,7 +116,7 @@ function initFunction() {
           `${senderInfo.nickname || senderInfo.username}:`,
           message
         );
-        debug('send chat notify');
+        debug('send chat notify finished!');
       }
     };
   }
