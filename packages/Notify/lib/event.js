@@ -29,6 +29,8 @@ exports.bindNotifyInfo = async function(data, cb, db) {
       is_active: true,
       userId,
     });
+
+    // TODO 如果是安卓的话需要给用户发送一条系统通知来提示开启自启动来保证用户能接收到信息
   } else {
     // 否则，更新user_uuid
     jpushInfo.user_uuid = userUUID;
