@@ -1,5 +1,5 @@
-const debug = require('debug')('trpg:application');
-const debugSocket = require('debug')('trpg:socket');
+import Debug from 'debug';
+const debug = Debug('trpg:application');
 const schedule = require('node-schedule');
 const fs = require('fs-extra');
 const path = require('path');
@@ -14,7 +14,7 @@ const SocketService = require('./socket');
 const logger = require('./logger')();
 const appLogger = require('./logger')('application');
 
-let app = (exports = module.exports = {});
+let app: any = (exports = module.exports = {});
 app.engines = {};
 app.settings = {}; // 设置配置列表
 app.storage = null; // 数据库服务列表
@@ -124,7 +124,7 @@ app.initStatJob = function initStatJob() {
   let run = async () => {
     try {
       applog('start statistics project info...');
-      let info = {};
+      let info: any = {};
       for (let job of this.statInfoJob) {
         let name = job.name;
         let fn = job.fn;
@@ -151,7 +151,7 @@ app.initStatJob = function initStatJob() {
 };
 
 app.initComponents = function initComponents() {
-  for (component of this.components) {
+  for (let component of this.components) {
     try {
       applog('initing ...%o', component);
       let componentInfo = component.call(this, this);
@@ -375,9 +375,9 @@ app.dbSync = async function dbSync() {
   }
 };
 
-function applog(...args) {
-  debug(...args);
-  appLogger.info(...args);
+function applog(formatter, ...others) {
+  debug(formatter, ...others);
+  appLogger.info(formatter, ...others);
 }
 
 app.log = applog;

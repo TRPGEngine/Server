@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const transaction = require('orm-transaction');
 const path = require('path');
 const fs = require('fs');
-const process = require('process');
+import process from 'process';
 const debug = require('debug')('trpg:storage');
 const debugSQL = require('debug')('trpg:storage:sql');
 const appLogger = require('./logger')('application');
@@ -20,7 +20,7 @@ const defaultDbOptions = {
   },
 };
 
-function Storage(dbconfig) {
+function Storage(dbconfig): void {
   if (!(this instanceof Storage)) return new Storage(dbconfig);
 
   this.db = this.initDb(dbconfig);
@@ -54,7 +54,7 @@ function redefineDb(db) {
     }
 
     // 增加类方法别名，使用闭包防止访问到不正确的对象
-    originModelCls = originDefine.call(db, name, attributes, options);
+    let originModelCls = originDefine.call(db, name, attributes, options);
     originModelCls.oneAsync = (function(_) {
       return function(where) {
         return _.findOne({ where });
@@ -140,7 +140,7 @@ Storage.prototype.test = function() {
 Storage.prototype.registerModel = function(modelFn) {
   if (typeof modelFn != 'function') {
     throw new TypeError(
-      `registerModel error: type of model must be Function not ${typeof model}`
+      `registerModel error: type of model must be Function not ${typeof modelFn}`
     );
   }
 

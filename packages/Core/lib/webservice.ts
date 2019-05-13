@@ -10,7 +10,8 @@ const Router = require('koa-router');
 const fs = require('fs-extra');
 const path = require('path');
 const { WebSessionMiddleware } = require('./utils/iosession');
-const debug = require('debug')('trpg:webservice');
+import Debug from 'debug';
+const debug = Debug('trpg:webservice');
 const koaDebug = require('debug')('trpg:webservice:koa');
 const appLogger = require('./logger')('application');
 
@@ -19,6 +20,8 @@ const publicDir = path.resolve(process.cwd(), './public');
 module.exports = WebService;
 
 class SessionStore {
+  trpgapp: any;
+
   constructor(trpgapp) {
     this.trpgapp = trpgapp;
   }
@@ -36,7 +39,7 @@ class SessionStore {
   }
 }
 
-function WebService(opts) {
+function WebService(opts): void {
   if (!(this instanceof WebService)) return new WebService(opts);
   this._app = new Koa();
   this._server = http.createServer(this._app.callback());

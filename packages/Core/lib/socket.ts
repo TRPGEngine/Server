@@ -1,12 +1,13 @@
 const IO = require('socket.io');
-const debug = require('debug')('trpg:socket');
+import Debug from 'debug';
+const debug = Debug('trpg:socket');
 const logger = require('./logger')();
 const appLogger = require('./logger')('application');
 const packageInfo = require('../../../package.json');
 
-const applog = (...args) => {
-  debug(...args);
-  appLogger.info(...args);
+const applog = (formatter, ...args) => {
+  debug(formatter, ...args);
+  appLogger.info(formatter, ...args);
 };
 
 const ioOpts = {
@@ -16,6 +17,10 @@ const ioOpts = {
 
 // socket.io 服务
 class SocketService {
+  _app;
+  _io;
+  events;
+
   constructor(app) {
     if (!app) {
       throw new Error('init socket service error: require app');
@@ -118,7 +123,7 @@ class SocketService {
           } else {
             applog(
               'unhandled error msg return on %s, received %o',
-              event.name,
+              eventName,
               data
             );
           }

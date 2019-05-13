@@ -1,7 +1,8 @@
 const util = require('util');
 const Redis = require('ioredis');
-const debug = require('debug')('trpg:cache');
-const _ = require('lodash');
+import Debug from 'debug';
+const debug = Debug('trpg:cache');
+import _ from 'lodash';
 
 const defaultOption = {
   expires: 1000 * 60 * 60 * 24, // 默认缓存一天, 0为不过期

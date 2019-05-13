@@ -3,14 +3,15 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "target": "es6",
-    "noImplicitAny": true,
+    "lib": ["es6"],
+    "noImplicitAny": false,
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*", "packages/*/types/*"]
+      "*": ["node_modules/*"] // packages/*/types/*
     }
   },
-  "include": ["src/**/*"]
+  "include": ["packages/**/*"]
 }

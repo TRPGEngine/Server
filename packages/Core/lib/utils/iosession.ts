@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-function IOSessionMiddleware(webapp, opt) {
+export function IOSessionMiddleware(webapp, opt) {
   const store = opt.store;
   const key = opt.key || 'koa:sess';
 
@@ -22,7 +22,7 @@ function IOSessionMiddleware(webapp, opt) {
   };
 }
 
-function WebSessionMiddleware(webapp, opt) {
+export function WebSessionMiddleware(webapp, opt) {
   const store = opt.store;
   const key = opt.key || 'koa:sess';
 
