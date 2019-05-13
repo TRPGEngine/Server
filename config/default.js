@@ -8,7 +8,6 @@ module.exports = {
     options: {
       host: 'localhost',
       dialect: 'mysql',
-      operatorsAliases: false,
       pool: {
         max: 5,
         min: 0,
