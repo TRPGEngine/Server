@@ -178,6 +178,14 @@ class SocketService {
   getAllEvents() {
     return this.events;
   }
+
+  on(name, cb) {
+    this._io.on(name, cb);
+  }
+
+  close(cb) {
+    this._io.close(cb);
+  }
 }
 
 module.exports = SocketService;
