@@ -10,7 +10,7 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*"] // packages/*/types/*
+      "*": ["node_modules/*"]
     }
   },
   "include": ["packages/**/*"]

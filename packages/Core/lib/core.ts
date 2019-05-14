@@ -1,23 +1,16 @@
-const EventEmitter = require('events').EventEmitter;
-const mixin = require('merge-descriptors');
-const proto = require('./application');
-const globals = require('./globals');
-const debug = require('debug')('trpg:core');
+import Application from './application';
+import Debug from 'debug';
+const debug = Debug('trpg:core');
 
 require('./utils'); // 引入工具拓展
 
 exports = module.exports = createApplication;
 
 function createApplication(conf) {
-  let app = {};
-
-  mixin(app, EventEmitter.prototype, false);
-  mixin(app, globals, false);
-  mixin(app, proto, false);
+  const app = new Application();
 
   setConfig(app, conf);
 
-  // app.init();
   return app;
 }
 
