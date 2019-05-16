@@ -1,5 +1,5 @@
 const util = require('util');
-const Redis = require('ioredis');
+import Redis from 'ioredis';
 import Debug from 'debug';
 const debug = Debug('trpg:cache');
 import _ from 'lodash';
@@ -69,7 +69,7 @@ RedisCache.prototype.remove = function(key) {
 };
 RedisCache.prototype.close = function() {
   debug('start closing redis cli');
-  return this.redis.disconnect();
+  this.redis.disconnect();
 };
 
 exports.Cache = Cache;

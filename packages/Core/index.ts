@@ -1,1 +1,4 @@
-module.exports = require('./lib/core');
+import Core from './lib/core';
+export default Core;
+
+module.exports = Core;

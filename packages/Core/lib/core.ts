@@ -4,9 +4,7 @@ const debug = Debug('trpg:core');
 
 require('./utils'); // 引入工具拓展
 
-exports = module.exports = createApplication;
-
-function createApplication(conf) {
+export default function createApplication(conf) {
   const app = new Application();
 
   setConfig(app, conf);
