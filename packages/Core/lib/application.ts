@@ -16,9 +16,12 @@ const logger = require('./logger')();
 const appLogger = require('./logger')('application');
 import xss from 'xss';
 
+type AppSettings = {
+  [key: string]: string | number | {};
+};
+
 class Application extends events.EventEmitter {
-  engines = {};
-  settings = {}; // 设置配置列表
+  settings: AppSettings = {}; // 设置配置列表
   storage = null; // 数据库服务列表
   cache = null; // 缓存服务
   reportservice = null; // 汇报服务
