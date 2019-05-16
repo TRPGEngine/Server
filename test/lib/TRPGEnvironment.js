@@ -22,11 +22,14 @@ class TRPGEnvironment extends NodeEnvironment {
   async setup() {
     debug('Setup TRPG Test Environment');
 
-    socket.open();
-
     // 创建trpg实例
     trpgapp = generateTRPGInstance();
     const db = trpgapp.storage.db;
+
+    socket.open();
+    socket.on('error', (err) => {
+      console.error('[TRPG-Test]', 'socket-client:', err);
+    });
 
     // 声明沙盒内可用的全局变量
     this.global._ = lodash;
