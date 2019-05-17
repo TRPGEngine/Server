@@ -19,10 +19,11 @@ function initStorage() {
   let app = this;
   let storage = app.storage;
   storage.registerModel(require('./models/jpush.js'));
+  storage.registerModel(require('./models/history.js'));
 
   app.on('initCompleted', function(app) {
     // 数据信息统计
-    debug('storage has been load 1 notify db model');
+    debug('storage has been load 2 notify db model');
   });
 }
 
@@ -49,12 +50,25 @@ function initFunction() {
   app.notify = {
     JPush,
     _client,
+    async addNotifyHistory(options) {
+      const ret = await db.models.notify_history.create({
+        type: 'jpush',
+        ...options,
+      });
+      return ret;
+    },
     async sendNotifyMsg(userUUID, title, msg, options = {}) {
       // TODO: 需要做频率限制与在线监测
       const platform = _.get(options, 'platform', JPush.ALL);
       const audience = _.get(options, 'audience', JPush.alias(userUUID));
 
-      // TODO: 增加到history
+      // 增加到history
+      app.notify.addNotifyHistory({
+        platform: 'all',
+        user_uuid: userUUID,
+        notification: title,
+        message: msg,
+      });
 
       return await _client
         .push()
@@ -79,7 +93,13 @@ function initFunction() {
         JPush.registration_id(registrationId)
       );
 
-      // TODO: 增加到history
+      // 增加到history
+      app.notify.addNotifyHistory({
+        platform: 'all',
+        registration_id: registrationId,
+        notification: title,
+        message: msg,
+      });
 
       return await _client
         .push()
