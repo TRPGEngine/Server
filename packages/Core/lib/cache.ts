@@ -24,7 +24,7 @@ interface ICache {
     options: CacheOptions
   ): Promise<CacheValue>;
   get(key: string): Promise<CacheValue>;
-  getWithGlob(glob: string): Promise<CacheValue>;
+  getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }>;
   remove(key: string): Promise<any>;
   close(): void;
 }
@@ -64,13 +64,14 @@ export class Cache implements ICache {
     return Promise.resolve(null);
   }
 
-  getWithGlob(glob: string): Promise<CacheValue[]> {
+  getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }> {
     const keys = Object.keys(this.data).filter(minimatch.filter(glob));
     if (keys.length > 0) {
-      const list = keys
+      const values = keys
         .map((key) => this.data[key])
-        .filter((x) => !x.expires || x.expires < new Date().valueOf());
-      return Promise.resolve(list);
+        .filter((x) => !x.expires || x.expires < new Date().valueOf())
+        .map((val) => val.rawData);
+      return Promise.resolve(_.zipObject(keys, values));
     }
     return Promise.resolve(null);
   }
@@ -122,11 +123,11 @@ export class RedisCache implements ICache {
     return JSON.parse(val);
   }
 
-  async getWithGlob(glob: string): Promise<CacheValue[]> {
+  async getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }> {
     const keys = await this.redis.keys(glob);
     if (keys.length > 0) {
-      const list = keys.map((key) => this.redis.get(this.genKey(key)));
-      return Promise.all(list).then((l) => l.map((val) => JSON.parse(val)));
+      const values = await Promise.all(keys.map((key) => this.get(key)));
+      return _.zipObject(keys, values);
     }
     return Promise.resolve(null);
   }
