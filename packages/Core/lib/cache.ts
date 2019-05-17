@@ -3,6 +3,7 @@ import Redis from 'ioredis';
 import Debug from 'debug';
 const debug = Debug('trpg:cache');
 import _ from 'lodash';
+import minimatch from 'minimatch';
 
 type CacheValue = string | number | {};
 interface CacheOptions {
@@ -23,6 +24,7 @@ interface ICache {
     options: CacheOptions
   ): Promise<CacheValue>;
   get(key: string): Promise<CacheValue>;
+  getWithGlob(glob: string): Promise<CacheValue>;
   remove(key: string): Promise<any>;
   close(): void;
 }
@@ -62,6 +64,17 @@ export class Cache implements ICache {
     return Promise.resolve(null);
   }
 
+  getWithGlob(glob: string): Promise<CacheValue[]> {
+    const keys = Object.keys(this.data).filter(minimatch.filter(glob));
+    if (keys.length > 0) {
+      const list = keys
+        .map((key) => this.data[key])
+        .filter((x) => !x.expires || x.expires < new Date().valueOf());
+      return Promise.resolve(list);
+    }
+    return Promise.resolve(null);
+  }
+
   remove(key: string) {
     if (this.data[key]) {
       delete this.data[key];
@@ -84,6 +97,10 @@ export class RedisCache implements ICache {
     this.redis = new Redis(this.url);
   }
 
+  private genKey(key: string) {
+    return `trpg:${key}`;
+  }
+
   set(
     key: string,
     value: CacheValue,
@@ -92,21 +109,30 @@ export class RedisCache implements ICache {
     options = Object.assign({}, defaultOption, options);
 
     debug('[redis]', `set ${key} to ${JSON.stringify(value)}`);
-    this.redis.set(`trpg:${key}`, JSON.stringify(value));
+    this.redis.set(this.genKey(key), JSON.stringify(value));
     if (options.expires > 0) {
       // 使用redis内置的过期机制
-      this.redis.pexpire(`trpg:${key}`, options.expires);
+      this.redis.pexpire(this.genKey(key), options.expires);
     }
-    return this.redis.set(`trpg:${key}`, JSON.stringify(value));
+    return this.redis.set(this.genKey(key), JSON.stringify(value));
   }
 
   async get(key: string): Promise<CacheValue> {
-    const val = await this.redis.get(`trpg:${key}`);
+    const val = await this.redis.get(this.genKey(key));
     return JSON.parse(val);
   }
 
+  async getWithGlob(glob: string): Promise<CacheValue[]> {
+    const keys = await this.redis.keys(glob);
+    if (keys.length > 0) {
+      const list = keys.map((key) => this.redis.get(this.genKey(key)));
+      return Promise.all(list).then((l) => l.map((val) => JSON.parse(val)));
+    }
+    return Promise.resolve(null);
+  }
+
   remove(key: string): Promise<number> {
-    return this.redis.del(`trpg:${key}`);
+    return this.redis.del(this.genKey(key));
   }
 
   close(): void {
