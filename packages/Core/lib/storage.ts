@@ -1,16 +1,24 @@
-const Sequelize = require('sequelize');
+import { Sequelize, Options, Op } from 'sequelize';
 const transaction = require('orm-transaction');
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
 import process from 'process';
-const debug = require('debug')('trpg:storage');
-const debugSQL = require('debug')('trpg:storage:sql');
-const appLogger = require('./logger')('application');
-const _set = require('lodash/set');
+import Debug from 'debug';
+const debug = Debug('trpg:storage');
+const debugSQL = Debug('trpg:storage:sql');
 
-module.exports = Storage;
+import { getLogger } from './logger';
+const appLogger = getLogger('application');
+import _set from 'lodash/set';
 
-const defaultDbOptions = {
+interface TRPGDbOptions {
+  database: string;
+  username: string;
+  password: string;
+  options: Options;
+}
+
+const defaultDbOptions: Options = {
   logging(sql) {
     debugSQL(sql);
   },
@@ -20,20 +28,74 @@ const defaultDbOptions = {
   },
 };
 
-function Storage(dbconfig): void {
-  if (!(this instanceof Storage)) return new Storage(dbconfig);
+export default class Storage {
+  db: Sequelize;
+  _Sequelize = Sequelize;
+  Op = Op;
+  models = [];
 
-  this.db = this.initDb(dbconfig);
-  this._Sequelize = Sequelize;
-  this.Op = Sequelize.Op;
-  this.models = [];
+  constructor(dbconfig: TRPGDbOptions) {
+    this.db = this.initDb(dbconfig);
 
-  redefineDb(this.db);
+    redefineDb(this.db);
+  }
+
+  // 初始化并返回一个db实例
+  initDb(dbconfig: TRPGDbOptions) {
+    let db: Sequelize;
+    if (typeof dbconfig === 'string') {
+      db = new Sequelize(dbconfig);
+    } else {
+      let { database, username, password, options } = dbconfig;
+
+      options = Object.assign({}, defaultDbOptions, options);
+      db = new Sequelize(database, username, password, options);
+    }
+
+    return db;
+  }
+
+  test() {
+    this.db
+      .authenticate()
+      .then(() => {
+        console.log('连接测试成功.');
+      })
+      .catch((err) => {
+        console.error('无法连接到数据库:', err);
+      });
+  }
+
+  // 注册模型
+  registerModel(modelFn) {
+    if (typeof modelFn != 'function') {
+      throw new TypeError(
+        `registerModel error: type of model must be Function not ${typeof modelFn}`
+      );
+    }
+
+    debug('register model %o success!', modelFn);
+    appLogger.info('register model %o success!', modelFn);
+    const model = modelFn(this._Sequelize, this.db);
+    this.models.push(model);
+  }
+
+  reset(force = false) {
+    return this.db.sync({ force });
+  }
+
+  query(sql: string) {
+    return this.db.query(sql);
+  }
+
+  close() {
+    return this.db.close();
+  }
 }
 
 // 重定义orm db实例的部分行为
 function redefineDb(db) {
-  db.op = Sequelize.Op;
+  db.op = Op;
   db.transactionAsync = async (fn) => {
     // TODO: 需要实现一个自动传递transaction的事务方法
     if (fn) {
@@ -75,169 +137,3 @@ function redefineDb(db) {
     return originModelCls;
   };
 }
-
-// 返回一个db实例
-Storage.prototype.initDb = function(dbconfig) {
-  let db;
-  if (typeof dbconfig === 'string') {
-    db = new Sequelize(dbconfig);
-  } else {
-    let { database, username, password, options } = dbconfig;
-
-    options = Object.assign({}, defaultDbOptions, options);
-    db = new Sequelize(database, username, password, options);
-  }
-
-  return db;
-};
-
-Storage.prototype.test = function() {
-  this.db
-    .authenticate()
-    .then(() => {
-      console.log('连接测试成功.');
-    })
-    .catch((err) => {
-      console.error('无法连接到数据库:', err);
-    });
-};
-// Storage.prototype.getModels = function(db, cb) {
-//   try {
-//     db.settings.set('instance.returnAllErrors', true);
-//     db.use(transaction);
-//
-//     for (model of this.models) {
-//       model(orm, db);
-//     }
-//
-//     // cb(null, db);
-//     return db;
-//   } catch (e) {
-//     // cb(e);
-//     throw new Error(e);
-//   }
-// }
-// Storage.prototype.connect = function(cb) {
-//   let storage = this;
-//   orm.connect(storage.dirverUrl, function(err, db) {
-//     if (err) throw new Error('Connection error: ' + err);
-//
-//     cb(storage.getModels(db));
-//   });
-// }
-// Storage.prototype.connectAsync = async function() {
-//   let storage = this;
-//   let db;
-//   try {
-//     db = await orm.connectAsync(storage.dirverUrl);
-//     db = storage.getModels(db);
-//   }catch(e) {
-//     throw new Error(e);
-//   }
-//
-//   return db;
-// }
-Storage.prototype.registerModel = function(modelFn) {
-  if (typeof modelFn != 'function') {
-    throw new TypeError(
-      `registerModel error: type of model must be Function not ${typeof modelFn}`
-    );
-  }
-
-  debug('register model %o success!', modelFn);
-  appLogger.info('register model %o success!', modelFn);
-  const model = modelFn(this._Sequelize, this.db);
-  this.models.push(model);
-};
-
-Storage.prototype.reset = function(force = false) {
-  // if(this.type === 'file') {
-  //   let filepath = path.resolve(process.cwd(), './db/');
-  //   // 创建文件夹
-  //   let dbDirExists = fs.existsSync(filepath);
-  //   if(!dbDirExists) {
-  //     fs.mkdirSync(filepath);
-  //   }
-  // }
-  //
-  // this.connect(function(db) {
-  //   db.drop(function(err) {
-  //     if (err) throw err;
-  //
-  //     db.sync(function (err) {
-  //       if (err) throw err;
-  //
-  //       cb(db);
-  //     });
-  //   });
-  // })
-  return this.db.sync({ force });
-};
-
-Storage.prototype.resetAsync = async function(cb) {
-  if (this.type === 'file') {
-    let filepath = path.resolve(process.cwd(), './db/');
-    // 创建文件夹
-    let dbDirExists = fs.existsSync(filepath);
-    if (!dbDirExists) {
-      fs.mkdirSync(filepath);
-    }
-  }
-
-  try {
-    const db = await this.connectAsync();
-    console.log('is dropping db...');
-    await db.dropAsync();
-    console.log('is recreate db...');
-    await db.syncPromise();
-    console.log('start reset module db...');
-    await cb(db);
-    console.log('reset completed!');
-  } catch (err) {
-    console.error('reset error:');
-    console.error(err);
-    process.exit(1);
-  }
-};
-
-Storage.prototype.syncAsync = async function() {
-  if (this.type === 'file') {
-    let filepath = path.resolve(process.cwd(), './db/');
-    // 创建文件夹
-    let dbDirExists = fs.existsSync(filepath);
-    if (!dbDirExists) {
-      fs.mkdirSync(filepath);
-    }
-  }
-
-  try {
-    const db = await this.connectAsync();
-    console.log('is sync db...');
-    await db.syncPromise();
-    console.log('sync completed!');
-  } catch (err) {
-    console.error('reset error:');
-    console.error(err);
-    process.exit(1);
-  }
-};
-
-/*
-db.driver.execQuery("SELECT id, email FROM user", function (err, data) { ... })
-// 上面是直接执行SQL，下面是类似参数化。   列用??表示, 列值用?表示。   建议使用下面这种
-db.driver.execQuery(
-  "SELECT user.??, user.?? FROM user WHERE user.?? LIKE ? AND user.?? > ?",
-  ['id', 'name', 'name', 'john', 'id', 55],
-  function (err, data) { ... }
-)
-*/
-Storage.prototype.query = function(sql, params, cb) {
-  this.connect(function(db) {
-    db.driver.execQuery(sql, params, cb);
-  });
-};
-
-// return Promise
-Storage.prototype.close = function() {
-  return this.db.close();
-};

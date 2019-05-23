@@ -1,6 +1,7 @@
 const Raven = require('raven');
-const appLogger = require('./logger')('application');
-const errorLogger = require('./logger')('error');
+import { getLogger } from './logger';
+const appLogger = getLogger('application');
+const errorLogger = getLogger('error');
 
 module.exports = Report;
 

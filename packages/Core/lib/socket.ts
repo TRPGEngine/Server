@@ -1,8 +1,9 @@
 const IO = require('socket.io');
 import Debug from 'debug';
 const debug = Debug('trpg:socket');
-const logger = require('./logger')();
-const appLogger = require('./logger')('application');
+import { getLogger } from './logger';
+const logger = getLogger();
+const appLogger = getLogger('application');
 const packageInfo = require('../../../package.json');
 
 const applog = (formatter, ...args) => {

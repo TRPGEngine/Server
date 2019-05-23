@@ -7,13 +7,14 @@ const path = require('path');
 const axios = require('axios');
 const _ = require('lodash');
 const { IOSessionMiddleware } = require('./utils/iosession');
-const Storage = require('./storage');
+import Storage from './storage';
 const { Cache, RedisCache } = require('./cache');
 const ReportService = require('./report');
 const WebService = require('./webservice');
 const SocketService = require('./socket');
-const logger = require('./logger')();
-const appLogger = require('./logger')('application');
+import { getLogger } from './logger';
+const logger = getLogger();
+const appLogger = getLogger('application');
 import xss from 'xss';
 
 type AppSettings = {
@@ -368,15 +369,6 @@ class Application extends events.EventEmitter {
         console.error('reset storage error', err);
         throw err;
       }
-    }
-  }
-
-  async dbSync() {
-    let app = this;
-    let storage = this.storage;
-    if (storage) {
-      applog('start sync storage');
-      await storage.syncAsync();
     }
   }
 

@@ -1,4 +1,4 @@
-const log4js = require('log4js');
+import log4js from 'log4js';
 log4js.configure({
   appenders: {
     datelog: {
@@ -31,7 +31,7 @@ log4js.configure({
 let defaultLogger = null;
 let loggers = {};
 
-function getDefaultLogger(loggerName) {
+export function getLogger(loggerName?: string) {
   if (loggerName) {
     if (!!loggers[loggerName]) {
       return loggers[loggerName];
@@ -50,5 +50,3 @@ function getDefaultLogger(loggerName) {
     }
   }
 }
-
-module.exports = getDefaultLogger;

@@ -13,7 +13,8 @@ const { WebSessionMiddleware } = require('./utils/iosession');
 import Debug from 'debug';
 const debug = Debug('trpg:webservice');
 const koaDebug = require('debug')('trpg:webservice:koa');
-const appLogger = require('./logger')('application');
+import { getLogger } from './logger';
+const appLogger = getLogger('application');
 
 const publicDir = path.resolve(process.cwd(), './public');
 
