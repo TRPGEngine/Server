@@ -1,11 +1,10 @@
 #!/bin/bash
-inv=`pwd`
+cd `dirname $0`
 dirs=$(ls -l | awk '/^d/ {print $NF}')
 
 for dir in $dirs
 do
   echo '开始处理:\t'$dir
-  # cd $inv/$p
   (
     cd $dir
     if [[ ! -n $1 ]]; then
