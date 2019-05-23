@@ -1,14 +1,14 @@
 import events from 'events';
 import Debug from 'debug';
 const debug = Debug('trpg:application');
-const schedule = require('node-schedule');
-const fs = require('fs-extra');
-const path = require('path');
-const axios = require('axios');
-const _ = require('lodash');
+import schedule from 'node-schedule';
+import fs from 'fs-extra';
+import path from 'path';
+import axios from 'axios';
+import _ from 'lodash';
 const { IOSessionMiddleware } = require('./utils/iosession');
-import Storage from './storage';
-const { Cache, RedisCache } = require('./cache');
+import Storage, { TRPGDbOptions } from './storage';
+import { Cache, RedisCache, ICache } from './cache';
 const ReportService = require('./report');
 const WebService = require('./webservice');
 const SocketService = require('./socket');
@@ -21,15 +21,20 @@ type AppSettings = {
   [key: string]: string | number | {};
 };
 
+type InternalEventFunc = (...args: any) => Promise<void>;
+type InternalEvents = {
+  [eventName: string]: Array<InternalEventFunc>;
+};
+
 class Application extends events.EventEmitter {
   settings: AppSettings = {}; // 设置配置列表
-  storage = null; // 数据库服务列表
-  cache = null; // 缓存服务
+  storage: Storage = null; // 数据库服务列表
+  cache: ICache = null; // 缓存服务
   reportservice = null; // 汇报服务
   webservice = null; // 网页服务
   socketservice = null; // websocket服务
   components = []; // 组件列表
-  events = {}; // 内部事件列表
+  events: InternalEvents = {}; // 内部事件列表
   timers = []; // 计时器列表
   webApi = {}; // 网页服务api
   statInfoJob = []; // 统计信息任务
@@ -113,13 +118,11 @@ class Application extends events.EventEmitter {
   }
 
   initStorage() {
-    let opts = {};
-
-    let dbconfig = this.get('db');
+    const dbconfig = this.get('db') as TRPGDbOptions;
     this.storage = new Storage(dbconfig);
   }
   initCache() {
-    let redisUrl = this.get('redisUrl');
+    const redisUrl = this.get('redisUrl').toString();
     if (redisUrl) {
       this.cache = new RedisCache({ url: redisUrl });
     } else {
@@ -170,7 +173,7 @@ class Application extends events.EventEmitter {
   }
 
   // eventFn is async/await fn
-  register(appEventName, eventFn) {
+  register(appEventName: string, eventFn: InternalEventFunc) {
     if (!!this.events[appEventName]) {
       this.events[appEventName].push(eventFn);
     } else {
@@ -304,23 +307,23 @@ class Application extends events.EventEmitter {
   }
 
   // 支持get('xxx.xxx')获取
-  get(path, defaultValue = '') {
+  get(path: string, defaultValue = '') {
     return _.get(this.settings, path, defaultValue);
   }
 
-  enabled(setting) {
+  enabled(setting: string) {
     return Boolean(this.set(setting));
   }
 
-  disabled(setting) {
+  disabled(setting: string) {
     return !this.set(setting);
   }
 
-  enable(setting) {
+  enable(setting: string) {
     return this.set(setting, true);
   }
 
-  disable(setting) {
+  disable(setting: string) {
     return this.set(setting, false);
   }
 

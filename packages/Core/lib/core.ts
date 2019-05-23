@@ -4,7 +4,7 @@ const debug = Debug('trpg:core');
 
 require('./utils'); // 引入工具拓展
 
-export default function createApplication(conf) {
+export default function createApplication(conf): Application {
   const app = new Application();
 
   setConfig(app, conf);
@@ -12,7 +12,7 @@ export default function createApplication(conf) {
   return app;
 }
 
-function setConfig(app, conf) {
+function setConfig(app: Application, conf) {
   if (!conf) {
     return;
   }

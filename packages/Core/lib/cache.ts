@@ -17,7 +17,7 @@ const defaultOption: CacheOptions = {
   expires: 1000 * 60 * 60 * 24, // 默认缓存一天, 0为不过期
 };
 
-interface ICache {
+export interface ICache {
   set(
     key: string,
     value: CacheValue,
@@ -124,6 +124,7 @@ export class RedisCache implements ICache {
   }
 
   async getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }> {
+    // TODO: 需要使用scan来优化
     const keys = await this.redis.keys(glob);
     if (keys.length > 0) {
       const values = await Promise.all(keys.map((key) => this.get(key)));

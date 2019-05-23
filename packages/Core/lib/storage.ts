@@ -11,7 +11,7 @@ import { getLogger } from './logger';
 const appLogger = getLogger('application');
 import _set from 'lodash/set';
 
-interface TRPGDbOptions {
+export interface TRPGDbOptions {
   database: string;
   username: string;
   password: string;

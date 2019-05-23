@@ -1,4 +1,9 @@
-import log4js from 'log4js';
+import log4js, { Logger } from 'log4js';
+
+interface LoggerList {
+  [loggerName: string]: Logger;
+}
+
 log4js.configure({
   appenders: {
     datelog: {
@@ -28,10 +33,10 @@ log4js.configure({
     error: { appenders: ['error'], level: 'error' },
   },
 });
-let defaultLogger = null;
-let loggers = {};
+let defaultLogger: Logger = null;
+let loggers: LoggerList = {};
 
-export function getLogger(loggerName?: string) {
+export function getLogger(loggerName?: string): Logger {
   if (loggerName) {
     if (!!loggers[loggerName]) {
       return loggers[loggerName];
