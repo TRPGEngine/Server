@@ -1444,7 +1444,7 @@
                     "required": true,
                     "allowNull": false,
                     "field": "stack",
-                    "seqType": "Sequelize.STRING(1000)"
+                    "seqType": "Sequelize.TEXT"
                 },
                 "createdAt": {
                     "allowNull": false,
@@ -2018,7 +2018,60 @@
                 }
             },
             "indexes": []
+        },
+        "notify_history": {
+            "tableName": "notify_history",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "type": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('jpush')"
+                },
+                "platform": {
+                    "field": "platform",
+                    "seqType": "Sequelize.ENUM('all', 'android', 'ios')"
+                },
+                "registration_id": {
+                    "field": "registration_id",
+                    "seqType": "Sequelize.STRING"
+                },
+                "user_uuid": {
+                    "field": "user_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "user_tags": {
+                    "field": "user_tags",
+                    "seqType": "Sequelize.JSON"
+                },
+                "notification": {
+                    "field": "notification",
+                    "seqType": "Sequelize.STRING"
+                },
+                "message": {
+                    "field": "message",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
         }
     },
-    "revision": 2
+    "revision": 3
 }
