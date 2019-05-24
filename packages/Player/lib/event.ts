@@ -61,6 +61,7 @@ exports.login = async function login(data, cb, db) {
     await db.models.player_login_log.createAsync({
       user_name: username,
       type: isApp ? 'app_standard' : 'standard',
+      socket_id: socket.id,
       ip,
       platform,
       device_info: {
@@ -101,6 +102,7 @@ exports.login = async function login(data, cb, db) {
       user_uuid: user.uuid,
       user_name: user.username,
       type: isApp ? 'app_standard' : 'standard',
+      socket_id: socket.id,
       ip,
       platform,
       device_info: {
@@ -149,6 +151,8 @@ exports.loginWithToken = async function loginWithToken(data, cb, db) {
     await db.models.player_login_log.createAsync({
       user_uuid: uuid,
       type: isApp ? 'app_token' : 'token',
+      socket_id: socket.id,
+      channel,
       ip,
       platform,
       device_info: {
@@ -179,6 +183,7 @@ exports.loginWithToken = async function loginWithToken(data, cb, db) {
       user_uuid: user.uuid,
       user_name: user.username,
       type: isApp ? 'app_token' : 'token',
+      socket_id: socket.id,
       channel,
       ip,
       platform,
@@ -327,6 +332,9 @@ exports.logout = async function logout(data, cb, db) {
     debug('logout success!user %s has been logout', user.uuid);
     user.token = '';
     await user.save();
+
+    // 记录用户离线时间
+    app.player.recordUserOfflineDate(socket);
 
     // 从列表中移除
     if (!!app.player) {

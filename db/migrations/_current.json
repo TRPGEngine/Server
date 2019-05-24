@@ -210,6 +210,10 @@
                     "field": "channel",
                     "seqType": "Sequelize.STRING"
                 },
+                "socket_id": {
+                    "field": "socket_id",
+                    "seqType": "Sequelize.STRING"
+                },
                 "ip": {
                     "field": "ip",
                     "seqType": "Sequelize.STRING"
@@ -233,6 +237,10 @@
                 "token": {
                     "field": "token",
                     "seqType": "Sequelize.STRING"
+                },
+                "offline_date": {
+                    "field": "offline_date",
+                    "seqType": "Sequelize.DATE"
                 },
                 "createdAt": {
                     "allowNull": false,
@@ -2073,5 +2081,5 @@
             "indexes": []
         }
     },
-    "revision": 3
+    "revision": 4
 }

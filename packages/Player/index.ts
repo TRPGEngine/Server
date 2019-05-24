@@ -133,7 +133,31 @@ function initFunction() {
       let player = await db.models.player_user.create(data);
       return player;
     },
+    // 记录用户离线时间
+    recordUserOfflineDate: async function(socket) {
+      const player = app.player.list.find(socket);
+      if (player) {
+        // 如果该用户已登录
+        const lastLog = await db.models.player_login_log.findOne({
+          where: {
+            user_uuid: player.uuid,
+            socket_id: socket.id,
+          },
+          order: [['id', 'desc']],
+        });
+        if (lastLog) {
+          // 如果有记录则更新，没有记录则无视
+          lastLog.offline_date = new Date();
+          await lastLog.save();
+        }
+      }
+    },
   };
+
+  // 断开连接时记录登出时间
+  app.on('disconnect', (socket) => {
+    app.player.recordUserOfflineDate(socket);
+  });
 }
 function initSocket() {
   let app = this;
