@@ -1,4 +1,12 @@
-import { Sequelize, Options, Op } from 'sequelize';
+import SequelizeStatic, {
+  Sequelize,
+  Options,
+  Op,
+  Model,
+  ModelOptions,
+  DataType,
+  ModelAttributeColumnOptions,
+} from 'sequelize';
 const transaction = require('orm-transaction');
 import path from 'path';
 import fs from 'fs';
@@ -18,6 +26,24 @@ export interface TRPGDbOptions {
   options: Options;
 }
 
+interface TRPGModelAttributes {
+  [name: string]:
+    | DataType
+    | (ModelAttributeColumnOptions & {
+        required?: true;
+      });
+}
+// 魔改一下db的类型，加入了一些自己的参数
+export type DBInstance = Sequelize & {
+  op?: typeof Op;
+  transactionAsync?: any;
+  define: (
+    modelName: string,
+    attributes: TRPGModelAttributes,
+    options?: ModelOptions
+  ) => typeof Model;
+};
+
 const defaultDbOptions: Options = {
   logging(sql) {
     debugSQL(sql);
@@ -29,8 +55,8 @@ const defaultDbOptions: Options = {
 };
 
 export default class Storage {
-  db: Sequelize;
-  _Sequelize = Sequelize;
+  db: DBInstance;
+  _Sequelize = SequelizeStatic;
   Op = Op;
   models = [];
 
@@ -94,7 +120,7 @@ export default class Storage {
 }
 
 // 重定义orm db实例的部分行为
-function redefineDb(db) {
+function redefineDb(db: DBInstance) {
   db.op = Op;
   db.transactionAsync = async (fn) => {
     // TODO: 需要实现一个自动传递transaction的事务方法
