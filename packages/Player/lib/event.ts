@@ -1,4 +1,5 @@
-const debug = require('debug')('trpg:component:player:event');
+import Debug from 'debug';
+const debug = Debug('trpg:component:player:event');
 const md5 = require('../md5');
 const uuid = require('uuid/v1');
 const _ = require('lodash');
@@ -136,9 +137,9 @@ exports.loginWithToken = async function loginWithToken(data, cb, db) {
 
   let cond = { uuid };
   if (isApp) {
-    cond.app_token = token;
+    cond['app_token'] = token;
   } else {
-    cond.token = token;
+    cond['token'] = token;
   }
   let user = await db.models.player_user.oneAsync(cond);
 
@@ -313,9 +314,9 @@ exports.logout = async function logout(data, cb, db) {
 
   let where = { uuid };
   if (isApp) {
-    where.app_token = token;
+    where['app_token'] = token;
   } else {
-    where.token = token;
+    where['token'] = token;
   }
 
   let user = await db.models.player_user.findOne({ where });
@@ -345,7 +346,7 @@ exports.findUser = async function findUser(data, cb, db) {
     throw '缺少参数';
   }
 
-  let User = db.models.player_user;
+  const User = db.models.player_user;
   let users = [];
   if (type === 'uuid') {
     users = await User.findAll({
@@ -373,7 +374,7 @@ exports.findUser = async function findUser(data, cb, db) {
   }
 
   let results = [];
-  for (user of users) {
+  for (let user of users) {
     results.push(user.getInfo());
   }
   return { results };

@@ -1,4 +1,5 @@
-const debug = require('debug')('trpg:component:player');
+import Debug from 'debug';
+const debug = Debug('trpg:component:player');
 const uuid = require('uuid/v1');
 const Router = require('koa-router');
 const Geetest = require('gt3-sdk');
@@ -37,10 +38,10 @@ function initConfig() {
 function initStorage() {
   let app = this;
   let storage = app.storage;
-  storage.registerModel(require('./lib/models/user.js'));
-  storage.registerModel(require('./lib/models/invite.js'));
-  storage.registerModel(require('./lib/models/loginLog.js'));
-  storage.registerModel(require('./lib/models/settings.js'));
+  storage.registerModel(require('./lib/models/user'));
+  storage.registerModel(require('./lib/models/invite'));
+  storage.registerModel(require('./lib/models/loginLog'));
+  storage.registerModel(require('./lib/models/settings'));
 
   app.on('initCompleted', function(app) {
     // 数据信息统计
@@ -107,7 +108,7 @@ function initFunction() {
         console.error('加入房间失败:', e);
       }
     },
-    leaveSocketRoom: function() {
+    leaveSocketRoom: function(userUUID, roomUUID) {
       try {
         let player = app.player.list.get(userUUID);
         if (player) {

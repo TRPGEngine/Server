@@ -1,4 +1,5 @@
-const debug = require('debug')('trpg:component:player:router:register');
+import Debug from 'debug';
+const debug = Debug('trpg:component:player:router:register');
 const Router = require('koa-router');
 const router = new Router();
 const geetestWrapper = require('../utils/geetestWrapper');

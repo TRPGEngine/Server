@@ -1,17 +1,16 @@
-const debug = require('debug')('trpg:component:player:list');
+import Debug from 'debug';
+const debug = Debug('trpg:component:player:list');
 
 module.exports = PlayerList;
 
 function PlayerList() {
-  if (!(this instanceof PlayerList)) return new PlayerList();
-
   this.list = [];
   return this;
 }
 
 PlayerList.prototype.find = function find(socket) {
   let result = null;
-  for (player of this.list) {
+  for (let player of this.list) {
     if (player.socket === socket) {
       result = player;
       break;
@@ -23,7 +22,7 @@ PlayerList.prototype.find = function find(socket) {
 
 PlayerList.prototype.get = function get(uuid) {
   let result = null;
-  for (player of this.list) {
+  for (let player of this.list) {
     if (player.uuid === uuid) {
       result = player;
       break;
@@ -35,7 +34,7 @@ PlayerList.prototype.get = function get(uuid) {
 
 PlayerList.prototype.add = function add(user, socket) {
   let uuid = user.uuid;
-  for (player of this.list) {
+  for (let player of this.list) {
     if (player.uuid === uuid) {
       // TODO: 修改为允许多端登录。并自动清除已经断开的链接
       if (player.socket !== socket) {
