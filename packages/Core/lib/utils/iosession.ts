@@ -5,18 +5,19 @@ export function IOSessionMiddleware(webapp, opt) {
   const key = opt.key || 'koa:sess';
 
   return async function(socket, next) {
-    if (!socket.handshake.headers.cookie) {
-      return next(new Error('no cookie'));
-    }
-    if (socket.websession) {
-      return next();
+    if (!socket.iosession) {
+      socket.iosession = new SessionContext(`io:${socket.id}`, store);
     }
 
-    let ctx = webapp.createContext(socket.request, socket.response);
-    let sid = ctx.cookies.get(key, opt); // web的cookie对应的session id。如果只访问socket服务而没访问过web服务的话返回的是undefined
+    if (!socket.websession) {
+      if (socket.handshake.headers.cookie) {
+        // 非严格指定，仅当有cookie的时候才会增加websession
+        let ctx = webapp.createContext(socket.request, socket.response);
+        let sid = ctx.cookies.get(key, opt); // web的cookie对应的session id。如果只访问socket服务而没访问过web服务的话返回的是undefined
 
-    socket.iosession = new SessionContext(`io:${socket.id}`, store);
-    socket.websession = new SessionContext(`web:${sid}`, store);
+        socket.websession = new SessionContext(`web:${sid}`, store);
+      }
+    }
 
     return next();
   };
