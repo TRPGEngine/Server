@@ -126,7 +126,7 @@ function initTimer() {
   const db = app.storage.db;
 
   app.registerStatJob('groupCount', async () => {
-    let res = await db.models.group_group.countAsync();
+    let res = await db.models.group_group.count();
     return res;
   });
 }
