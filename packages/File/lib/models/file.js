@@ -52,6 +52,7 @@ module.exports = function File(Sequelize, db) {
           return `/file/download/${this.uuid}/${this.originalname}`;
         },
         getUploadUrl: function() {
+          const name = this.name;
           const catalog = this.is_persistence ? 'persistence' : 'temporary';
           return `/uploads/${catalog}/${name}`;
         },
