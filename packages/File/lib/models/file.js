@@ -37,12 +37,12 @@ module.exports = function File(Sequelize, db) {
       },
       methods: {
         getPreviewUrl: function(apihost) {
-          if (
-            ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].indexOf(this.ext) >= 0
-          ) {
+          const ext = this.ext;
+
+          if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(ext)) {
             // 是office文件
             return config.getOfficePreviewUrl(apihost + this.getDownloadUrl());
-          } else if (['.pdf', 'jpg', 'png']) {
+          } else if (['.pdf', 'jpg', 'png'].includes(ext)) {
             return apihost + this.getDownloadUrl();
           } else {
             return '';
@@ -50,6 +50,10 @@ module.exports = function File(Sequelize, db) {
         },
         getDownloadUrl: function() {
           return `/file/download/${this.uuid}/${this.originalname}`;
+        },
+        getUploadUrl: function() {
+          const catalog = this.is_persistence ? 'persistence' : 'temporary';
+          return `/uploads/${catalog}/${name}`;
         },
         getObject: function() {
           return {
@@ -63,6 +67,7 @@ module.exports = function File(Sequelize, db) {
             is_persistence: this.is_persistence,
             createAt: this.createAt,
             owner_uuid: this.owner_uuid,
+            upload_url: this.getUploadUrl(),
           };
         },
       },
