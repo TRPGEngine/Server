@@ -7,17 +7,17 @@ import SequelizeStatic, {
   DataType,
   ModelAttributeColumnOptions,
 } from 'sequelize';
-const transaction = require('orm-transaction');
-import path from 'path';
-import fs from 'fs';
-import process from 'process';
+// const transaction = require('orm-transaction'); // TODO
 import Debug from 'debug';
 const debug = Debug('trpg:storage');
 const debugSQL = Debug('trpg:storage:sql');
+import { ModelFn } from 'trpg/core';
 
 import { getLogger } from './logger';
 const appLogger = getLogger('application');
 import _set from 'lodash/set';
+
+export type ModelFn = (Sequelize: typeof SequelizeStatic, db: DBInstance) => Model;
 
 export interface TRPGDbOptions {
   database: string;
@@ -93,7 +93,7 @@ export default class Storage {
   }
 
   // 注册模型
-  registerModel(modelFn) {
+  registerModel(modelFn: ModelFn): Model {
     if (typeof modelFn != 'function') {
       throw new TypeError(
         `registerModel error: type of model must be Function not ${typeof modelFn}`
@@ -104,6 +104,7 @@ export default class Storage {
     appLogger.info('register model %o success!', modelFn);
     const model = modelFn(this._Sequelize, this.db);
     this.models.push(model);
+    return model;
   }
 
   reset(force = false) {
