@@ -17,7 +17,10 @@ import { getLogger } from './logger';
 const appLogger = getLogger('application');
 import _set from 'lodash/set';
 
-export type ModelFn = (Sequelize: typeof SequelizeStatic, db: DBInstance) => Model;
+export type ModelFn = (
+  Sequelize: typeof SequelizeStatic,
+  db: DBInstance
+) => Model;
 
 export interface TRPGDbOptions {
   database: string;

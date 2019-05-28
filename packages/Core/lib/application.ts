@@ -11,7 +11,7 @@ import Storage, { TRPGDbOptions } from './storage';
 import { Cache, RedisCache, ICache } from './cache';
 const ReportService = require('./report');
 const WebService = require('./webservice');
-const SocketService = require('./socket');
+import SocketService, { SocketEventFn } from './socket';
 import { getLogger } from './logger';
 const logger = getLogger();
 const appLogger = getLogger('application');
@@ -181,12 +181,12 @@ class Application extends events.EventEmitter {
     }
   }
 
-  registerEvent(eventName, eventFn) {
+  registerEvent(eventName: string, eventFn: SocketEventFn) {
     this.socketservice.registerIOEvent(eventName, eventFn);
   }
 
   // loopNum 循环次数,不传则为无限循环
-  registerTimer(fn, millisec, loopNum) {
+  registerTimer(fn: () => void, millisec: number, loopNum: number) {
     var indexNum = 0;
     let timer = setInterval(function() {
       fn();

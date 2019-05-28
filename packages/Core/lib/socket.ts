@@ -1,12 +1,29 @@
-const IO = require('socket.io');
+import IO, { Server, Socket } from 'socket.io';
 import Debug from 'debug';
 const debug = Debug('trpg:socket');
 import { getLogger } from './logger';
+import { TRPGApplication } from '../types/app';
+import { DBInstance } from './storage';
 const logger = getLogger();
 const appLogger = getLogger('application');
 const packageInfo = require('../../../package.json');
 
-const applog = (formatter, ...args) => {
+export type MiddlewareFn = (socket: IO.Socket, fn: (err?: any) => void) => void;
+export type SocketCallbackFn = (ret: {
+  result: boolean;
+  [other: string]: any;
+}) => void;
+export type SocketEventFn = (
+  data: {},
+  cb: SocketCallbackFn,
+  db: DBInstance
+) => any;
+export interface EventType {
+  name: string;
+  fn: SocketEventFn;
+}
+
+const applog = (formatter: string, ...args: any[]) => {
   debug(formatter, ...args);
   appLogger.info(formatter, ...args);
 };
@@ -17,12 +34,12 @@ const ioOpts = {
 };
 
 // socket.io 服务
-class SocketService {
-  _app;
-  _io;
-  events;
+export default class SocketService {
+  _app: TRPGApplication;
+  _io: Server;
+  events: EventType[];
 
-  constructor(app) {
+  constructor(app: TRPGApplication) {
     if (!app) {
       throw new Error('init socket service error: require app');
     }
@@ -74,7 +91,7 @@ class SocketService {
     });
   }
 
-  registerIOEvent(eventName, eventFn) {
+  registerIOEvent(eventName: string, eventFn: SocketEventFn) {
     const index = this.events.findIndex((e) => {
       return e.name === eventName;
     });
@@ -90,8 +107,9 @@ class SocketService {
           data = {}; // 定义一个默认空对象防止在方法内部因为取不到参数而报错
         }
 
-        let app = this.app;
-        let db = app.storage.db;
+        const wrap = this;
+        const app = wrap.app;
+        const db = app.storage.db;
         try {
           let ret = await eventFn.call(this, data, cb, db);
           if (ret !== undefined) {
@@ -134,7 +152,7 @@ class SocketService {
   }
 
   // 向socket注入自定义事件处理
-  injectCustomEvents(socket) {
+  injectCustomEvents(socket: Socket) {
     // 注册事件
     const app = this._app;
     const wrap = { app, socket };
@@ -172,7 +190,7 @@ class SocketService {
   }
 
   // 应用中间件
-  use(middleware) {
+  use(middleware: MiddlewareFn) {
     this._io.use(middleware);
   }
 
@@ -180,13 +198,11 @@ class SocketService {
     return this.events;
   }
 
-  on(name, cb) {
+  on(name: string, cb: Function) {
     this._io.on(name, cb);
   }
 
-  close(cb) {
+  close(cb: () => void) {
     this._io.close(cb);
   }
 }
-
-module.exports = SocketService;

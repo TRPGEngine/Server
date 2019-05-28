@@ -47,6 +47,7 @@
   "devDependencies": {
     "@types/ioredis": "^4.0.10",
     "@types/minimatch": "^3.0.3",
+    "@types/socket.io": "^2.1.2",
     "chai": "^4.1.1",
     "gulp": "^3.9.1",
     "gulp-live-server": "0.0.31",

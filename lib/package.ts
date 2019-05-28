@@ -1,4 +1,4 @@
-import { TRPGApplication, Model, ModelFn } from 'trpg/core';
+import { TRPGApplication, Model, ModelFn, SocketEventFn } from 'trpg/core';
 
 export default abstract class BasePackage {
   public abstract name: string;
@@ -21,7 +21,16 @@ export default abstract class BasePackage {
     this._models.push(model);
   }
 
-  regSocketEvent(event) {}
+  regSocketEvent(name: string, event: SocketEventFn) {
+    const app = this._app;
+    const packageName = this.name;
+    if (!name.startsWith(`${packageName}::`)) {
+      // 事件名必须为: 包名::事件名
+      name = `${packageName}::${name}`;
+    }
+
+    app.registerEvent(name, event);
+  }
 
   regValue(value: {}) {}
   regMethod(method: any) {}
