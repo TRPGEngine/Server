@@ -5,7 +5,7 @@ const debug = Debug('trpg:cache');
 import _ from 'lodash';
 import minimatch from 'minimatch';
 
-type CacheValue = string | number | {};
+export type CacheValue = string | number | {};
 interface CacheOptions {
   expires: number;
 }
@@ -21,7 +21,7 @@ export interface ICache {
   set(
     key: string,
     value: CacheValue,
-    options: CacheOptions
+    options?: CacheOptions
   ): Promise<CacheValue>;
   get(key: string): Promise<CacheValue>;
   getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }>;

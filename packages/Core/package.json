@@ -46,6 +46,8 @@
   },
   "devDependencies": {
     "@types/ioredis": "^4.0.10",
+    "@types/koa": "^2.0.48",
+    "@types/koa-router": "^7.0.40",
     "@types/minimatch": "^3.0.3",
     "@types/socket.io": "^2.1.2",
     "chai": "^4.1.1",

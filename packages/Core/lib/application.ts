@@ -4,13 +4,13 @@ const debug = Debug('trpg:application');
 import schedule from 'node-schedule';
 import fs from 'fs-extra';
 import path from 'path';
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import _ from 'lodash';
 const { IOSessionMiddleware } = require('./utils/iosession');
 import Storage, { TRPGDbOptions } from './storage';
 import { Cache, RedisCache, ICache } from './cache';
 const ReportService = require('./report');
-const WebService = require('./webservice');
+import WebService from './webservice';
 import SocketService, { SocketEventFn } from './socket';
 import { getLogger } from './logger';
 const logger = getLogger();
@@ -31,8 +31,8 @@ class Application extends events.EventEmitter {
   storage: Storage = null; // 数据库服务列表
   cache: ICache = null; // 缓存服务
   reportservice = null; // 汇报服务
-  webservice = null; // 网页服务
-  socketservice = null; // websocket服务
+  webservice: WebService = null; // 网页服务
+  socketservice: SocketService = null; // websocket服务
   components = []; // 组件列表
   events: InternalEvents = {}; // 内部事件列表
   timers = []; // 计时器列表
@@ -107,7 +107,7 @@ class Application extends events.EventEmitter {
   initSocketService() {
     const socketservice = new SocketService(this);
     socketservice.use(
-      IOSessionMiddleware(this.webservice._app, this.webservice.sessionOpt)
+      IOSessionMiddleware(this.webservice.app, this.webservice.sessionOpt)
     );
     socketservice.initIOEvent();
     this.socketservice = socketservice;
@@ -225,35 +225,25 @@ class Application extends events.EventEmitter {
   }
 
   request = {
-    get(url, query, config) {
-      return axios(
-        Object.assign(
-          {},
-          {
-            url,
-            method: 'get',
-            params: query,
-          },
-          config
-        )
-      ).then((res) => {
+    get(url: string, query: any, config: AxiosRequestConfig) {
+      return axios({
+        url,
+        method: 'get',
+        params: query,
+        ...config,
+      }).then((res) => {
         applog('[request GET]', url, query, res.status);
         appLogger.info('\t[request res detail]:', res);
         return res.data;
       });
     },
-    post(url, data, config) {
-      return axios(
-        Object.assign(
-          {},
-          {
-            url,
-            method: 'post',
-            data,
-          },
-          config
-        )
-      ).then((res) => {
+    post(url: string, data: any, config: AxiosRequestConfig) {
+      return axios({
+        url,
+        method: 'post',
+        data,
+        ...config,
+      }).then((res) => {
         applog('[request POST]', url, data, res.status);
         appLogger.info('\t[request res detail]:', res);
         return res.data;
@@ -271,7 +261,7 @@ class Application extends events.EventEmitter {
     this.reportservice.reportErrorWithContext(err, context);
   }
 
-  async close(cb) {
+  async close(cb: () => void) {
     debug('closing....');
     await this.storage.close();
     this.socketservice.close(cb);
