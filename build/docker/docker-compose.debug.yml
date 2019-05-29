@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  server:
+    image: server
+    build: ../
+    environment:
+      NODE_ENV: development
+    ports:
+      - 23256:23256
+      - 9229:9229
+    ## set your startup file here
+    command: node --inspect index.js

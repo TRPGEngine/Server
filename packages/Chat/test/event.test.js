@@ -95,7 +95,7 @@ describe('chat event action', () => {
     });
   });
 
-  describe('message action', async () => {
+  describe('message action', () => {
     const targetConverse = 'test-trpg-converse-' + Math.random();
     const targetUUID = 'test-trpg-uuid-' + Math.random();
 
