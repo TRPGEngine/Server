@@ -126,17 +126,33 @@ function initFunction() {
 
       const { message, sender_uuid, to_uuid } = pkg;
 
+      if (app.player.isSystemUUID(to_uuid)) {
+        // 不尝试向系统发送推送
+        debug('send chat notify cancel. target is system uuid[%s]', to_uuid);
+        return;
+      }
+
       // TODO: 这里要做一步缓存
       const notifyInfo = await app.notify.getNotifyInfo(to_uuid);
       if (notifyInfo && notifyInfo.is_active) {
         // 发送通知
+        const registrationId = notifyInfo.registration_id;
         const senderInfo = await app.player.getUserInfo(sender_uuid);
         await app.notify.sendNotifyMsgByRegistrationId(
-          notifyInfo.registration_id,
+          registrationId,
           `${senderInfo.nickname || senderInfo.username}:`,
           message
         );
-        debug('send chat notify finished!');
+        debug(
+          'send chat notify finished! to uuid %s[%s]',
+          to_uuid,
+          registrationId
+        );
+      } else {
+        debug(
+          'send chat notify cancel! Not found notifyInfo in uuid %s',
+          to_uuid
+        );
       }
     };
   }

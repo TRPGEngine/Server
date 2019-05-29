@@ -152,6 +152,13 @@ function initFunction() {
         }
       }
     },
+    /**
+     * 监测该UUID是否为用户的UUID
+     * @param uuid 监测的UUID
+     */
+    isSystemUUID: function isSystemUUID(uuid: string) {
+      return uuid.indexOf('trpg') >= 0;
+    },
   };
 
   // 断开连接时记录登出时间
