@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import axios, { AxiosRequestConfig } from 'axios';
 import _ from 'lodash';
-const { IOSessionMiddleware } = require('./utils/iosession');
+import { IOSessionMiddleware } from './utils/iosession';
 import Storage, { TRPGDbOptions } from './storage';
 import { Cache, RedisCache, ICache } from './cache';
 const ReportService = require('./report');

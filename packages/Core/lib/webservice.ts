@@ -9,14 +9,15 @@ import session from 'koa-session';
 import Router from 'koa-router';
 import fs from 'fs-extra';
 import path from 'path';
-const { WebSessionMiddleware } = require('./utils/iosession');
+import { WebSessionMiddleware } from './utils/iosession';
 import Debug from 'debug';
 const debug = Debug('trpg:webservice');
-const koaDebug = require('debug')('trpg:webservice:koa');
+const koaDebug = Debug('trpg:webservice:koa');
 import { getLogger } from './logger';
+const appLogger = getLogger('application');
+
 import { TRPGApplication } from '../types/app';
 import { CacheValue } from './cache';
-const appLogger = getLogger('application');
 
 const publicDir = path.resolve(process.cwd(), './public');
 

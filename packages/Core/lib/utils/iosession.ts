@@ -40,11 +40,6 @@ export function WebSessionMiddleware(webapp, opt) {
   };
 }
 
-module.exports = {
-  IOSessionMiddleware,
-  WebSessionMiddleware,
-};
-
 function SessionContext(sid, store) {
   this.sid = sid;
   this.store = store;
