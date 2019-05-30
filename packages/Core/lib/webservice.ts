@@ -2,6 +2,7 @@ require('marko/node-require');
 import http from 'http';
 import Koa, { Middleware } from 'koa';
 import logger from 'koa-logger';
+import helmet from 'koa-helmet';
 import cors from '@koa/cors';
 import bodyParser from 'koa-bodyparser';
 import serve from 'koa-static';
@@ -108,6 +109,7 @@ export default class WebService {
         koaDebug(str.trim());
       })
     );
+    this.use(helmet());
     this.use(cors());
     this.use(bodyParser());
     this.use(serve(publicDir));
