@@ -23,6 +23,7 @@ export interface ICache {
     value: CacheValue,
     options?: CacheOptions
   ): Promise<CacheValue>;
+  rpush(key: string, ...values: any[]): void;
   get(key: string): Promise<CacheValue>;
   getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }>;
   remove(key: string): Promise<any>;
@@ -50,6 +51,14 @@ export class Cache implements ICache {
       );
     }
     return Promise.resolve(value);
+  }
+
+  rpush(key: string, ...values: any[]): void {
+    if (!this.data[key] || Array.isArray(this.data[key])) {
+      this.data[key] = [];
+    }
+
+    this.data[key].push(...values);
   }
 
   get(key: string): Promise<CacheValue> {
@@ -116,6 +125,10 @@ export class RedisCache implements ICache {
       this.redis.pexpire(this.genKey(key), options.expires);
     }
     return this.redis.set(this.genKey(key), JSON.stringify(value));
+  }
+
+  rpush(key: string, ...values: any[]): void {
+    return this.redis.rpush(key, ...values);
   }
 
   async get(key: string): Promise<CacheValue> {
