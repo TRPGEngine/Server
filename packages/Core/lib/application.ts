@@ -110,6 +110,8 @@ class Application extends events.EventEmitter {
       IOSessionMiddleware(this.webservice.app, this.webservice.sessionOpt)
     );
     socketservice.initIOEvent();
+    // TODO: 增加一个定时任务，定期记录事件平均耗时
+
     this.socketservice = socketservice;
     this.on('disconnect', (socket) => {
       // 离线时移除之前的iosession

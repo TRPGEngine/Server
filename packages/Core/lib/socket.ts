@@ -9,10 +9,11 @@ const appLogger = getLogger('application');
 const packageInfo = require('../../../package.json');
 
 export type MiddlewareFn = (socket: IO.Socket, fn: (err?: any) => void) => void;
-export type SocketCallbackFn = (ret: {
+export type SocketCallbackResult = {
   result: boolean;
   [other: string]: any;
-}) => void;
+};
+export type SocketCallbackFn = (ret: SocketCallbackResult) => void;
 export type SocketEventFn = (
   data: {},
   cb: SocketCallbackFn,
@@ -99,6 +100,7 @@ export default class SocketService {
       applog('register socket event [%s] duplicated', eventName);
       return;
     }
+
     applog('register socket event [%s]', eventName);
     this.events.push({
       name: eventName,
@@ -107,7 +109,7 @@ export default class SocketService {
           data = {}; // 定义一个默认空对象防止在方法内部因为取不到参数而报错
         }
 
-        const wrap = this;
+        const wrap = this; // 此处的this是指 injectCustomEvents 方法分配的this
         const app = wrap.app;
         const db = app.storage.db;
         try {
@@ -170,8 +172,11 @@ export default class SocketService {
         }
         logger.info(eventName, '<--', data);
 
-        event.fn.call(wrap, data, function(res) {
+        const startTime = new Date().valueOf(); // 记录开始时间
+        event.fn.call(wrap, data, (res: SocketCallbackResult) => {
           cb(res);
+          const endTime = new Date().valueOf(); // 记录结束时间
+          this.recordSocketTime(eventName, endTime - startTime);
           res = JSON.parse(JSON.stringify(res));
           if (verbose) {
             debug('[%s]%s --> %o', socketId, eventName, res);
@@ -192,6 +197,17 @@ export default class SocketService {
   // 应用中间件
   use(middleware: MiddlewareFn) {
     this._io.use(middleware);
+  }
+
+  /**
+   * 记录socket事件的耗时到cache中， 定期清理统计
+   * @param eventName 事件名
+   * @param millisecond 用时: 单位毫秒
+   */
+  recordSocketTime(eventName: string, millisecond: number) {
+    const cacheKey = `meter:socket:event:${eventName}`;
+
+    this._app.cache.rpush(cacheKey, millisecond);
   }
 
   getAllEvents() {

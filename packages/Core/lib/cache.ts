@@ -59,6 +59,7 @@ export class Cache implements ICache {
     }
 
     this.data[key].push(...values);
+    debug('[cache]', `rpush ${key} with ${values.join(',')}`);
   }
 
   get(key: string): Promise<CacheValue> {
@@ -128,7 +129,8 @@ export class RedisCache implements ICache {
   }
 
   rpush(key: string, ...values: any[]): void {
-    return this.redis.rpush(key, ...values);
+    this.redis.rpush(key, ...values);
+    debug('[redis]', `rpush ${key} with ${values.join(',')}`);
   }
 
   async get(key: string): Promise<CacheValue> {
