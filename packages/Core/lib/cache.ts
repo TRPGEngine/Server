@@ -24,6 +24,14 @@ export interface ICache {
     options?: CacheOptions
   ): Promise<CacheValue>;
   rpush(key: string, ...values: any[]): void;
+
+  /**
+   * 清理列表一定范围内的数据
+   * @param key 唯一键
+   * @param start 起始索引
+   * @param size 清理列表长度
+   */
+  lclear(key: string, start: number, size: number): void;
   get(key: string): Promise<CacheValue>;
   getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }>;
   remove(key: string): Promise<any>;
@@ -54,12 +62,22 @@ export class Cache implements ICache {
   }
 
   rpush(key: string, ...values: any[]): void {
-    if (!this.data[key] || Array.isArray(this.data[key])) {
+    if (!this.data[key] || !Array.isArray(this.data[key])) {
       this.data[key] = [];
     }
 
     this.data[key].push(...values);
     debug('[cache]', `rpush ${key} with ${values.join(',')}`);
+  }
+
+  lclear(key: string, start: number, size: number): void {
+    if (!this.data[key] || !Array.isArray(this.data[key])) {
+      return;
+    }
+
+    const arr: any[] = this.data[key];
+    arr.splice(start, size);
+    debug('[cache]', `lclear ${key} in range [${start}, ${start + size}]`);
   }
 
   get(key: string): Promise<CacheValue> {
@@ -131,6 +149,12 @@ export class RedisCache implements ICache {
   rpush(key: string, ...values: any[]): void {
     this.redis.rpush(key, ...values);
     debug('[redis]', `rpush ${key} with ${values.join(',')}`);
+  }
+
+  lclear(key: string, start: number, size: number): void {
+    // ltrim 为保留一部分。即清理的逻辑下保留的数据应为 (start + size, -1)
+    this.redis.ltrim(key, start + size, -1);
+    debug('[redis]', `lclear ${key} in range [${start}, ${start + size}]`);
   }
 
   async get(key: string): Promise<CacheValue> {
