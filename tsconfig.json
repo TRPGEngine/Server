@@ -11,7 +11,8 @@
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*"],
-      "trpg/*": ["types/*"]
+      "trpg/*": ["types/*"],
+      "lib/*": ["lib/*"]
     }
   },
   "include": ["packages/**/*", "lib/**/*"]
