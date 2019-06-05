@@ -2,9 +2,13 @@ import Application from './application';
 import Debug from 'debug';
 const debug = Debug('trpg:core');
 
+type Config = {
+  [name: string]: string | number | {};
+};
+
 require('./utils'); // 引入工具拓展
 
-export default function createApplication(conf): Application {
+export default function createApplication(conf: Config): Application {
   const app = new Application();
 
   setConfig(app, conf);
@@ -12,7 +16,7 @@ export default function createApplication(conf): Application {
   return app;
 }
 
-function setConfig(app: Application, conf) {
+function setConfig(app: Application, conf: Config) {
   if (!conf) {
     return;
   }

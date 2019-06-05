@@ -48,7 +48,6 @@ class Application extends events.EventEmitter {
 
   init() {
     this.setMaxListeners(20); // 设置事件监听数量
-    this.defaultConfiguration();
     this.initReportService();
     this.initWebService();
     this.initSocketService();
@@ -60,22 +59,6 @@ class Application extends events.EventEmitter {
     applog('init completed!');
     this.emit('initCompleted', this);
     this.webservice.listen();
-  }
-
-  defaultConfiguration() {
-    let env = process.env.NODE_ENV || 'development';
-    let port = process.env.PORT || '23256';
-    let apihost = process.env.HOST || 'https://trpgapi.moonrailgun.com'; // 后台服务的对外接口, 用于外部服务
-    let verbose = false;
-    if (process.env.VERBOSE && process.env.VERBOSE.toLowerCase() === 'true') {
-      verbose = true;
-    }
-
-    this.setDefault('env', env);
-    this.setDefault('port', port);
-    this.setDefault('apihost', apihost);
-    this.setDefault('verbose', verbose);
-    this.setDefault('webserviceHomepage', '');
   }
 
   initReportService() {
@@ -287,14 +270,6 @@ class Application extends events.EventEmitter {
 
     this.settings[setting] = val;
 
-    return this;
-  }
-
-  setDefault(setting, val) {
-    if (!this.settings[setting]) {
-      applog('set "%s" to %o by default', setting, val);
-      this.settings[setting] = val;
-    }
     return this;
   }
 

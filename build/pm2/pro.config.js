@@ -9,7 +9,7 @@ module.exports = {
       max_restarts: 10,
       env: {
         NODE_ENV: 'production',
-        PORT: '23256',
+        TRPG_PORT: '23256',
         VERBOSE: 'true',
         DEBUG: 'trpg:*',
       },

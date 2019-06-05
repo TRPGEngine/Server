@@ -1,6 +1,13 @@
 const randomString = require('crypto-random-string');
 
 module.exports = {
+  env: process.env.NODE_ENV || 'development',
+  port: process.env.TRPG_PORT || '23256',
+  apihost: process.env.HOST || 'http://127.0.0.1:23256', // 后台服务的对外接口, 用于外部服务
+  verbose:
+    process.env.VERBOSE && process.env.VERBOSE.toLowerCase() === 'true'
+      ? true
+      : false,
   db: {
     database: 'trpg',
     username: 'root',
