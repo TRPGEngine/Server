@@ -1,6 +1,7 @@
 const player = require('../packages/Player');
 const actor = require('../packages/Actor');
 const chat = require('../packages/Chat');
+const chatEmotion = require('../packages/ChatEmotion');
 const dice = require('../packages/Dice');
 const group = require('../packages/Group');
 const file = require('../packages/File');
@@ -17,6 +18,7 @@ module.exports = function loadModules(app) {
   app.load(file());
   app.load(actor);
   app.load(chat);
+  app.load(chatEmotion);
   app.load(dice); // 尚未测试
   app.load(group);
   app.load(dashboard); // 尚未测试
