@@ -1,4 +1,4 @@
-import { TRPGApplication, Model, ModelFn, SocketEventFn } from 'trpg/core';
+import { TRPGApplication, ModelFn, SocketEventFn, Model } from 'trpg/core';
 import Router from 'koa-router';
 import Debug, { Debugger } from 'debug';
 
@@ -8,7 +8,7 @@ export default abstract class BasePackage {
   public abstract desc: string; // 包信息描述
   private _debug: Debugger;
   private _app: TRPGApplication;
-  private _models: Model[]; // 该包注册的数据库模型列表
+  private _models: (typeof Model)[] = []; // 该包注册的数据库模型列表
   private _router: Router; // 该包独有的Router
 
   constructor(app: TRPGApplication) {

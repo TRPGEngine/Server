@@ -6,6 +6,7 @@ import SequelizeStatic, {
   ModelOptions,
   DataType,
   ModelAttributeColumnOptions,
+  InitOptions,
 } from 'sequelize';
 // const transaction = require('orm-transaction'); // TODO
 import Debug from 'debug';
@@ -20,7 +21,7 @@ import _set from 'lodash/set';
 export type ModelFn = (
   Sequelize: typeof SequelizeStatic,
   db: DBInstance
-) => Model;
+) => typeof TRPGModel;
 
 export interface TRPGDbOptions {
   database: string;
@@ -33,7 +34,10 @@ interface TRPGModelAttributes {
   [name: string]:
     | DataType
     | (ModelAttributeColumnOptions & {
-        required?: true;
+        /**
+         * alias of allowNull
+         */
+        required?: boolean;
       });
 }
 // 魔改一下db的类型，加入了一些自己的参数
@@ -44,7 +48,7 @@ export type DBInstance = Sequelize & {
     modelName: string,
     attributes: TRPGModelAttributes,
     options?: ModelOptions
-  ) => typeof Model;
+  ) => typeof TRPGModel;
 };
 
 const defaultDbOptions: Options = {
@@ -61,7 +65,7 @@ export default class Storage {
   db: DBInstance;
   _Sequelize = SequelizeStatic;
   Op = Op;
-  models = [];
+  models: (typeof TRPGModel)[] = [];
 
   constructor(dbconfig: TRPGDbOptions) {
     this.db = this.initDb(dbconfig);
@@ -70,7 +74,7 @@ export default class Storage {
   }
 
   // 初始化并返回一个db实例
-  initDb(dbconfig: TRPGDbOptions) {
+  initDb(dbconfig: TRPGDbOptions): DBInstance {
     let db: Sequelize;
     if (typeof dbconfig === 'string') {
       db = new Sequelize(dbconfig);
@@ -81,7 +85,7 @@ export default class Storage {
       db = new Sequelize(database, username, password, options);
     }
 
-    return db;
+    return db as DBInstance;
   }
 
   test() {
@@ -96,7 +100,7 @@ export default class Storage {
   }
 
   // 注册模型
-  registerModel(modelFn: ModelFn): Model {
+  registerModel(modelFn: ModelFn): typeof TRPGModel {
     if (typeof modelFn != 'function') {
       throw new TypeError(
         `registerModel error: type of model must be Function not ${typeof modelFn}`
@@ -166,4 +170,18 @@ function redefineDb(db: DBInstance) {
 
     return originModelCls;
   };
+}
+
+export class TRPGModel extends Model {
+  public static init(attributes: TRPGModelAttributes, options: InitOptions) {
+    // 增加required
+    for (let field in attributes) {
+      const attr = attributes[field] as any;
+      if (attr.required === true) {
+        _set(attr, 'allowNull', false);
+      }
+    }
+
+    Model.init(attributes, options);
+  }
 }

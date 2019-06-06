@@ -16,6 +16,7 @@ import { getLogger } from './logger';
 const logger = getLogger();
 const appLogger = getLogger('application');
 import xss from 'xss';
+import BasePackage from 'lib/package';
 
 type AppSettings = {
   [key: string]: string | number | {};
@@ -33,7 +34,7 @@ class Application extends events.EventEmitter {
   reportservice = null; // 汇报服务
   webservice: WebService = null; // 网页服务
   socketservice: SocketService = null; // websocket服务
-  components = []; // 组件列表
+  components: BasePackage[] | Function[] = []; // 组件列表
   events: InternalEvents = {}; // 内部事件列表
   timers = []; // 计时器列表
   webApi = {}; // 网页服务api
@@ -147,9 +148,23 @@ class Application extends events.EventEmitter {
   initComponents() {
     for (let component of this.components) {
       try {
-        applog('initing ...%o', component);
-        let componentInfo = component.call(this, this);
-        applog('component info:', componentInfo);
+        const isNewPackage = component instanceof BasePackage; // 检测是否为新版包
+        if (!isNewPackage) {
+          // 旧版包处理
+          applog('initing ...%o', component);
+          let componentInfo = (component as Function).call(this, this);
+          applog('component info:', componentInfo);
+        } else {
+          // 新版包处理
+          const instance = component as BasePackage;
+          const componentName = instance.name;
+          applog('initing ...%s', componentName);
+          instance.onInit();
+          applog('component info:', {
+            name: componentName,
+            require: instance.require,
+          });
+        }
       } catch (e) {
         console.warn(`component init error when ${component}:\n`);
         throw e;
@@ -309,12 +324,24 @@ class Application extends events.EventEmitter {
   load(component) {
     let app = this;
     if (!!component && typeof component === 'function') {
+      if (BasePackage.isPrototypeOf(component)) {
+        // 新包onLoad处理
+        component = new component(this);
+        (component as BasePackage).onLoad();
+        applog(
+          'load component into comments list(length: %d). %s',
+          this.components.length,
+          component.name
+        );
+      } else {
+        // 旧包处理
+        applog(
+          'load component into comments list(length: %d). %o',
+          this.components.length,
+          component
+        );
+      }
       this.components.push(component);
-      applog(
-        'load component into comments list(length: %d). %o',
-        this.components.length,
-        component
-      );
     } else {
       applog(`component must be a Function not a ${typeof component}`);
       throw new Error('Component load failed. Component must be a Function.');
