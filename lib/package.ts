@@ -25,8 +25,9 @@ export default abstract class BasePackage {
   /**
    * 被初始化的回调
    * 需要被实现
+   * 必须是一个同步方法
    */
-  abstract onInit(): Promise<void>;
+  abstract onInit(): void;
 
   get app() {
     return this._app;

@@ -181,7 +181,6 @@ export class TRPGModel extends Model {
         _set(attr, 'allowNull', false);
       }
     }
-
-    Model.init(attributes, options);
+    Model.init.call(this, attributes, options);
   }
 }

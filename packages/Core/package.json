@@ -40,7 +40,7 @@
     "orm": "^4.0.2",
     "orm-transaction": "github:TRPGEngine/node-orm-transaction",
     "raven": "^2.6.4",
-    "sequelize": "^5.8.6",
+    "sequelize": "^5.8.7",
     "socket.io": "^2.0.2",
     "xss": "^1.0.6"
   },
