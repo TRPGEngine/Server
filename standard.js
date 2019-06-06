@@ -1,4 +1,5 @@
 require('ts-node').register();
+require('tsconfig-paths').register();
 
 const config = require('config');
 const loadModules = require('./loader/standard');

@@ -1,3 +1,3 @@
 import App from '../lib/application';
 
-declare type TRPGApplication = App;
+export type TRPGApplication = App;
