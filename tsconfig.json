@@ -12,7 +12,8 @@
     "paths": {
       "*": ["node_modules/*"],
       "trpg/*": ["types/*"],
-      "lib/*": ["lib/*"]
+      "lib/*": ["lib/*"],
+      "packages/*": ["packages/*"]
     }
   },
   "include": ["packages/**/*", "lib/**/*"]
