@@ -10,7 +10,6 @@
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*"],
       "trpg/*": ["types/*"],
       "lib/*": ["lib/*"],
       "packages/*": ["packages/*"]
