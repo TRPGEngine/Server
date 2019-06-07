@@ -58,6 +58,7 @@ module.exports = function File(Sequelize, db) {
         },
         getObject: function() {
           return {
+            id: this.id,
             fileuuid: this.uuid,
             originalname: this.originalname,
             size: this.size,

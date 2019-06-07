@@ -2,9 +2,10 @@ import BasePackage from 'lib/package';
 import fs from 'fs-extra';
 import ChatEmotionCatalogModel from './models/catalog';
 import ChatEmotionItemModel from './models/item';
+import EmotionRouter from './routers/emotion';
 
 export default class ChatEmotion extends BasePackage {
-  public name: string = 'ChatEmotionComponent';
+  public name: string = 'ChatEmotion';
   public require: string[] = [
     'PlayerComponent',
     'FileComponent',
@@ -18,7 +19,8 @@ export default class ChatEmotion extends BasePackage {
     this.regModel(ChatEmotionCatalogModel);
     this.regModel(ChatEmotionItemModel);
 
-    // TODO: 注册路由组件
+    // 注册路由组件
+    this.regRoute(EmotionRouter);
   }
 
   /**
