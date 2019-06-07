@@ -18,12 +18,12 @@ module.exports = function Group(Sequelize, db) {
     {
       paranoid: true,
       hooks: {
-        beforeCreate: function() {
-          if (!Array.isArray(this.managers_uuid)) {
-            this.managers_uuid = [];
+        beforeCreate: function(group) {
+          if (!Array.isArray(group.managers_uuid)) {
+            group.managers_uuid = [];
           }
-          if (this.managers_uuid.indexOf(this.owner_uuid) === -1) {
-            this.managers_uuid.push(this.owner_uuid);
+          if (group.managers_uuid.indexOf(group.owner_uuid) === -1) {
+            group.managers_uuid.push(group.owner_uuid);
           }
         },
       },

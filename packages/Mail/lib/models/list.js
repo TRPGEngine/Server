@@ -14,20 +14,20 @@ module.exports = function List(Sequelize, db) {
     },
     {
       hooks: {
-        beforeCreate: function() {
-          if (!this.email_user) {
-            this.email_user = this.email_address.split('@')[0];
+        beforeCreate: function(item) {
+          if (!item.email_user) {
+            item.email_user = item.email_address.split('@')[0];
           }
-          if (!this.email_provider) {
-            this.email_provider = this.email_address.split('@')[1];
+          if (!item.email_provider) {
+            item.email_provider = item.email_address.split('@')[1];
           }
         },
-        beforeSave: function() {
-          if (!this.email_user) {
-            this.email_user = this.email_address.split('@')[0];
+        beforeSave: function(item) {
+          if (!item.email_user) {
+            item.email_user = item.email_address.split('@')[0];
           }
-          if (!this.email_provider) {
-            this.email_provider = this.email_address.split('@')[1];
+          if (!item.email_provider) {
+            item.email_provider = item.email_address.split('@')[1];
           }
         },
       },

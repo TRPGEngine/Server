@@ -19,19 +19,19 @@ module.exports = function File(Sequelize, db) {
     },
     {
       hooks: {
-        beforeCreate: function() {
-          if (!this.ext) {
-            if (this.name.indexOf('.') >= 0) {
-              let tmp = this.name.split('.');
-              this.ext = tmp[tmp.length - 1];
+        beforeCreate: function(file) {
+          if (!file.ext) {
+            if (file.name.indexOf('.') >= 0) {
+              let tmp = file.name.split('.');
+              file.ext = tmp[tmp.length - 1];
             } else {
-              this.ext = '';
+              file.ext = '';
             }
           }
-          this.ext = this.ext.toLowerCase();
-          if (!this.can_preview) {
+          file.ext = file.ext.toLowerCase();
+          if (!file.can_preview) {
             // 数据可能为默认值。创建时不管怎么样都检测一遍
-            this.can_preview = config.canPreviewExt.indexOf(this.ext) >= 0;
+            file.can_preview = config.canPreviewExt.indexOf(file.ext) >= 0;
           }
         },
       },
