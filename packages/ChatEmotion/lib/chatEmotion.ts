@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import ChatEmotionCatalogModel from './models/catalog';
 import ChatEmotionItemModel from './models/item';
 import EmotionRouter from './routers/emotion';
+import { emotionsDir } from './constant';
 
 export default class ChatEmotion extends BasePackage {
   public name: string = 'ChatEmotion';
@@ -27,6 +28,6 @@ export default class ChatEmotion extends BasePackage {
    * 确保表情包文件夹存在
    */
   ensureDir(): Promise<void> {
-    return fs.ensureDir('public/uploads/persistence/emotions');
+    return fs.ensureDir(emotionsDir);
   }
 }

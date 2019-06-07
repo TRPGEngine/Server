@@ -4,7 +4,11 @@ import { ChatEmotionItem } from '../models/item';
 import auth from 'packages/File/lib/middleware/auth';
 import upload from 'packages/File/lib/middleware/upload';
 import sha256 from 'packages/File/lib/middleware/sha256';
+import allowMIME from 'packages/File/lib/middleware/allowMIME';
+import imageResize from 'packages/File/lib/middleware/imageResize';
+import move from 'packages/File/lib/middleware/move';
 import fileStorage from 'packages/File/lib/middleware/storage/file';
+import { emotionsDir } from '../constant';
 
 const router = new Router();
 
@@ -19,11 +23,12 @@ router.get('/getEmotionList', async (ctx) => {
 });
 
 router.post(
-  '/upload',
+  '/upload/item',
   auth(),
   upload(true).single('file'),
-  // TODO: allow mimetype
-  // TODO: image resize
+  allowMIME(['image/jpeg', 'image/gif', 'image/png']),
+  move(emotionsDir),
+  imageResize(256, 256),
   sha256(),
   fileStorage(true),
   async (ctx) => {
