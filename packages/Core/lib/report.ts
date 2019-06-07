@@ -13,12 +13,18 @@ const defaultConfig = {
 
 function Report(reportSetting) {
   this._setting = Object.assign({}, defaultConfig, reportSetting);
+  this.installed = false;
   if (this._setting.sentry) {
     Raven.config(this._setting.sentry).install();
+    this.installed = true;
   }
 }
 
 Report.prototype.reportError = function(err, options = null) {
+  if (!this.installed) {
+    return;
+  }
+
   const setting = this._setting;
   if (setting.logger) {
     errorLogger.error(err);
@@ -40,6 +46,10 @@ Report.prototype.reportError = function(err, options = null) {
 };
 
 Report.prototype.reportErrorWithContext = function(err, context = {}) {
+  if (!this.installed) {
+    return;
+  }
+
   Raven.context(() => {
     Raven.setContext(context);
     this.reportError(err);

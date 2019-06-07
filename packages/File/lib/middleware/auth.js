@@ -1,6 +1,8 @@
 module.exports = function() {
   return async (ctx, next) => {
     let trpgapp = ctx.trpgapp;
+
+    // TODO: 目前先基于header的user-uuid 之后改成jwt校验防止伪造
     let user_uuid = ctx.request.header['user-uuid'];
     if (!user_uuid) {
       ctx.response.status = 403;
@@ -10,7 +12,7 @@ module.exports = function() {
     let player = trpgapp.player.list.get(user_uuid);
     if (!player) {
       ctx.response.status = 403;
-      throw '用户不存在，请检查登录状态';
+      throw '用户不在线，请检查登录状态';
     } else {
       ctx.player = player;
       return next();

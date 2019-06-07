@@ -209,8 +209,8 @@ export default class WebService {
    * 初始化路由处理
    */
   initError() {
-    this._app.on('error', function(err) {
-      this.trpgapp.report.reportError(err);
+    this._app.on('error', (err) => {
+      this.trpgapp.error(err);
     });
   }
 

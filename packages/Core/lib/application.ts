@@ -160,6 +160,7 @@ class Application extends events.EventEmitter {
           const componentName = instance.name;
           applog('initing ...%s', componentName);
           instance.onInit();
+          instance.onInitCompleted();
           applog('component info:', {
             name: componentName,
             require: instance.require,
@@ -258,6 +259,7 @@ class Application extends events.EventEmitter {
   }
 
   errorWithContext(err, context) {
+    console.error('Error', err);
     this.reportservice.reportErrorWithContext(err, context);
   }
 

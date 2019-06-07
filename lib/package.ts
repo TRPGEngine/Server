@@ -44,7 +44,7 @@ export default abstract class BasePackage {
     return this._router;
   }
 
-  getPackageName() {
+  getPackageName(): string {
     return this.name;
   }
 
@@ -65,8 +65,9 @@ export default abstract class BasePackage {
     app.registerEvent(name, event);
   }
 
-  protected regRoute(path: string, route: Router) {
-    this.router.use(path, route.routes());
+  protected regRoute(route: Router) {
+    const scope = this.getPackageName().toLowerCase();
+    this.router.use(`/${scope}`, route.routes());
   }
 
   /**
