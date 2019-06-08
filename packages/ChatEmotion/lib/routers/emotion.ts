@@ -49,6 +49,24 @@ router.post(
   }
 );
 
+// 获取表情包列表
+router.get('/catalog/get', async (ctx) => {
+  const name = ctx.request.query.name;
+  if (!name) {
+    throw new Error('缺少必要字段');
+  }
+
+  const catalog = await ChatEmotionCatalog.findOne({
+    where: {
+      name,
+    },
+    order: [['id', 'DESC']],
+    include: [{ model: ChatEmotionItem, as: 'items' }],
+  });
+
+  ctx.body = { catalog };
+});
+
 // 表情包生成
 router.post('/catalog/create', auth(), async (ctx) => {
   const name: string = ctx.request.body.name;

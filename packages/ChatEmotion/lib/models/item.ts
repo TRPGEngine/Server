@@ -29,7 +29,15 @@ export default function ChatEmotionItemModel(Sequelize: Orm, db: DBInstance) {
     { tableName: 'chat_emotion_item', sequelize: db }
   );
 
-  ChatEmotionItem.belongsTo(ChatEmotionCatalog, { as: 'catalog' });
+  ChatEmotionItem.belongsTo(ChatEmotionCatalog, {
+    foreignKey: 'catalogId',
+    as: 'catalog',
+  });
+  ChatEmotionCatalog.hasMany(ChatEmotionItem, {
+    foreignKey: 'catalogId',
+    as: 'items',
+  });
+
   const File = db.models.file_file;
   if (!!File) {
     ChatEmotionItem.belongsTo(File as any, { as: 'file' });
