@@ -502,6 +502,10 @@
                     "field": "type",
                     "seqType": "Sequelize.STRING"
                 },
+                "path": {
+                    "field": "path",
+                    "seqType": "Sequelize.STRING"
+                },
                 "can_preview": {
                     "defaultValue": {
                         "value": false
@@ -2282,5 +2286,5 @@
             "indexes": []
         }
     },
-    "revision": 6
+    "revision": 7
 }

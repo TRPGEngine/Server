@@ -1,3 +1,4 @@
+const path = require('path');
 const config = require('../config');
 
 module.exports = function File(Sequelize, db) {
@@ -12,6 +13,7 @@ module.exports = function File(Sequelize, db) {
       mimetype: { type: Sequelize.STRING },
       ext: { type: Sequelize.STRING },
       type: { type: Sequelize.STRING },
+      path: { type: Sequelize.STRING },
       can_preview: { type: Sequelize.BOOLEAN, defaultValue: false },
       is_persistence: { type: Sequelize.BOOLEAN, defaultValue: false },
       is_expired: { type: Sequelize.BOOLEAN, defaultValue: false },
@@ -52,6 +54,12 @@ module.exports = function File(Sequelize, db) {
           return `/file/download/${this.uuid}/${this.originalname}`;
         },
         getUploadUrl: function() {
+          if (this.path && this.path.startsWith('public')) {
+            // this.path地址为public开头的数据
+            const seg = this.path.split(path.sep);
+            return '/' + seg.splice(1).join('/'); // 移除第一段并返回用斜线连接后的剩余部分
+          }
+
           const name = this.name;
           const catalog = this.is_persistence ? 'persistence' : 'temporary';
           return `/uploads/${catalog}/${name}`;
