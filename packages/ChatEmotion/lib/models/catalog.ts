@@ -1,6 +1,8 @@
 import { Orm, DBInstance, Model } from 'trpg/core';
 
-export class ChatEmotionCatalog extends Model {}
+export class ChatEmotionCatalog extends Model {
+  id!: number;
+}
 
 export default function ChatEmotionCatalogModel(
   Sequelize: Orm,

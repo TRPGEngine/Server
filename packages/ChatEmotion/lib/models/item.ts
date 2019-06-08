@@ -37,6 +37,8 @@ export default function ChatEmotionItemModel(Sequelize: Orm, db: DBInstance) {
 
   const User = db.models.player_user as any;
   if (!!User) {
+    ChatEmotionItem.belongsTo(User, { as: 'owner' });
+
     // Usermap
     ChatEmotionItem.belongsToMany(User, {
       through: 'chat_emotion_usermap_item',

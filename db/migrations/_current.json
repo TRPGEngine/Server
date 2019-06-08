@@ -1020,6 +1020,17 @@
                     "onUpdate": "CASCADE",
                     "field": "fileId",
                     "seqType": "Sequelize.INTEGER"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
                 }
             },
             "indexes": []
@@ -2286,5 +2297,5 @@
             "indexes": []
         }
     },
-    "revision": 7
+    "revision": 8
 }

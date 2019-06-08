@@ -1,6 +1,6 @@
 import Router from 'koa-router';
-import { TRPGApplication } from 'trpg/core';
-import { ChatEmotionItem } from '../models/item';
+import { TRPGApplication, Op } from 'trpg/core';
+import _ from 'lodash';
 import auth from 'packages/File/lib/middleware/auth';
 import upload from 'packages/File/lib/middleware/upload';
 import sha256 from 'packages/File/lib/middleware/sha256';
@@ -9,13 +9,12 @@ import imageResize from 'packages/File/lib/middleware/imageResize';
 import move from 'packages/File/lib/middleware/move';
 import fileStorage from 'packages/File/lib/middleware/storage/file';
 import { emotionsDir } from '../constant';
+import { ChatEmotionCatalog } from '../models/catalog';
+import { ChatEmotionItem } from '../models/item';
 
 const router = new Router();
 
 router.get('/getEmotionList', async (ctx) => {
-  // const trpgapp = ctx.trpgapp as TRPGApplication;
-  // const db = trpgapp.storage.db;
-
   const list = await ChatEmotionItem.findAll();
   console.log(ctx.request.href);
 
@@ -32,6 +31,7 @@ router.post(
   sha256(),
   fileStorage(true, 'emotion'),
   async (ctx) => {
+    const playerId = _.get(ctx, 'player.user.id');
     const fileInfo = ctx.fileinfo;
     const fileId = fileInfo.id;
     const fileOriginalName = fileInfo.originalname;
@@ -42,10 +42,43 @@ router.post(
       name: name || fileOriginalName,
       url: uploadUrl,
       fileId,
+      ownerId: playerId,
     });
 
     ctx.body = item;
   }
 );
+
+// 表情包生成
+router.post('/catalog/create', auth(), async (ctx) => {
+  const name: string = ctx.request.body.name;
+  const items: string[] = ctx.request.body.items; // item uuid update
+  const playerId = _.get(ctx, 'player.user.id');
+
+  if (!name || !items) {
+    throw new Error('缺少必要字段');
+  }
+
+  // TODO: 事务
+  const catalog: ChatEmotionCatalog = await ChatEmotionCatalog.create({
+    name,
+    ownerId: playerId,
+  });
+  const [number] = await ChatEmotionItem.update(
+    {
+      catalogId: catalog.id,
+    },
+    {
+      where: {
+        uuid: {
+          [Op.in]: items,
+        },
+        ownerId: playerId,
+      },
+    }
+  );
+
+  ctx.body = { catalog, number };
+});
 
 export default router;
