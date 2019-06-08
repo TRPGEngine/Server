@@ -1,6 +1,7 @@
 const uuid = require('uuid/v1');
 
-module.exports = function() {
+// TODO: 聊天的相关逻辑应转移到Chat模块。而不是在File模块
+module.exports = function chatImgStorage() {
   return async (ctx, next) => {
     let trpgapp = ctx.trpgapp;
     if (!ctx.player) {

@@ -11,7 +11,7 @@ module.exports = function File(Sequelize, db) {
       encoding: { type: Sequelize.STRING },
       mimetype: { type: Sequelize.STRING },
       ext: { type: Sequelize.STRING },
-      type: { type: Sequelize.ENUM('file') },
+      type: { type: Sequelize.STRING },
       can_preview: { type: Sequelize.BOOLEAN, defaultValue: false },
       is_persistence: { type: Sequelize.BOOLEAN, defaultValue: false },
       is_expired: { type: Sequelize.BOOLEAN, defaultValue: false },

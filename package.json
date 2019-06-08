@@ -11,7 +11,7 @@
     "run:nodemon": "nodemon -e js,ts standard.js",
     "packages:install": "sh packages/foreach.sh 'npm install'",
     "prettier:all": "prettier --write \"./**/*.{js,ts}\"",
-    "db:migrate:generate": "./cli.js generate-migrate",
+    "db:migrate:generate": "node ./cli.js generate-migrate",
     "db:migrate:run": "runmigration --models-path ./db/models.js --migrations-path ./db/migrations",
     "playground": "node ./playground/playground.js --experimental-repl-await",
     "test": "jest --config=./test/jest.config.js --runInBand"

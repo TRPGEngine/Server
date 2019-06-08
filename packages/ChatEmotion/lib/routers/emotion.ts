@@ -30,7 +30,7 @@ router.post(
   move(emotionsDir),
   imageResize(256, 256),
   sha256(),
-  fileStorage(true),
+  fileStorage(true, 'emotion'),
   async (ctx) => {
     const fileInfo = ctx.fileinfo;
     const fileId = fileInfo.id;

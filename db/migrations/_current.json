@@ -500,7 +500,7 @@
                 },
                 "type": {
                     "field": "type",
-                    "seqType": "Sequelize.ENUM('file')"
+                    "seqType": "Sequelize.STRING"
                 },
                 "can_preview": {
                     "defaultValue": {
@@ -2282,5 +2282,5 @@
             "indexes": []
         }
     },
-    "revision": 5
+    "revision": 6
 }

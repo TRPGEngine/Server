@@ -1,6 +1,6 @@
 const uuid = require('uuid/v1');
 
-module.exports = function(isPersistence = false) {
+module.exports = function fileStorage(isPersistence = false, type = 'file') {
   return async (ctx, next) => {
     let trpgapp = ctx.trpgapp;
     if (!ctx.player) {
@@ -18,7 +18,7 @@ module.exports = function(isPersistence = false) {
       size,
       encoding,
       mimetype,
-      type: 'file',
+      type,
       is_persistence: isPersistence,
       owner_uuid: ctx.player.user.uuid,
       ownerId: ctx.player.user.id,
