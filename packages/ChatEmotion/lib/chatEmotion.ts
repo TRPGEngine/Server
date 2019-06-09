@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import ChatEmotionCatalogModel from './models/catalog';
 import ChatEmotionItemModel from './models/item';
 import EmotionRouter from './routers/emotion';
+import UsermapRouter from './routers/usermap';
 import { emotionsDir } from './constant';
 import { getUserEmotionCatalog } from './event';
 
@@ -23,6 +24,7 @@ export default class ChatEmotion extends BasePackage {
 
     // 注册路由组件
     this.regRoute(EmotionRouter);
+    this.regRoute(UsermapRouter);
 
     // 注册socket事件
     this.regSocketEvent('getUserEmotionCatalog', getUserEmotionCatalog);

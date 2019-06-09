@@ -12,18 +12,8 @@ export async function getUserEmotionCatalog(data, cb, db) {
 
   const userId = player.user.id;
 
-  // TODO: 可能需要优化
-  const catalogs = await ChatEmotionCatalog.findAll({
-    include: [
-      {
-        model: db.models.player_user,
-        as: 'users',
-        where: {
-          id: userId,
-        },
-      },
-    ],
-  });
+  const user = await db.models.player_user.findByPk(userId);
+  const catalogs = await user.getEmotionCatalogs();
 
   return { catalogs };
 }
