@@ -1,7 +1,7 @@
 import BasePackage from 'lib/package';
 import fs from 'fs-extra';
-import ChatEmotionCatalogModel from './models/catalog';
 import ChatEmotionItemModel from './models/item';
+import ChatEmotionCatalogModel from './models/catalog';
 import EmotionRouter from './routers/emotion';
 import UsermapRouter from './routers/usermap';
 import { emotionsDir } from './constant';
@@ -19,8 +19,8 @@ export default class ChatEmotion extends BasePackage {
   onInit(): void {
     this.ensureDir();
 
-    this.regModel(ChatEmotionCatalogModel);
     this.regModel(ChatEmotionItemModel);
+    this.regModel(ChatEmotionCatalogModel);
 
     // 注册路由组件
     this.regRoute(EmotionRouter);

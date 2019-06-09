@@ -1,7 +1,10 @@
 import { Orm, DBInstance, Model } from 'trpg/core';
+import { ChatEmotionItem } from './item';
 
 export class ChatEmotionCatalog extends Model {
   id!: number;
+  uuid!: string;
+  name: string;
 }
 
 export default function ChatEmotionCatalogModel(
@@ -22,6 +25,15 @@ export default function ChatEmotionCatalogModel(
     },
     { tableName: 'chat_emotion_catalog', sequelize: db }
   );
+
+  ChatEmotionItem.belongsTo(ChatEmotionCatalog, {
+    foreignKey: 'catalogId',
+    as: 'catalog',
+  });
+  ChatEmotionCatalog.hasMany(ChatEmotionItem, {
+    foreignKey: 'catalogId',
+    as: 'items',
+  });
 
   const User = db.models.player_user as any;
   if (!!User) {

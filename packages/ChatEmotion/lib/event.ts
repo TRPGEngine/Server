@@ -1,5 +1,4 @@
-import { ChatEmotionCatalog } from './models/catalog';
-import { Op } from 'trpg/core';
+import _ from 'lodash';
 
 export async function getUserEmotionCatalog(data, cb, db) {
   const app = this.app;
@@ -14,6 +13,11 @@ export async function getUserEmotionCatalog(data, cb, db) {
 
   const user = await db.models.player_user.findByPk(userId);
   const catalogs = await user.getEmotionCatalogs();
+
+  for (let catalog of catalogs) {
+    const items = await catalog.getItems();
+    _.set(catalog, 'dataValues.items', items);
+  }
 
   return { catalogs };
 }
