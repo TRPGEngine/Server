@@ -50,11 +50,11 @@ export default function ChatEmotionItemModel(Sequelize: Orm, db: DBInstance) {
     // Usermap
     ChatEmotionItem.belongsToMany(User, {
       through: 'chat_emotion_usermap_item',
-      as: 'user',
+      as: 'users',
     });
     User.belongsToMany(ChatEmotionItem, {
       through: 'chat_emotion_usermap_item',
-      as: 'item',
+      as: 'items',
     });
   }
 

@@ -30,11 +30,11 @@ export default function ChatEmotionCatalogModel(
     // Usermap
     ChatEmotionCatalog.belongsToMany(User, {
       through: 'chat_emotion_usermap_catalog',
-      as: 'user',
+      as: 'users',
     });
     User.belongsToMany(ChatEmotionCatalog, {
       through: 'chat_emotion_usermap_catalog',
-      as: 'catalog',
+      as: 'catalogs',
     });
   }
 

@@ -56,7 +56,7 @@ export default abstract class BasePackage {
 
   protected regSocketEvent(name: string, event: SocketEventFn) {
     const app = this.app;
-    const packageName = this.name;
+    const packageName = this.getPackageName().toLocaleLowerCase();
     if (!name.startsWith(`${packageName}::`)) {
       // 事件名必须为: 包名::事件名
       name = `${packageName}::${name}`;

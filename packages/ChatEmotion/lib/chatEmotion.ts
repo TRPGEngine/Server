@@ -4,6 +4,7 @@ import ChatEmotionCatalogModel from './models/catalog';
 import ChatEmotionItemModel from './models/item';
 import EmotionRouter from './routers/emotion';
 import { emotionsDir } from './constant';
+import { getUserEmotionCatalog } from './event';
 
 export default class ChatEmotion extends BasePackage {
   public name: string = 'ChatEmotion';
@@ -22,6 +23,9 @@ export default class ChatEmotion extends BasePackage {
 
     // 注册路由组件
     this.regRoute(EmotionRouter);
+
+    // 注册socket事件
+    this.regSocketEvent('getUserEmotionCatalog', getUserEmotionCatalog);
   }
 
   /**
