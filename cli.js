@@ -6,10 +6,11 @@ const binPath = path.resolve(__dirname, './node_modules/.bin/');
 const getBinPath = (name) => {
   return path.resolve(binPath, name);
 };
-const exec = (file, args) => {
+const exec = (file, args, options) => {
   return execa(file, args, {
     stdout: process.stdout,
     stderr: process.stderr,
+    ...options,
   });
 };
 
@@ -46,12 +47,20 @@ yargs
     }
   )
   .command('run-migrate', 'run all db migrate', {}, function handler(args) {
-    exec(getBinPath('runmigration'), [
-      '--models-path',
-      './db/models.js',
-      '--migrations-path',
-      './db/migrations',
-    ]);
+    exec(
+      getBinPath('runmigration'),
+      [
+        '--models-path',
+        './db/models.js',
+        '--migrations-path',
+        './db/migrations',
+      ],
+      {
+        env: {
+          TRPG_PORT: 23666, // 使用一个不冲突的端口
+        },
+      }
+    );
   })
   // 代码补全
   .completion('completion', function(current, argv) {
