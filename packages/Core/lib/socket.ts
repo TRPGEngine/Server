@@ -205,7 +205,7 @@ export default class SocketService {
    * @param millisecond 用时: 单位毫秒
    */
   recordSocketTime(eventName: string, millisecond: number) {
-    const cacheKey = `meter:socket:event:${eventName}`;
+    const cacheKey = `metrics:socket:event:${eventName}`;
 
     this._app.cache.rpush(cacheKey, millisecond);
   }
