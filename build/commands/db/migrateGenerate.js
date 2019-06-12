@@ -10,9 +10,9 @@ exports.builder = function(args) {
     .default('comment', '').argv;
 };
 exports.handler = function(argv) {
-  const { name, comment } = args;
+  const { name, comment } = argv;
   if (!name) {
-    // name为字符串且
+    // name 不存在
     console.error('Error: Require Migrate Name');
     return;
   }
