@@ -4,3 +4,4 @@ public/
 config/local.js
 node_modules
 db/migrations/_current_bak.json
+db/seeders/emotion/mitaomao/thumbnail/
