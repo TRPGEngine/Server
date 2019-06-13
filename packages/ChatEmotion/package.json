@@ -1,0 +1,23 @@
+{
+  "name": "trpg-chat-emotion",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "trpg"
+  ],
+  "author": "moonrailgun",
+  "license": "MIT",
+  "dependencies": {
+    "hashids": "^1.2.2"
+  },
+  "devDependencies": {
+    "@types/hashids": "^1.0.30"
+  }
+}

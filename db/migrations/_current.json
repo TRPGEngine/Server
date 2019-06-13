@@ -861,6 +861,130 @@
             },
             "indexes": []
         },
+        "chat_emotion_item": {
+            "tableName": "chat_emotion_item",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "required": true,
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "allowNull": false,
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "url": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "url",
+                    "seqType": "Sequelize.STRING"
+                },
+                "width": {
+                    "field": "width",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "height": {
+                    "field": "height",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "fileId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "file_file",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "fileId",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "catalogId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "chat_emotion_catalog",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "catalogId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "chat_emotion_usermap_item": {
+            "tableName": "chat_emotion_usermap_item",
+            "schema": {
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ChatEmotionItemId": {
+                    "primaryKey": true,
+                    "references": {
+                        "model": "chat_emotion_item",
+                        "key": "id"
+                    },
+                    "onDelete": "CASCADE",
+                    "onUpdate": "CASCADE",
+                    "field": "ChatEmotionItemId",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "playerUserId": {
+                    "primaryKey": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "CASCADE",
+                    "onUpdate": "CASCADE",
+                    "field": "playerUserId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
         "chat_emotion_catalog": {
             "tableName": "chat_emotion_catalog",
             "schema": {
@@ -949,8 +1073,8 @@
             },
             "indexes": []
         },
-        "chat_emotion_item": {
-            "tableName": "chat_emotion_item",
+        "chat_emotion_secret_signal": {
+            "tableName": "chat_emotion_secret_signal",
             "schema": {
                 "id": {
                     "allowNull": false,
@@ -969,25 +1093,11 @@
                     "field": "uuid",
                     "seqType": "Sequelize.UUID"
                 },
-                "name": {
+                "code": {
                     "required": true,
                     "allowNull": false,
-                    "field": "name",
+                    "field": "code",
                     "seqType": "Sequelize.STRING"
-                },
-                "url": {
-                    "required": true,
-                    "allowNull": false,
-                    "field": "url",
-                    "seqType": "Sequelize.STRING"
-                },
-                "width": {
-                    "field": "width",
-                    "seqType": "Sequelize.INTEGER"
-                },
-                "height": {
-                    "field": "height",
-                    "seqType": "Sequelize.INTEGER"
                 },
                 "createdAt": {
                     "allowNull": false,
@@ -1010,18 +1120,7 @@
                     "field": "catalogId",
                     "seqType": "Sequelize.INTEGER"
                 },
-                "fileId": {
-                    "allowNull": true,
-                    "references": {
-                        "model": "file_file",
-                        "key": "id"
-                    },
-                    "onDelete": "SET NULL",
-                    "onUpdate": "CASCADE",
-                    "field": "fileId",
-                    "seqType": "Sequelize.INTEGER"
-                },
-                "ownerId": {
+                "creatorId": {
                     "allowNull": true,
                     "references": {
                         "model": "player_user",
@@ -1029,45 +1128,7 @@
                     },
                     "onDelete": "SET NULL",
                     "onUpdate": "CASCADE",
-                    "field": "ownerId",
-                    "seqType": "Sequelize.INTEGER"
-                }
-            },
-            "indexes": []
-        },
-        "chat_emotion_usermap_item": {
-            "tableName": "chat_emotion_usermap_item",
-            "schema": {
-                "createdAt": {
-                    "allowNull": false,
-                    "field": "createdAt",
-                    "seqType": "Sequelize.DATE"
-                },
-                "updatedAt": {
-                    "allowNull": false,
-                    "field": "updatedAt",
-                    "seqType": "Sequelize.DATE"
-                },
-                "ChatEmotionItemId": {
-                    "primaryKey": true,
-                    "references": {
-                        "model": "chat_emotion_item",
-                        "key": "id"
-                    },
-                    "onDelete": "CASCADE",
-                    "onUpdate": "CASCADE",
-                    "field": "ChatEmotionItemId",
-                    "seqType": "Sequelize.INTEGER"
-                },
-                "playerUserId": {
-                    "primaryKey": true,
-                    "references": {
-                        "model": "player_user",
-                        "key": "id"
-                    },
-                    "onDelete": "CASCADE",
-                    "onUpdate": "CASCADE",
-                    "field": "playerUserId",
+                    "field": "creatorId",
                     "seqType": "Sequelize.INTEGER"
                 }
             },
@@ -2297,5 +2358,5 @@
             "indexes": []
         }
     },
-    "revision": 8
+    "revision": 9
 }

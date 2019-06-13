@@ -6,6 +6,7 @@ import EmotionRouter from './routers/emotion';
 import UsermapRouter from './routers/usermap';
 import { emotionsDir } from './constant';
 import { getUserEmotionCatalog } from './event';
+import ChatEmotionSecretSignalModel from './models/secretSignal';
 
 export default class ChatEmotion extends BasePackage {
   public name: string = 'ChatEmotion';
@@ -21,6 +22,7 @@ export default class ChatEmotion extends BasePackage {
 
     this.regModel(ChatEmotionItemModel);
     this.regModel(ChatEmotionCatalogModel);
+    this.regModel(ChatEmotionSecretSignalModel);
 
     // 注册路由组件
     this.regRoute(EmotionRouter);
