@@ -24,12 +24,10 @@ exports.handler = async function(argv) {
   }
 
   // 获取文件夹下所有的文件
-  // const fileList = fs.readdirSync(seederDir);
   const seederFiles = glob(pattern, {
     cwd: seederDir,
     sync: true,
   });
-  console.log('files', seederFiles);
   const maxIndex = Math.max(
     ...seederFiles.map((filename) => Number(filename.split('-')[0])),
     0
@@ -38,9 +36,9 @@ exports.handler = async function(argv) {
   const curFileName = `${curIndex}-seeder-${name}.js`;
   const curFileContent = `'use strict';
 /**
- * ${curFileName}.js
+ * ${curFileName}
  * ${comment}
- * /
+ */
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
