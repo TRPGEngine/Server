@@ -3,13 +3,14 @@ const fs = require('fs-extra');
 const path = require('path');
 const glob = require('glob');
 
-const seedDir = getProjectPath('./db/seeders/');
+const pattern = '*[0-9]-seeder-*.js';
+const seederDir = getProjectPath('./db/seeders/');
 
-exports.command = 'generate-seed';
-exports.desc = 'generate a blank db seed';
+exports.command = 'generate-seeder';
+exports.desc = 'generate a blank db seeder';
 exports.builder = function(args) {
   return args
-    .usage('$0 generate-seed --name [name] <options>')
+    .usage('$0 generate-seeder --name [name] <options>')
     .string(['name', 'comment'])
     .demandOption('name', 'Require seed name to generate')
     .default('comment', '').argv;
@@ -23,18 +24,18 @@ exports.handler = async function(argv) {
   }
 
   // 获取文件夹下所有的文件
-  // const fileList = fs.readdirSync(seedDir);
-  const seedFiles = glob('*[0-9]-seed-*.js', {
-    cwd: seedDir,
+  // const fileList = fs.readdirSync(seederDir);
+  const seederFiles = glob(pattern, {
+    cwd: seederDir,
     sync: true,
   });
-  console.log('files', seedFiles);
+  console.log('files', seederFiles);
   const maxIndex = Math.max(
-    ...seedFiles.map((filename) => Number(filename.split('-')[0])),
+    ...seederFiles.map((filename) => Number(filename.split('-')[0])),
     0
   ); // 返回最大index, 如果没有匹配文件返回 0
   const curIndex = maxIndex + 1;
-  const curFileName = `${curIndex}-seed-${name}.js`;
+  const curFileName = `${curIndex}-seeder-${name}.js`;
   const curFileContent = `'use strict';
 /**
  * ${curFileName}.js
@@ -50,5 +51,5 @@ module.exports = {
   }
 }
   `;
-  await fs.outputFile(path.resolve(seedDir, curFileName), curFileContent);
+  await fs.outputFile(path.resolve(seederDir, curFileName), curFileContent);
 };
