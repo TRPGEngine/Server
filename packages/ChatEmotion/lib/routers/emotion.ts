@@ -11,6 +11,7 @@ import fileStorage from 'packages/File/lib/middleware/storage/file';
 import { emotionsDir } from '../constant';
 import { ChatEmotionCatalog } from '../models/catalog';
 import { ChatEmotionItem } from '../models/item';
+import { ChatEmotionSecretSignal } from '../models/secretSignal';
 
 const router = new Router();
 
@@ -97,6 +98,30 @@ router.post('/catalog/create', auth(), async (ctx) => {
   );
 
   ctx.body = { catalog, number };
+});
+
+// 新增表情包暗号
+router.post('/catalog/secretSignal/create', auth(), async (ctx) => {
+  const { catalogUUID } = ctx.request.body;
+  const playerId = _.get(ctx, 'player.user.id');
+
+  const catalog = await ChatEmotionCatalog.findOne({
+    attributes: ['id'],
+    where: { uuid: catalogUUID },
+  });
+
+  if (!catalog) {
+    throw new Error('该表情包不存在');
+  }
+
+  const code = await ChatEmotionSecretSignal.getUniqHashId();
+  const secretSignal = await ChatEmotionSecretSignal.create({
+    code,
+    catalogId: catalog.id,
+    creatorId: playerId,
+  });
+
+  ctx.body = { uuid: secretSignal.uuid, code: secretSignal.code };
 });
 
 export default router;
