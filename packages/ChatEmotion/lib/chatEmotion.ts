@@ -5,7 +5,7 @@ import ChatEmotionCatalogModel from './models/catalog';
 import EmotionRouter from './routers/emotion';
 import UsermapRouter from './routers/usermap';
 import { emotionsDir } from './constant';
-import { getUserEmotionCatalog } from './event';
+import { getUserEmotionCatalog, addUserEmotionWithSecretSignal } from './event';
 import ChatEmotionSecretSignalModel from './models/secretSignal';
 
 export default class ChatEmotion extends BasePackage {
@@ -30,6 +30,10 @@ export default class ChatEmotion extends BasePackage {
 
     // 注册socket事件
     this.regSocketEvent('getUserEmotionCatalog', getUserEmotionCatalog);
+    this.regSocketEvent(
+      'addUserEmotionWithSecretSignal',
+      addUserEmotionWithSecretSignal
+    );
   }
 
   /**
