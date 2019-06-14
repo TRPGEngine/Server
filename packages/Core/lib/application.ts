@@ -41,6 +41,7 @@ class Application extends events.EventEmitter {
   statInfoJob = []; // 统计信息任务
   job = null; // node-schedule定时任务
   testcase = [];
+  [packageInject: string]: any; // 包注入的方法
 
   run() {
     // TODO 启动检测，如果为第一次启动则初始化。如果非第一次启动则重新开启（保留之前配置）

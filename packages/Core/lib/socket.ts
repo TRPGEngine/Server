@@ -9,20 +9,43 @@ const appLogger = getLogger('application');
 const packageInfo = require('../../../package.json');
 
 export type MiddlewareFn = (socket: IO.Socket, fn: (err?: any) => void) => void;
+
+export interface SocketEventType {
+  name: string;
+  fn: SocketEventFn;
+}
+type BaseDataType = {
+  [name: string]: any;
+};
 export type SocketCallbackResult = {
   result: boolean;
   [other: string]: any;
 };
 export type SocketCallbackFn = (ret: SocketCallbackResult) => void;
+
+/**
+ * 进行一层数据处理的封装后的Socket事件方法
+ */
 export type SocketEventFn = (
-  data: {},
+  data: BaseDataType,
   cb: SocketCallbackFn,
   db: DBInstance
-) => any;
-export interface EventType {
-  name: string;
-  fn: SocketEventFn;
+) => void;
+
+type EventRet = {} | boolean | void;
+interface EventWrap {
+  app: TRPGApplication;
+  socket: SocketIO.Socket;
 }
+/**
+ * Socket事件的方法类型
+ */
+export type EventFunc<DataType extends BaseDataType = BaseDataType> = (
+  this: EventWrap,
+  data: DataType,
+  cb: SocketCallbackFn,
+  db: DBInstance
+) => Promise<EventRet>;
 
 const applog = (formatter: string, ...args: any[]) => {
   debug(formatter, ...args);
@@ -38,7 +61,7 @@ const ioOpts = {
 export default class SocketService {
   _app: TRPGApplication;
   _io: Server;
-  events: EventType[];
+  events: SocketEventType[];
 
   constructor(app: TRPGApplication) {
     if (!app) {
@@ -92,7 +115,7 @@ export default class SocketService {
     });
   }
 
-  registerIOEvent(eventName: string, eventFn: SocketEventFn) {
+  registerIOEvent(eventName: string, eventFn: EventFunc) {
     const index = this.events.findIndex((e) => {
       return e.name === eventName;
     });

@@ -1,1 +1,1 @@
-export { SocketEventFn } from '../lib/socket';
+export { SocketEventFn, EventFunc } from '../lib/socket';
