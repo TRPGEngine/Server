@@ -21,7 +21,7 @@ export type SocketCallbackResult = {
   result: boolean;
   [other: string]: any;
 };
-export type SocketCallbackFn = (ret: SocketCallbackResult) => void;
+export type SocketCallbackFn = (ret: SocketCallbackResult) => Promise<void>;
 
 /**
  * 进行一层数据处理的封装后的Socket事件方法
@@ -39,6 +39,7 @@ interface EventWrap {
 }
 /**
  * Socket事件的方法类型
+ * 原始事件方法类型
  */
 export type EventFunc<DataType extends BaseDataType = BaseDataType> = (
   this: EventWrap,

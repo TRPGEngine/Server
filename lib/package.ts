@@ -1,4 +1,4 @@
-import { TRPGApplication, ModelFn, SocketEventFn, Model } from 'trpg/core';
+import { TRPGApplication, ModelFn, Model, EventFunc } from 'trpg/core';
 import Router from 'koa-router';
 import Debug, { Debugger } from 'debug';
 
@@ -54,7 +54,7 @@ export default abstract class BasePackage {
     this._models.push(model);
   }
 
-  protected regSocketEvent(name: string, event: SocketEventFn) {
+  protected regSocketEvent(name: string, event: EventFunc) {
     const app = this.app;
     const packageName = this.getPackageName().toLocaleLowerCase();
     if (!name.startsWith(`${packageName}::`)) {

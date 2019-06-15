@@ -11,7 +11,7 @@ import Storage, { TRPGDbOptions } from './storage';
 import { Cache, RedisCache, ICache } from './cache';
 const ReportService = require('./report');
 import WebService from './webservice';
-import SocketService, { SocketEventFn } from './socket';
+import SocketService, { EventFunc } from './socket';
 import { getLogger } from './logger';
 const logger = getLogger();
 const appLogger = getLogger('application');
@@ -183,7 +183,7 @@ class Application extends events.EventEmitter {
     }
   }
 
-  registerEvent(eventName: string, eventFn: SocketEventFn) {
+  registerEvent(eventName: string, eventFn: EventFunc) {
     this.socketservice.registerIOEvent(eventName, eventFn);
   }
 
