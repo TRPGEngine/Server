@@ -1,7 +1,8 @@
 import _ from 'lodash';
+import { EventFunc } from 'trpg/core';
 import { ChatEmotionSecretSignal } from './models/secretSignal';
 import { ChatEmotionCatalog } from './models/catalog';
-import { EventFunc } from 'trpg/core';
+import { ChatEmotionItem } from './models/item';
 
 export async function getUserEmotionCatalog(data, cb, db) {
   const app = this.app;
@@ -41,7 +42,13 @@ export const addUserEmotionWithSecretSignal: EventFunc<{
     where: {
       code,
     },
-    include: [{ model: ChatEmotionCatalog, as: 'catalog' }],
+    include: [
+      {
+        model: ChatEmotionCatalog,
+        as: 'catalog',
+        include: [{ model: ChatEmotionItem, as: 'items' }],
+      },
+    ],
     order: [['id', 'DESC']],
   });
 
