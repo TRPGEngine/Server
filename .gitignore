@@ -1,4 +1,5 @@
 package-lock.json
+stat.json
 logs/
 public/
 config/local.js
