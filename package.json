@@ -10,7 +10,7 @@
     "run:standard": "node standard.js",
     "run:nodemon": "nodemon -e js,ts standard.js",
     "packages:install": "sh packages/foreach.sh 'npm install'",
-    "prettier:all": "prettier --write \"./**/*.{js,ts}\"",
+    "prettier:all": "prettier --write \"./packages/**/*.{js,ts}\"",
     "db:migrate:generate": "node ./cli.js generate-migrate",
     "db:migrate:run": "node ./cli.js run-migrate",
     "playground": "node ./playground/playground.js --experimental-repl-await",
