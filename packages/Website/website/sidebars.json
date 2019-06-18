@@ -1,10 +1,10 @@
 {
   "docs": {
-    "Docusaurus": ["doc1"],
-    "First Category": ["doc2"],
-    "Second Category": ["doc3"]
+    "开始": ["getstart"],
+    "创建人物": ["doc2"],
+    "配置设置": ["doc3"]
   },
-  "docs-other": {
-    "First Category": ["doc4", "doc5"]
+  "develop": {
+    "开发": ["develop", "doc5"]
   }
 }

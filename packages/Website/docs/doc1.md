@@ -1,7 +1,7 @@
 ---
-id: doc1
-title: Latin-ish
-sidebar_label: Example Page
+id: getstart
+title: 起步
+sidebar_label: 从这开始
 ---
 
 Check the [documentation](https://docusaurus.io) for how to use Docusaurus.

@@ -38,12 +38,13 @@ const siteConfig = {
 
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
-    { doc: 'doc1', label: 'Docs' },
-    { doc: 'doc4', label: 'API' },
-    { page: 'help', label: 'Help' },
-    { blog: true, label: 'Blog' },
+    { doc: 'getstart', label: '文档' },
+    { doc: 'develop', label: '开发' },
+    { page: 'help', label: '帮助' },
+    { blog: true, label: '博客' },
     { languages: false },
     { search: false },
+    { href: 'http://moonrailgun.com', label: '关于作者' },
   ],
 
   // If you have users set above, you add it here:
@@ -56,7 +57,7 @@ const siteConfig = {
 
   /* Colors for website */
   colors: {
-    primaryColor: '#080e4d',
+    primaryColor: '#8C6244',
     secondaryColor: '#050935',
   },
 
