@@ -3,6 +3,7 @@ const app = require('../standard');
 const db = {
   sequelize: app.storage.db,
   Sequelize: app.storage._Sequelize,
+  app,
 };
 
 for (const model of app.storage.models) {

@@ -5,6 +5,8 @@ const { getProjectPath } = require('../utils');
 const pattern = '*[0-9]-seeder-*.js';
 const seederDir = getProjectPath('./db/seeders/');
 
+process.env.DEBUG = 'trpg:storage:sql';
+
 exports.command = 'run-seeder';
 exports.desc = 'run all db seeder or specify seeder file';
 exports.builder = function(args) {
@@ -16,7 +18,7 @@ exports.builder = function(args) {
 exports.handler = async function(argv) {
   const { file } = argv;
 
-  const { sequelize, Sequelize } = require('../../../db/models');
+  const { sequelize, Sequelize, app } = require('../../../db/models');
   const queryInterface = sequelize.getQueryInterface();
 
   const execSeederFile = async (file) => {
@@ -25,7 +27,7 @@ exports.handler = async function(argv) {
     const module = require(targetFile);
 
     if (module['up'] && typeof module['up'] === 'function') {
-      await module['up'](queryInterface, Sequelize);
+      await module['up'](queryInterface, Sequelize, { app });
     } else {
       console.log('Exec fail, should have up function in', filename);
     }

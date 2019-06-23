@@ -41,13 +41,13 @@ exports.handler = async function(argv) {
  */
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: (queryInterface, Sequelize, { app }) => {
     // Here create your db insert row
   },
   down: (queryInterface, Sequelize) => {
     // Optional, here code your db remove row
-  }
-}
+  },
+};
   `;
   await fs.outputFile(path.resolve(seederDir, curFileName), curFileContent);
 };
