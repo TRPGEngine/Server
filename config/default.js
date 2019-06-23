@@ -23,6 +23,10 @@ module.exports = {
       },
     },
   },
+  jwt: {
+    // json web token 相关设定
+    secret: randomString(10),
+  },
   dashboard: {
     // dashboard模块网页端的账号密码
     admin: [

@@ -374,6 +374,9 @@ class Application extends events.EventEmitter {
 
   log = applog;
   xss = xss;
+
+  jwtSign = (payload: any) => this.webservice.jwtSign(payload);
+  jwtVerify = (token: string) => this.webservice.jwtVerify(token);
 }
 export default Application;
 

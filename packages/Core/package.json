@@ -21,10 +21,12 @@
   "homepage": "https://github.com/TRPGEngine/Core#readme",
   "dependencies": {
     "@koa/cors": "^2.2.3",
+    "@types/jsonwebtoken": "^8.3.2",
     "axios": "^0.19.0",
     "debug": "^3.1.0",
     "fs-extra": "^5.0.0",
     "ioredis": "^3.2.2",
+    "jsonwebtoken": "^8.5.1",
     "koa": "^2.4.1",
     "koa-bodyparser": "^4.2.0",
     "koa-helmet": "^4.1.0",

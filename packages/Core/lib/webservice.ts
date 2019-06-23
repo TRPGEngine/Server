@@ -10,6 +10,7 @@ import session from 'koa-session';
 import Router from 'koa-router';
 import fs from 'fs-extra';
 import path from 'path';
+import jwt from 'jsonwebtoken';
 import { WebSessionMiddleware } from './utils/iosession';
 import Debug from 'debug';
 const debug = Debug('trpg:webservice');
@@ -21,6 +22,7 @@ import { TRPGApplication } from '../types/app';
 import { CacheValue } from './cache';
 
 const publicDir = path.resolve(process.cwd(), './public');
+const jwtIssuer = 'trpg';
 
 class SessionStore {
   trpgapp: TRPGApplication;
@@ -42,6 +44,10 @@ class SessionStore {
   }
 }
 
+interface JWTConfig {
+  secret: string;
+}
+
 export default class WebService {
   private _app = new Koa();
   private _server = http.createServer(this._app.callback());
@@ -51,6 +57,7 @@ export default class WebService {
   context = this._app.context;
   trpgapp: TRPGApplication;
   sessionOpt: any;
+  jwtConfig: JWTConfig;
 
   constructor(opts) {
     this.trpgapp = this.context.trpgapp = opts.app;
@@ -97,6 +104,8 @@ export default class WebService {
     if (opts && opts.homepage && typeof opts.homepage === 'string') {
       this.homepage = opts.homepage;
     }
+
+    this.jwtConfig = opts.jwt;
   }
 
   /**
@@ -162,10 +171,15 @@ export default class WebService {
    * 初始化上下文信息
    */
   initContext() {
+    // 渲染方法
     this.context.render = function(template, data) {
       this.response.type = 'html';
       this.response.body = template.stream(data);
     };
+
+    // jwt 相关
+    this.context.jwtSign = this.jwtSign;
+    this.context.jwtVerify = this.jwtVerify;
   }
 
   /**
@@ -234,4 +248,26 @@ export default class WebService {
   getHttpServer() {
     return this._server;
   }
+
+  /**
+   * 签名jwt
+   * 过期时间一天
+   * @param payload 签名内容包
+   */
+  jwtSign = (payload: any): string => {
+    return jwt.sign(payload, this.jwtConfig.secret, {
+      expiresIn: '1d',
+      issuer: jwtIssuer,
+    });
+  };
+
+  /**
+   * 校验jwt
+   * 返回校验后的结果
+   */
+  jwtVerify = (token: string): string | object => {
+    return jwt.verify(token, this.jwtConfig.secret, {
+      issuer: jwtIssuer,
+    });
+  };
 }
