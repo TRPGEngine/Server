@@ -32,6 +32,10 @@
                     "field": "password",
                     "seqType": "Sequelize.STRING"
                 },
+                "salt": {
+                    "field": "salt",
+                    "seqType": "Sequelize.STRING"
+                },
                 "nickname": {
                     "required": false,
                     "field": "nickname",
@@ -2358,5 +2362,5 @@
             "indexes": []
         }
     },
-    "revision": 9
+    "revision": 10
 }

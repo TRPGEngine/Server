@@ -1,6 +1,6 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
-module.exports = function(str) {
+function md5Encrypt(str: string) {
   if (typeof str != 'string') {
     str = String(str);
   }
@@ -9,4 +9,6 @@ module.exports = function(str) {
   md5sum.update(str);
   str = md5sum.digest('hex');
   return str;
-};
+}
+
+export default md5Encrypt;

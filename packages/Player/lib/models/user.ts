@@ -1,3 +1,6 @@
+import md5Encrypt from 'packages/Player/md5';
+import randomString from 'crypto-random-string';
+
 module.exports = function User(Sequelize, db) {
   let User = db.define(
     'player_user',
@@ -13,6 +16,7 @@ module.exports = function User(Sequelize, db) {
         uniq: true,
       },
       password: { type: Sequelize.STRING, required: true },
+      salt: { type: Sequelize.STRING },
       nickname: { type: Sequelize.STRING, required: false },
       avatar: { type: Sequelize.STRING, required: false, defaultValue: '' },
       last_login: { type: Sequelize.DATE },
@@ -68,6 +72,14 @@ module.exports = function User(Sequelize, db) {
       },
     }
   );
+
+  /**
+   * 生成一个盐值供用户加密时使用
+   * 盐值的计算公式为随机16位字符串的MD5散列值
+   */
+  User.genSalt = (): string => {
+    return md5Encrypt(randomString(16));
+  };
 
   User.belongsToMany(User, { through: 'player_friends', as: 'friend' });
 
