@@ -1,6 +1,7 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:player:event');
-const md5 = require('../md5');
+import md5 from '../md5';
+import sha1 from '../sha1';
 const uuid = require('uuid/v1');
 const _ = require('lodash');
 
@@ -51,10 +52,21 @@ exports.login = async function login(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let user = await db.models.player_user.oneAsync({
-    username,
-    password: md5(password),
+  const Sequelize = app.storage._Sequelize;
+  const user = await db.models.player_user.findOne({
+    where: {
+      username,
+      password: Sequelize.fn(
+        'SHA1',
+        Sequelize.fn(
+          'CONCAT',
+          Sequelize.fn('MD5', password),
+          Sequelize.col('salt')
+        )
+      ),
+    },
   });
+
   if (!user) {
     debug('login fail, try to login [%s] and password error', username);
     cb({ result: false, msg: '账户或密码错误' });
@@ -227,9 +239,11 @@ exports.register = async function register(data, cb, db) {
     throw '用户名已存在';
   }
 
+  const salt = modelUser.genSalt();
   let results = await modelUser.create({
     username,
-    password: md5(password),
+    password: sha1(md5(password) + salt), // 存储密码为sha1(md5(md5(realpass)) + salt)
+    salt,
   });
   debug('register success: %o', results);
   return { results };
