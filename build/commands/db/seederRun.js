@@ -5,8 +5,6 @@ const { getProjectPath } = require('../utils');
 const pattern = '*[0-9]-seeder-*.js';
 const seederDir = getProjectPath('./db/seeders/');
 
-process.env.DEBUG = 'trpg:storage:sql';
-
 exports.command = 'run-seeder';
 exports.desc = 'run all db seeder or specify seeder file';
 exports.builder = function(args) {

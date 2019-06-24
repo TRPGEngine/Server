@@ -13,6 +13,8 @@
     "prettier:all": "prettier --write \"./packages/**/*.{js,ts}\"",
     "db:migrate:generate": "node ./cli.js generate-migrate",
     "db:migrate:run": "node ./cli.js run-migrate",
+    "db:seeder:generate": "node ./cli.js generate-seeder",
+    "db:seeder:run": "node ./cli.js run-seeder",
     "playground": "node ./playground/playground.js --experimental-repl-await",
     "test": "jest --config=./test/jest.config.js --runInBand"
   },
