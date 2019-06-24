@@ -18,6 +18,11 @@
     "playground": "node ./playground/playground.js --experimental-repl-await",
     "test": "jest --config=./test/jest.config.js --runInBand"
   },
+  "husky": {
+    "hooks": {
+      "commit-msg": "node ./build/husky/commit-msg.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TRPGEngine/Server.git"
@@ -56,6 +61,7 @@
     "@types/node-schedule": "^1.2.3",
     "cross-env": "^5.2.0",
     "glob": "^7.1.4",
+    "husky": "^2.4.1",
     "jest": "^24.7.1",
     "prettier": "^1.16.4",
     "sequelize-auto-migrations": "github:TRPGEngine/sequelize-auto-migrations",
