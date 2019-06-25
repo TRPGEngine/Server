@@ -425,7 +425,6 @@ let createConverse = async function createConverse(data, cb) {
       let convUser = await db.models.player_user.oneAsync({ uuid });
       if (!convUser) {
         cb({ result: false, msg: '目标用户不存在' });
-        db.close();
         return;
       }
 
@@ -455,8 +454,6 @@ let createConverse = async function createConverse(data, cb) {
         data
       );
     }
-
-    db.close();
   } catch (err) {
     console.error(err);
     cb({ result: false, msg: err.toString() });

@@ -5,7 +5,7 @@ const lodash = require('lodash');
 const randomString = require('crypto-random-string');
 const config = require('config');
 let trpgapp = null;
-const socket = io('ws://127.0.0.1:23256', {
+const socket = io(`ws://127.0.0.1:${lodash.get(config, 'port', 23256)}`, {
   autoConnect: false,
 });
 
@@ -91,11 +91,15 @@ class TRPGEnvironment extends NodeEnvironment {
   async teardown() {
     debug('Teardown TRPG Test Environment');
 
-    socket.close();
-    if (trpgapp) {
-      // TODO: trpg还是没有关闭所有的连接, 可以考虑将其放到下一级(测试文件级)
-      await trpgapp.close();
-      trpgapp = null;
+    try {
+      socket.close();
+      if (trpgapp) {
+        // TODO: trpg还是没有关闭所有的连接, 可以考虑将其放到下一级(测试文件级)
+        await trpgapp.close();
+        trpgapp = null;
+      }
+    } catch (err) {
+      debug('Teardown error:', err);
     }
 
     await super.teardown();

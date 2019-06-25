@@ -5,5 +5,9 @@ module.exports = {
     options: {
       benchmark: true,
     },
+    pool: {
+      max: 1,
+      min: 0,
+    },
   },
 };

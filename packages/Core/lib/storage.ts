@@ -122,8 +122,12 @@ export default class Storage {
     return this.db.query(sql);
   }
 
-  close() {
-    return this.db.close();
+  async close(): Promise<void> {
+    try {
+      await this.db.close();
+    } catch (err) {
+      console.error('close storage error:', err);
+    }
   }
 }
 

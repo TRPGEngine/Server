@@ -242,7 +242,11 @@ export default class SocketService {
     this._io.on(name, cb);
   }
 
-  close(cb: () => void) {
-    this._io.close(cb);
+  close(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._io.close(() => {
+        resolve();
+      });
+    });
   }
 }

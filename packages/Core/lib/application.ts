@@ -264,10 +264,10 @@ class Application extends events.EventEmitter {
     this.reportservice.reportErrorWithContext(err, context);
   }
 
-  async close(cb: () => void) {
+  async close() {
     debug('closing....');
     await this.storage.close();
-    this.socketservice.close(cb);
+    await this.socketservice.close();
     // 清理timer
     for (let timer of this.timers) {
       clearInterval(timer);
