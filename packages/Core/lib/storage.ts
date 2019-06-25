@@ -181,6 +181,11 @@ export class TRPGModel extends Model {
         _set(attr, 'allowNull', false);
       }
     }
+    if (options && !options.modelName) {
+      // modelName默认为tableName
+      options.modelName = options.tableName;
+    }
+
     Model.init.call(this, attributes, options);
   }
 }

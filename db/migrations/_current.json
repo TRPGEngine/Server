@@ -1,5 +1,63 @@
 {
     "tables": {
+        "core_metrics": {
+            "tableName": "core_metrics",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "name": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "date": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "date",
+                    "seqType": "Sequelize.DATEONLY"
+                },
+                "type": {
+                    "required": true,
+                    "defaultValue": {
+                        "value": "socket"
+                    },
+                    "allowNull": false,
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('socket', 'route')"
+                },
+                "usage": {
+                    "required": true,
+                    "comment": "usage time of a function or event. unit is ms",
+                    "allowNull": false,
+                    "field": "usage",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "count": {
+                    "required": true,
+                    "comment": "count of this statistics",
+                    "allowNull": false,
+                    "field": "count",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
         "player_user": {
             "tableName": "player_user",
             "schema": {
@@ -964,7 +1022,7 @@
                     "field": "updatedAt",
                     "seqType": "Sequelize.DATE"
                 },
-                "ChatEmotionItemId": {
+                "chatEmotionItemId": {
                     "primaryKey": true,
                     "references": {
                         "model": "chat_emotion_item",
@@ -972,7 +1030,7 @@
                     },
                     "onDelete": "CASCADE",
                     "onUpdate": "CASCADE",
-                    "field": "ChatEmotionItemId",
+                    "field": "chatEmotionItemId",
                     "seqType": "Sequelize.INTEGER"
                 },
                 "playerUserId": {
@@ -1052,7 +1110,7 @@
                     "field": "updatedAt",
                     "seqType": "Sequelize.DATE"
                 },
-                "ChatEmotionCatalogId": {
+                "chatEmotionCatalogId": {
                     "primaryKey": true,
                     "references": {
                         "model": "chat_emotion_catalog",
@@ -1060,7 +1118,7 @@
                     },
                     "onDelete": "CASCADE",
                     "onUpdate": "CASCADE",
-                    "field": "ChatEmotionCatalogId",
+                    "field": "chatEmotionCatalogId",
                     "seqType": "Sequelize.INTEGER"
                 },
                 "playerUserId": {
@@ -2362,5 +2420,5 @@
             "indexes": []
         }
     },
-    "revision": 10
+    "revision": 11
 }

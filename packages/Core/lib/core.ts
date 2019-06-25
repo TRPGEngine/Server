@@ -1,6 +1,7 @@
 import Application from './application';
 import Debug from 'debug';
 const debug = Debug('trpg:core');
+import internal from './internal/internal';
 
 type Config = {
   [name: string]: string | number | {};
@@ -12,6 +13,9 @@ export default function createApplication(conf: Config): Application {
   const app = new Application();
 
   setConfig(app, conf);
+
+  // 注册内部模块
+  app.load(internal);
 
   return app;
 }
