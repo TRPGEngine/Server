@@ -1,5 +1,34 @@
 {
     "tables": {
+        "core_global_config": {
+            "tableName": "core_global_config",
+            "schema": {
+                "name": {
+                    "required": true,
+                    "primaryKey": true,
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "value": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "value",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
         "core_metrics": {
             "tableName": "core_metrics",
             "schema": {
@@ -2420,5 +2449,5 @@
             "indexes": []
         }
     },
-    "revision": 11
+    "revision": 12
 }
