@@ -48,9 +48,13 @@ export default abstract class BasePackage {
     return this.name;
   }
 
-  protected regModel(modelFn: ModelFn) {
+  /**
+   * 注册一个数据库ORM模型
+   * @param modelDefinitionFn 数据库模型定义方法
+   */
+  protected regModel(modelDefinitionFn: ModelFn) {
     const storage = this.storage;
-    const model = storage.registerModel(modelFn);
+    const model = storage.registerModel(modelDefinitionFn);
     this._models.push(model);
   }
 

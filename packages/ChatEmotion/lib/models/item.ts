@@ -2,7 +2,10 @@ import { Model, DBInstance, Orm } from 'trpg/core';
 
 export class ChatEmotionItem extends Model {}
 
-export default function ChatEmotionItemModel(Sequelize: Orm, db: DBInstance) {
+export default function ChatEmotionItemDefinition(
+  Sequelize: Orm,
+  db: DBInstance
+) {
   ChatEmotionItem.init(
     {
       uuid: {

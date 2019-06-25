@@ -18,7 +18,7 @@ export class ChatEmotionSecretSignal extends Model {
   }
 }
 
-export default function ChatEmotionSecretSignalModel(
+export default function ChatEmotionSecretSignalDefinition(
   Sequelize: Orm,
   db: DBInstance
 ) {

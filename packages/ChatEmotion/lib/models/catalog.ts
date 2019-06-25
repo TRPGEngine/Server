@@ -7,7 +7,7 @@ export class ChatEmotionCatalog extends Model {
   name: string;
 }
 
-export default function ChatEmotionCatalogModel(
+export default function ChatEmotionCatalogDefinition(
   Sequelize: Orm,
   db: DBInstance
 ) {

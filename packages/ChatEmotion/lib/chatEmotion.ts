@@ -1,12 +1,12 @@
 import BasePackage from 'lib/package';
 import fs from 'fs-extra';
-import ChatEmotionItemModel from './models/item';
-import ChatEmotionCatalogModel from './models/catalog';
+import ChatEmotionItemDefinition from './models/item';
+import ChatEmotionCatalogDefinition from './models/catalog';
+import ChatEmotionSecretSignalDefinition from './models/secretSignal';
 import EmotionRouter from './routers/emotion';
 import UsermapRouter from './routers/usermap';
 import { emotionsDir } from './constant';
 import { getUserEmotionCatalog, addUserEmotionWithSecretSignal } from './event';
-import ChatEmotionSecretSignalModel from './models/secretSignal';
 
 export default class ChatEmotion extends BasePackage {
   public name: string = 'ChatEmotion';
@@ -20,9 +20,9 @@ export default class ChatEmotion extends BasePackage {
   onInit(): void {
     this.ensureDir();
 
-    this.regModel(ChatEmotionItemModel);
-    this.regModel(ChatEmotionCatalogModel);
-    this.regModel(ChatEmotionSecretSignalModel);
+    this.regModel(ChatEmotionItemDefinition);
+    this.regModel(ChatEmotionCatalogDefinition);
+    this.regModel(ChatEmotionSecretSignalDefinition);
 
     // 注册路由组件
     this.regRoute(EmotionRouter);
