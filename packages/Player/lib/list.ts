@@ -1,14 +1,15 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:player:list');
+import { Socket } from 'trpg/core';
 
 module.exports = PlayerList;
+export default PlayerList;
 
 function PlayerList() {
   this.list = [];
-  return this;
 }
 
-PlayerList.prototype.find = function find(socket) {
+PlayerList.prototype.find = function find(socket: Socket) {
   let result = null;
   for (let player of this.list) {
     if (player.socket === socket) {
@@ -20,7 +21,7 @@ PlayerList.prototype.find = function find(socket) {
   return result;
 };
 
-PlayerList.prototype.get = function get(uuid) {
+PlayerList.prototype.get = function get(uuid: string) {
   let result = null;
   for (let player of this.list) {
     if (player.uuid === uuid) {
@@ -32,7 +33,7 @@ PlayerList.prototype.get = function get(uuid) {
   return result;
 };
 
-PlayerList.prototype.add = function add(user, socket) {
+PlayerList.prototype.add = function add(user, socket: Socket) {
   let uuid = user.uuid;
   for (let player of this.list) {
     if (player.uuid === uuid) {
@@ -51,7 +52,10 @@ PlayerList.prototype.add = function add(user, socket) {
   debug('add success, current list have %d player', this.list.length);
 };
 
-PlayerList.prototype.remove = function remove(uuid, slient = false) {
+PlayerList.prototype.remove = function remove(
+  uuid: string,
+  slient: boolean = false
+) {
   let list = this.list;
   for (var i = 0; i < list.length; i++) {
     let p = list[i];

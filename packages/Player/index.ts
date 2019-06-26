@@ -5,7 +5,7 @@ const Router = require('koa-router');
 const Geetest = require('gt3-sdk');
 const md5 = require('./md5');
 const event = require('./lib/event');
-const PlayerList = require('./lib/list');
+import PlayerList from './lib/list';
 
 let geetest = null; // 极验的实例
 

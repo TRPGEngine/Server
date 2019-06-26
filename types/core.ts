@@ -6,4 +6,8 @@ export {
   ModelFn,
   Op,
 } from '../packages/Core/types/storage';
-export { SocketEventFn, EventFunc } from '../packages/Core/types/socket';
+export {
+  SocketEventFn,
+  EventFunc,
+  Socket,
+} from '../packages/Core/types/socket';
