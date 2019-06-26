@@ -1,5 +1,3 @@
-const uuid = require('uuid/v1');
-
 module.exports = function Request(Sequelize, db) {
   let Request = db.define(
     'group_request',

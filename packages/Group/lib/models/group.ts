@@ -1,5 +1,3 @@
-const uuid = require('uuid/v1');
-
 module.exports = function Group(Sequelize, db) {
   let Group = db.define(
     'group_group',

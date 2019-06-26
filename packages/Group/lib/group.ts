@@ -1,6 +1,7 @@
-const debug = require('debug')('trpg:component:group');
+import Debug from 'debug';
+const debug = Debug('trpg:component:group');
 const event = require('./event');
-const uuid = require('uuid/v4');
+import uuid from 'uuid/v4';
 
 module.exports = function GroupComponent(app) {
   initStorage.call(app);
@@ -18,10 +19,10 @@ module.exports = function GroupComponent(app) {
 function initStorage() {
   let app = this;
   let storage = app.storage;
-  storage.registerModel(require('./models/group.js'));
-  storage.registerModel(require('./models/invite.js'));
-  storage.registerModel(require('./models/actor.js'));
-  storage.registerModel(require('./models/request.js'));
+  storage.registerModel(require('./models/group'));
+  storage.registerModel(require('./models/invite'));
+  storage.registerModel(require('./models/actor'));
+  storage.registerModel(require('./models/request'));
 
   app.on('initCompleted', function(app) {
     // 数据信息统计

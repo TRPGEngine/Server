@@ -1,4 +1,4 @@
-const uuid = require('uuid/v1');
+import uuid from 'uuid/v1';
 
 module.exports = function Invite(Sequelize, db) {
   let Invite = db.define(

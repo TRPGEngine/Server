@@ -1,5 +1,6 @@
-const debug = require('debug')('trpg:component:group:event');
-const uuid = require('uuid/v4');
+import Debug from 'debug';
+const debug = Debug('trpg:component:group:event');
+import uuid from 'uuid/v4';
 
 exports.create = async function create(data, cb, db) {
   const app = this.app;
