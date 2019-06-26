@@ -11,7 +11,7 @@ import fileStorage from 'packages/File/lib/middleware/storage/file';
 import { emotionsDir } from '../constant';
 import { ChatEmotionCatalog } from '../models/catalog';
 import { ChatEmotionItem } from '../models/item';
-import { ChatEmotionSecretSignal } from '../models/secretSignal';
+import { ChatEmotionSecretSignal } from '../models/secret-signal';
 
 const router = new Router();
 

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { EventFunc } from 'trpg/core';
-import { ChatEmotionSecretSignal } from './models/secretSignal';
+import { ChatEmotionSecretSignal } from './models/secret-signal';
 import { ChatEmotionCatalog } from './models/catalog';
 import { ChatEmotionItem } from './models/item';
 

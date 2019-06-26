@@ -2,7 +2,7 @@ import BasePackage from 'lib/package';
 import fs from 'fs-extra';
 import ChatEmotionItemDefinition from './models/item';
 import ChatEmotionCatalogDefinition from './models/catalog';
-import ChatEmotionSecretSignalDefinition from './models/secretSignal';
+import ChatEmotionSecretSignalDefinition from './models/secret-signal';
 import EmotionRouter from './routers/emotion';
 import UsermapRouter from './routers/usermap';
 import { emotionsDir } from './constant';
