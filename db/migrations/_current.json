@@ -1,5 +1,43 @@
 {
     "tables": {
+        "core_system_log": {
+            "tableName": "core_system_log",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "name": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "type": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "type",
+                    "seqType": "Sequelize.STRING"
+                },
+                "message": {
+                    "field": "message",
+                    "seqType": "Sequelize.STRING"
+                },
+                "data": {
+                    "field": "data",
+                    "seqType": "Sequelize.JSON"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
         "core_global_config": {
             "tableName": "core_global_config",
             "schema": {
@@ -2449,5 +2487,5 @@
             "indexes": []
         }
     },
-    "revision": 12
+    "revision": 13
 }
