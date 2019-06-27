@@ -1,7 +1,7 @@
 import events from 'events';
 import Debug from 'debug';
 const debug = Debug('trpg:application');
-import schedule from 'node-schedule';
+import schedule, { JobCallback, Job } from 'node-schedule';
 import fs from 'fs-extra';
 import path from 'path';
 import axios, { AxiosRequestConfig } from 'axios';
@@ -27,6 +27,11 @@ type InternalEvents = {
   [eventName: string]: Array<InternalEventFunc>;
 };
 
+type ScheduleJob = {
+  name: string;
+  job: Job;
+};
+
 class Application extends events.EventEmitter {
   settings: AppSettings = {}; // 设置配置列表
   storage: Storage = null; // 数据库服务列表
@@ -39,7 +44,8 @@ class Application extends events.EventEmitter {
   timers = []; // 计时器列表
   webApi = {}; // 网页服务api
   statInfoJob = []; // 统计信息任务
-  job = null; // node-schedule定时任务
+  job = null; // node-schedule定时任务(每日凌晨2点)
+  scheduleJob: ScheduleJob[] = []; // 计划任务列表
   testcase = [];
   [packageInject: string]: any; // 包注入的方法
 
@@ -203,7 +209,7 @@ class Application extends events.EventEmitter {
 
   // 只执行一次的计时器
   // 用于替代系统默认的setTimeout
-  registerTimerOnce(fn, millisec) {
+  registerTimerOnce(fn: () => void, millisec: number) {
     this.registerTimer(fn, millisec, 1);
   }
 
@@ -223,6 +229,27 @@ class Application extends events.EventEmitter {
     this.statInfoJob.push({
       name: statName,
       fn: statCb,
+    });
+  }
+
+  /**
+   * 注册计划任务
+   * @param name 计划任务名
+   * @param rule 计划任务执行规则
+   * @param fn 计划任务方法
+   */
+  registerScheduleJob(name: string, rule: string, fn: JobCallback) {
+    for (let s of this.statInfoJob) {
+      if (s.name === name) {
+        applog(`schedule job [${name}] has been registered`);
+        return;
+      }
+    }
+
+    applog('register schedule job [%s]', name);
+    this.scheduleJob.push({
+      name,
+      job: schedule.scheduleJob(name, rule, fn),
     });
   }
 
