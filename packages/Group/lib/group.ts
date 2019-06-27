@@ -1,137 +1,119 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:group');
 const event = require('./event');
-import uuid from 'uuid/v4';
+import BasePackage from 'lib/package';
 
-module.exports = function GroupComponent(app) {
-  initStorage.call(app);
-  initFunction.call(app);
-  initSocket.call(app);
-  initTimer.call(app);
-  initReset.call(app);
+export default class Group extends BasePackage {
+  public name: string = 'Group';
+  public require: string[] = ['Player', 'File', 'Chat'];
+  public desc: string = '团模块';
+  onInit(): void {
+    this.regModel(require('./models/group'));
+    this.regModel(require('./models/invite'));
+    this.regModel(require('./models/actor'));
+    this.regModel(require('./models/request'));
 
-  return {
-    name: 'GroupComponent',
-    require: ['PlayerComponent', 'ChatComponent', 'ActorComponent'],
-  };
-};
-
-function initStorage() {
-  let app = this;
-  let storage = app.storage;
-  storage.registerModel(require('./models/group'));
-  storage.registerModel(require('./models/invite'));
-  storage.registerModel(require('./models/actor'));
-  storage.registerModel(require('./models/request'));
-
-  app.on('initCompleted', function(app) {
-    // 数据信息统计
-    debug('storage has been load 4 group db model');
-  });
-}
-
-function initFunction() {
-  let app = this;
-  let db = app.storage.db;
-  app.group = {
-    addGroupMemberAsync: async function(groupUUID, userUUID) {
-      if (!groupUUID || !userUUID) {
-        debug('add group need 2 uuid: receive %o', { groupUUID, userUUID });
-        return;
-      }
-
-      try {
-        // 检查是否已加入
-        let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
-        let user = await db.models.player_user.oneAsync({ uuid: userUUID });
-        if (group && user) {
-          let members = await group.getMembers();
-          for (let u of members) {
-            if (u.uuid === user.uuid) {
-              return false;
-            }
-          }
-          let res = await group.addMember(user);
-
-          // 检查是否在线, 如果在线则发送一条更新通知
-          if (app.player) {
-            let player = app.player.list.get(user.uuid);
-            if (player) {
-              player.socket.emit('group::addGroupSuccess', { group });
-              app.player.joinSocketRoom(user.uuid, group.uuid);
-            }
-          }
-
-          return res;
-        } else {
-          throw new Error(
-            `团信息不全或添加的成员信息不全: ${groupUUID} ${userUUID}`
-          );
+    const app = this.app;
+    const db = this.db;
+    this.regMethod({
+      addGroupMemberAsync: async function(groupUUID, userUUID) {
+        if (!groupUUID || !userUUID) {
+          debug('add group need 2 uuid: receive %o', { groupUUID, userUUID });
+          return;
         }
-      } catch (err) {
-        console.error('[addGroupMemberAsync]', err);
-        throw err;
-      }
-    },
-    getGroupManagersUUIDAsync: async function(groupUUID) {
-      try {
-        let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
-        return [group.owner_uuid, ...group.managers_uuid];
-      } catch (err) {
-        console.error('[getGroupManagers]', err);
-        return [];
-      }
-    },
-  };
+
+        try {
+          // 检查是否已加入
+          let group = await (db.models.group_group as any).findOne({
+            where: { uuid: groupUUID },
+          });
+          let user = await (db.models.player_user as any).findOne({
+            uuid: userUUID,
+          });
+          if (group && user) {
+            let members = await group.getMembers();
+            for (let u of members) {
+              if (u.uuid === user.uuid) {
+                return false;
+              }
+            }
+            let res = await group.addMember(user);
+
+            // 检查是否在线, 如果在线则发送一条更新通知
+            if (app.player) {
+              let player = app.player.list.get(user.uuid);
+              if (player) {
+                player.socket.emit('group::addGroupSuccess', { group });
+                app.player.joinSocketRoom(user.uuid, group.uuid);
+              }
+            }
+
+            return res;
+          } else {
+            throw new Error(
+              `团信息不全或添加的成员信息不全: ${groupUUID} ${userUUID}`
+            );
+          }
+        } catch (err) {
+          console.error('[addGroupMemberAsync]', err);
+          throw err;
+        }
+      },
+      getGroupManagersUUIDAsync: async function(groupUUID) {
+        try {
+          let group = await (db.models.group_group as any).findOne({
+            uuid: groupUUID,
+          });
+          return [group.owner_uuid, ...group.managers_uuid];
+        } catch (err) {
+          console.error('[getGroupManagers]', err);
+          return [];
+        }
+      },
+    });
+
+    this.regSocketEvent('create', event.create);
+    this.regSocketEvent('getInfo', event.getInfo);
+    this.regSocketEvent('updateInfo', event.updateInfo);
+    this.regSocketEvent('findGroup', event.findGroup);
+    this.regSocketEvent('requestJoinGroup', event.requestJoinGroup);
+    this.regSocketEvent('agreeGroupRequest', event.agreeGroupRequest);
+    this.regSocketEvent('refuseGroupRequest', event.refuseGroupRequest);
+    this.regSocketEvent('sendGroupInvite', event.sendGroupInvite);
+    this.regSocketEvent('refuseGroupInvite', event.refuseGroupInvite);
+    this.regSocketEvent('agreeGroupInvite', event.agreeGroupInvite);
+    this.regSocketEvent('getGroupInvite', event.getGroupInvite);
+    this.regSocketEvent('getGroupList', event.getGroupList);
+    this.regSocketEvent('getGroupMembers', event.getGroupMembers);
+    this.regSocketEvent('getGroupActors', event.getGroupActors);
+    this.regSocketEvent('addGroupActor', event.addGroupActor);
+    this.regSocketEvent('removeGroupActor', event.removeGroupActor);
+    this.regSocketEvent('agreeGroupActor', event.agreeGroupActor);
+    this.regSocketEvent('refuseGroupActor', event.refuseGroupActor);
+    this.regSocketEvent('updateGroupActorInfo', event.updateGroupActorInfo);
+    this.regSocketEvent(
+      'setPlayerSelectedGroupActor',
+      event.setPlayerSelectedGroupActor
+    );
+    this.regSocketEvent(
+      'getPlayerSelectedGroupActor',
+      event.getPlayerSelectedGroupActor
+    );
+    this.regSocketEvent('quitGroup', event.quitGroup);
+    this.regSocketEvent('dismissGroup', event.dismissGroup);
+    this.regSocketEvent('tickMember', event.tickMember);
+    this.regSocketEvent('setMemberToManager', event.setMemberToManager);
+    this.regSocketEvent('getGroupStatus', event.getGroupStatus);
+    this.regSocketEvent('setGroupStatus', event.setGroupStatus);
+
+    this.regStatJob('groupCount', async () => {
+      let res = await db.models.group_group.count();
+      return res;
+    });
+  }
 }
 
-function initSocket() {
-  let app = this;
-  app.registerEvent('group::create', event.create);
-  app.registerEvent('group::getInfo', event.getInfo);
-  app.registerEvent('group::updateInfo', event.updateInfo);
-  app.registerEvent('group::findGroup', event.findGroup);
-  app.registerEvent('group::requestJoinGroup', event.requestJoinGroup);
-  app.registerEvent('group::agreeGroupRequest', event.agreeGroupRequest);
-  app.registerEvent('group::refuseGroupRequest', event.refuseGroupRequest);
-  app.registerEvent('group::sendGroupInvite', event.sendGroupInvite);
-  app.registerEvent('group::refuseGroupInvite', event.refuseGroupInvite);
-  app.registerEvent('group::agreeGroupInvite', event.agreeGroupInvite);
-  app.registerEvent('group::getGroupInvite', event.getGroupInvite);
-  app.registerEvent('group::getGroupList', event.getGroupList);
-  app.registerEvent('group::getGroupMembers', event.getGroupMembers);
-  app.registerEvent('group::getGroupActors', event.getGroupActors);
-  app.registerEvent('group::addGroupActor', event.addGroupActor);
-  app.registerEvent('group::removeGroupActor', event.removeGroupActor);
-  app.registerEvent('group::agreeGroupActor', event.agreeGroupActor);
-  app.registerEvent('group::refuseGroupActor', event.refuseGroupActor);
-  app.registerEvent('group::updateGroupActorInfo', event.updateGroupActorInfo);
-  app.registerEvent(
-    'group::setPlayerSelectedGroupActor',
-    event.setPlayerSelectedGroupActor
-  );
-  app.registerEvent(
-    'group::getPlayerSelectedGroupActor',
-    event.getPlayerSelectedGroupActor
-  );
-  app.registerEvent('group::quitGroup', event.quitGroup);
-  app.registerEvent('group::dismissGroup', event.dismissGroup);
-  app.registerEvent('group::tickMember', event.tickMember);
-  app.registerEvent('group::setMemberToManager', event.setMemberToManager);
-  app.registerEvent('group::getGroupStatus', event.getGroupStatus);
-  app.registerEvent('group::setGroupStatus', event.setGroupStatus);
-}
-
-function initTimer() {
-  const app = this;
-  const db = app.storage.db;
-
-  app.registerStatJob('groupCount', async () => {
-    let res = await db.models.group_group.count();
-    return res;
-  });
-}
-
+// TODO: 移除RESET 改用seeder进行数据填充
 function initReset() {
   let app = this;
   app.register('resetStorage', async function(storage, db) {

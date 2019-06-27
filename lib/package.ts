@@ -2,6 +2,10 @@ import { TRPGApplication, ModelFn, Model, EventFunc } from 'trpg/core';
 import Router from 'koa-router';
 import Debug, { Debugger } from 'debug';
 
+export interface PackageMethodsType {
+  [methodName: string]: Function;
+}
+
 export default abstract class BasePackage {
   public abstract name: string; // 包名
   public abstract require: string[]; // 包依赖列表
@@ -37,6 +41,10 @@ export default abstract class BasePackage {
     return this.app.storage;
   }
 
+  get db() {
+    return this.storage.db;
+  }
+
   get router() {
     if (!this._router) {
       this._router = new Router();
@@ -44,8 +52,11 @@ export default abstract class BasePackage {
     return this._router;
   }
 
+  /**
+   * 返回包名小写版本
+   */
   getPackageName(): string {
-    return this.name;
+    return (this.name || '').toLocaleLowerCase();
   }
 
   /**
@@ -60,7 +71,7 @@ export default abstract class BasePackage {
 
   protected regSocketEvent(name: string, event: EventFunc) {
     const app = this.app;
-    const packageName = this.getPackageName().toLocaleLowerCase();
+    const packageName = this.getPackageName();
     if (!name.startsWith(`${packageName}::`)) {
       // 事件名必须为: 包名::事件名
       name = `${packageName}::${name}`;
@@ -72,6 +83,24 @@ export default abstract class BasePackage {
   protected regRoute(route: Router) {
     const scope = this.getPackageName().toLowerCase();
     this.router.use(`/${scope}`, route.routes());
+  }
+
+  /**
+   *
+   * @param methods 方法列表对象
+   */
+  protected regMethod(methods: PackageMethodsType) {
+    const packageName = this.getPackageName();
+    this.app[packageName] = Object.assign({}, this.app[packageName], methods);
+  }
+
+  /**
+   * 注册一个统计项，默认的每天凌晨2点会进行统计
+   * @param name 统计项名
+   * @param func 统计调用方法
+   */
+  protected regStatJob(name: string, func: () => Promise<number | string>) {
+    this.app.registerStatJob(name, func);
   }
 
   /**
@@ -96,7 +125,6 @@ export default abstract class BasePackage {
 
   // TODO
   regValue(value: {}) {}
-  regMethod(method: any) {}
 
   /**
    * 输出调试信息

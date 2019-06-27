@@ -1,1 +1,3 @@
-module.exports = require('./lib/group');
+import Group from './lib/group';
+
+module.exports = Group;
