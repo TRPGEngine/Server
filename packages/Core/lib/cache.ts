@@ -32,6 +32,8 @@ export interface ICache {
    * @param size 清理列表长度
    */
   lclear(key: string, start: number, size: number): void;
+
+  keys(glob: string): Promise<string[]>;
   get(key: string): Promise<CacheValue>;
   getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }>;
   remove(key: string): Promise<any>;
@@ -80,6 +82,16 @@ export class Cache implements ICache {
     debug('[cache]', `lclear ${key} in range [${start}, ${start + size}]`);
   }
 
+  /**
+   * 返回存储中符合条件的键值列表
+   * @param glob 匹配规则
+   */
+  keys(glob: string): Promise<string[]> {
+    return Promise.resolve(
+      Object.keys(this.data).filter(minimatch.filter(glob))
+    );
+  }
+
   get(key: string): Promise<CacheValue> {
     const tmp = this.data[key];
     // IDEA: 这里可以考虑过期不删除。而是不返回数据。因为会被后面的set操作覆盖。是一种懒操作
@@ -92,16 +104,16 @@ export class Cache implements ICache {
     return Promise.resolve(null);
   }
 
-  getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }> {
-    const keys = Object.keys(this.data).filter(minimatch.filter(glob));
+  async getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }> {
+    const keys = await this.keys(glob);
     if (keys.length > 0) {
       const values = keys
         .map((key) => this.data[key])
         .filter((x) => !x.expires || x.expires < new Date().valueOf())
         .map((val) => val.rawData);
-      return Promise.resolve(_.zipObject(keys, values));
+      return _.zipObject(keys, values);
     }
-    return Promise.resolve(null);
+    return null;
   }
 
   remove(key: string) {
@@ -157,14 +169,18 @@ export class RedisCache implements ICache {
     debug('[redis]', `lclear ${key} in range [${start}, ${start + size}]`);
   }
 
+  async keys(glob: string): Promise<string[]> {
+    // TODO: 需要使用scan来优化
+    return await this.redis.keys(glob);
+  }
+
   async get(key: string): Promise<CacheValue> {
     const val = await this.redis.get(this.genKey(key));
     return JSON.parse(val);
   }
 
   async getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }> {
-    // TODO: 需要使用scan来优化
-    const keys = await this.redis.keys(glob);
+    const keys = await this.keys(glob);
     if (keys.length > 0) {
       const values = await Promise.all(keys.map((key) => this.get(key)));
       return _.zipObject(keys, values);
