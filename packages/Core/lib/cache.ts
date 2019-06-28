@@ -33,9 +33,19 @@ export interface ICache {
    */
   lclear(key: string, start: number, size: number): void;
 
+  /**
+   * 返回存储中符合条件的键值列表
+   * @param glob 匹配规则
+   */
   keys(glob: string): Promise<string[]>;
   get(key: string): Promise<CacheValue>;
   getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }>;
+
+  /**
+   * 获取列表
+   * @param key 键
+   */
+  lget(key: string): Promise<CacheValue[]>;
   remove(key: string): Promise<any>;
   close(): void;
 }
@@ -82,10 +92,6 @@ export class Cache implements ICache {
     debug('[cache]', `lclear ${key} in range [${start}, ${start + size}]`);
   }
 
-  /**
-   * 返回存储中符合条件的键值列表
-   * @param glob 匹配规则
-   */
   keys(glob: string): Promise<string[]> {
     return Promise.resolve(
       Object.keys(this.data).filter(minimatch.filter(glob))
@@ -114,6 +120,16 @@ export class Cache implements ICache {
       return _.zipObject(keys, values);
     }
     return null;
+  }
+
+  async lget(key: string): Promise<CacheValue[]> {
+    const arr = await this.get(key);
+
+    if (Array.isArray(arr)) {
+      return arr;
+    } else {
+      return [arr];
+    }
   }
 
   remove(key: string) {
@@ -186,6 +202,11 @@ export class RedisCache implements ICache {
       return _.zipObject(keys, values);
     }
     return Promise.resolve(null);
+  }
+
+  async lget(key: string): Promise<CacheValue[]> {
+    const arr = await this.redis.lrange(key, 0, -1); // 获取所有值
+    return arr;
   }
 
   remove(key: string): Promise<number> {
