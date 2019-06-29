@@ -16,6 +16,11 @@ npm install
 npm install --production
 ```
 
+**推荐的Node版本号**
+```bash
+v8.11.3
+```
+
 **运行脚本**
 ```bash
 npm start
