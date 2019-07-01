@@ -1,35 +1,46 @@
+import { Model, Orm, DBInstance } from 'trpg/core';
+
 const at = require('trpg-actor-template');
 
-module.exports = function Template(Sequelize, db) {
-  let Template = db.define(
-    'actor_template',
+export class ActorTemplate extends Model {
+  uuid: string;
+  name: string;
+  desc: string;
+  avatar: string;
+  info: string;
+
+  getObject() {
+    let info = {};
+    try {
+      info = at.parse(this.info);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      return info;
+    }
+  }
+
+  static findTemplateAsync(nameFragment) {}
+}
+
+export default function ActorTemplateDefinition(
+  Sequelize: Orm,
+  db: DBInstance
+) {
+  ActorTemplate.init(
     {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
-      name: { type: Sequelize.STRING, require: true },
+      name: { type: Sequelize.STRING, required: true },
       desc: { type: Sequelize.STRING },
       avatar: { type: Sequelize.STRING },
       info: { type: Sequelize.TEXT },
     },
-    {
-      paranoid: true,
-      methods: {
-        getObject: function() {
-          let info = {};
-          try {
-            info = at.parse(this.info);
-          } catch (err) {
-            console.error(err);
-          } finally {
-            return info;
-          }
-        },
-      },
-    }
+    { tableName: 'actor_template', sequelize: db, paranoid: true }
   );
 
-  Template.findTemplateAsync = (nameFragment) => {
+  ActorTemplate.findTemplateAsync = (nameFragment) => {
     const Op = Sequelize.Op;
-    return Template.findAll({
+    return ActorTemplate.findAll({
       where: {
         name: {
           [Op.like]: `%${nameFragment}%`,
@@ -39,17 +50,17 @@ module.exports = function Template(Sequelize, db) {
     });
   };
 
-  let User = db.models.player_user;
+  let User = db.models.player_user as any;
   if (!!User) {
-    Template.belongsTo(User, {
+    ActorTemplate.belongsTo(User, {
       foreignKey: 'creatorId',
       as: 'creator',
     });
-    User.hasMany(Template, {
+    User.hasMany(ActorTemplate, {
       foreignKey: 'creatorId',
       as: 'templates',
     });
   }
 
-  return Template;
-};
+  return ActorTemplate;
+}

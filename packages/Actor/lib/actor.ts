@@ -3,6 +3,7 @@ const debug = Debug('trpg:component:actor');
 const event = require('./event');
 import at from 'trpg-actor-template';
 import uuid from 'uuid/v1';
+import ActorTemplateDefinition from './models/template';
 
 export default ActorComponent;
 
@@ -22,7 +23,7 @@ function initStorage() {
   let app = this;
   let storage = app.storage;
   storage.registerModel(require('./models/actor'));
-  storage.registerModel(require('./models/template'));
+  storage.registerModel(ActorTemplateDefinition);
 
   app.on('initCompleted', function(app) {
     // 数据信息统计
