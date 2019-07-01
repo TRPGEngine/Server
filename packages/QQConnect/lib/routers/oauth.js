@@ -79,7 +79,9 @@ router.get('/callback', async (ctx, next) => {
   let db = await ctx.trpgapp.storage.db;
 
   await db.transactionAsync(async () => {
-    let record = await db.models.oauth_qq_access_info.oneAsync({ openid });
+    let record = await db.models.oauth_qq_access_info.findOne({
+      where: { openid },
+    });
     if (record) {
       // 用户已通过qq登录注册账号
       // let player = await record.getRelatedUserAsync();

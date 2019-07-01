@@ -49,8 +49,10 @@ router.get('/validate/_bind', async (ctx, next) => {
 
   try {
     let mailbox = await db.models.mail_list.findByPk(mailInfo.id);
-    let user = await db.models.player_user.oneAsync({
-      uuid: mailInfo.user_uuid,
+    let user = await db.models.player_user.findOne({
+      where: {
+        uuid: mailInfo.user_uuid,
+      },
     });
     if (mailbox && user) {
       if (mailbox.enabled) {

@@ -48,7 +48,7 @@ function initFunction() {
         }
       }
 
-      let res = await db.models.chat_log.oneAsync({ uuid: msg_uuid });
+      let res = await db.models.chat_log.findOne({ where: { uuid: msg_uuid } });
       return res;
     },
     updateMsgAsync: async function(msg_uuid, payload) {
@@ -76,7 +76,7 @@ function initFunction() {
         }
       }
 
-      let res = await db.models.chat_log.oneAsync({ uuid: msg_uuid });
+      let res = await db.models.chat_log.findOne({ where: { uuid: msg_uuid } });
       Object.assign(res, payload);
       res = await res.saveAsync();
       notify();

@@ -18,7 +18,7 @@ exports.get = async function get(data, cb, db) {
     throw '缺少参数';
   }
 
-  let note = await db.models.note_note.oneAsync({ uuid: noteUUID });
+  let note = await db.models.note_note.findOne({ where: { uuid: noteUUID } });
   if (!note) {
     throw '该笔记不存在';
   }
@@ -50,9 +50,11 @@ exports.save = async function save(data, cb, db) {
 
   noteContent = xss(noteContent); // 进行防xss处理
 
-  let note = await db.models.note_note.oneAsync({
-    uuid: noteUUID,
-    ownerId: player.user.id,
+  let note = await db.models.note_note.findOne({
+    where: {
+      uuid: noteUUID,
+      ownerId: player.user.id,
+    },
   });
   if (note) {
     // 之前已存在， 更新内容

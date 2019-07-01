@@ -80,8 +80,12 @@ function initFunction() {
       }
 
       try {
-        let user1 = await db.models.player_user.oneAsync({ uuid: uuid1 });
-        let user2 = await db.models.player_user.oneAsync({ uuid: uuid2 });
+        let user1 = await db.models.player_user.findOne({
+          where: { uuid: uuid1 },
+        });
+        let user2 = await db.models.player_user.findOne({
+          where: { uuid: uuid2 },
+        });
         await user1.addFriend(user2);
         await user2.addFriend(user1);
       } catch (err) {

@@ -155,7 +155,7 @@ exports.loginWithToken = async function loginWithToken(data, cb, db) {
   } else {
     cond['token'] = token;
   }
-  let user = await db.models.player_user.oneAsync(cond);
+  let user = await db.models.player_user.findOne({ where: cond });
 
   if (!user) {
     debug('login with token fail, try to login %s', uuid);
@@ -522,9 +522,11 @@ exports.agreeFriendInvite = async function agreeFriendInvite(data, cb, db) {
   }
 
   let inviteUUID = data.uuid;
-  let invite = await db.models.player_invite.oneAsync({
-    uuid: inviteUUID,
-    to_uuid: player.uuid,
+  let invite = await db.models.player_invite.findOne({
+    where: {
+      uuid: inviteUUID,
+      to_uuid: player.uuid,
+    },
   });
   if (!invite) {
     throw '没有找到该邀请';
@@ -594,7 +596,9 @@ exports.getSettings = async function getSettings(data, cb, db) {
   }
   let uuid = player.uuid;
 
-  let settings = await db.models.player_settings.oneAsync({ user_uuid: uuid });
+  let settings = await db.models.player_settings.findOne({
+    where: { user_uuid: uuid },
+  });
 
   if (!settings) {
     // 没有记录过用户设置
@@ -622,7 +626,9 @@ exports.saveSettings = async function saveSettings(data, cb, db) {
   }
   let uuid = player.uuid;
 
-  let settings = await db.models.player_settings.oneAsync({ user_uuid: uuid });
+  let settings = await db.models.player_settings.findOne({
+    where: { user_uuid: uuid },
+  });
   if (!settings) {
     settings = await db.models.player_settings.createAsync({
       user_uuid: uuid,

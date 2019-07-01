@@ -76,7 +76,9 @@ exports.updateInfo = async function updateInfo(data, cb, db) {
     throw '缺少参数';
   }
 
-  let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
   if (!group) {
     throw '找不到团';
   }
@@ -288,7 +290,9 @@ exports.refuseGroupRequest = async function refuseGroupRequest(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let request = await db.models.group_request.oneAsync({ uuid: request_uuid });
+  let request = await db.models.group_request.findOne({
+    where: { uuid: request_uuid },
+  });
   if (!request) {
     throw '找不到该入团申请';
   }
@@ -297,7 +301,9 @@ exports.refuseGroupRequest = async function refuseGroupRequest(data, cb, db) {
   }
 
   let group_uuid = request.group_uuid;
-  let group = await db.models.group_group.oneAsync({ uuid: group_uuid });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: group_uuid },
+  });
   if (!group) {
     throw '找不到该团';
   }
@@ -333,7 +339,9 @@ exports.sendGroupInvite = async function sendGroupInvite(data, cb, db) {
     throw '你不能邀请自己';
   }
 
-  let group = await db.models.group_group.oneAsync({ uuid: group_uuid });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: group_uuid },
+  });
   if (!group) {
     throw '该团不存在';
   }
@@ -342,12 +350,14 @@ exports.sendGroupInvite = async function sendGroupInvite(data, cb, db) {
     throw '抱歉您不是该团管理员没有邀请权限';
   }
 
-  let inviteIsExist = await db.models.group_invite.oneAsync({
-    group_uuid,
-    from_uuid,
-    to_uuid,
-    is_agree: false,
-    is_refuse: false,
+  let inviteIsExist = await db.models.group_invite.findOne({
+    where: {
+      group_uuid,
+      from_uuid,
+      to_uuid,
+      is_agree: false,
+      is_refuse: false,
+    },
   });
   if (inviteIsExist) {
     throw '重复请求';
@@ -440,7 +450,9 @@ exports.agreeGroupInvite = async function agreeGroupInvite(data, cb, db) {
   });
   invite.is_agree = true;
   let groupUUID = invite.group_uuid;
-  let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
   if (!group) {
     throw '该团不存在';
   }
@@ -531,7 +543,9 @@ exports.getGroupActors = async function getGroupActors(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
   if (!group) {
     throw '找不到团信息';
   }
@@ -607,7 +621,9 @@ exports.removeGroupActor = async function(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
   if (!group) {
     throw '找不到团';
   }
@@ -828,7 +844,9 @@ exports.getPlayerSelectedGroupActor = async function getPlayerSelectedGroupActor
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
   if (!group) {
     throw '找不到团';
   }
@@ -865,7 +883,9 @@ exports.quitGroup = async function quitGroup(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
   if (!group) {
     throw '找不到团';
   }
@@ -903,7 +923,9 @@ exports.dismissGroup = async function dismissGroup(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
   if (!group) {
     throw '找不到团';
   }
@@ -945,11 +967,15 @@ exports.tickMember = async function tickMember(data, cb, db) {
     throw '您不能踢出你自己';
   }
 
-  let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
   if (!group) {
     throw '找不到团';
   }
-  let member = await db.models.player_user.oneAsync({ uuid: memberUUID });
+  let member = await db.models.player_user.findOne({
+    where: { uuid: memberUUID },
+  });
   if (!member) {
     throw '找不到该成员';
   }
@@ -1001,11 +1027,15 @@ exports.setMemberToManager = async function setMemberToManager(data, cb, db) {
   if (player.user.uuid === memberUUID) {
     throw '你不能将自己提升为管理员';
   }
-  let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
   if (!group) {
     throw '找不到团';
   }
-  let member = await db.models.player_user.oneAsync({ uuid: memberUUID });
+  let member = await db.models.player_user.findOne({
+    where: { uuid: memberUUID },
+  });
   if (!member) {
     throw '找不到该成员';
   }
@@ -1070,7 +1100,9 @@ exports.setGroupStatus = async function setGroupStatus(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.oneAsync({ uuid: groupUUID });
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
   if (!group) {
     throw '没有找到该团';
   }

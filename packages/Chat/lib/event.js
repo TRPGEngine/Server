@@ -422,7 +422,7 @@ let createConverse = async function createConverse(data, cb) {
     let type = data.type || 'user';
     let name = data.name;
     if (type === 'user') {
-      let convUser = await db.models.player_user.oneAsync({ uuid });
+      let convUser = await db.models.player_user.findOne({ where: { uuid } });
       if (!convUser) {
         cb({ result: false, msg: '目标用户不存在' });
         return;
@@ -430,7 +430,9 @@ let createConverse = async function createConverse(data, cb) {
 
       let converse;
       await db.transactionAsync(async () => {
-        let user = await db.models.player_user.oneAsync({ uuid: player.uuid });
+        let user = await db.models.player_user.findOne({
+          where: { uuid: player.uuid },
+        });
         converse = await db.models.chat_converse.createAsync({
           uuid: generateUUID(),
           type: data.type || 'user',
@@ -474,9 +476,11 @@ let removeConverse = async function removeConverse(data, cb, db) {
     throw '缺少必要字段';
   }
 
-  let converse = await db.models.chat_converse.oneAsync({
-    ownerId: user.id,
-    uuid: converse_uuid,
+  let converse = await db.models.chat_converse.findOne({
+    where: {
+      ownerId: user.id,
+      uuid: converse_uuid,
+    },
   });
   if (!converse) {
     throw '该会话不存在';
@@ -499,7 +503,7 @@ let getConverses = async function getConverses(data, cb, db) {
   if (!player) {
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
-  let user = await db.models.player_user.oneAsync({ uuid: player.uuid });
+  let user = await db.models.player_user.findOne({where: { uuid: player.uuid }});
   let converses = await user.getConverses();
   return { list: converses };
 };

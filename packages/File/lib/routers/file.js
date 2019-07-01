@@ -33,7 +33,7 @@ router.get('/download/:fileuuid/:filename?', async (ctx) => {
   const trpgapp = ctx.trpgapp;
   const db = trpgapp.storage.db;
 
-  let info = await db.models.file_file.oneAsync({ uuid: fileuuid });
+  let info = await db.models.file_file.findOne({ where: { uuid: fileuuid } });
   if (!info) {
     ctx.body = '没有该文件记录';
     return;

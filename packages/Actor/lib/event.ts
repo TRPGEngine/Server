@@ -2,23 +2,31 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:actor:event');
 
 exports.getTemplate = async function(data, cb, db) {
-  let app = this.app;
-  let socket = this.socket;
+  const app = this.app;
+  const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.list.find(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let uuid = data.uuid;
+  const uuid = data.uuid;
   if (!uuid || typeof uuid !== 'string') {
     // 返回个人所有的模板
-    let user = await db.models.player_user.oneAsync({ uuid: player.uuid });
-    let templates = await user.getTemplates();
+    const user = await db.models.player_user.findOne({
+      where: {
+        uuid: player.uuid,
+      },
+    });
+    const templates = await user.getTemplates();
     return { templates };
   } else {
     // 返回指定模板信息
-    let template = await db.models.actor_template.oneAsync({ uuid });
+    const template = await db.models.actor_template.findOne({
+      where: {
+        uuid,
+      },
+    });
     return { template };
   }
 };
@@ -183,8 +191,10 @@ exports.createActor = async function(data, cb, db) {
     await actor.setOwner(player.user);
     if (!!avatar) {
       let tmp = avatar.split('/');
-      let avatarModel = await db.models.file_avatar.oneAsync({
-        name: tmp[tmp.length - 1],
+      let avatarModel = await db.models.file_avatar.findOne({
+        where: {
+          name: tmp[tmp.length - 1],
+        },
       });
       if (avatarModel) {
         avatarModel.attach_uuid = actor.uuid;
@@ -212,11 +222,13 @@ exports.getActor = async function(data, cb, db) {
   let uuid = data.uuid;
   if (uuid) {
     // 返回指定的actor
-    let actor = await db.models.actor_actor.oneAsync({ uuid });
+    let actor = await db.models.actor_actor.findOne({ where: { uuid } });
     return { actor };
   } else {
     // 返回当前用户所有的actor
-    let user = await db.models.player_user.oneAsync({ uuid: player.uuid });
+    let user = await db.models.player_user.findOne({
+      where: { uuid: player.uuid },
+    });
     let actors = await user.getActors();
     return { actors };
   }
@@ -236,9 +248,11 @@ exports.removeActor = async function(data, cb, db) {
   }
 
   await db.transactionAsync(async () => {
-    let actor = await db.models.actor_actor.oneAsync({
-      uuid,
-      ownerId: player.user.id,
+    let actor = await db.models.actor_actor.findOne({
+      where: {
+        uuid,
+        ownerId: player.user.id,
+      },
     });
     if (!actor) {
       throw '没有找到该角色';

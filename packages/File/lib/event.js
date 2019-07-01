@@ -10,7 +10,9 @@ exports.bindAttachUUID = async function(data, cb, db) {
   let avatar_uuid = data.avatar_uuid;
   let attach_uuid = data.attach_uuid;
 
-  let avatar = await db.models.file_avatar.oneAsync({ uuid: avatar_uuid });
+  let avatar = await db.models.file_avatar.findOne({
+    where: { uuid: avatar_uuid },
+  });
   avatar.attach_uuid = attach_uuid;
   await avatar.saveAsync();
   return {
@@ -25,7 +27,7 @@ exports.getFileInfo = async function(data, cb, db) {
   let uuid = data.uuid;
   let host = app.get('apihost');
 
-  let info = await db.models.file_file.oneAsync({ uuid });
+  let info = await db.models.file_file.findOne({ where: { uuid } });
   return Object.assign({}, info.getObject(), {
     downloadUrl: host + info.getDownloadUrl(),
     previewUrl: info.getPreviewUrl(host),
