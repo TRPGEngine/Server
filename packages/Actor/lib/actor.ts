@@ -1,9 +1,12 @@
-const debug = require('debug')('trpg:component:actor');
+import Debug from 'debug';
+const debug = Debug('trpg:component:actor');
 const event = require('./event');
-const at = require('trpg-actor-template');
-const uuid = require('uuid/v1');
+import at from 'trpg-actor-template';
+import uuid from 'uuid/v1';
 
-module.exports = function ActorComponent(app) {
+export default ActorComponent;
+
+function ActorComponent(app) {
   initStorage.call(app);
   initFunction.call(app);
   initSocket.call(app);
@@ -13,13 +16,13 @@ module.exports = function ActorComponent(app) {
     name: 'ActorComponent',
     require: ['PlayerComponent', 'FileComponent'],
   };
-};
+}
 
 function initStorage() {
   let app = this;
   let storage = app.storage;
-  storage.registerModel(require('./models/actor.js'));
-  storage.registerModel(require('./models/template.js'));
+  storage.registerModel(require('./models/actor'));
+  storage.registerModel(require('./models/template'));
 
   app.on('initCompleted', function(app) {
     // 数据信息统计

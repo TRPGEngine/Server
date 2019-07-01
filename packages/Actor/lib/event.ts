@@ -1,4 +1,5 @@
-const debug = require('debug')('trpg:component:actor:event');
+import Debug from 'debug';
+const debug = Debug('trpg:component:actor:event');
 
 exports.getTemplate = async function(data, cb, db) {
   let app = this.app;
@@ -39,7 +40,7 @@ exports.findTemplate = async function(data, cb, db) {
   let templates = await db.models.actor_template.findTemplateAsync(
     nameFragment
   );
-  for (template of templates) {
+  for (let template of templates) {
     let creator = await template.getCreator();
     if (creator) {
       template.dataValues.creator_name = creator.getName();
