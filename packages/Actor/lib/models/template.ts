@@ -1,4 +1,4 @@
-import { Model, Orm, DBInstance } from 'trpg/core';
+import { Model, Orm, DBInstance, Op } from 'trpg/core';
 
 const at = require('trpg-actor-template');
 
@@ -20,7 +20,16 @@ export class ActorTemplate extends Model {
     }
   }
 
-  static findTemplateAsync(nameFragment) {}
+  static findTemplateAsync(nameFragment: string): Promise<ActorTemplate[]> {
+    return ActorTemplate.findAll({
+      where: {
+        name: {
+          [Op.like]: `%${nameFragment}%`,
+        },
+      },
+      limit: 10,
+    });
+  }
 }
 
 export default function ActorTemplateDefinition(
@@ -37,18 +46,6 @@ export default function ActorTemplateDefinition(
     },
     { tableName: 'actor_template', sequelize: db, paranoid: true }
   );
-
-  ActorTemplate.findTemplateAsync = (nameFragment) => {
-    const Op = Sequelize.Op;
-    return ActorTemplate.findAll({
-      where: {
-        name: {
-          [Op.like]: `%${nameFragment}%`,
-        },
-      },
-      limit: 10,
-    });
-  };
 
   let User = db.models.player_user as any;
   if (!!User) {
