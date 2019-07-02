@@ -8,6 +8,8 @@ export class ActorTemplate extends Model {
   desc: string;
   avatar: string;
   info: string;
+  layout: string;
+  built_in: boolean;
 
   getObject() {
     let info = {};
@@ -43,6 +45,8 @@ export default function ActorTemplateDefinition(
       desc: { type: Sequelize.STRING },
       avatar: { type: Sequelize.STRING },
       info: { type: Sequelize.TEXT },
+      layout: { type: Sequelize.TEXT },
+      built_in: { type: Sequelize.BOOLEAN },
     },
     { tableName: 'actor_template', sequelize: db, paranoid: true }
   );

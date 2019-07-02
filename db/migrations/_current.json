@@ -772,7 +772,8 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "name": {
-                    "require": true,
+                    "required": true,
+                    "allowNull": false,
                     "field": "name",
                     "seqType": "Sequelize.STRING"
                 },
@@ -787,6 +788,14 @@
                 "info": {
                     "field": "info",
                     "seqType": "Sequelize.TEXT"
+                },
+                "layout": {
+                    "field": "layout",
+                    "seqType": "Sequelize.TEXT"
+                },
+                "built_in": {
+                    "field": "built_in",
+                    "seqType": "Sequelize.BOOLEAN"
                 },
                 "createdAt": {
                     "allowNull": false,
@@ -2487,5 +2496,5 @@
             "indexes": []
         }
     },
-    "revision": 14
+    "revision": 15
 }
