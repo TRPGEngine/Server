@@ -16,6 +16,7 @@
     "db:seeder:generate": "node ./cli.js generate-seeder",
     "db:seeder:run": "node ./cli.js run-seeder",
     "playground": "node ./playground/playground.js --experimental-repl-await",
+    "bench": "node ./test/bench/index.js && cat ./test/bench/out.log",
     "test": "jest --config=./test/jest.config.js --runInBand"
   },
   "husky": {
@@ -66,6 +67,7 @@
     "jest": "^24.7.1",
     "prettier": "^1.16.4",
     "sequelize-auto-migrations": "github:TRPGEngine/sequelize-auto-migrations",
-    "socket.io-client": "^2.2.0"
+    "socket.io-client": "^2.2.0",
+    "websocket-bench": "^0.2.0"
   }
 }
