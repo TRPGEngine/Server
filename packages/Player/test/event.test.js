@@ -1,7 +1,18 @@
-const _ = require('lodash');
-const md5 = require('../md5');
+const crypto = require('crypto');
 const db = global.db;
 const emitEvent = global.emitEvent;
+const _ = global._;
+
+function md5(str) {
+  if (typeof str != 'string') {
+    str = String(str);
+  }
+
+  var md5sum = crypto.createHash('md5');
+  md5sum.update(str);
+  str = md5sum.digest('hex');
+  return str;
+}
 
 describe('account', () => {
   test('login should be ok', async () => {

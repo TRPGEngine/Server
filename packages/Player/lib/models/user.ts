@@ -1,4 +1,4 @@
-import md5Encrypt from 'packages/Player/md5';
+import md5Encrypt from '../utils/md5';
 import randomString from 'crypto-random-string';
 
 module.exports = function User(Sequelize, db) {

@@ -1,9 +1,11 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:player:event');
-import md5 from '../md5';
-import sha1 from '../sha1';
-const uuid = require('uuid/v1');
-const _ = require('lodash');
+import md5 from './utils/md5';
+import sha1 from './utils/sha1';
+import uuid from 'uuid/v1';
+import _ from 'lodash';
+
+export {};
 
 let autoJoinSocketRoom = async function autoJoinSocketRoom(socket) {
   if (!socket) {
