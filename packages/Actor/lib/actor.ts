@@ -2,8 +2,8 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:actor');
 const event = require('./event');
 import at from 'trpg-actor-template';
-import uuid from 'uuid/v1';
 import ActorTemplateDefinition from './models/template';
+import ActorDefinition from './models/actor';
 
 export default ActorComponent;
 
@@ -22,7 +22,7 @@ function ActorComponent(app) {
 function initStorage() {
   let app = this;
   let storage = app.storage;
-  storage.registerModel(require('./models/actor'));
+  storage.registerModel(ActorDefinition);
   storage.registerModel(ActorTemplateDefinition);
 
   app.on('initCompleted', function(app) {

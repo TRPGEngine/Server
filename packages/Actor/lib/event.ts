@@ -181,7 +181,7 @@ exports.createActor = async function(data, cb, db) {
 
   let actor = null;
   await db.transactionAsync(async () => {
-    actor = await db.models.actor_actor.createAsync({
+    actor = await db.models.actor_actor.create({
       name,
       avatar,
       desc,
