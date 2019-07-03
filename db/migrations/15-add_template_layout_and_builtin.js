@@ -54,32 +54,6 @@ var migrationCommands = [{
                 "required": true
             }
         ]
-    },
-    {
-        fn: "changeColumn",
-        params: [
-            "actor_template",
-            "name",
-            {
-                "type": Sequelize.STRING,
-                "field": "name",
-                "allowNull": false,
-                "required": true
-            }
-        ]
-    },
-    {
-        fn: "changeColumn",
-        params: [
-            "actor_template",
-            "name",
-            {
-                "type": Sequelize.STRING,
-                "field": "name",
-                "allowNull": false,
-                "required": true
-            }
-        ]
     }
 ];
 
