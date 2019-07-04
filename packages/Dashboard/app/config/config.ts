@@ -1,18 +1,13 @@
 import { IConfig, IPlugin } from 'umi-types';
+import defaultSettings from './defaultSettings'; // https://umijs.org/config/
 
-import defaultSettings from './defaultSettings';
-// https://umijs.org/config/
 import slash from 'slash2';
 import webpackPlugin from './plugin.config';
-
-const { pwa, primaryColor } = defaultSettings;
-
-// preview.pro.ant.design only do not use in your production ;
+const { pwa, primaryColor } = defaultSettings; // preview.pro.ant.design only do not use in your production ;
 // preview.pro.ant.design 专用环境变量，请不要在你的项目中使用它。
+
 const { ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION } = process.env;
-
 const isAntDesignProPreview = ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site';
-
 const plugins: IPlugin[] = [
   [
     'umi-plugin-react',
@@ -41,8 +36,7 @@ const plugins: IPlugin[] = [
               importWorkboxFrom: 'local',
             },
           }
-        : false,
-      // default close dll, because issue https://github.com/ant-design/ant-design-pro/issues/4665
+        : false, // default close dll, because issue https://github.com/ant-design/ant-design-pro/issues/4665
       // dll features https://webpack.js.org/plugins/dll-plugin/
       // dll: {
       //   include: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
@@ -59,22 +53,21 @@ const plugins: IPlugin[] = [
       autoAddMenu: true,
     },
   ],
-];
+]; // 针对 preview.pro.ant.design 的 GA 统计代码
 
-// 针对 preview.pro.ant.design 的 GA 统计代码
 if (isAntDesignProPreview) {
-  plugins.push([
-    'umi-plugin-ga',
-    {
-      code: 'UA-72788897-6',
-    },
-  ]);
-  plugins.push([
-    'umi-plugin-pro',
-    {
-      serverUrl: 'https://ant-design-pro.netlify.com',
-    },
-  ]);
+  // plugins.push([
+  //   'umi-plugin-ga',
+  //   {
+  //     code: 'UA-72788897-6',
+  //   },
+  // ]);
+  // plugins.push([
+  //   'umi-plugin-pro',
+  //   {
+  //     serverUrl: 'https://ant-design-pro.netlify.com',
+  //   },
+  // ]);
 }
 
 export default {
@@ -87,6 +80,8 @@ export default {
     ie: 11,
   },
   devtool: isAntDesignProPreview ? 'source-map' : false,
+  base: '/dashboard/',
+  publicPath: '/dashboard/',
   // umi routes: https://umijs.org/zh/guide/router.html
   routes: [
     {
@@ -97,9 +92,20 @@ export default {
       routes: [
         {
           path: '/',
-          name: 'welcome',
-          icon: 'smile',
-          component: './Welcome',
+          name: 'dashboard',
+          icon: 'dashboard',
+          routes: [
+            {
+              path: '/monitor',
+              name: 'monitor',
+              component: './dashboard/Monitor',
+            },
+            {
+              name: 'login',
+              path: '/user/login',
+              component: './user/login',
+            },
+          ],
         },
         {
           component: './404',

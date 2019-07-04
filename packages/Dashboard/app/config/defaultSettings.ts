@@ -44,7 +44,8 @@ export interface DefaultSettings {
 
 export default {
   navTheme: 'dark',
-  primaryColor: '#1890FF',
+  // primaryColor: '#1890FF',
+  primaryColor: '#8C6244',
   layout: 'sidemenu',
   contentWidth: 'Fluid',
   fixedHeader: false,
@@ -54,7 +55,7 @@ export default {
   menu: {
     locale: true,
   },
-  title: 'Ant Design Pro',
+  title: 'TRPG Engine 后台管理平台',
   pwa: false,
   iconfontUrl: '',
 } as DefaultSettings;
