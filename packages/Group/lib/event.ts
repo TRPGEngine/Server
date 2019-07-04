@@ -466,6 +466,10 @@ exports.agreeGroupInvite = async function agreeGroupInvite(data, cb, db) {
   return { res: invite };
 };
 
+/**
+ * 获取所有未处理的团邀请列表
+ * 未处理的定义: 未同意且未拒绝
+ */
 exports.getGroupInvite = async function getGroupInvite(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
