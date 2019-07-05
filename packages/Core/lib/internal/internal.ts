@@ -5,6 +5,8 @@ import CoreMetricsDefinition, { CoreMetrics } from './models/metrics';
 import Debug from 'debug';
 const debug = Debug('trpg:component:internal');
 
+import CoreRouter from './routers/core';
+
 const SOCKET_PREFIX = 'metrics:socket:event:';
 
 export default class Core extends BasePackage {
@@ -16,6 +18,9 @@ export default class Core extends BasePackage {
     this.regModel(CoreGlobalConfigDefinition);
     this.regModel(CoreMetricsDefinition);
 
+    this.regRoute(CoreRouter);
+
+    // 每小时执行一次收集事件调用时间
     this.regScheduleJob(
       'collect-metrics',
       '0 0 */1 * * *',
@@ -25,7 +30,7 @@ export default class Core extends BasePackage {
 
         const metricsRecordKeys = await this.app.cache.keys('metrics:*');
 
-        // 处理socket 事件统计
+        // 处理 socket 事件统计
         const socketKeys = metricsRecordKeys.filter((key) =>
           key.startsWith(SOCKET_PREFIX)
         );
@@ -35,7 +40,7 @@ export default class Core extends BasePackage {
           this.app.cache.lclear(key, 0, vals.length);
           const arr = vals.map((v) => Number(v) || 0);
 
-          // 计算
+          // 计算平均值与最大最小值
           const avg = arr.reduce((prev, cur) => prev + cur, 0);
           const max = Math.max(...arr);
           const min = Math.min(...arr);
