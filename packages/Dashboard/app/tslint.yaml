@@ -1,0 +1,73 @@
+---
+extends:
+    - tslint:recommended
+    - tslint-react
+    - tslint-config-prettier
+    - tslint-react-hooks
+
+rules:
+    triple-equals: true
+    jsdoc-format: false
+    class-name: true
+    no-bitwise: false
+    prefer-const:
+        - true
+        - destructuring: all
+    ban-types: true
+    no-shadowed-variable: false
+    no-empty-interface: false
+    forin: false
+    radix: false
+    variable-name:
+        options:
+            - ban-keywords
+            - check-format
+            - allow-pascal-case
+            - allow-snake-case
+            - allow-leading-underscore
+            - allow-trailing-underscore
+    prefer-for-of: false
+    one-variable-per-declaration: true
+    no-unused-expression: false
+    no-empty: false
+    only-arrow-functions: false
+    interface-name: false
+    jsx-no-lambda: false
+    jsx-no-bind: false
+    jsx-self-close: false
+    jsx-no-string-ref: true
+    no-string-literal: false
+    max-classes-per-file: false
+    member-access:
+        - true
+        - no-public
+    member-ordering:
+        options:
+            - order: fields-first
+            - alphabetize: true
+    ordered-imports: false
+    object-literal-sort-keys: false
+    no-arg: true
+    no-conditional-assignment: false
+    no-consecutive-blank-lines: false
+    no-console:
+        severity: warning
+        options:
+            - debug
+            - info
+            - log
+            - time
+            - timeEnd
+            - trace
+    react-hooks-nesting: error
+
+jsRules:
+    jsdoc-format: false
+    no-shadowed-variable: false
+    forin: false
+    radix: false
+    no-unused-expression: false
+    no-empty: false
+    no-string-literal: false
+    ordered-imports: false
+    object-literal-sort-keys: false

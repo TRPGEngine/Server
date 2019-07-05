@@ -9,10 +9,10 @@ export interface CurrentUser {
   title?: string;
   group?: string;
   signature?: string;
-  tags?: {
+  tags?: Array<{
     key: string;
     label: string;
-  }[];
+  }>;
   unreadCount?: number;
 }
 
@@ -68,7 +68,7 @@ const UserModel: UserModelType = {
       state = {
         currentUser: {},
       },
-      action,
+      action
     ) {
       return {
         ...state,
