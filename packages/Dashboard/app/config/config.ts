@@ -105,6 +105,11 @@ export default {
               path: '/user/login',
               component: './user/login',
             },
+            {
+              name: 'analysis',
+              path: '/dashboard/analysis',
+              component: './dashboard/analysis',
+            },
           ],
         },
         {
