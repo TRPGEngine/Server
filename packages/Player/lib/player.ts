@@ -39,7 +39,7 @@ function initStorage() {
   let storage = app.storage;
   storage.registerModel(require('./models/user'));
   storage.registerModel(require('./models/invite'));
-  storage.registerModel(require('./models/loginLog'));
+  storage.registerModel(require('./models/login-log'));
   storage.registerModel(require('./models/settings'));
 
   app.on('initCompleted', function(app) {
