@@ -48,6 +48,13 @@ describe('template event', () => {
     expect(ret.template.uuid).toBe(this.testTemplate.uuid);
   });
 
+  test('getSuggestTemplate should be ok', async () => {
+    const ret = await emitEvent('actor::getSuggestTemplate', {});
+    expect(ret.result).toBe(true);
+    expect(ret).toHaveProperty('templates');
+    expect(Array.isArray(ret.templates)).toBe(true);
+  });
+
   test('findTemplate should be ok', async () => {
     let ret = await emitEvent('actor::findTemplate', { name: '刀' });
     expect(ret.result).toBe(true);

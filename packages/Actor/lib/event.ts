@@ -1,4 +1,6 @@
 import Debug from 'debug';
+import { EventFunc } from 'trpg/core';
+import { ActorTemplate } from './models/template';
 const debug = Debug('trpg:component:actor:event');
 
 exports.getTemplate = async function(data, cb, db) {
@@ -30,6 +32,20 @@ exports.getTemplate = async function(data, cb, db) {
     return { template };
   }
 };
+
+/**
+ * 获取推荐角色模板
+ */
+const getSuggestTemplate: EventFunc = async function(data, cb, db) {
+  const templates = await ActorTemplate.findAll({
+    where: {
+      built_in: true,
+    },
+  });
+
+  return { templates };
+};
+exports.getSuggestTemplate = getSuggestTemplate;
 
 exports.findTemplate = async function(data, cb, db) {
   const app = this.app;

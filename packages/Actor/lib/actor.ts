@@ -39,6 +39,7 @@ function initFunction() {
 function initSocket() {
   let app = this;
   app.registerEvent('actor::getTemplate', event.getTemplate);
+  app.registerEvent('actor::getSuggestTemplate', event.getSuggestTemplate);
   app.registerEvent('actor::findTemplate', event.findTemplate);
   app.registerEvent('actor::createTemplate', event.createTemplate);
   app.registerEvent('actor::createTemplateAdvanced', event.createTemplate);
