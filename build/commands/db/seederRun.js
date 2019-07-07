@@ -14,6 +14,8 @@ exports.builder = function(args) {
     .describe('file', 'Optional, specify seed file').argv;
 };
 exports.handler = async function(argv) {
+  process.env['TRPG_PORT'] = 23666; // 配置环境变量.
+
   const { file } = argv;
 
   const { sequelize, Sequelize, app } = require('../../../db/models');
