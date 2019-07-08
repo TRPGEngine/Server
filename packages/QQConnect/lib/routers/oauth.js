@@ -14,12 +14,13 @@ router.get('/login', (ctx, next) => {
   // let state = Math.random();// 生成一个随机数作为state
   // ctx.session.qqconnectState = state;
   const config = ctx.QQConnectConfig;
+  const apihost = ctx.trpgapp.get('apihost');
   let state = ctx.query.platform || 'web';
 
   let params = {
     response_type: 'code',
     client_id: config.appid,
-    redirect_uri: encodeURI(config.callback),
+    redirect_uri: encodeURI(url.resolve(apihost, config.callback)),
     state,
     scope: config.scope.join(','),
   };
@@ -35,6 +36,7 @@ router.get('/login', (ctx, next) => {
 router.get('/callback', async (ctx, next) => {
   const config = ctx.QQConnectConfig;
   const template = require('../views/callback.marko');
+  const apihost = ctx.trpgapp.get('apihost');
   let { code, state, usercancel } = ctx.query;
   let platform = state;
 
@@ -61,13 +63,19 @@ router.get('/callback', async (ctx, next) => {
     client_id: config.appid,
     client_secret: config.appkey,
     code,
-    redirect_uri: encodeURI(config.callback),
+    redirect_uri: encodeURI(url.resolve(apihost, config.callback)),
   });
-  let { access_token, expires_in, refresh_token } = querystring.parse(
-    accessData
-  );
-
+  let {
+    access_token,
+    expires_in,
+    refresh_token,
+    error,
+    error_description,
+  } = querystring.parse(accessData);
   console.log('accessData', accessData);
+  if (error) {
+    throw new Error(error_description);
+  }
 
   // 获取openid
   let meData = await ctx.trpgapp.request.get(GET_OPENID_URL, { access_token });
@@ -82,10 +90,10 @@ router.get('/callback', async (ctx, next) => {
     let record = await db.models.oauth_qq_access_info.findOne({
       where: { openid },
     });
-    if (record) {
+    if (record && record.relatedUserId) {
       // 用户已通过qq登录注册账号
       // let player = await record.getRelatedUserAsync();
-      let playerId = await record.related_user_id;
+      let playerId = record.relatedUserId;
       let player = await db.models.player_user.findByPk(playerId);
       let token = uuid();
       if (platform === 'app') {
@@ -93,7 +101,6 @@ router.get('/callback', async (ctx, next) => {
       } else {
         player.token = token;
       }
-      console.log('TODO: TMP', JSON.parse(JSON.stringify(player)));
       await player.saveAsync();
       res = {
         uuid: player.uuid,
