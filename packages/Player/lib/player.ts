@@ -2,7 +2,8 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:player');
 import Router from 'koa-router';
 const Geetest = require('gt3-sdk');
-const md5 = require('./utils/md5');
+import md5 from './utils/md5';
+import sha1 from './utils/sha1';
 const event = require('./event');
 import PlayerList from './list';
 
@@ -125,11 +126,14 @@ function initFunction() {
     },
     // 服务端直接创建用户
     createNewAsync: async function(username, password, options) {
+      const modelUser = db.models.player_user;
+      const salt = modelUser.genSalt();
       let data = Object.assign(
         {},
         {
           username,
-          password: md5(md5(password)), // 客户端一层md5, 服务端一层md5, 所以服务端直接创建用户需要2层md5加密
+          password: sha1(md5(md5(password)) + salt),
+          salt,
         },
         options
       );
