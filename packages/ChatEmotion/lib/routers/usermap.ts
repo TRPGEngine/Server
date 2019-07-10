@@ -10,7 +10,7 @@ const router = new Router();
  */
 router.post('/usermap/addCatalog', auth(), async (ctx) => {
   const player = ctx.player;
-  const { uuid } = ctx.request.body;
+  const uuid = _.get(ctx, 'request.body.uuid');
 
   const catalog = await ChatEmotionCatalog.findOne({ where: { uuid } });
   const db = ctx.trpgapp.storage.db;

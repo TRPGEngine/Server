@@ -70,8 +70,8 @@ router.get('/catalog/get', async (ctx) => {
 
 // 表情包生成
 router.post('/catalog/create', auth(), async (ctx) => {
-  const name: string = ctx.request.body.name;
-  const items: string[] = ctx.request.body.items; // item uuid update
+  const name: string = _.get(ctx, 'request.body.name');
+  const items: string[] = _.get(ctx, 'request.body.items', []); // item uuid update
   const playerId = _.get(ctx, 'player.user.id');
 
   if (!name || !items) {
@@ -102,7 +102,7 @@ router.post('/catalog/create', auth(), async (ctx) => {
 
 // 新增表情包暗号
 router.post('/catalog/secretSignal/create', auth(), async (ctx) => {
-  const { catalogUUID } = ctx.request.body;
+  const catalogUUID = _.get(ctx, 'request.body.catalogUUID');
   const playerId = _.get(ctx, 'player.user.id');
 
   const catalog = await ChatEmotionCatalog.findOne({
