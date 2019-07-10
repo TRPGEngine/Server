@@ -49,7 +49,6 @@
     "@types/koa-bodyparser": "^4.3.0",
     "@types/koa-helmet": "^3.1.2",
     "@types/koa-logger": "^3.1.1",
-    "@types/koa-router": "^7.0.40",
     "@types/koa-session": "^5.10.0",
     "@types/koa-static": "^4.0.1",
     "@types/koa__cors": "^2.2.3",

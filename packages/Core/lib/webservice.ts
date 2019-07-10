@@ -232,7 +232,7 @@ export default class WebService {
    * 插入中间件
    * @param middleware 中间件
    */
-  use(middleware: Middleware) {
+  use(middleware: Middleware<any, any>) {
     this._app.use(middleware);
     return this;
   }
