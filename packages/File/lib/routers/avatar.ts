@@ -1,9 +1,10 @@
-const Router = require('koa-router');
-const fs = require('fs-extra');
-const avatar = require('../middleware/avatar');
-const avatarStorage = require('../middleware/storage')();
-const avatarProcess = require('../middleware/process')();
-const auth = require('../middleware/auth')();
+import Router from 'koa-router';
+import upload from '../middleware/upload';
+import sha256 from '../middleware/sha256';
+import thumbnail from '../middleware/thumbnail';
+import _ from 'lodash';
+const avatarStorage = require('../middleware/storage/avatar');
+const auth = require('../middleware/auth');
 const utils = require('../utils');
 const config = require('../config');
 
@@ -11,14 +12,16 @@ let router = new Router();
 
 router.post(
   '/',
-  auth,
-  avatar.single('avatar'),
-  avatarProcess,
-  avatarStorage,
+  auth(),
+  upload('public/avatar/').single('avatar'),
+  sha256(),
+  thumbnail(128, 128),
+  avatarStorage(),
   async (ctx, next) => {
-    let filename = ctx.req.file.filename;
-    let size = ctx.req.file.size;
-    let has_thumbnail = ctx.req.file.has_thumbnail;
+    const filename = _.get(ctx, 'req.file.filename');
+    const size = _.get(ctx, 'req.file.size');
+    const has_thumbnail = _.get(ctx, 'req.file.has_thumbnail', false);
+
     ctx.body = {
       filename,
       url: has_thumbnail
