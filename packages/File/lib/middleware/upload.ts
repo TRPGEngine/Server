@@ -6,7 +6,7 @@ import _ from 'lodash';
  * 上传文件中间件
  * @param path 文件上传路径，可以为boolean型， 如果为true则上传到永久目录，如果为false则上传到临时目录， 默认为false
  */
-export default function uploadMiddleware(path: string | boolean = false) {
+function uploadMiddleware(path: string | boolean = false) {
   return multer({
     storage: multer.diskStorage({
       //文件保存路径
@@ -29,3 +29,6 @@ export default function uploadMiddleware(path: string | boolean = false) {
     limits: config.limits,
   });
 }
+
+export default uploadMiddleware;
+module.exports = uploadMiddleware;
