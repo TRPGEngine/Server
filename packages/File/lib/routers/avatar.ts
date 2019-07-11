@@ -2,6 +2,7 @@ import Router from 'koa-router';
 import upload from '../middleware/upload';
 import sha256 from '../middleware/sha256';
 import thumbnail from '../middleware/thumbnail';
+import allowMIME from '../middleware/allowMIME';
 import _ from 'lodash';
 const avatarStorage = require('../middleware/storage/avatar');
 const auth = require('../middleware/auth');
@@ -14,6 +15,7 @@ router.post(
   '/',
   auth(),
   upload('public/avatar/').single('avatar'),
+  allowMIME(['image/jpeg', 'image/png']),
   sha256(),
   thumbnail(128, 128),
   avatarStorage(),
