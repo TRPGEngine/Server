@@ -24,7 +24,8 @@ module.exports = {
     },
   },
   graphql: {
-    enable: true,
+    // 默认在开发环境打开GraphQL
+    enable: process.env.NODE_ENV === 'development' ? true : false,
   },
   jwt: {
     // json web token 相关设定
