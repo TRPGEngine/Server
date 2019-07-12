@@ -59,6 +59,15 @@ export default abstract class BasePackage {
   }
 
   /**
+   * 获取app config配置
+   * @param path 配置路径
+   * @param defaultValue 默认值
+   */
+  getConfig(path: string, defaultValue?: string) {
+    return this.app.get(path, defaultValue);
+  }
+
+  /**
    * 返回包名小写版本
    */
   getPackageName(): string {

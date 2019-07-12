@@ -2,12 +2,27 @@ import BasePackage from 'lib/package';
 import CoreSystemLogDefinition from './models/system-log';
 import CoreGlobalConfigDefinition from './models/global-config';
 import CoreMetricsDefinition, { CoreMetrics } from './models/metrics';
+import { ApolloServer, gql } from 'apollo-server-koa';
 import Debug from 'debug';
 const debug = Debug('trpg:component:internal');
 
 import CoreRouter from './routers/core';
 
 const SOCKET_PREFIX = 'metrics:socket:event:';
+
+// Construct a schema, using GraphQL schema language
+const typeDefs = gql`
+  type Query {
+    hello: String
+  }
+`;
+
+// Provide resolver functions for your schema fields
+const resolvers = {
+  Query: {
+    hello: () => 'Hello world!',
+  },
+};
 
 export default class Core extends BasePackage {
   public name: string = 'Core';
@@ -19,6 +34,9 @@ export default class Core extends BasePackage {
     this.regModel(CoreMetricsDefinition);
 
     this.regRoute(CoreRouter);
+    if (this.getConfig('graphql.enable') === true) {
+      this.initGraphQL();
+    }
 
     // 每小时执行一次收集事件调用时间
     this.regScheduleJob(
@@ -59,5 +77,17 @@ export default class Core extends BasePackage {
         await CoreMetrics.bulkCreate(socketRecord);
       }
     );
+  }
+
+  initGraphQL() {
+    const graphql = new ApolloServer({
+      typeDefs,
+      resolvers,
+    });
+
+    graphql.applyMiddleware({
+      app: this.app.webservice.app,
+      path: '/core/graphql',
+    });
   }
 }

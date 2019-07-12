@@ -22,9 +22,12 @@
   "dependencies": {
     "@koa/cors": "^2.2.3",
     "@types/jsonwebtoken": "^8.3.2",
+    "apollo-server-koa": "^2.6.9",
     "axios": "^0.19.0",
     "debug": "^3.1.0",
     "fs-extra": "^5.0.0",
+    "graphql": "^14.4.2",
+    "graphql-sequelize": "^9.3.6",
     "ioredis": "^3.2.2",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.4.1",

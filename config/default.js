@@ -23,6 +23,9 @@ module.exports = {
       },
     },
   },
+  graphql: {
+    enable: true,
+  },
   jwt: {
     // json web token 相关设定
     secret: randomString(10),
