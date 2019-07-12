@@ -7,22 +7,9 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:internal');
 
 import CoreRouter from './routers/core';
+import { generateSchema } from './graphql/generate-schema';
 
 const SOCKET_PREFIX = 'metrics:socket:event:';
-
-// Construct a schema, using GraphQL schema language
-const typeDefs = gql`
-  type Query {
-    hello: String
-  }
-`;
-
-// Provide resolver functions for your schema fields
-const resolvers = {
-  Query: {
-    hello: () => 'Hello world!',
-  },
-};
 
 export default class Core extends BasePackage {
   public name: string = 'Core';
@@ -35,7 +22,10 @@ export default class Core extends BasePackage {
 
     this.regRoute(CoreRouter);
     if (this.getConfig('graphql.enable') === true) {
-      this.initGraphQL();
+      this.app.on('initCompleted', () => {
+        // 全部加载完毕后初始化GraphQL服务。 保证所有的数据库模型都加载完毕
+        this.initGraphQL();
+      });
     }
 
     // 每小时执行一次收集事件调用时间
@@ -80,11 +70,13 @@ export default class Core extends BasePackage {
   }
 
   initGraphQL() {
-    const graphql = new ApolloServer({
-      typeDefs,
-      resolvers,
-    });
+    const db = this.app.storage.db;
+    const schema = generateSchema(db);
 
+    // TODO: 需要一个鉴权机制
+    const graphql = new ApolloServer({
+      schema,
+    });
     graphql.applyMiddleware({
       app: this.app.webservice.app,
       path: '/core/graphql',
