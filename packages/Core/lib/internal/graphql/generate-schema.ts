@@ -1,7 +1,6 @@
 import {
   GraphQLSchema,
   GraphQLObjectType,
-  GraphQLScalarType,
   GraphQLObjectTypeConfig,
 } from 'graphql';
 import { Sequelize, Model } from 'sequelize';
@@ -12,12 +11,6 @@ import {
   defaultArgs,
 } from 'graphql-sequelize';
 import _ from 'lodash';
-
-interface FieldsType {
-  [name: string]: {
-    type: GraphQLScalarType;
-  };
-}
 
 /**
  * 根据sequelize实例数据生成一个对应的Schema
