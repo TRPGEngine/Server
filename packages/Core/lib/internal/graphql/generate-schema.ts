@@ -2,16 +2,40 @@ import {
   GraphQLSchema,
   GraphQLObjectType,
   GraphQLObjectTypeConfig,
+  GraphQLEnumType,
 } from 'graphql';
-import { Sequelize, Model } from 'sequelize';
+import { Sequelize, Model, ENUM, DataType } from 'sequelize';
 import {
   resolver,
   attributeFields,
   defaultListArgs,
   defaultArgs,
+  typeMapper,
 } from 'graphql-sequelize';
 import _ from 'lodash';
+import { toPinyin } from '../../utils/pinyin';
 
+typeMapper.mapType((type: DataType) => {
+  if (type instanceof ENUM) {
+    return new GraphQLEnumType({
+      name: 'tempEnumName',
+      values: _(type.values)
+        .mapKeys((value) => {
+          return value
+            .trim()
+            .replace(/([^_a-zA-Z0-9])/g, (_, p) => toPinyin(p) || ' ') // 转化类型时中文需要转化为拼音
+            .split(' ')
+            .map((v, i) => (i ? _.upperFirst(v) : v))
+            .join('')
+            .replace(/(^\d)/, '_$1');
+        })
+        .mapValues((v) => ({ value: v }))
+        .value(),
+    });
+  }
+
+  return false;
+});
 /**
  * 根据sequelize实例数据生成一个对应的Schema
  * @param db sequelize实例
