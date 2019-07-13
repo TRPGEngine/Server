@@ -27,6 +27,7 @@
     "debug": "^3.1.0",
     "fs-extra": "^5.0.0",
     "graphql": "^14.4.2",
+    "graphql-relay": "^0.6.0",
     "graphql-sequelize": "^9.3.6",
     "ioredis": "^3.2.2",
     "jsonwebtoken": "^8.5.1",
