@@ -1,7 +1,9 @@
 import {
   GraphQLSchema,
+  GraphQLList,
   GraphQLObjectType,
   GraphQLObjectTypeConfig,
+  GraphQLOutputType,
   GraphQLEnumType,
 } from 'graphql';
 import { Sequelize, Model, ENUM, DataType } from 'sequelize';
@@ -36,6 +38,48 @@ typeMapper.mapType((type: DataType) => {
 
   return false;
 });
+
+/**
+ * 添加配置项到query config
+ * @param queryConfig 目标查询配置文件
+ * @param modelCls 要处理的Sequelize模型
+ * @param fields 生成的fields
+ * @param isList 是否为列表
+ * @param queryName 查询名
+ * @param typeName 类型名
+ * @param description 描述
+ */
+function appendQueryConfig(
+  queryConfig: GraphQLObjectTypeConfig<any, any>,
+  modelCls: typeof Model,
+  fields: any,
+  isList: boolean = false,
+  queryName: string = modelCls.name,
+  typeName: string = modelCls.name,
+  description: string = '模型: ' + modelCls.tableName
+) {
+  if (isList) {
+    queryName += '_list';
+    typeName += '_list';
+  }
+
+  let type: GraphQLOutputType = new GraphQLObjectType({
+    name: typeName,
+    description,
+    fields,
+  });
+
+  if (isList) {
+    type = new GraphQLList(type);
+  }
+
+  _.set(queryConfig, ['fields', queryName], {
+    type,
+    args: Object.assign({}, defaultArgs(modelCls), defaultListArgs()),
+    resolve: resolver(modelCls, { list: isList }),
+  });
+}
+
 /**
  * 根据sequelize实例数据生成一个对应的Schema
  * @param db sequelize实例
@@ -48,17 +92,12 @@ export function generateSchema(db: Sequelize): GraphQLSchema {
   };
   _.forEach(models, (modelCls: typeof Model, modelName: string) => {
     const fields = attributeFields(modelCls);
-    const type = new GraphQLObjectType({
-      name: modelCls.name,
-      description: modelCls.tableName,
-      fields,
-    });
 
-    _.set(queryConfig, ['fields', modelName], {
-      type,
-      args: Object.assign({}, defaultArgs(modelCls), defaultListArgs()),
-      resolve: resolver(modelCls),
-    });
+    // 加入单项查询
+    appendQueryConfig(queryConfig, modelCls, fields, false);
+
+    // 加入列表查询
+    appendQueryConfig(queryConfig, modelCls, fields, true);
   });
 
   return new GraphQLSchema({
