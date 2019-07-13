@@ -319,8 +319,8 @@ class Application extends events.EventEmitter {
   }
 
   // 支持get('xxx.xxx')获取
-  get(path: string, defaultValue = '') {
-    return _.get(this.settings, path, defaultValue);
+  get<T = string | number | {}>(path: string, defaultValue: any = ''): T {
+    return _.get<any, any, T>(this.settings, path, defaultValue);
   }
 
   enabled(setting: string) {

@@ -42,6 +42,13 @@ module.exports = function User(Sequelize, db) {
         getName: function() {
           return this.nickname || this.username;
         },
+        getJWTPayload: function() {
+          return {
+            uuid: this.uuid,
+            name: this.getName(),
+            avatar: this.avatar,
+          };
+        },
         getInfo: function(includeToken = false) {
           return {
             username: this.username,

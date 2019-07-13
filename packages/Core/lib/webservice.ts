@@ -20,6 +20,7 @@ const appLogger = getLogger('application');
 
 import { TRPGApplication } from '../types/app';
 import { CacheValue } from './cache';
+import Application from './application';
 
 const publicDir = path.resolve(process.cwd(), './public');
 const jwtIssuer = 'trpg';
@@ -44,6 +45,13 @@ class SessionStore {
   }
 }
 
+interface WebServiceOpts {
+  app: Application;
+  port: number;
+  webApi: any;
+  homepage: string;
+}
+
 interface JWTConfig {
   secret: string;
 }
@@ -59,7 +67,7 @@ export default class WebService {
   sessionOpt: any;
   jwtConfig: JWTConfig;
 
-  constructor(opts) {
+  constructor(opts: WebServiceOpts) {
     this.trpgapp = this.context.trpgapp = opts.app;
     this.sessionOpt = {
       key: 'koa:trpg:sess',
@@ -94,7 +102,7 @@ export default class WebService {
    * 初始化配置信息
    * @param opts 配置
    */
-  initConfig(opts) {
+  initConfig(opts: WebServiceOpts) {
     if (opts && opts.port && typeof opts.port === 'number') {
       this.port = opts.port;
     }
@@ -105,7 +113,7 @@ export default class WebService {
       this.homepage = opts.homepage;
     }
 
-    this.jwtConfig = opts.jwt;
+    this.jwtConfig = opts.app.get<JWTConfig>('jwt', {});
   }
 
   /**
@@ -265,9 +273,22 @@ export default class WebService {
    * 校验jwt
    * 返回校验后的结果
    */
-  jwtVerify = (token: string): string | object => {
-    return jwt.verify(token, this.jwtConfig.secret, {
-      issuer: jwtIssuer,
+  jwtVerify = (token: string): Promise<string | object> => {
+    return new Promise((resolve, reject) => {
+      jwt.verify(
+        token,
+        this.jwtConfig.secret,
+        {
+          issuer: jwtIssuer,
+        },
+        (err, decoded) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(decoded);
+          }
+        }
+      );
     });
   };
 }
