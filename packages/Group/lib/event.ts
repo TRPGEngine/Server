@@ -599,7 +599,7 @@ exports.addGroupActor = async function addGroupActor(data, cb, db) {
     groupActor = await db.models.group_actor.create({
       actor_uuid: actorUUID,
       actor_info: {},
-      avatar: '',
+      avatar: actor.avatar,
       passed: false,
       ownerId: player.user.id,
     });
@@ -894,7 +894,7 @@ exports.quitGroup = async function quitGroup(data, cb, db) {
     throw '找不到团';
   }
   if (group.owner_uuid === player.uuid) {
-    throw '作为团长你无法直接退出群';
+    throw '作为团主持人你无法直接退出群';
   }
 
   let removeMember = await group.removeMember(player.user);
