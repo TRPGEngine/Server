@@ -7,3 +7,4 @@ node_modules
 db/migrations/_current_bak.json
 db/seeders/emotion/mitaomao/thumbnail/
 test/bench/out.log
+!packages/Dashboard/lib/public
