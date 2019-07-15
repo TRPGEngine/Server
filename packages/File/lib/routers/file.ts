@@ -45,9 +45,9 @@ router.get('/download/:fileuuid/:filename?', async (ctx) => {
   ctx.type = 'application/octet-stream';
   try {
     if (is_persistence) {
-      await send(ctx, `./public/uploads/persistence/${name}`);
+      await send(ctx as any, `./public/uploads/persistence/${name}`);
     } else {
-      await send(ctx, `./public/uploads/temporary/${name}`);
+      await send(ctx as any, `./public/uploads/temporary/${name}`);
     }
   } catch (e) {
     console.error(e);

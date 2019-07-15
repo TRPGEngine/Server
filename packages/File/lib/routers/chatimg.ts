@@ -1,26 +1,24 @@
-const Router = require('koa-router');
+import Router from 'koa-router';
+import upload from '../middleware/upload';
+import sha265 from '../middleware/sha256';
 const config = require('../config');
-const chatimg = require('../middleware/tmpsave');
-const chatimgProcess = require('../middleware/process')(
-  config.path.chatimgDir,
-  false
-);
 const chatimgStorage = require('../middleware/storage/chatimg')();
-const auth = require('../middleware/auth')();
-const uuid = require('uuid/v1');
+const auth = require('../middleware/auth');
+import uuid from 'uuid/v1';
+import _ from 'lodash';
 
 let router = new Router();
 
 router.post(
   '/upload',
-  auth,
-  chatimg.single('image'),
-  chatimgProcess,
+  auth(),
+  upload(config.path.chatimgDir).single('image'),
+  sha265(),
   chatimgStorage,
   async (ctx, next) => {
-    let filename = ctx.req.file.filename;
-    let size = ctx.req.file.size;
-    let has_thumbnail = ctx.req.file.has_thumbnail;
+    let filename = _.get(ctx, 'req.file.filename');
+    let size = _.get(ctx, 'req.file.size');
+    let has_thumbnail = _.get(ctx, 'req.file.has_thumbnail', false);
     ctx.body = {
       filename,
       url: has_thumbnail
@@ -33,22 +31,14 @@ router.post(
 );
 
 // 基于https://sm.ms/api/upload接口的数据存储
-router.post('/smms', auth, async (ctx, next) => {
-  let {
-    url,
-    storename,
-    width,
-    height,
-    size,
-    hash,
-    timestamp,
-    ip,
-  } = ctx.request.body;
+router.post('/smms', auth(), async (ctx, next) => {
+  const body = _.get(ctx, 'request.body');
+  let { url, storename, width, height, size, hash, timestamp, ip } = body;
   let ext = {
     hash,
     timestamp,
     ip,
-    delete: ctx.request.body.delete,
+    delete: body.delete,
   };
 
   const db = await ctx.trpgapp.storage.db;
