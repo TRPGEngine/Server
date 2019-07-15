@@ -1,19 +1,19 @@
-const Router = require('koa-router');
-const send = require('koa-send');
-const upload = require('../middleware/upload');
-const auth = require('../middleware/auth')();
+import Router from 'koa-router';
+import send from 'koa-send';
+import upload from '../middleware/upload';
+const auth = require('../middleware/auth');
 const fileStorage = require('../middleware/storage/file');
 const fileProcess = require('../middleware/process');
 
-let router = new Router();
+const router = new Router();
 
-let ret = async (ctx) => {
+const ret = async (ctx) => {
   ctx.body = ctx.fileinfo;
 };
 
 router.post(
   '/upload/persistence',
-  auth,
+  auth(),
   upload(true).single('file'),
   fileProcess('./public/uploads/persistence', false),
   fileStorage(true),
@@ -21,7 +21,7 @@ router.post(
 );
 router.post(
   '/upload/temporary',
-  auth,
+  auth(),
   upload(false).single('file'),
   fileProcess('./public/uploads/temporary', false),
   fileStorage(false),
