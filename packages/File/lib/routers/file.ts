@@ -1,9 +1,9 @@
 import Router from 'koa-router';
 import send from 'koa-send';
 import upload from '../middleware/upload';
+import sha256 from '../middleware/sha256';
 const auth = require('../middleware/auth');
 const fileStorage = require('../middleware/storage/file');
-const fileProcess = require('../middleware/process');
 
 const router = new Router();
 
@@ -15,7 +15,7 @@ router.post(
   '/upload/persistence',
   auth(),
   upload(true).single('file'),
-  fileProcess('./public/uploads/persistence', false),
+  sha256(),
   fileStorage(true),
   ret
 );
@@ -23,7 +23,7 @@ router.post(
   '/upload/temporary',
   auth(),
   upload(false).single('file'),
-  fileProcess('./public/uploads/temporary', false),
+  sha256(),
   fileStorage(false),
   ret
 );
