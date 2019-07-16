@@ -9,7 +9,7 @@ export default function allowMIME(types: MIMEType[]) {
     if (!types.includes(mimetype)) {
       await fs.remove(path);
 
-      throw new Error('不允许的文件类型');
+      throw new Error('不允许的文件类型:' + mimetype);
     }
 
     return next();

@@ -1,6 +1,7 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:group:event');
 import uuid from 'uuid/v4';
+import _ from 'lodash';
 
 exports.create = async function create(data, cb, db) {
   const app = this.app;
@@ -605,6 +606,9 @@ exports.addGroupActor = async function addGroupActor(data, cb, db) {
     });
     groupActor = await groupActor.setActor(actor);
     groupActor = await groupActor.setGroup(group);
+
+    _.set(groupActor, 'dataValues.actor', actor);
+    _.set(groupActor, 'dataValues.group', group);
   });
 
   return { groupActor };
@@ -668,7 +672,7 @@ exports.removeGroupActor = async function(data, cb, db) {
   return true;
 };
 
-exports.agreeGroupActor = async function refuseGroupActor(data, cb, db) {
+exports.agreeGroupActor = async function agreeGroupActor(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
