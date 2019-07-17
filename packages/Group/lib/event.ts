@@ -1,6 +1,7 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:group:event');
 import uuid from 'uuid/v4';
+import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
 
 exports.create = async function create(data, cb, db) {
@@ -789,11 +790,10 @@ exports.updateGroupActorInfo = async function updateGroupActorInfo(
   return true;
 };
 
-exports.setPlayerSelectedGroupActor = async function setPlayerSelectedGroupActor(
-  data,
-  cb,
-  db
-) {
+const setPlayerSelectedGroupActor: EventFunc<{
+  groupUUID: string;
+  groupActorUUID: string;
+}> = async function setPlayerSelectedGroupActor(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -802,22 +802,23 @@ exports.setPlayerSelectedGroupActor = async function setPlayerSelectedGroupActor
     throw '用户不存在，请检查登录状态';
   }
 
-  let groupUUID = data.groupUUID;
-  let groupActorUUID = data.groupActorUUID; // 可以为null 即取消选择
+  const userUUID = player.user.uuid;
+  const groupUUID = data.groupUUID;
+  const groupActorUUID = data.groupActorUUID; // 可以为null 即取消选择
   if (!groupUUID) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.findOne({
+  const group = await (db.models.group_group as any).findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
     throw '找不到团';
   }
-  let members = await group.getMembers();
+  const members = await group.getMembers();
   let isSaved = false;
   for (let member of members) {
-    if (member.uuid === player.user.uuid) {
+    if (member.uuid === userUUID) {
       member.group_group_members.selected_group_actor_uuid = groupActorUUID;
       await member.save();
       isSaved = true;
@@ -828,10 +829,18 @@ exports.setPlayerSelectedGroupActor = async function setPlayerSelectedGroupActor
     throw '当前用户不在团列表中';
   }
 
+  // 通知团其他人
+  socket.broadcast.to(groupUUID).emit('group::updatePlayerSelectedGroupActor', {
+    userUUID,
+    groupUUID,
+    groupActorUUID,
+  });
+
   return {
     data: { groupUUID, groupActorUUID },
   };
 };
+exports.setPlayerSelectedGroupActor = setPlayerSelectedGroupActor;
 
 exports.getPlayerSelectedGroupActor = async function getPlayerSelectedGroupActor(
   data,
