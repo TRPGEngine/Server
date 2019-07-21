@@ -1,4 +1,5 @@
-const debug = require('debug')('trpg:component:chat:event');
+import Debug from 'debug';
+const debug = Debug('trpg:component:chat:event');
 const generateUUID = require('uuid/v4');
 
 let addChatLog = function addChatLog(messagePkg) {
@@ -121,7 +122,7 @@ let getUserChatLog = async function getUserChatLog(data, cb, db) {
     });
     list = list.concat(logs);
     // 获取缓存中的聊天记录
-    for (log of logList) {
+    for (const log of logList) {
       if (
         !log.converse_uuid &&
         ((log.sender_uuid === userUUID && log.to_uuid === selfUUID) ||
@@ -503,7 +504,9 @@ let getConverses = async function getConverses(data, cb, db) {
   if (!player) {
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
-  let user = await db.models.player_user.findOne({where: { uuid: player.uuid }});
+  let user = await db.models.player_user.findOne({
+    where: { uuid: player.uuid },
+  });
   let converses = await user.getConverses();
   return { list: converses };
 };

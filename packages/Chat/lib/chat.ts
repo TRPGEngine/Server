@@ -1,7 +1,10 @@
-const debug = require('debug')('trpg:component:chat');
+import Debug from 'debug';
+const debug = Debug('trpg:component:chat');
 const event = require('./event');
 
-module.exports = function ChatComponent(app) {
+module.exports = ChatComponent;
+
+export default function ChatComponent(app) {
   initStorage.call(app);
   initFunction.call(app);
   initSocket.call(app);
@@ -13,13 +16,13 @@ module.exports = function ChatComponent(app) {
     name: 'ChatComponent',
     require: ['PlayerComponent'],
   };
-};
+}
 
 function initStorage() {
   let app = this;
   let storage = app.storage;
-  storage.registerModel(require('./models/log.js'));
-  storage.registerModel(require('./models/converse.js'));
+  storage.registerModel(require('./models/log'));
+  storage.registerModel(require('./models/converse'));
 
   app.on('initCompleted', function(app) {
     // 数据信息统计
