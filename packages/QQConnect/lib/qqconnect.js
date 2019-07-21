@@ -17,7 +17,7 @@ module.exports = function QQConnectComponent(app) {
 function initStorage() {
   let app = this;
   let storage = app.storage;
-  storage.registerModel(require('./models/accessInfo.js'));
+  storage.registerModel(require('./models/access-info'));
 
   app.on('initCompleted', function(app) {
     // 数据信息统计

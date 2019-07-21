@@ -2,7 +2,7 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:player:router:register');
 const Router = require('koa-router');
 const router = new Router();
-const geetestWrapper = require('../utils/geetestWrapper');
+const geetestWrapper = require('../utils/geetest-wrapper');
 
 router.get('/gt-register', async function(ctx, next) {
   const geetest = ctx.geetest;

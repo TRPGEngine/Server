@@ -30,7 +30,7 @@ function initStorage() {
   let count = 1;
   count += registerAll(require('./models/register'));
   count += registerAll(require('./models/chatlog'));
-  count += registerAll(require('./models/loginTimes'));
+  count += registerAll(require('./models/login-times'));
 
   app.on('initCompleted', function(app) {
     // 数据信息统计

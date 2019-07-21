@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 
 router.get('/validate/_bind', async (ctx, next) => {
-  const template = require('../views/bindResult');
+  const template = require('../views/bind-result');
   const trpgapp = ctx.trpgapp;
 
   let { user_uuid, hash, email_address } = ctx.query;
