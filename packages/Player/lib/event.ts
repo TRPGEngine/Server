@@ -545,7 +545,7 @@ exports.agreeFriendInvite = async function agreeFriendInvite(data, cb, db) {
     // 发送更新好友的通知
     let player1 = app.player.list.get(uuid1);
     if (player1) {
-      player1.socket.emit('player::addFriend', { uuid: uuid2 });
+      player1.socket.emit('player::appendFriend', { uuid: uuid2 });
     }
   });
 

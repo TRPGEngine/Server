@@ -183,7 +183,7 @@ function initSocket() {
   app.registerEvent('player::changePassword', event.changePassword);
   app.registerEvent('player::logout', event.logout);
   app.registerEvent('player::findUser', event.findUser);
-  app.registerEvent('player::addFriend', event.addFriend);
+  // app.registerEvent('player::addFriend', event.addFriend); // 禁止直接加好友接口
   app.registerEvent('player::getFriends', event.getFriends);
   app.registerEvent('player::sendFriendInvite', event.sendFriendInvite);
   app.registerEvent('player::refuseFriendInvite', event.refuseFriendInvite);
