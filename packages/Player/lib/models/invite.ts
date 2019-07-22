@@ -1,8 +1,16 @@
 import uuid from 'uuid/v1';
+import { Model, Orm, DBInstance } from 'trpg/core';
 
-module.exports = function Invite(Sequelize, db) {
-  let Invite = db.define(
-    'player_invite',
+export class PlayerInvite extends Model {
+  uuid: string;
+  from_uuid: string;
+  to_uuid: string;
+  is_agree: boolean;
+  is_refuse: boolean;
+}
+
+export default function PlayerInviteDefinition(Sequelize: Orm, db: DBInstance) {
+  PlayerInvite.init<PlayerInvite>(
     {
       uuid: {
         type: Sequelize.STRING,
@@ -15,6 +23,8 @@ module.exports = function Invite(Sequelize, db) {
       is_refuse: { type: Sequelize.BOOLEAN, defaultValue: false },
     },
     {
+      tableName: 'player_invite',
+      sequelize: db,
       hooks: {
         beforeCreate: function(invite) {
           if (!invite.uuid) {
@@ -22,9 +32,8 @@ module.exports = function Invite(Sequelize, db) {
           }
         },
       },
-      methods: {},
     }
   );
 
-  return Invite;
-};
+  return PlayerInvite;
+}
