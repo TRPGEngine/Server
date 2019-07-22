@@ -319,7 +319,7 @@ class Application extends events.EventEmitter {
   }
 
   // 支持get('xxx.xxx')获取
-  get<T = string | number | {}>(path: string, defaultValue: any = ''): T {
+  get<T = string | number | any>(path: string, defaultValue: any = ''): T {
     return _.get<any, any, T>(this.settings, path, defaultValue);
   }
 
