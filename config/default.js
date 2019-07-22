@@ -42,7 +42,6 @@ module.exports = {
   },
   redisUrl: '',
   webserviceHomepage: '/admin/home',
-  apihost: 'http://127.0.0.1:23256',
   oauth: {
     // qq互联相关信息 required!
     qqconnect: {
