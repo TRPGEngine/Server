@@ -110,5 +110,6 @@ export default class Core extends BasePackage {
       app: this.app.webservice.app,
       path: '/core/graphql',
     });
+    debug('GraphQL Service Start!');
   }
 }
