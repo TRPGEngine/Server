@@ -10,6 +10,7 @@ import CoreRouter from './routers/core';
 import { generateSchema } from './graphql/generate-schema';
 
 const SOCKET_PREFIX = 'metrics:socket:event:';
+const WEBSERVICE_PREFIX = 'metrics:webservice:route:';
 
 export default class Core extends BasePackage {
   public name: string = 'Core';
@@ -65,6 +66,34 @@ export default class Core extends BasePackage {
           });
         }
         await CoreMetrics.bulkCreate(socketRecord);
+
+        // 处理 webservice route 事件统计
+        const webserviceKeys = metricsRecordKeys.filter((key) =>
+          key.startsWith(WEBSERVICE_PREFIX)
+        );
+        const webserviceRecord = [];
+        for (const key of webserviceKeys) {
+          const vals = await this.app.cache.lget(key);
+          this.app.cache.lclear(key, 0, vals.length);
+          const arr = vals.map((v) => Number(v) || 0);
+
+          // 计算平均值与最大最小值
+          const avg = arr.reduce((prev, cur) => prev + cur, 0);
+          const max = Math.max(...arr);
+          const min = Math.min(...arr);
+          const count = arr.length;
+
+          webserviceRecord.push({
+            name: key.substr(WEBSERVICE_PREFIX.length),
+            date,
+            type: 'route',
+            avg_usage: avg,
+            min_usage: min,
+            max_usage: max,
+            count,
+          });
+        }
+        await CoreMetrics.bulkCreate(webserviceRecord);
       }
     );
   }

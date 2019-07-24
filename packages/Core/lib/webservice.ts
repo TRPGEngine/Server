@@ -17,6 +17,7 @@ const debug = Debug('trpg:webservice');
 const koaDebug = Debug('trpg:webservice:koa');
 import { getLogger } from './logger';
 const appLogger = getLogger('application');
+import _ from 'lodash';
 
 import { TRPGApplication } from '../types/app';
 import { CacheValue } from './cache';
@@ -131,6 +132,19 @@ export default class WebService {
     this.use(bodyParser());
     this.use(serve(publicDir));
     this.use(session(this.sessionOpt, this._app));
+    this.use(async (ctx, next) => {
+      const url = ctx.url;
+      if (_.isString(url) && url.startsWith('/api')) {
+        const startDate = new Date().valueOf();
+        await next();
+        const usageDate = new Date().valueOf() - startDate;
+
+        // 记录用时
+        setTimeout(() => {
+          this.recordWebserviceTime(url, usageDate);
+        }, 0);
+      }
+    });
 
     if (this.trpgapp.get('env') === 'development') {
       // 开发环境
@@ -209,7 +223,7 @@ export default class WebService {
     }
 
     // stat
-    router.get('/stat', async (ctx) => {
+    router.get('/api/stat', async (ctx) => {
       ctx.body = await fs.readJson(path.resolve(process.cwd(), './stat.json'));
     });
 
@@ -255,6 +269,17 @@ export default class WebService {
 
   getHttpServer() {
     return this._server;
+  }
+
+  /**
+   * 记录 webservice route 服务的用时
+   * @param path 访问请求的请求地址
+   * @param millisecond 请求用时
+   */
+  recordWebserviceTime(path: string, millisecond: number) {
+    const cacheKey = `metrics:webservice:route:${path}`;
+
+    this.trpgapp.cache.rpush(cacheKey, millisecond);
   }
 
   /**
