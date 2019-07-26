@@ -1,6 +1,6 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:chat');
-const event = require('./event');
+import * as event from './event';
 
 module.exports = ChatComponent;
 
@@ -216,9 +216,7 @@ function initSocket() {
   let app = this;
   app.registerEvent('chat::message', event.message);
   app.registerEvent('chat::getConverses', event.getConverses);
-  // app.registerEvent('chat::createConverse', event.createConverse); // 弃用
   app.registerEvent('chat::removeConverse', event.removeConverse);
-  // app.registerEvent('chat::getChatLog', event.getChatLog);
   app.registerEvent('chat::getUserChatLog', event.getUserChatLog);
   app.registerEvent('chat::getConverseChatLog', event.getConverseChatLog);
   app.registerEvent('chat::getAllUserConverse', event.getAllUserConverse);

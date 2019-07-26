@@ -2,7 +2,7 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:chat:event');
 const generateUUID = require('uuid/v4');
 
-let addChatLog = function addChatLog(messagePkg) {
+export const addChatLog = function addChatLog(messagePkg) {
   let app = this;
   let log = app.chat.log;
   if (!!log && !!messagePkg) {
@@ -26,66 +26,8 @@ let addChatLog = function addChatLog(messagePkg) {
   }
 };
 
-// 弃用
-// let saveChatLog = function saveChatLog() {
-//   let app = this;
-//   let logList = app.chat.log;
-//   let cacheList = Object.assign([], logList);// 缓存区
-//   logList.splice(0, cacheList.length);
-//   app.storage.connect(function(db) {
-//     let Log = db.models.chat_log;
-//     Log.create(cacheList, function(err) {
-//       db.close();
-//       if(!!err) {
-//         console.warn('try to save log list error:', cacheList);
-//         console.warn('saveChatLog Error:', err);
-//       }
-//     })
-//   });
-//
-//   debug('chat log auto saving...');
-// }
-
-// 弃用
-// let getChatLog = async function getChatLog(data, cb) {
-//   let app = this.app;
-//   let logList = app.chat.log;
-//   let converse_uuid = data.converse_uuid;
-//   let offsetDate = data.offsetDate || '';
-//   let limit = data.limit || 10;
-//   if(!converse_uuid) {
-//     cb({result: false, msg: '缺少必要参数'})
-//     return;
-//   }
-//
-//   try {
-//     let list = [];
-//     let db = await app.storage.connectAsync();
-//     if(!offsetDate) {
-//       // 初始获取聊天记录
-//       let logs = await db.models.chat_log.find().order('-date').limit(limit).findAsync({converse_uuid});
-//       list = list.concat(logs);
-//       // 获取缓存中的聊天记录
-//       for (log of logList) {
-//         if(log.converse_uuid === converse_uuid) {
-//           list.push(log);
-//           continue;
-//         }
-//       }
-//     }else {
-//       let dateCond = app.storage._orm.lte(new Date(offsetDate));
-//       let logs = await db.models.chat_log.find().order('-date').limit(limit).findAsync({converse_uuid, date: dateCond});
-//       list = list.concat(logs);
-//     }
-//     cb({result: true, list});
-//     db.close();
-//   }catch (err) {
-//     cb({result: false, msg: err.toString()})
-//   }
-// }
-
 // 获取某一用户与当前用户的聊天记录
-let getUserChatLog = async function getUserChatLog(data, cb, db) {
+export const getUserChatLog = async function getUserChatLog(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
   const logList = app.chat.log;
@@ -148,7 +90,11 @@ let getUserChatLog = async function getUserChatLog(data, cb, db) {
   return { list };
 };
 
-let getConverseChatLog = async function getConverseChatLog(data, cb, db) {
+export const getConverseChatLog = async function getConverseChatLog(
+  data,
+  cb,
+  db
+) {
   const app = this.app;
   const socket = this.socket;
   const logList = app.chat.log;
@@ -208,7 +154,11 @@ let getConverseChatLog = async function getConverseChatLog(data, cb, db) {
   return { list };
 };
 
-let getAllUserConverse = async function getAllUserConverse(data, cb, db) {
+export const getAllUserConverse = async function getAllUserConverse(
+  data,
+  cb,
+  db
+) {
   const app = this.app;
   const socket = this.socket;
   const Op = app.storage.Op;
@@ -266,7 +216,7 @@ let getAllUserConverse = async function getAllUserConverse(data, cb, db) {
   return { senders };
 };
 
-let getOfflineUserConverse = async function getOfflineUserConverse(
+export const getOfflineUserConverse = async function getOfflineUserConverse(
   data,
   cb,
   db
@@ -337,7 +287,7 @@ let getOfflineUserConverse = async function getOfflineUserConverse(
   return { senders };
 };
 
-let message = function message(data, cb) {
+export const message = function message(data, cb) {
   let app = this.app;
   let socket = this.socket;
   if (!!app.player) {
@@ -405,65 +355,7 @@ let message = function message(data, cb) {
   }
 };
 
-// 会话创建用于多人会话, 创建团以后自动生成一个团会话
-// !!! 弃用
-let createConverse = async function createConverse(data, cb) {
-  let app = this.app;
-  let socket = this.socket;
-
-  try {
-    let player = app.player.list.find(socket);
-    if (!player) {
-      cb({ result: false, msg: '尚未登录' });
-      return;
-    }
-
-    let db = await app.storage.connectAsync();
-    let uuid = data.uuid;
-    let type = data.type || 'user';
-    let name = data.name;
-    if (type === 'user') {
-      let convUser = await db.models.player_user.findOne({ where: { uuid } });
-      if (!convUser) {
-        cb({ result: false, msg: '目标用户不存在' });
-        return;
-      }
-
-      let converse;
-      await db.transactionAsync(async () => {
-        let user = await db.models.player_user.findOne({
-          where: { uuid: player.uuid },
-        });
-        converse = await db.models.chat_converse.createAsync({
-          uuid: generateUUID(),
-          type: data.type || 'user',
-          name: name || '',
-          icon: '', // 在之后可以对多人会话进行icon修改操作
-          owner_id: user.id,
-        });
-        debug('create converse success: %s', JSON.stringify(converse));
-        converse.addParticipants([user, convUser], () => {});
-        // app.chat.converses[converse.uuid] = Object.assign({}, converse);
-        app.chat.addConverse();
-      });
-
-      cb({ result: true, data: converse });
-    }
-    if (type === 'group') {
-      debug('创建用户组会话失败。尚未实现');
-    } else {
-      debug(
-        'create converse failed, try to create undefined type of converse: %o',
-        data
-      );
-    }
-  } catch (err) {
-    console.error(err);
-    cb({ result: false, msg: err.toString() });
-  }
-};
-
-let removeConverse = async function removeConverse(data, cb, db) {
+export const removeConverse = async function removeConverse(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
@@ -491,8 +383,10 @@ let removeConverse = async function removeConverse(data, cb, db) {
   return true;
 };
 
-// 获取多人会话列表
-let getConverses = async function getConverses(data, cb, db) {
+/**
+ * 获取多人会话列表
+ */
+export const getConverses = async function getConverses(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
@@ -511,7 +405,14 @@ let getConverses = async function getConverses(data, cb, db) {
   return { list: converses };
 };
 
-let updateCardChatData = async function updateCardChatData(data, cb, db) {
+/**
+ * 更新卡片消息内置数据
+ */
+export const updateCardChatData = async function updateCardChatData(
+  data,
+  cb,
+  db
+) {
   const app = this.app;
   const socket = this.socket;
   const Op = app.storage.Op;
@@ -559,8 +460,10 @@ let updateCardChatData = async function updateCardChatData(data, cb, db) {
   return { log };
 };
 
-// 发送正在输入信号
-const startWriting = async function startWriting(data, cb, db) {
+/**
+ * 发送正在输入信号
+ */
+export const startWriting = async function startWriting(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
   const player = app.player.list.find(socket);
@@ -583,8 +486,10 @@ const startWriting = async function startWriting(data, cb, db) {
   }
 };
 
-// 发送停止输入信号
-const stopWriting = async function stopWriting(data, cb, db) {
+/**
+ * 发送停止输入信号
+ */
+export const stopWriting = async function stopWriting(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
   const player = app.player.list.find(socket);
@@ -606,17 +511,3 @@ const stopWriting = async function stopWriting(data, cb, db) {
     }
   }
 };
-
-exports.addChatLog = addChatLog;
-exports.message = message;
-exports.getConverses = getConverses;
-exports.createConverse = createConverse;
-exports.removeConverse = removeConverse;
-// exports.getChatLog = getChatLog;
-exports.getUserChatLog = getUserChatLog;
-exports.getConverseChatLog = getConverseChatLog;
-exports.getAllUserConverse = getAllUserConverse;
-exports.getOfflineUserConverse = getOfflineUserConverse;
-exports.updateCardChatData = updateCardChatData;
-exports.startWriting = startWriting;
-exports.stopWriting = stopWriting;
