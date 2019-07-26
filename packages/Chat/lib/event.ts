@@ -26,7 +26,9 @@ export const addChatLog = function addChatLog(messagePkg) {
   }
 };
 
-// 获取某一用户与当前用户的聊天记录
+/**
+ * 获取某一用户与当前用户的聊天记录
+ */
 export const getUserChatLog = async function getUserChatLog(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
@@ -55,6 +57,7 @@ export const getUserChatLog = async function getUserChatLog(data, cb, db) {
   };
 
   let list = [];
+  let nomore = false;
   if (!offsetDate) {
     // 初始获取聊天记录
     let logs = await db.models.chat_log.findAll({
@@ -62,6 +65,10 @@ export const getUserChatLog = async function getUserChatLog(data, cb, db) {
       limit,
       order: [['date', 'DESC']],
     });
+    if (logs.length < limit) {
+      // 如果取到的数据量少于限制，则表示没有更多数据了
+      nomore = true;
+    }
     list = list.concat(logs);
     // 获取缓存中的聊天记录
     for (const log of logList) {
@@ -85,11 +92,18 @@ export const getUserChatLog = async function getUserChatLog(data, cb, db) {
       limit,
       order: [['date', 'DESC']],
     });
+    if (logs.length < limit) {
+      // 如果取到的数据量少于限制，则表示没有更多数据了
+      nomore = true;
+    }
     list = list.concat(logs);
   }
-  return { list };
+  return { list, nomore };
 };
 
+/**
+ * 获取会话聊天记录
+ */
 export const getConverseChatLog = async function getConverseChatLog(
   data,
   cb,
@@ -113,6 +127,7 @@ export const getConverseChatLog = async function getConverseChatLog(
   let selfUUID = player.uuid;
 
   let list = [];
+  let nomore = false;
   let where = {
     converse_uuid,
     [Op.or]: [
@@ -129,6 +144,10 @@ export const getConverseChatLog = async function getConverseChatLog(
       limit,
       order: [['date', 'DESC']],
     });
+    if (logs.length < limit) {
+      // 如果取到的数据量少于限制，则表示没有更多数据了
+      nomore = true;
+    }
     list = list.concat(logs);
     // 获取缓存中的聊天记录
     for (let log of logList) {
@@ -149,9 +168,13 @@ export const getConverseChatLog = async function getConverseChatLog(
       limit,
       order: [['date', 'DESC']],
     });
+    if (logs.length < limit) {
+      // 如果取到的数据量少于限制，则表示没有更多数据了
+      nomore = true;
+    }
     list = list.concat(logs);
   }
-  return { list };
+  return { list, nomore };
 };
 
 export const getAllUserConverse = async function getAllUserConverse(
