@@ -154,8 +154,11 @@ export class RedisCache implements ICache {
     this.redis = new Redis(this.url);
   }
 
-  private genKey(key: string) {
-    return `trpg:${key}`;
+  private genKey(key: string): string {
+    if (!key.startsWith('trpg:')) {
+      return `trpg:${key}`;
+    }
+    return key;
   }
 
   set(
@@ -163,35 +166,40 @@ export class RedisCache implements ICache {
     value: CacheValue,
     options: CacheOptions
   ): Promise<CacheValue> {
+    key = this.genKey(key);
     options = Object.assign({}, defaultOption, options);
 
     debug('[redis]', `set ${key} to ${JSON.stringify(value)}`);
-    this.redis.set(this.genKey(key), JSON.stringify(value));
+    this.redis.set(key, JSON.stringify(value));
     if (options.expires > 0) {
       // 使用redis内置的过期机制
-      this.redis.pexpire(this.genKey(key), options.expires);
+      this.redis.pexpire(key, options.expires);
     }
-    return this.redis.set(this.genKey(key), JSON.stringify(value));
+    return this.redis.set(key, JSON.stringify(value));
   }
 
   rpush(key: string, ...values: any[]): void {
+    key = this.genKey(key);
     this.redis.rpush(key, ...values);
     debug('[redis]', `rpush ${key} with ${values.join(',')}`);
   }
 
+  // ltrim 为保留一部分。即清理的逻辑下保留的数据应为 (start + size, -1)
   lclear(key: string, start: number, size: number): void {
-    // ltrim 为保留一部分。即清理的逻辑下保留的数据应为 (start + size, -1)
+    key = this.genKey(key);
     this.redis.ltrim(key, start + size, -1);
     debug('[redis]', `lclear ${key} in range [${start}, ${start + size}]`);
   }
 
   async keys(glob: string): Promise<string[]> {
     // TODO: 需要使用scan来优化
+    glob = this.genKey(glob);
     return await this.redis.keys(glob);
   }
 
   async get(key: string): Promise<CacheValue> {
-    const val = await this.redis.get(this.genKey(key));
+    key = this.genKey(key);
+    const val = await this.redis.get(key);
     return JSON.parse(val);
   }
 
@@ -205,12 +213,14 @@ export class RedisCache implements ICache {
   }
 
   async lget(key: string): Promise<CacheValue[]> {
+    key = this.genKey(key);
     const arr = await this.redis.lrange(key, 0, -1); // 获取所有值
     return arr;
   }
 
   remove(key: string): Promise<number> {
-    return this.redis.del(this.genKey(key));
+    key = this.genKey(key);
+    return this.redis.del(key);
   }
 
   close(): void {
