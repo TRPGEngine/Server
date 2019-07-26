@@ -46,6 +46,12 @@ export interface ICache {
    * @param key 键
    */
   lget(key: string): Promise<CacheValue[]>;
+
+  /**
+   * 返回集合中的所有的成
+   * @param key 键
+   */
+  smembers(key: string): Promise<string[]>;
   remove(key: string): Promise<any>;
   close(): void;
 }
@@ -132,6 +138,15 @@ export class Cache implements ICache {
     }
   }
 
+  async smembers(key: string): Promise<string[]> {
+    const vals = await this.get(key);
+    if (Array.isArray(vals)) {
+      return vals.filter((item, index, arr) => arr.indexOf(item) === index); // 数组去重
+    } else {
+      return vals as any;
+    }
+  }
+
   remove(key: string) {
     if (this.data[key]) {
       delete this.data[key];
@@ -210,6 +225,12 @@ export class RedisCache implements ICache {
       return _.zipObject(keys, values);
     }
     return Promise.resolve(null);
+  }
+
+  async smembers(key: string): Promise<string[]> {
+    key = this.genKey(key);
+    const members = await this.redis.smembers(key);
+    return members;
   }
 
   async lget(key: string): Promise<CacheValue[]> {
