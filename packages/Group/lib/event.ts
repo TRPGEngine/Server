@@ -645,7 +645,7 @@ exports.removeGroupActor = async function(data, cb, db) {
   let isGroupActorExist = await db.models.group_actor.findOne({
     where: {
       uuid: groupActorUUID,
-      group_id: group.id,
+      groupId: group.id,
     },
   });
   if (!isGroupActorExist) {

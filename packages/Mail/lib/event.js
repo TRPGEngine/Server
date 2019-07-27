@@ -57,7 +57,7 @@ exports.bindMail = async function bindMail(data, cb, db) {
   let mail = await db.models.mail_list.createAsync({
     user_uuid: userUUID,
     email_address: address,
-    owner_id: player.user.id,
+    ownerId: player.user.id,
   });
 
   const subject = '绑定TRPG账户电子邮箱';
