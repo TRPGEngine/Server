@@ -189,6 +189,7 @@ export default class SocketService {
               eventName,
               data
             );
+            app.reportservice.reportError(err); // 使用汇报服务汇报错误
           }
         }
       },

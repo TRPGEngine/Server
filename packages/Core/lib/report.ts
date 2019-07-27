@@ -21,16 +21,14 @@ function Report(reportSetting) {
 }
 
 Report.prototype.reportError = function(err, options = null) {
-  if (!this.installed) {
-    return;
-  }
+  console.error(err); // 在终端里输出一遍
 
   const setting = this._setting;
   if (setting.logger) {
     errorLogger.error(err);
   }
 
-  if (setting.sentry) {
+  if (this.installed) {
     let errorFn;
     if (typeof err === 'string') {
       // 如果不是一个错误类型的。提交错误文本信息到sentry
