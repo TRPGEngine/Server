@@ -25,7 +25,7 @@ export default function ActorDefinition(Sequelize: Orm, db: DBInstance) {
     {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       name: { type: Sequelize.STRING, required: true },
-      desc: { type: Sequelize.STRING },
+      desc: { type: Sequelize.TEXT },
       avatar: { type: Sequelize.STRING },
       template_uuid: { type: Sequelize.STRING, required: true },
       info: { type: Sequelize.JSON },

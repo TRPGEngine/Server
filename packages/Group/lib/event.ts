@@ -563,6 +563,9 @@ exports.getGroupActors = async function getGroupActors(data, cb, db) {
   return { actors: res };
 };
 
+/**
+ * 添加团人物
+ */
 exports.addGroupActor = async function addGroupActor(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
@@ -599,6 +602,8 @@ exports.addGroupActor = async function addGroupActor(data, cb, db) {
   let groupActor;
   await db.transactionAsync(async () => {
     groupActor = await db.models.group_actor.create({
+      name: actor.name,
+      desc: actor.desc,
       actor_uuid: actorUUID,
       actor_info: {},
       avatar: actor.avatar,

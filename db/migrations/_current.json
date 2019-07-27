@@ -710,7 +710,7 @@
                 },
                 "desc": {
                     "field": "desc",
-                    "seqType": "Sequelize.STRING"
+                    "seqType": "Sequelize.TEXT"
                 },
                 "avatar": {
                     "field": "avatar",
@@ -1566,9 +1566,17 @@
                     "field": "actor_info",
                     "seqType": "Sequelize.JSON"
                 },
+                "name": {
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "desc": {
+                    "field": "desc",
+                    "seqType": "Sequelize.TEXT"
+                },
                 "avatar": {
                     "field": "avatar",
-                    "seqType": "Sequelize.TEXT"
+                    "seqType": "Sequelize.STRING"
                 },
                 "passed": {
                     "defaultValue": {
@@ -2497,5 +2505,5 @@
             "indexes": []
         }
     },
-    "revision": 16
+    "revision": 17
 }
