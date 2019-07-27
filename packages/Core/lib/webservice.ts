@@ -144,6 +144,8 @@ export default class WebService {
         setTimeout(() => {
           this.recordWebserviceTime(url, usageDate);
         }, 0);
+      } else {
+        return next();
       }
     });
 
@@ -229,7 +231,7 @@ export default class WebService {
     });
 
     // api
-    for (var apiPath in this.webApi) {
+    for (let apiPath in this.webApi) {
       let path = apiPath;
       if (apiPath[0] !== '/') {
         path = '/' + apiPath;
