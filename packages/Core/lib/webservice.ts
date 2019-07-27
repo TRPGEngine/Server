@@ -92,6 +92,7 @@ export default class WebService {
     this.initMiddleware();
     this.initContext();
     this.initRoute();
+    this.initForward();
     this.initError();
   }
 
@@ -239,6 +240,16 @@ export default class WebService {
       appLogger.info('register web api [%s] success!', apiPath);
     }
     this.use(router.routes()).use(router.allowedMethods());
+  }
+
+  /**
+   * 初始化事件转发
+   */
+  initForward() {
+    // 转发外部传来的connection 事件
+    this.trpgapp.on('connection', (connection) => {
+      this.app.emit('connection', connection);
+    });
   }
 
   /**

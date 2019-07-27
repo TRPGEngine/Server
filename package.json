@@ -43,6 +43,7 @@
     "debug": "^4.1.1",
     "execa": "^1.0.0",
     "fs-extra": "^8.0.1",
+    "get-port": "^5.0.0",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.11",
     "memoize-one": "^5.0.4",
