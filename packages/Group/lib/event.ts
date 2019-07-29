@@ -564,6 +564,55 @@ exports.getGroupActors = async function getGroupActors(data, cb, db) {
 };
 
 /**
+ * 获取团所有成员选择的人物卡的uuid
+ * 返回一个mapping: {成员UUID: 团人物卡UUID}
+ */
+const getGroupActorMapping: EventFunc<{
+  groupUUID: string;
+}> = async function getGroupActorMapping(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.list.find(socket);
+  if (!player) {
+    throw '用户不存在，请检查登录状态';
+  }
+
+  const selfUUID = player.user.uuid;
+  const { groupUUID } = data;
+
+  const group = await (db.models.group_group as any).findOne({
+    where: { uuid: groupUUID },
+  });
+  if (!group) {
+    throw '找不到团信息';
+  }
+
+  const members = await group.getMembers();
+  const mapping = _.fromPairs(
+    members.map((member) => {
+      const userUUID = _.get(member, 'uuid');
+      const groupActorUUID = _.get(
+        member,
+        'group_group_members.selected_group_actor_uuid'
+      );
+
+      if (_.isNil(groupActorUUID)) {
+        return [];
+      }
+
+      return [userUUID, groupActorUUID];
+    })
+  );
+  if (mapping[selfUUID]) {
+    mapping['self'] = mapping[selfUUID];
+  }
+
+  return { mapping };
+};
+exports.getGroupActorMapping = getGroupActorMapping;
+
+/**
  * 添加团人物
  */
 exports.addGroupActor = async function addGroupActor(data, cb, db) {
