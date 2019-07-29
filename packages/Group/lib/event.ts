@@ -825,7 +825,7 @@ const setPlayerSelectedGroupActor: EventFunc<{
   for (let member of members) {
     if (member.uuid === userUUID) {
       member.group_group_members.selected_group_actor_uuid = groupActorUUID;
-      await member.save();
+      await member.group_group_members.save();
       isSaved = true;
       break;
     }
