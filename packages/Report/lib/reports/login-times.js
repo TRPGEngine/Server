@@ -3,7 +3,9 @@ module.exports = {
     const app = this;
     const Op = app.storage.Op;
     let login_count = await db.models.player_login_log.count({
-      createdAt: { [Op.between]: [start, end] },
+      where: {
+        createdAt: { [Op.between]: [start, end] },
+      },
     });
     let user_count = await db.models.player_login_log
       .aggregate('user_uuid', 'DISTINCT', {
@@ -25,7 +27,9 @@ module.exports = {
     const app = this;
     const Op = app.storage.Op;
     let login_count = await db.models.player_login_log.count({
-      createdAt: { [Op.between]: [start, end] },
+      where: {
+        createdAt: { [Op.between]: [start, end] },
+      },
     });
     let user_count = await db.models.player_login_log
       .aggregate('user_uuid', 'DISTINCT', {
@@ -47,7 +51,9 @@ module.exports = {
     const app = this;
     const Op = app.storage.Op;
     let login_count = await db.models.player_login_log.count({
-      createdAt: { [Op.between]: [start, end] },
+      where: {
+        createdAt: { [Op.between]: [start, end] },
+      },
     });
     let user_count = await db.models.player_login_log
       .aggregate('user_uuid', 'DISTINCT', {

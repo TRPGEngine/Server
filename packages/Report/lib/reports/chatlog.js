@@ -3,7 +3,9 @@ module.exports = {
     const app = this;
     const Op = app.storage.Op;
     let count = await db.models.chat_log.count({
-      date: { [Op.between]: [start, end] },
+      where: {
+        date: { [Op.between]: [start, end] },
+      },
     });
     await db.models.report_chatlog_daily.create({
       count,
@@ -15,7 +17,9 @@ module.exports = {
     const app = this;
     const Op = app.storage.Op;
     let count = await db.models.chat_log.count({
-      date: { [Op.between]: [start, end] },
+      where: {
+        date: { [Op.between]: [start, end] },
+      },
     });
     await db.models.report_chatlog_weekly.create({
       count,
@@ -27,7 +31,9 @@ module.exports = {
     const app = this;
     const Op = app.storage.Op;
     let count = await db.models.chat_log.count({
-      date: { [Op.between]: [start, end] },
+      where: {
+        date: { [Op.between]: [start, end] },
+      },
     });
     await db.models.report_chatlog_monthly.create({
       count,
