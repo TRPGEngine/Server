@@ -15,5 +15,5 @@
       "packages/*": ["packages/*"]
     }
   },
-  "include": ["packages/**/*", "lib/**/*"]
+  "include": ["packages/**/*", "lib/**/*", "types/**/*"]
 }

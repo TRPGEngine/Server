@@ -176,8 +176,20 @@ function redefineDb(db: DBInstance) {
   };
 }
 
+/**
+ * 用自定义的InitOption来代替原来的InitOptions.
+ * 因为原始的InitOption没法给ModelOptions传model类型
+ */
+export interface TRPGModelInitOptions<M extends Model<any, any> = Model>
+  extends ModelOptions<M> {
+  tableName: string; // 必须设定tableName
+  sequelize: Sequelize;
+}
 export class TRPGModel extends Model {
-  public static init(attributes: TRPGModelAttributes, options: InitOptions) {
+  public static init<M extends TRPGModel = TRPGModel>(
+    attributes: TRPGModelAttributes,
+    options: TRPGModelInitOptions<M>
+  ) {
     // 增加required
     for (let field in attributes) {
       const attr = attributes[field] as any;
@@ -191,5 +203,21 @@ export class TRPGModel extends Model {
     }
 
     Model.init.call(this, attributes, options);
+  }
+
+  // 方法别名 below
+  public static createAsync(
+    values?: object,
+    options?: SequelizeStatic.CreateOptions
+  ) {
+    return this.create(values, options);
+  }
+
+  public saveAsync(options?: SequelizeStatic.SaveOptions) {
+    return this.save(options);
+  }
+
+  public removeAsync(options?: SequelizeStatic.InstanceDestroyOptions) {
+    return this.destroy(options);
   }
 }

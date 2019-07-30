@@ -12,7 +12,7 @@ router.get('/:noteUUID', async (ctx, next) => {
     where: { uuid: noteUUID },
   });
   if (note) {
-    let user = await db.models.player_user.findByPk(note.owner_id);
+    let user = await db.models.player_user.findByPk(note.ownerId);
     let pkg = {
       author: user,
       note: note,

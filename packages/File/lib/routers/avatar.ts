@@ -2,7 +2,7 @@ import Router from 'koa-router';
 import upload from '../middleware/upload';
 import sha256 from '../middleware/sha256';
 import thumbnail from '../middleware/thumbnail';
-import allowMIME from '../middleware/allowMIME';
+import allowMIME from '../middleware/allow-mime';
 import _ from 'lodash';
 const avatarStorage = require('../middleware/storage/avatar');
 const auth = require('../middleware/auth');

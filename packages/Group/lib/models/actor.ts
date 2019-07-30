@@ -3,18 +3,25 @@ module.exports = function GroupActor(Sequelize, db) {
     'group_actor',
     {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
-      actor_uuid: { type: Sequelize.UUID },
-      actor_info: { type: Sequelize.JSON },
-      avatar: { type: Sequelize.TEXT },
+      actor_uuid: { type: Sequelize.UUID }, // 对应actor_actor的UUID
+      actor_info: { type: Sequelize.JSON }, // 团人物信息
+      name: { type: Sequelize.STRING },
+      desc: { type: Sequelize.TEXT },
+      avatar: { type: Sequelize.STRING },
       passed: { type: Sequelize.BOOLEAN, defaultValue: false },
       enabled: { type: Sequelize.BOOLEAN, defaultValue: true },
     },
     {
       methods: {
+        /**
+         * 获取团人物卡信息
+         */
         getObjectAsync: async function() {
           let actor = await this.getActor();
           return {
             uuid: this.uuid,
+            name: this.name,
+            desc: this.desc,
             actor_uuid: this.actor_uuid,
             actor_info: this.actor_info,
             avatar: this.avatar,

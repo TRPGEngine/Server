@@ -23,6 +23,10 @@ module.exports = {
       },
     },
   },
+  graphql: {
+    // 默认在开发环境打开GraphQL
+    enable: process.env.NODE_ENV === 'development' ? true : false,
+  },
   jwt: {
     // json web token 相关设定
     secret: randomString(10),
@@ -38,7 +42,6 @@ module.exports = {
   },
   redisUrl: '',
   webserviceHomepage: '/admin/home',
-  apihost: 'http://127.0.0.1:23256',
   oauth: {
     // qq互联相关信息 required!
     qqconnect: {

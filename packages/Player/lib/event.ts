@@ -291,9 +291,9 @@ exports.updateInfo = async function updateInfo(data, cb, db) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let user_id = player.user.id;
+  let userId = player.user.id;
 
-  let user = await db.models.player_user.findByPk(user_id);
+  let user = await db.models.player_user.findByPk(userId);
   // TODO: 检测用户信息合法性(如禁止敏感字符作为昵称)
   user.updateInfo(data);
   await user.saveAsync();
@@ -313,8 +313,8 @@ exports.changePassword = async function changePassword(data, cb, db) {
   oldPassword = md5(oldPassword);
   newPassword = md5(newPassword);
 
-  let user_id = player.user.id;
-  let user = await db.models.player_user.findByPk(user_id);
+  let userId = player.user.id;
+  let user = await db.models.player_user.findByPk(userId);
   if (user.password !== oldPassword) {
     throw '原密码不正确';
   }
@@ -545,7 +545,7 @@ exports.agreeFriendInvite = async function agreeFriendInvite(data, cb, db) {
     // 发送更新好友的通知
     let player1 = app.player.list.get(uuid1);
     if (player1) {
-      player1.socket.emit('player::addFriend', { uuid: uuid2 });
+      player1.socket.emit('player::appendFriend', { uuid: uuid2 });
     }
   });
 

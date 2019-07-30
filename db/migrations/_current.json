@@ -146,7 +146,7 @@
                 },
                 "username": {
                     "required": true,
-                    "uniq": true,
+                    "unique": true,
                     "allowNull": false,
                     "field": "username",
                     "seqType": "Sequelize.STRING"
@@ -703,13 +703,14 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "name": {
-                    "require": true,
+                    "required": true,
+                    "allowNull": false,
                     "field": "name",
                     "seqType": "Sequelize.STRING"
                 },
                 "desc": {
                     "field": "desc",
-                    "seqType": "Sequelize.STRING"
+                    "seqType": "Sequelize.TEXT"
                 },
                 "avatar": {
                     "field": "avatar",
@@ -1565,9 +1566,17 @@
                     "field": "actor_info",
                     "seqType": "Sequelize.JSON"
                 },
+                "name": {
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "desc": {
+                    "field": "desc",
+                    "seqType": "Sequelize.TEXT"
+                },
                 "avatar": {
                     "field": "avatar",
-                    "seqType": "Sequelize.TEXT"
+                    "seqType": "Sequelize.STRING"
                 },
                 "passed": {
                     "defaultValue": {
@@ -2496,5 +2505,5 @@
             "indexes": []
         }
     },
-    "revision": 15
+    "revision": 17
 }

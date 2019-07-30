@@ -1,5 +1,6 @@
 import Debug from 'debug';
 import { EventFunc } from 'trpg/core';
+import _ from 'lodash';
 import { ActorTemplate } from './models/template';
 const debug = Debug('trpg:component:actor:event');
 
@@ -294,6 +295,7 @@ exports.updateActor = async function(data, cb, db) {
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
+  const userId = player.user.id;
 
   let uuid = data.uuid;
   let name = data.name;
@@ -309,8 +311,12 @@ exports.updateActor = async function(data, cb, db) {
 
   return await db.transactionAsync(async () => {
     let actor = await db.models.actor_actor.findOne({
-      where: { uuid },
+      where: { uuid, ownerId: userId },
     });
+    if (_.isNil(actor)) {
+      throw new Error('无法更新角色信息: 该角色不存在');
+    }
+
     let oldAvatar = actor.avatar.toString();
     actor.name = name;
     actor.avatar = avatar;

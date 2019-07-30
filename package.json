@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "dev": "cross-env DEBUG=trpg:* NODE_ENV=development npm run run:nodemon",
     "pro": "cross-env NODE_ENV=production npm run run:standard",
     "run:standard": "node standard.js",
-    "run:nodemon": "nodemon -e js,ts standard.js",
+    "run:nodemon": "nodemon -e js,ts -i *.marko.js standard.js",
     "packages:install": "sh packages/foreach.sh 'npm install'",
     "prettier:all": "prettier --write \"./packages/**/*.{js,ts}\"",
     "db:migrate:generate": "node ./cli.js generate-migrate",
@@ -43,6 +43,7 @@
     "debug": "^4.1.1",
     "execa": "^1.0.0",
     "fs-extra": "^8.0.1",
+    "get-port": "^5.0.0",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.11",
     "memoize-one": "^5.0.4",
@@ -58,6 +59,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^7.0.0",
+    "@types/koa-bodyparser": "^4.3.0",
     "@types/koa-router": "^7.0.42",
     "@types/lodash": "^4.14.126",
     "@types/memoize-one": "^4.1.1",

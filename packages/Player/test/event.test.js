@@ -70,27 +70,27 @@ describe('user action', () => {
 
   test.todo('findUser should be ok');
 
-  test('addFriend should be ok', async () => {
-    let testUser = await db.models.player_user.findOne({
-      where: {
-        username: 'admin5',
-      },
-    });
-    expect(testUser).toBeTruthy();
-    let targetUUID = testUser.uuid;
+  // test('addFriend should be ok', async () => {
+  //   let testUser = await db.models.player_user.findOne({
+  //     where: {
+  //       username: 'admin5',
+  //     },
+  //   });
+  //   expect(testUser).toBeTruthy();
+  //   let targetUUID = testUser.uuid;
 
-    let ret = await emitEvent('player::addFriend', {
-      uuid: targetUUID,
-    });
-    expect(ret.result).toBe(true);
+  //   let ret = await emitEvent('player::addFriend', {
+  //     uuid: targetUUID,
+  //   });
+  //   expect(ret.result).toBe(true);
 
-    // 查询数据库校验是否写入数据库
-    let friends = await userInfoDbInstance.getFriend();
-    expect(friends).toHaveProperty('length');
+  //   // 查询数据库校验是否写入数据库
+  //   let friends = await userInfoDbInstance.getFriend();
+  //   expect(friends).toHaveProperty('length');
 
-    let friendIndex = _.findIndex(friends, { uuid: targetUUID });
-    expect(friendIndex).toBeGreaterThanOrEqual(0);
-  });
+  //   let friendIndex = _.findIndex(friends, { uuid: targetUUID });
+  //   expect(friendIndex).toBeGreaterThanOrEqual(0);
+  // });
 
   test('getFriends should be ok', async () => {
     let ret = await emitEvent('player::getFriends');

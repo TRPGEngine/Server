@@ -8,4 +8,4 @@ const packages = fs
   .filter((p) => fs.existsSync(p) && fs.statSync(p).isDirectory())
   .map((p) => path.basename(p));
 
-module.exports = ['lib', 'config', 'doc', 'db', 'all', ...packages];
+module.exports = ['lib', 'config', 'doc', 'db', 'all', 'misc', ...packages];

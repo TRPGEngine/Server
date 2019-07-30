@@ -86,6 +86,7 @@ export default class Group extends BasePackage {
     this.regSocketEvent('getGroupList', event.getGroupList);
     this.regSocketEvent('getGroupMembers', event.getGroupMembers);
     this.regSocketEvent('getGroupActors', event.getGroupActors);
+    this.regSocketEvent('getGroupActorMapping', event.getGroupActorMapping);
     this.regSocketEvent('addGroupActor', event.addGroupActor);
     this.regSocketEvent('removeGroupActor', event.removeGroupActor);
     this.regSocketEvent('agreeGroupActor', event.agreeGroupActor);

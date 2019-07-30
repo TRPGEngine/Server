@@ -319,8 +319,8 @@ class Application extends events.EventEmitter {
   }
 
   // 支持get('xxx.xxx')获取
-  get(path: string, defaultValue = '') {
-    return _.get(this.settings, path, defaultValue);
+  get<T = string | number | any>(path: string, defaultValue: any = ''): T {
+    return _.get<any, any, T>(this.settings, path, defaultValue);
   }
 
   enabled(setting: string) {
@@ -359,14 +359,14 @@ class Application extends events.EventEmitter {
         component = new component(this);
         (component as BasePackage).onLoad();
         applog(
-          'load component into comments list(length: %d). %s',
+          'load component into components list(index: %d). %s',
           this.components.length,
           component.name
         );
       } else {
         // 旧包处理
         applog(
-          'load component into comments list(length: %d). %o',
+          'load component into components list(index: %d). %o',
           this.components.length,
           component
         );

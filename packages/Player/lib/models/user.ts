@@ -1,9 +1,76 @@
 import md5Encrypt from '../utils/md5';
 import randomString from 'crypto-random-string';
+import { Model, DBInstance, Orm } from 'trpg/core';
 
-module.exports = function User(Sequelize, db) {
-  let User = db.define(
-    'player_user',
+export class PlayerUser extends Model {
+  id: number;
+  uuid: string;
+  username: string;
+  password: string;
+  salt: string;
+  nickname: string;
+  avatar: string;
+  last_login: Date;
+  last_ip: string;
+  token: string;
+  app_token: string;
+  sex: '男' | '女' | '其他' | '保密';
+  sign: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
+
+  /**
+   * 生成一个长度为16的随机盐
+   */
+  static genSalt(): string {
+    return md5Encrypt(randomString(16));
+  }
+
+  getName() {
+    return this.nickname || this.username;
+  }
+
+  getJWTPayload() {
+    return {
+      uuid: this.uuid,
+      name: this.getName(),
+      avatar: this.avatar,
+    };
+  }
+
+  getInfo(includeToken = false) {
+    return {
+      username: this.username,
+      nickname: this.nickname || this.username,
+      uuid: this.uuid,
+      last_login: this.last_login,
+      createAt: this.createdAt,
+      id: this.id,
+      avatar: this.avatar,
+      token: includeToken ? this.token : '',
+      app_token: includeToken ? this.app_token : '',
+      sex: this.sex,
+      sign: this.sign,
+    };
+  }
+
+  updateInfo(data) {
+    // 数据保护
+    delete data.id;
+    delete data.username;
+    delete data.password;
+    delete data.uuid;
+    delete data.createAt;
+    delete data.token;
+    delete data.app_token;
+
+    return Object.assign(this, data);
+  }
+}
+
+export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
+  PlayerUser.init<PlayerUser>(
     {
       uuid: {
         type: Sequelize.UUID,
@@ -13,7 +80,7 @@ module.exports = function User(Sequelize, db) {
       username: {
         type: Sequelize.STRING,
         required: true,
-        uniq: true,
+        unique: true,
       },
       password: { type: Sequelize.STRING, required: true },
       salt: { type: Sequelize.STRING },
@@ -30,6 +97,8 @@ module.exports = function User(Sequelize, db) {
       sign: { type: Sequelize.STRING },
     },
     {
+      tableName: 'player_user',
+      sequelize: db,
       paranoid: true,
       hooks: {
         beforeSave: function(user, options) {
@@ -38,50 +107,13 @@ module.exports = function User(Sequelize, db) {
           }
         },
       },
-      methods: {
-        getName: function() {
-          return this.nickname || this.username;
-        },
-        getInfo: function(includeToken = false) {
-          return {
-            username: this.username,
-            nickname: this.nickname || this.username,
-            uuid: this.uuid,
-            last_login: this.last_login,
-            createAt: this.createAt,
-            id: this.id,
-            avatar: this.avatar,
-            token: includeToken ? this.token : '',
-            app_token: includeToken ? this.app_token : '',
-            sex: this.sex,
-            sign: this.sign,
-          };
-        },
-        updateInfo: function(data) {
-          // 数据保护
-          delete data.id;
-          delete data.username;
-          delete data.password;
-          delete data.uuid;
-          delete data.createAt;
-          delete data.token;
-          delete data.app_token;
-
-          return Object.assign(this, data);
-        },
-      },
     }
   );
 
-  /**
-   * 生成一个盐值供用户加密时使用
-   * 盐值的计算公式为随机16位字符串的MD5散列值
-   */
-  User.genSalt = (): string => {
-    return md5Encrypt(randomString(16));
-  };
+  PlayerUser.belongsToMany(PlayerUser, {
+    through: 'player_friends',
+    as: 'friend',
+  });
 
-  User.belongsToMany(User, { through: 'player_friends', as: 'friend' });
-
-  return User;
-};
+  return PlayerUser;
+}

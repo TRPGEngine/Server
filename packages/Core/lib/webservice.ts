@@ -17,9 +17,11 @@ const debug = Debug('trpg:webservice');
 const koaDebug = Debug('trpg:webservice:koa');
 import { getLogger } from './logger';
 const appLogger = getLogger('application');
+import _ from 'lodash';
 
 import { TRPGApplication } from '../types/app';
 import { CacheValue } from './cache';
+import Application from './application';
 
 const publicDir = path.resolve(process.cwd(), './public');
 const jwtIssuer = 'trpg';
@@ -44,6 +46,13 @@ class SessionStore {
   }
 }
 
+interface WebServiceOpts {
+  app: Application;
+  port: number;
+  webApi: any;
+  homepage: string;
+}
+
 interface JWTConfig {
   secret: string;
 }
@@ -59,7 +68,7 @@ export default class WebService {
   sessionOpt: any;
   jwtConfig: JWTConfig;
 
-  constructor(opts) {
+  constructor(opts: WebServiceOpts) {
     this.trpgapp = this.context.trpgapp = opts.app;
     this.sessionOpt = {
       key: 'koa:trpg:sess',
@@ -83,6 +92,7 @@ export default class WebService {
     this.initMiddleware();
     this.initContext();
     this.initRoute();
+    this.initForward();
     this.initError();
   }
 
@@ -94,7 +104,7 @@ export default class WebService {
    * 初始化配置信息
    * @param opts 配置
    */
-  initConfig(opts) {
+  initConfig(opts: WebServiceOpts) {
     if (opts && opts.port && typeof opts.port === 'number') {
       this.port = opts.port;
     }
@@ -105,7 +115,7 @@ export default class WebService {
       this.homepage = opts.homepage;
     }
 
-    this.jwtConfig = opts.jwt;
+    this.jwtConfig = opts.app.get<JWTConfig>('jwt', {});
   }
 
   /**
@@ -123,6 +133,21 @@ export default class WebService {
     this.use(bodyParser());
     this.use(serve(publicDir));
     this.use(session(this.sessionOpt, this._app));
+    this.use(async (ctx, next) => {
+      const url = ctx.url;
+      if (_.isString(url) && url.startsWith('/api')) {
+        const startDate = new Date().valueOf();
+        await next();
+        const usageDate = new Date().valueOf() - startDate;
+
+        // 记录用时
+        setTimeout(() => {
+          this.recordWebserviceTime(url, usageDate);
+        }, 0);
+      } else {
+        return next();
+      }
+    });
 
     if (this.trpgapp.get('env') === 'development') {
       // 开发环境
@@ -201,12 +226,12 @@ export default class WebService {
     }
 
     // stat
-    router.get('/stat', async (ctx) => {
+    router.get('/api/stat', async (ctx) => {
       ctx.body = await fs.readJson(path.resolve(process.cwd(), './stat.json'));
     });
 
     // api
-    for (var apiPath in this.webApi) {
+    for (let apiPath in this.webApi) {
       let path = apiPath;
       if (apiPath[0] !== '/') {
         path = '/' + apiPath;
@@ -217,6 +242,16 @@ export default class WebService {
       appLogger.info('register web api [%s] success!', apiPath);
     }
     this.use(router.routes()).use(router.allowedMethods());
+  }
+
+  /**
+   * 初始化事件转发
+   */
+  initForward() {
+    // 转发外部传来的connection 事件
+    this.trpgapp.on('connection', (connection) => {
+      this.app.emit('connection', connection);
+    });
   }
 
   /**
@@ -250,6 +285,17 @@ export default class WebService {
   }
 
   /**
+   * 记录 webservice route 服务的用时
+   * @param path 访问请求的请求地址
+   * @param millisecond 请求用时
+   */
+  recordWebserviceTime(path: string, millisecond: number) {
+    const cacheKey = `metrics:webservice:route:${path}`;
+
+    this.trpgapp.cache.rpush(cacheKey, millisecond);
+  }
+
+  /**
    * 签名jwt
    * 过期时间一天
    * @param payload 签名内容包
@@ -265,9 +311,22 @@ export default class WebService {
    * 校验jwt
    * 返回校验后的结果
    */
-  jwtVerify = (token: string): string | object => {
-    return jwt.verify(token, this.jwtConfig.secret, {
-      issuer: jwtIssuer,
+  jwtVerify = (token: string): Promise<string | object> => {
+    return new Promise((resolve, reject) => {
+      jwt.verify(
+        token,
+        this.jwtConfig.secret,
+        {
+          issuer: jwtIssuer,
+        },
+        (err, decoded) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(decoded);
+          }
+        }
+      );
     });
   };
 }
