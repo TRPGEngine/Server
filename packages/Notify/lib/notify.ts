@@ -164,4 +164,5 @@ function initFunction() {
 function initSocket() {
   let app = this;
   app.registerEvent('notify::bindNotifyInfo', event.bindJPushNotifyInfo);
+  app.registerEvent('notify::bindUPushNotifyInfo', event.bindUPushNotifyInfo);
 }
