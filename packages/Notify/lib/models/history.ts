@@ -1,9 +1,20 @@
-module.exports = function NotifyHistory(Sequelize, db) {
-  let NotifyHistory = db.define(
-    'notify_history',
+import { Model } from 'trpg/core';
+
+export class NotifyHistory extends Model {
+  type: string;
+  platform: string;
+  registration_id: string; // 设备唯一标识
+  user_uuid: string;
+  user_tags: {};
+  notification: string;
+  message: string;
+}
+
+export default function NotifyHistoryDefinition(Sequelize, db) {
+  NotifyHistory.init(
     {
       type: {
-        type: Sequelize.ENUM('jpush'),
+        type: Sequelize.ENUM('jpush', 'upush'),
         required: true,
       },
       platform: {
@@ -26,9 +37,10 @@ module.exports = function NotifyHistory(Sequelize, db) {
       },
     },
     {
-      methods: {},
+      tableName: 'notify_history',
+      sequelize: db,
     }
   );
 
   return NotifyHistory;
-};
+}
