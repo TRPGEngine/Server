@@ -69,5 +69,10 @@ module.exports = {
       appKey: '',
       masterSecret: '',
     },
+    // 友盟推送服务接口所需要的秘钥
+    upush: {
+      appKey: '',
+      masterSecret: '',
+    },
   },
 };
