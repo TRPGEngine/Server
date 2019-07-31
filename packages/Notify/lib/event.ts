@@ -1,4 +1,14 @@
-exports.bindNotifyInfo = async function(data, cb, db) {
+import { EventFunc } from 'trpg/core';
+import { NotifyJPush } from './models/jpush';
+
+// 绑定通知信息: 极光推送
+export const bindJPushNotifyInfo: EventFunc<{
+  info: {
+    userUUID: string;
+    registrationID: string;
+    userTags: any;
+  };
+}> = async function(data, cb, db) {
   const { app, socket } = this;
   const info = data.info;
   const { userUUID, registrationID, userTags } = info;
@@ -16,21 +26,21 @@ exports.bindNotifyInfo = async function(data, cb, db) {
     throw '非法操作, UUID不匹配';
   }
 
-  const jpushInfo = await db.models.notify_jpush.findOne({
+  const jpushInfo = await NotifyJPush.findOne({
     where: {
       registration_id: registrationID,
     },
   });
   if (!jpushInfo) {
     // 如果当前设备没有记录,则创建
-    await db.models.notify_jpush.create({
+    await NotifyJPush.create({
       registration_id: registrationID,
       user_uuid: userUUID,
       is_active: true,
       userId,
     });
 
-    // TODO 如果是安卓的话需要给用户发送一条系统通知来提示开启自启动来保证用户能接收到信息
+    // TODO: 如果是安卓的话需要给用户发送一条系统通知来提示开启自启动来保证用户能接收到信息
   } else {
     // 否则，更新user_uuid
     jpushInfo.user_uuid = userUUID;
