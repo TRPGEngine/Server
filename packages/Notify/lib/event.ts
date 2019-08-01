@@ -7,12 +7,11 @@ export const bindJPushNotifyInfo: EventFunc<{
   info: {
     userUUID: string;
     registrationID: string;
-    userTags: any;
   };
 }> = async function(data, cb, db) {
   const { app, socket } = this;
   const info = data.info;
-  const { userUUID, registrationID, userTags } = info;
+  const { userUUID, registrationID } = info;
   if (!userUUID || !registrationID) {
     throw '缺少必要字段';
   }
@@ -57,13 +56,13 @@ export const bindJPushNotifyInfo: EventFunc<{
 export const bindUPushNotifyInfo: EventFunc<{
   info: {
     userUUID: string;
-    deviceTokens: string;
+    registrationID: string;
   };
 }> = async function(data, cb, db) {
   const { app, socket } = this;
-  const { userUUID, deviceTokens } = data.info;
+  const { userUUID, registrationID } = data.info;
 
-  if (!userUUID || !deviceTokens) {
+  if (!userUUID || !registrationID) {
     throw '缺少必要字段';
   }
 
@@ -80,13 +79,13 @@ export const bindUPushNotifyInfo: EventFunc<{
 
   const upushInfo = await NotifyUPush.findOne({
     where: {
-      device_tokens: deviceTokens,
+      device_tokens: registrationID,
     },
   });
   if (!upushInfo) {
     // 没有记录则创建
     await NotifyUPush.create({
-      device_tokens: deviceTokens,
+      device_tokens: registrationID,
       user_uuid: userUUID,
       is_active: true,
       userId,
