@@ -1,5 +1,6 @@
 import { IConfig, IPlugin } from 'umi-types';
 import defaultSettings from './defaultSettings'; // https://umijs.org/config/
+import routes from './router.config';
 
 import slash from 'slash2';
 import webpackPlugin from './plugin.config';
@@ -84,57 +85,7 @@ export default {
   base: '/dashboard/',
   publicPath: '/dashboard/',
   // umi routes: https://umijs.org/zh/guide/router.html
-  routes: [
-    {
-      path: '/user',
-      component: '../layouts/UserLayout',
-      routes: [
-        { path: '/user', redirect: '/user/login' },
-        { path: '/user/login', name: 'login', component: './user/login' },
-        {
-          component: './404',
-        },
-      ],
-    },
-    {
-      path: '/',
-      component: '../layouts/BasicLayout',
-      Routes: ['src/pages/Authorized'],
-      authority: ['admin', 'user'],
-      routes: [
-        {
-          path: '/home',
-          name: 'dashboard',
-          icon: 'dashboard',
-          routes: [
-            { path: '/home', redirect: '/home/monitor' },
-            {
-              path: '/home/monitor',
-              name: 'monitor',
-              component: './dashboard/Monitor',
-            },
-            {
-              name: 'analysis',
-              path: '/home/analysis',
-              component: './dashboard/analysis',
-            },
-          ],
-        },
-        {
-          path: '/notify',
-          name: 'notify',
-          icon: 'notification',
-          component: './notify',
-        },
-        {
-          component: './404',
-        },
-      ],
-    },
-    {
-      component: './404',
-    },
-  ],
+  routes,
   // Theme for antd: https://ant.design/docs/react/customize-theme-cn
   theme: {
     'primary-color': primaryColor,
