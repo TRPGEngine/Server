@@ -82,6 +82,7 @@ function appendQueryConfig(
 
 /**
  * 根据sequelize实例数据生成一个对应的Schema
+ * 目前仅允许查询
  * @param db sequelize实例
  */
 export function generateSchema(db: Sequelize): GraphQLSchema {
