@@ -7,7 +7,8 @@ const { pwa, primaryColor } = defaultSettings; // preview.pro.ant.design only do
 // preview.pro.ant.design 专用环境变量，请不要在你的项目中使用它。
 
 const { ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION } = process.env;
-const isAntDesignProPreview = ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site';
+const isAntDesignProPreview =
+  ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site';
 const plugins: IPlugin[] = [
   [
     'umi-plugin-react',
@@ -85,32 +86,45 @@ export default {
   // umi routes: https://umijs.org/zh/guide/router.html
   routes: [
     {
+      path: '/user',
+      component: '../layouts/UserLayout',
+      routes: [
+        { path: '/user', redirect: '/user/login' },
+        { path: '/user/login', name: 'login', component: './user/login' },
+        {
+          component: './404',
+        },
+      ],
+    },
+    {
       path: '/',
       component: '../layouts/BasicLayout',
       Routes: ['src/pages/Authorized'],
       authority: ['admin', 'user'],
       routes: [
         {
-          path: '/',
+          path: '/home',
           name: 'dashboard',
           icon: 'dashboard',
           routes: [
+            { path: '/home', redirect: '/home/monitor' },
             {
-              path: '/monitor',
+              path: '/home/monitor',
               name: 'monitor',
               component: './dashboard/Monitor',
             },
             {
-              name: 'login',
-              path: '/user/login',
-              component: './user/login',
-            },
-            {
               name: 'analysis',
-              path: '/dashboard/analysis',
+              path: '/home/analysis',
               component: './dashboard/analysis',
             },
           ],
+        },
+        {
+          path: '/notify',
+          name: 'notify',
+          icon: 'notification',
+          component: './notify',
         },
         {
           component: './404',
@@ -141,7 +155,7 @@ export default {
         resourcePath: string;
       },
       _: string,
-      localName: string,
+      localName: string
     ) => {
       if (
         context.resourcePath.includes('node_modules') ||
