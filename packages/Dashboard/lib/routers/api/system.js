@@ -14,7 +14,7 @@ router.post('/_login', async (ctx, next) => {
   }
 
   let accounts = config.admin;
-  let index = accounts.find(
+  let index = accounts.findIndex(
     (account) => account.username === username && account.password === password
   );
 
