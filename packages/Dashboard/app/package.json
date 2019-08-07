@@ -17,7 +17,7 @@
     "lint:prettier": "check-prettier lint",
     "lint:style": "stylelint --fix \"src/**/*.less\" --syntax less",
     "prettier": "prettier -c --write **/*",
-    "start": "umi dev",
+    "start": "cross-env PORT=8090 umi dev",
     "start:no-mock": "cross-env MOCK=none umi dev",
     "test": "umi test",
     "test:all": "node ./tests/run-tests.js",
