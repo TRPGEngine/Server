@@ -13,7 +13,7 @@ export async function getFakeCaptcha(mobile: string) {
 }
 
 export async function userLogin(username: string, password: string) {
-  return request.post(`/dashboard/api/v2/login`, {
+  return request.post(`/dashboard/api/v2/system/login`, {
     data: {
       username,
       password,

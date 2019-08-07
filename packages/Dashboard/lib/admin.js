@@ -64,7 +64,7 @@ function initRouters() {
   // webservice.use(view.routes());
   // webservice.use(captcha.routes());
 
-  router.use('/admin', captcha.routes(), api.routes(), view.routes());
+  router.use('/dashboard', captcha.routes(), api.routes(), view.routes());
   webservice.use(router.routes());
 }
 

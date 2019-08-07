@@ -32,6 +32,10 @@ router.post('/login', async (ctx, next) => {
 
   ctx.body = {
     result: true,
+    token: ctx.trpgapp.jwtSign({
+      username,
+      type: 'admin',
+    }),
   };
 });
 
