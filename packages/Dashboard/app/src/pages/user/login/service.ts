@@ -11,3 +11,12 @@ export async function fakeAccountLogin(params: FromDataType) {
 export async function getFakeCaptcha(mobile: string) {
   return request(`/api/login/captcha?mobile=${mobile}`);
 }
+
+export async function userLogin(username: string, password: string) {
+  return request.post(`/dashboard/api/v2/login`, {
+    data: {
+      username,
+      password,
+    },
+  });
+}

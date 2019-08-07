@@ -1,7 +1,7 @@
 import { AnyAction, Reducer } from 'redux';
 import { EffectsCommandMap } from 'dva';
 import { routerRedux } from 'dva/router';
-import { fakeAccountLogin, getFakeCaptcha } from './service';
+import { fakeAccountLogin, getFakeCaptcha, userLogin } from './service';
 import { getPageQuery, setAuthority } from './utils/utils';
 
 export interface StateType {
@@ -12,7 +12,9 @@ export interface StateType {
 
 export type Effect = (
   action: AnyAction,
-  effects: EffectsCommandMap & { select: <T>(func: (state: StateType) => T) => T },
+  effects: EffectsCommandMap & {
+    select: <T>(func: (state: StateType) => T) => T;
+  }
 ) => void;
 
 export interface ModelType {
@@ -36,7 +38,9 @@ const Model: ModelType = {
 
   effects: {
     *login({ payload }, { call, put }) {
-      const response = yield call(fakeAccountLogin, payload);
+      const { username, password } = payload;
+      const response = yield call(userLogin, username, password);
+      console.log('response', response);
       yield put({
         type: 'changeLoginStatus',
         payload: response,
