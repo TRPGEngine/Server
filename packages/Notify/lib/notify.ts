@@ -2,6 +2,7 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:notify');
 import NotifyHistoryDefinition from './models/history';
 import NotifyJPushDefinition from './models/jpush';
+import NotifyUPushDefinition from './models/upush';
 const config = require('config').get('notify');
 import _ from 'lodash';
 const JPush = require('jpush-async').JPushAsync;
@@ -23,6 +24,7 @@ function initStorage() {
   let storage = app.storage;
   storage.registerModel(NotifyHistoryDefinition);
   storage.registerModel(NotifyJPushDefinition);
+  storage.registerModel(NotifyUPushDefinition);
 
   app.on('initCompleted', function(app) {
     // 数据信息统计

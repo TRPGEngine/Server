@@ -22,6 +22,7 @@ interface UPushResponse {
 export class NotifyUPush extends Model {
   device_tokens: string;
   user_uuid: string;
+  user_tags: string[];
   is_active: boolean;
 
   /**
@@ -72,10 +73,10 @@ export class NotifyUPush extends Model {
   }
 }
 
-export default function UPushDefinition(Sequelize: Orm, db: DBInstance) {
+export default function NotifyUPushDefinition(Sequelize: Orm, db: DBInstance) {
   NotifyUPush.init(
     {
-      device_tokens: {
+      registration_id: {
         type: Sequelize.STRING,
         required: true,
         unique: true,
@@ -83,6 +84,9 @@ export default function UPushDefinition(Sequelize: Orm, db: DBInstance) {
       user_uuid: {
         type: Sequelize.UUID,
         required: true,
+      },
+      user_tags: {
+        type: Sequelize.JSON,
       },
       is_active: {
         type: Sequelize.BOOLEAN,
