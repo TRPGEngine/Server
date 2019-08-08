@@ -1,0 +1,12 @@
+{
+  "ignore": [
+    "dist",
+    "logs",
+    "packages/Dashboard/app/",
+    "*.marko.js"
+  ],
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "ext": "js,ts"
+}

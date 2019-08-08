@@ -8,7 +8,7 @@
     "dev": "cross-env DEBUG=trpg:* NODE_ENV=development npm run run:nodemon",
     "pro": "cross-env NODE_ENV=production npm run run:standard",
     "run:standard": "node standard.js",
-    "run:nodemon": "nodemon -e js,ts -i *.marko.js standard.js",
+    "run:nodemon": "nodemon standard.js",
     "packages:install": "sh packages/foreach.sh 'npm install'",
     "prettier:all": "prettier --write \"./packages/**/*.{js,ts}\"",
     "db:migrate:generate": "node ./cli.js generate-migrate",
