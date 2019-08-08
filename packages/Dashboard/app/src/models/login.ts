@@ -12,7 +12,7 @@ export function getPageQuery(): {
 
 export type Effect = (
   action: AnyAction,
-  effects: EffectsCommandMap & { select: <T>(func: (state: {}) => T) => T },
+  effects: EffectsCommandMap & { select: <T>(func: (state: {}) => T) => T }
 ) => void;
 
 export interface ModelType {
@@ -44,7 +44,7 @@ const Model: ModelType = {
             search: stringify({
               redirect: window.location.href,
             }),
-          }),
+          })
         );
       }
     },

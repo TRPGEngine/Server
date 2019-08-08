@@ -4,6 +4,8 @@
  */
 import { extend } from 'umi-request';
 import { notification } from 'antd';
+import { getToken } from './authority';
+import _set from 'lodash/set';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -45,6 +47,14 @@ const errorHandler = (error: { response: Response }): void => {
 const request = extend({
   errorHandler, // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
+});
+request.interceptors.request.use((url, options) => {
+  _set(options, 'headers.X-Token', getToken());
+
+  return {
+    url,
+    options,
+  };
 });
 
 export default request;

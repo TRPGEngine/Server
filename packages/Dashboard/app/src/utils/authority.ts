@@ -1,8 +1,12 @@
+import memoizeOne from 'memoize-one';
+
 // use localStorage to store the authority info, which might be sent from server in actual project.
 export function getAuthority(str?: string): string | string[] {
   // return localStorage.getItem('antd-pro-authority') || ['admin', 'user'];
   const authorityString =
-    typeof str === 'undefined' ? localStorage.getItem('antd-pro-authority') : str;
+    typeof str === 'undefined'
+      ? localStorage.getItem('antd-pro-authority')
+      : str;
   // authorityString could be admin, "admin", ["admin"]
   let authority;
   try {
@@ -17,13 +21,25 @@ export function getAuthority(str?: string): string | string[] {
   }
   // preview.pro.ant.design only do not use in your production.
   // preview.pro.ant.design 专用环境变量，请不要在你的项目中使用它。
-  if (!authority && ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site') {
+  if (
+    !authority &&
+    ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site'
+  ) {
     return ['admin'];
   }
   return authority;
 }
 
-export function setAuthority(authority: string | string[]): void {
+export function setAuthority(
+  authority: string | string[],
+  token: string
+): void {
   const proAuthority = typeof authority === 'string' ? [authority] : authority;
-  return localStorage.setItem('antd-pro-authority', JSON.stringify(proAuthority));
+  localStorage.setItem('antd-pro-authority', JSON.stringify(proAuthority));
+  localStorage.setItem('dashboard-token', token);
 }
+
+// 获取token
+export const getToken = memoizeOne(() =>
+  localStorage.getItem('dashboard-token')
+);

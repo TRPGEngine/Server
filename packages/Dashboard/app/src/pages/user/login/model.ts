@@ -3,6 +3,7 @@ import { EffectsCommandMap } from 'dva';
 import { routerRedux } from 'dva/router';
 import { fakeAccountLogin, getFakeCaptcha, userLogin } from './service';
 import { getPageQuery, setAuthority } from './utils/utils';
+import { notification } from 'antd';
 
 export interface StateType {
   status?: 'ok' | 'error';
@@ -40,30 +41,32 @@ const Model: ModelType = {
     *login({ payload }, { call, put }) {
       const { username, password } = payload;
       const response = yield call(userLogin, username, password);
-      console.log('response', response);
-      yield put({
-        type: 'changeLoginStatus',
-        payload: response,
-      });
-      // Login successfully
-      if (response.status === 'ok') {
-        const urlParams = new URL(window.location.href);
-        const params = getPageQuery();
-        let { redirect } = params as { redirect: string };
-        if (redirect) {
-          const redirectUrlParams = new URL(redirect);
-          if (redirectUrlParams.origin === urlParams.origin) {
-            redirect = redirect.substr(urlParams.origin.length);
-            if (redirect.match(/^\/.*#/)) {
-              redirect = redirect.substr(redirect.indexOf('#') + 1);
-            }
-          } else {
-            window.location.href = redirect;
-            return;
-          }
-        }
-        yield put(routerRedux.replace(redirect || '/'));
+      if (!response.result) {
+        notification.error({ message: '登录失败' });
+        return;
       }
+      yield put({
+        type: 'user/updateCurrentUserToken',
+        payload: response.token,
+      });
+
+      // 登录成功页面跳转
+      const urlParams = new URL(window.location.href);
+      const params = getPageQuery();
+      let { redirect } = params as { redirect: string };
+      if (redirect) {
+        const redirectUrlParams = new URL(redirect);
+        if (redirectUrlParams.origin === urlParams.origin) {
+          redirect = redirect.substr(urlParams.origin.length);
+          if (redirect.match(/^\/.*#/)) {
+            redirect = redirect.substr(redirect.indexOf('#') + 1);
+          }
+        } else {
+          window.location.href = redirect;
+          return;
+        }
+      }
+      yield put(routerRedux.replace(redirect || '/'));
     },
 
     *getCaptcha({ payload }, { call }) {

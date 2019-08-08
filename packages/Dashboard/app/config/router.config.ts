@@ -1,5 +1,6 @@
 import { IRoute } from 'umi-types/config';
 
+// umi routes: https://umijs.org/zh/guide/router.html
 export const routes: IRoute[] = [
   {
     path: '/user',
@@ -18,6 +19,7 @@ export const routes: IRoute[] = [
     Routes: ['src/pages/Authorized'],
     authority: ['admin', 'user'],
     routes: [
+      { path: '/', redirect: '/home' },
       {
         path: '/home',
         name: 'dashboard',

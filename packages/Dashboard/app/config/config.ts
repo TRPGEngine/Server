@@ -84,7 +84,6 @@ export default {
   devtool: isAntDesignProPreview ? 'source-map' : false,
   base: '/dashboard/',
   publicPath: '/dashboard/',
-  // umi routes: https://umijs.org/zh/guide/router.html
   routes,
   // Theme for antd: https://ant.design/docs/react/customize-theme-cn
   theme: {
