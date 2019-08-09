@@ -139,5 +139,9 @@ export default {
       changeOrigin: true,
       // pathRewrite: { '^/server': '' },
     },
+    '/core/graphql': {
+      target: 'http://127.0.0.1:23256/',
+      changeOrigin: true,
+    },
   },
 } as IConfig;
