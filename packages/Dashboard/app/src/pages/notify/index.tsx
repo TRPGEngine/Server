@@ -4,6 +4,7 @@ import { connect } from 'dva';
 import { StateType } from './model';
 import { Dispatch } from 'redux';
 import _get from 'lodash/get';
+import SendNotify from './components/modals/SendNotify';
 
 interface Props {
   notifyPanel: StateType;
@@ -26,14 +27,40 @@ interface Props {
   })
 )
 class Notify extends Component<Props> {
+  state = {
+    sendNotifyVisible: false,
+    selectedRegistrationId: '',
+  };
+
   componentDidMount() {
+    this.fetchDevices(1);
+  }
+
+  fetchDevices(page: number) {
     const { dispatch } = this.props;
     dispatch({
       type: 'notifyPanel/fetch',
+      page,
     });
   }
 
+  renderModal() {
+    const { sendNotifyVisible, selectedRegistrationId } = this.state;
+
+    return (
+      <div>
+        <SendNotify
+          visible={sendNotifyVisible}
+          registrationId={selectedRegistrationId}
+          onClose={() => this.setState({ sendNotifyVisible: false })}
+        />
+      </div>
+    );
+  }
+
   renderTable() {
+    const { loading, notifyPanel } = this.props;
+
     const columns = [
       {
         title: 'ID',
@@ -73,9 +100,19 @@ class Notify extends Component<Props> {
       {
         title: 'Action',
         key: 'action',
-        render: (_: any, record: {}) => (
+        render: (_: any, record: any) => (
           <span>
-            <a href="javascript:;">发送通知</a>
+            <a
+              href="javascript:;"
+              onClick={() =>
+                this.setState({
+                  sendNotifyVisible: true,
+                  selectedRegistrationId: record.registration_id,
+                })
+              }
+            >
+              发送通知
+            </a>
             <Divider type="vertical" />
             <a href="javascript:;">查看历史</a>
           </span>
@@ -83,9 +120,16 @@ class Notify extends Component<Props> {
       },
     ];
 
-    const data = _get(this.props, 'notifyPanel.devices', []);
+    const data = notifyPanel.devices || [];
 
-    return <Table columns={columns} dataSource={data} />;
+    return (
+      <Table
+        loading={loading}
+        pagination={false}
+        columns={columns}
+        dataSource={data}
+      />
+    );
   }
 
   render() {
@@ -97,6 +141,7 @@ class Notify extends Component<Props> {
         <p style={{ textAlign: 'center' }}>通知配置</p>
         <p style={{ textAlign: 'center' }}>{JSON.stringify(devices)}</p>
         {this.renderTable()}
+        {this.renderModal()}
       </div>
     );
   }

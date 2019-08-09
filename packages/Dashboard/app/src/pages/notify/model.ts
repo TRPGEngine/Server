@@ -34,15 +34,11 @@ const Model: ModelType = {
 
   effects: {
     *fetch({ page = 1 }, { call, put }) {
-      try {
-        const response = yield call(fetchDevicesList, page);
-        yield put({
-          type: 'updateDevices',
-          payload: _get(response, 'data.devices'),
-        });
-      } catch (err) {
-        console.error(err);
-      }
+      const response = yield call(fetchDevicesList, page, 100);
+      yield put({
+        type: 'updateDevices',
+        payload: _get(response, 'data.devices'),
+      });
     },
   },
 
