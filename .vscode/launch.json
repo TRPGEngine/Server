@@ -7,13 +7,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "nodemon",
-      "runtimeExecutable": "nodemon",
+      "name": "server debugger",
       "program": "${workspaceFolder}/standard.js",
       "restart": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
-      "args": ["-e js,ts"],
       "env": {
         "DEBUG": "trpg:*",
         "NODE_ENV": "development"
