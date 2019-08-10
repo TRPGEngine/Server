@@ -32,6 +32,7 @@ module.exports = {
     secret: randomString(10),
   },
   dashboard: {
+    enable: process.env.NODE_ENV === 'development' ? true : false,
     // dashboard模块网页端的账号密码
     admin: [
       {

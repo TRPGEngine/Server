@@ -1,10 +1,15 @@
-const debug = require('debug')('trpg:component:admin');
+const debug = require('debug')('trpg:component:dashboard');
 const serve = require('koa-static');
 const Router = require('koa-router');
 const os = require('os');
 const https = require('https');
 
 module.exports = function AdminComponent(app) {
+  if (app.get('dashboard.enable') === false) {
+    debug('无法加载Dashboard组件： 在配置中已关闭');
+    return;
+  }
+
   checkAdminPassword.call(app);
   initWebService.call(app);
   initRouters.call(app);
