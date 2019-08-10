@@ -60,7 +60,7 @@ function appendFieldsFkAssociations(
       // 即当前模型上有外键字段指向外部模型的id
       const targetModel = association.target; // 目标模型
       const identifierField = association.identifierField; // 连接字段
-      const type = _.get(queryConfig, ['fields', targetModel.name, 'type']);
+      const type = _.get(queryConfig, ['fields', targetModel.name, 'type']); // 该类型为之前注册过的模型的graphql类型
       if (!_.isNil(type)) {
         _.set(fields, `fk_${name}`, {
           type, // 返回 GraphQLObjectType
@@ -132,7 +132,7 @@ export function generateSchema(db: Sequelize): GraphQLSchema {
     fields: {},
   };
   _.forEach(models, (modelCls: typeof Model, modelName: string) => {
-    const fields = attributeFields(modelCls);
+    const fields = attributeFields(modelCls); // 可以被查询的字段
     // fields加入关联字段
     appendFieldsFkAssociations(queryConfig, modelCls, fields);
 
