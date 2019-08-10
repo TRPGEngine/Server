@@ -124,6 +124,7 @@ class Notify extends Component<Props> {
 
     return (
       <Table
+        rowKey="id"
         loading={loading}
         pagination={false}
         columns={columns}
@@ -139,7 +140,6 @@ class Notify extends Component<Props> {
     return (
       <div>
         <p style={{ textAlign: 'center' }}>通知配置</p>
-        <p style={{ textAlign: 'center' }}>{JSON.stringify(devices)}</p>
         {this.renderTable()}
         {this.renderModal()}
       </div>
