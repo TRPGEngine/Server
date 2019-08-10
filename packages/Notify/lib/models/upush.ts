@@ -1,6 +1,7 @@
 import { Model, Orm, DBInstance, TRPGApplication } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import md5Encrypt from 'packages/Player/lib/utils/md5';
+import _ from 'lodash';
 
 // 友盟push
 
@@ -20,7 +21,7 @@ interface UPushResponse {
 }
 
 export class NotifyUPush extends Model {
-  device_tokens: string;
+  registration_id: string;
   user_uuid: string;
   user_tags: string[];
   is_active: boolean;
@@ -28,7 +29,12 @@ export class NotifyUPush extends Model {
   /**
    * 向当前设备发送推送信息
    */
-  async sendNotifyMsg(app: TRPGApplication, msg: string) {
+  async sendNotifyMsg(
+    app: TRPGApplication,
+    text: string,
+    title: string = '通知',
+    mipush: boolean = false
+  ) {
     const upushConfig = app.get<NotifyPushConfig>('notify.upush');
     const { appKey, masterSecret } = upushConfig;
     if (!appKey || !masterSecret) {
@@ -40,36 +46,44 @@ export class NotifyUPush extends Model {
       timestamp: new Date().valueOf(),
       type: 'unicast',
       production_mode: true,
-      device_tokens: this.device_tokens,
+      device_tokens: this.registration_id,
       payload: {
-        display_type: 'message',
+        display_type: 'notification',
         body: {
-          custom: msg,
+          ticker: '来自TRPG的通知',
+          title,
+          text,
         },
       },
-
-      // 使用厂商渠道
-      mipush: true,
-      mi_activity: 'com.moonrailgun.trpg', // TODO 需要校验一下是否可以不填写
     };
+
+    if (mipush) {
+      // TODO
+      // body = {
+      //   ...body,
+      //   // 使用厂商渠道
+      //   // mipush: true,
+      //   // mi_activity: 'com.moonrailgun.trpg', // TODO 需要校验一下是否可以不填写
+      // }
+    }
 
     // 创建签名
     const sign = md5Encrypt(
       `POST${UPUSH_URL}${JSON.stringify(body)}${masterSecret}`
     );
 
-    const res = await app.request.post<UPushResponse>(
-      `${UPUSH_URL}?sign=${sign}`,
-      body
-    );
+    try {
+      const res = await app.request.post<UPushResponse>(
+        `${UPUSH_URL}?sign=${sign}`,
+        body
+      );
+      // TODO: 创建历史记录
 
-    if (res.ret === 'FAIL') {
-      throw new Error(res.data.error_msg);
+      return res.data.msg_id;
+    } catch (err) {
+      console.error(err);
+      throw new Error(_.get(err, 'response.data.data.error_msg'));
     }
-
-    // 创建历史记录
-
-    return res.data.msg_id;
   }
 }
 
