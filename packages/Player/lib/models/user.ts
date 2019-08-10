@@ -9,6 +9,7 @@ export class PlayerUser extends Model {
   password: string;
   salt: string;
   nickname: string;
+  name: string;
   avatar: string;
   last_login: Date;
   last_ip: string;
@@ -85,6 +86,12 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
       password: { type: Sequelize.STRING, required: true },
       salt: { type: Sequelize.STRING },
       nickname: { type: Sequelize.STRING, required: false },
+      name: {
+        type: Sequelize.VIRTUAL,
+        get() {
+          return this.nickname || this.username;
+        },
+      },
       avatar: { type: Sequelize.STRING, required: false, defaultValue: '' },
       last_login: { type: Sequelize.DATE },
       last_ip: { type: Sequelize.STRING },
