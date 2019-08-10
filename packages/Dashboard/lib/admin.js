@@ -12,7 +12,12 @@ module.exports = function AdminComponent(app) {
 
   return {
     name: 'ActorComponent',
-    require: ['PlayerComponent', 'GroupComponent', 'ChatComponent'],
+    require: [
+      'PlayerComponent',
+      'GroupComponent',
+      'ChatComponent',
+      'NotifyComponent',
+    ],
   };
 };
 
