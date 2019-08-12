@@ -6,7 +6,7 @@ import SequelizeStatic, {
   ModelOptions,
   DataType,
   ModelAttributeColumnOptions,
-  InitOptions,
+  CreateOptions,
 } from 'sequelize';
 // const transaction = require('orm-transaction'); // TODO
 import Debug from 'debug';
@@ -185,8 +185,9 @@ export interface TRPGModelInitOptions<M extends Model<any, any> = Model>
   tableName: string; // 必须设定tableName
   sequelize: Sequelize;
 }
-export class TRPGModel extends Model {
+export abstract class TRPGModel extends Model {
   public static init<M extends TRPGModel = TRPGModel>(
+    this: { new (): M } & typeof TRPGModel,
     attributes: TRPGModelAttributes,
     options: TRPGModelInitOptions<M>
   ) {
@@ -206,18 +207,11 @@ export class TRPGModel extends Model {
   }
 
   // 方法别名 below
-  public static createAsync(
+  public static createAsync<M extends TRPGModel>(
+    this: { new (): M } & typeof TRPGModel,
     values?: object,
-    options?: SequelizeStatic.CreateOptions
+    options?: CreateOptions
   ) {
     return this.create(values, options);
-  }
-
-  public saveAsync(options?: SequelizeStatic.SaveOptions) {
-    return this.save(options);
-  }
-
-  public removeAsync(options?: SequelizeStatic.InstanceDestroyOptions) {
-    return this.destroy(options);
   }
 }
