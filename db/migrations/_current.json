@@ -2397,6 +2397,64 @@
             },
             "indexes": []
         },
+        "notify_history": {
+            "tableName": "notify_history",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "type": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('jpush', 'upush')"
+                },
+                "platform": {
+                    "field": "platform",
+                    "seqType": "Sequelize.ENUM('all', 'android', 'ios')"
+                },
+                "registration_id": {
+                    "field": "registration_id",
+                    "seqType": "Sequelize.STRING"
+                },
+                "user_uuid": {
+                    "field": "user_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "user_tags": {
+                    "comment": "user tags when send notify use. if not use any user tag to send, keep it null",
+                    "field": "user_tags",
+                    "seqType": "Sequelize.JSON"
+                },
+                "title": {
+                    "field": "title",
+                    "seqType": "Sequelize.STRING"
+                },
+                "message": {
+                    "field": "message",
+                    "seqType": "Sequelize.STRING"
+                },
+                "data": {
+                    "field": "data",
+                    "seqType": "Sequelize.JSON"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
         "notify_jpush": {
             "tableName": "notify_jpush",
             "schema": {
@@ -2451,8 +2509,8 @@
             },
             "indexes": []
         },
-        "notify_history": {
-            "tableName": "notify_history",
+        "notify_upush": {
+            "tableName": "notify_upush",
             "schema": {
                 "id": {
                     "allowNull": false,
@@ -2461,21 +2519,16 @@
                     "field": "id",
                     "seqType": "Sequelize.INTEGER"
                 },
-                "type": {
-                    "required": true,
-                    "allowNull": false,
-                    "field": "type",
-                    "seqType": "Sequelize.ENUM('jpush')"
-                },
-                "platform": {
-                    "field": "platform",
-                    "seqType": "Sequelize.ENUM('all', 'android', 'ios')"
-                },
                 "registration_id": {
+                    "required": true,
+                    "unique": true,
+                    "allowNull": false,
                     "field": "registration_id",
                     "seqType": "Sequelize.STRING"
                 },
                 "user_uuid": {
+                    "required": true,
+                    "allowNull": false,
                     "field": "user_uuid",
                     "seqType": "Sequelize.UUID"
                 },
@@ -2483,13 +2536,9 @@
                     "field": "user_tags",
                     "seqType": "Sequelize.JSON"
                 },
-                "notification": {
-                    "field": "notification",
-                    "seqType": "Sequelize.STRING"
-                },
-                "message": {
-                    "field": "message",
-                    "seqType": "Sequelize.STRING"
+                "is_active": {
+                    "field": "is_active",
+                    "seqType": "Sequelize.BOOLEAN"
                 },
                 "createdAt": {
                     "allowNull": false,
@@ -2500,10 +2549,21 @@
                     "allowNull": false,
                     "field": "updatedAt",
                     "seqType": "Sequelize.DATE"
+                },
+                "userId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "userId",
+                    "seqType": "Sequelize.INTEGER"
                 }
             },
             "indexes": []
         }
     },
-    "revision": 17
+    "revision": 20
 }

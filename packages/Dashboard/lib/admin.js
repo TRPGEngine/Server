@@ -1,10 +1,15 @@
-const debug = require('debug')('trpg:component:admin');
+const debug = require('debug')('trpg:component:dashboard');
 const serve = require('koa-static');
 const Router = require('koa-router');
 const os = require('os');
 const https = require('https');
 
 module.exports = function AdminComponent(app) {
+  if (app.get('dashboard.enable') === false) {
+    debug('无法加载Dashboard组件： 在配置中已关闭');
+    return;
+  }
+
   checkAdminPassword.call(app);
   initWebService.call(app);
   initRouters.call(app);
@@ -12,7 +17,12 @@ module.exports = function AdminComponent(app) {
 
   return {
     name: 'ActorComponent',
-    require: ['PlayerComponent', 'GroupComponent', 'ChatComponent'],
+    require: [
+      'PlayerComponent',
+      'GroupComponent',
+      'ChatComponent',
+      'NotifyComponent',
+    ],
   };
 };
 
@@ -64,7 +74,7 @@ function initRouters() {
   // webservice.use(view.routes());
   // webservice.use(captcha.routes());
 
-  router.use('/admin', captcha.routes(), api.routes(), view.routes());
+  router.use('/dashboard', captcha.routes(), api.routes(), view.routes());
   webservice.use(router.routes());
 }
 

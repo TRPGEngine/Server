@@ -2,6 +2,7 @@ import { Effect } from 'dva';
 import { Reducer } from 'redux';
 
 import { queryCurrent, query as queryUsers } from '@/services/user';
+import { setAuthority } from '@/utils/authority';
 
 export interface CurrentUser {
   avatar?: string;
@@ -14,6 +15,7 @@ export interface CurrentUser {
     label: string;
   }>;
   unreadCount?: number;
+  token?: string;
 }
 
 export interface UserModelState {
@@ -28,17 +30,20 @@ export interface UserModelType {
     fetchCurrent: Effect;
   };
   reducers: {
+    updateCurrentUserToken: Reducer<UserModelState>;
     saveCurrentUser: Reducer<UserModelState>;
     changeNotifyCount: Reducer<UserModelState>;
   };
 }
 
+const initialState = {
+  currentUser: {},
+};
+
 const UserModel: UserModelType = {
   namespace: 'user',
 
-  state: {
-    currentUser: {},
-  },
+  state: initialState,
 
   effects: {
     *fetch(_, { call, put }) {
@@ -58,18 +63,24 @@ const UserModel: UserModelType = {
   },
 
   reducers: {
+    updateCurrentUserToken(state = initialState, action) {
+      const token = action.payload;
+      setAuthority('admin', token);
+      return {
+        ...state,
+        currentUser: {
+          ...state.currentUser,
+          token,
+        },
+      };
+    },
     saveCurrentUser(state, action) {
       return {
         ...state,
         currentUser: action.payload || {},
       };
     },
-    changeNotifyCount(
-      state = {
-        currentUser: {},
-      },
-      action
-    ) {
+    changeNotifyCount(state = initialState, action) {
       return {
         ...state,
         currentUser: {

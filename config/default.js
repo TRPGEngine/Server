@@ -32,6 +32,7 @@ module.exports = {
     secret: randomString(10),
   },
   dashboard: {
+    enable: process.env.NODE_ENV === 'development' ? true : false,
     // dashboard模块网页端的账号密码
     admin: [
       {
@@ -66,6 +67,11 @@ module.exports = {
   notify: {
     // 极光推送服务端接口需要的秘钥。没有该项将无法注册notify服务
     jpush: {
+      appKey: '',
+      masterSecret: '',
+    },
+    // 友盟推送服务接口所需要的秘钥
+    upush: {
       appKey: '',
       masterSecret: '',
     },

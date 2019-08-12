@@ -828,7 +828,7 @@ exports.updateGroupActorInfo = async function updateGroupActorInfo(
     throw '找不到团';
   }
   if (!group.isManagerOrOwner(player.uuid)) {
-    throw '没有修改权限';
+    throw '没有修改权限, 只有管理员才能修改团人物卡信息';
   }
   let groupActor = await db.models.group_actor.findOne({
     where: {

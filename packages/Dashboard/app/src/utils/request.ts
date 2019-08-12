@@ -1,9 +1,12 @@
 /**
  * request 网络请求工具
- * 更详细的 api 文档: https://github.com/umijs/umi-request
+ * 更详细的 api 文档: https://github.com/umijs/umi-request
  */
-import { extend } from 'umi-request';
+import { extend, ResponseError } from 'umi-request';
 import { notification } from 'antd';
+import { getToken } from './authority';
+import _set from 'lodash/set';
+import _get from 'lodash/get';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -26,10 +29,11 @@ const codeMessage = {
 /**
  * 异常处理程序
  */
-const errorHandler = (error: { response: Response }): void => {
-  const { response } = error;
+const errorHandler = (error: ResponseError): void => {
+  const { response, data } = error;
   if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
+    const errorText =
+      data.msg || codeMessage[response.status] || response.statusText;
     const { status, url } = response;
 
     notification.error({
@@ -45,6 +49,14 @@ const errorHandler = (error: { response: Response }): void => {
 const request = extend({
   errorHandler, // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
+});
+request.interceptors.request.use((url, options) => {
+  _set(options, 'headers.X-Token', getToken());
+
+  return {
+    url,
+    options,
+  };
 });
 
 export default request;

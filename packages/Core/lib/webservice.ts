@@ -166,10 +166,20 @@ export default class WebService {
       try {
         await next();
         if (ctx.body === undefined) {
-          ctx.status = 404;
+          let msg = '';
+          if (ctx.status === 404) {
+            msg = 'Not found';
+          } else if (ctx.status === 500) {
+            msg = 'System Error';
+          } else if (ctx.status === 403) {
+            msg = 'Forbidden';
+          } else {
+            msg = 'Unknown Error';
+          }
+
           ctx.body = {
             result: false,
-            msg: 'Not found',
+            msg,
           };
         }
       } catch (e) {

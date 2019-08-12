@@ -1,8 +1,12 @@
-const debug = require('debug')('trpg:component:notify');
+import Debug from 'debug';
+const debug = Debug('trpg:component:notify');
+import NotifyHistoryDefinition from './models/history';
+import NotifyJPushDefinition from './models/jpush';
+import NotifyUPushDefinition from './models/upush';
 const config = require('config').get('notify');
-const _ = require('lodash');
+import _ from 'lodash';
 const JPush = require('jpush-async').JPushAsync;
-const event = require('./event');
+import * as event from './event';
 
 module.exports = function NotifyComponent(app) {
   initStorage.call(app);
@@ -18,8 +22,9 @@ module.exports = function NotifyComponent(app) {
 function initStorage() {
   let app = this;
   let storage = app.storage;
-  storage.registerModel(require('./models/jpush.js'));
-  storage.registerModel(require('./models/history.js'));
+  storage.registerModel(NotifyHistoryDefinition);
+  storage.registerModel(NotifyJPushDefinition);
+  storage.registerModel(NotifyUPushDefinition);
 
   app.on('initCompleted', function(app) {
     // 数据信息统计
@@ -50,6 +55,7 @@ function initFunction() {
   app.notify = {
     JPush,
     _client,
+    // JPush
     async addNotifyHistory(options) {
       const ret = await db.models.notify_history.create({
         type: 'jpush',
@@ -57,6 +63,7 @@ function initFunction() {
       });
       return ret;
     },
+    // JPush
     async sendNotifyMsg(userUUID, title, msg, options = {}) {
       // TODO: 需要做频率限制与在线监测
       const platform = _.get(options, 'platform', JPush.ALL);
@@ -66,7 +73,7 @@ function initFunction() {
       app.notify.addNotifyHistory({
         platform: 'all',
         user_uuid: userUUID,
-        notification: title,
+        title,
         message: msg,
       });
 
@@ -79,6 +86,7 @@ function initFunction() {
         .setOptions(null, 60)
         .send();
     },
+    // JPush
     async sendNotifyMsgByRegistrationId(
       registrationId,
       title,
@@ -97,7 +105,7 @@ function initFunction() {
       app.notify.addNotifyHistory({
         platform: 'all',
         registration_id: registrationId,
-        notification: title,
+        title,
         message: msg,
       });
 
@@ -160,5 +168,6 @@ function initFunction() {
 
 function initSocket() {
   let app = this;
-  app.registerEvent('notify::bindNotifyInfo', event.bindNotifyInfo);
+  app.registerEvent('notify::bindNotifyInfo', event.bindJPushNotifyInfo);
+  app.registerEvent('notify::bindUPushNotifyInfo', event.bindUPushNotifyInfo);
 }

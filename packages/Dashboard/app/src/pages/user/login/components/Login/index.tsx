@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { FormComponentProps } from 'antd/es/form';
 import classNames from 'classnames';
 import LoginContext, { LoginContextProps } from './LoginContext';
-import LoginItem, { LoginItemProps } from './LoginItem';
+import LoginItem, { LoginItemProps, LoginItemType } from './LoginItem';
 
 import LoginSubmit from './LoginSubmit';
 import LoginTab from './LoginTab';
@@ -16,7 +16,7 @@ export interface LoginProps {
   onSubmit?: (error: any, values: any) => void;
   className?: string;
   form: FormComponentProps['form'];
-  children: React.ReactElement<LoginTab>[];
+  children: Array<React.ReactElement<LoginTab>>;
 }
 
 interface LoginState {
@@ -26,17 +26,17 @@ interface LoginState {
 }
 
 class Login extends Component<LoginProps, LoginState> {
-  public static Tab = LoginTab;
+  static Tab = LoginTab;
 
-  public static Submit = LoginSubmit;
+  static Submit = LoginSubmit;
 
-  public static UserName: React.FunctionComponent<LoginItemProps>;
+  static UserName: React.FunctionComponent<LoginItemProps>;
 
-  public static Password: React.FunctionComponent<LoginItemProps>;
+  static Password: React.FunctionComponent<LoginItemProps>;
 
-  public static Mobile: React.FunctionComponent<LoginItemProps>;
+  static Mobile: React.FunctionComponent<LoginItemProps>;
 
-  public static Captcha: React.FunctionComponent<LoginItemProps>;
+  static Captcha: React.FunctionComponent<LoginItemProps>;
 
   static defaultProps = {
     className: '',
@@ -64,7 +64,7 @@ class Login extends Component<LoginProps, LoginState> {
         if (onTabChange) {
           onTabChange(type);
         }
-      },
+      }
     );
   };
 
@@ -73,19 +73,19 @@ class Login extends Component<LoginProps, LoginState> {
     const { tabs = [] } = this.state;
     return {
       tabUtil: {
-        addTab: id => {
+        addTab: (id) => {
           this.setState({
             tabs: [...tabs, id],
           });
         },
-        removeTab: id => {
+        removeTab: (id) => {
           this.setState({
-            tabs: tabs.filter(currentId => currentId !== id),
+            tabs: tabs.filter((currentId) => currentId !== id),
           });
         },
       },
       form: { ...form },
-      updateActive: activeItem => {
+      updateActive: (activeItem) => {
         const { type = '', active = {} } = this.state;
         if (active[type]) {
           active[type].push(activeItem);
@@ -116,11 +116,13 @@ class Login extends Component<LoginProps, LoginState> {
   render() {
     const { className, children } = this.props;
     const { type, tabs = [] } = this.state;
-    const TabChildren: React.ReactComponentElement<LoginTab>[] = [];
-    const otherChildren: React.ReactElement<any>[] = [];
+    const TabChildren: Array<React.ReactComponentElement<LoginTab>> = [];
+    const otherChildren: Array<React.ReactElement<any>> = [];
     React.Children.forEach(
       children,
-      (child: React.ReactComponentElement<LoginTab> | React.ReactElement<any>) => {
+      (
+        child: React.ReactComponentElement<LoginTab> | React.ReactElement<any>
+      ) => {
         if (!child) {
           return;
         }
@@ -129,7 +131,7 @@ class Login extends Component<LoginProps, LoginState> {
         } else {
           otherChildren.push(child);
         }
-      },
+      }
     );
     return (
       <LoginContext.Provider value={this.getContext()}>
@@ -157,7 +159,7 @@ class Login extends Component<LoginProps, LoginState> {
   }
 }
 
-(Object.keys(LoginItem) as (keyof LoginItemType)[]).forEach(item => {
+(Object.keys(LoginItem) as Array<keyof LoginItemType>).forEach((item) => {
   Login[item] = LoginItem[item];
 });
 

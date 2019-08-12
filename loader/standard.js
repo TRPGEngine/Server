@@ -21,13 +21,14 @@ module.exports = function loadModules(app) {
   app.load(chatEmotion);
   app.load(dice); // 尚未测试
   app.load(group);
-  app.load(dashboard); // 尚未测试
   app.load(note); // 尚未测试
   app.load(help);
   app.load(qqconnect); // 尚未测试
   app.load(report); // 尚未测试
   app.load(mail); // 尚未测试
   app.load(notify);
+
+  app.load(dashboard); // 尚未测试
 
   return app;
 };
