@@ -118,7 +118,7 @@ module.exports = function(isStandalone = false) {
             debug('exist other file relation, only remove record:', filename);
           }
 
-          await fi.removeAsync();
+          await fi.destroy();
         }
         debug(`remove ${count} avatar file record success!`);
 
@@ -134,7 +134,7 @@ module.exports = function(isStandalone = false) {
         });
         for (let fi of list_f) {
           fi.is_expired = true;
-          await fi.saveAsync();
+          await fi.save();
         }
         for (let fi of list_f) {
           let filename = fi.name;

@@ -249,7 +249,7 @@ export default class Player extends BasePackage {
               data.city
             } ${data.county}`;
             debug('请求ip信息结果:', log.ip_address);
-            await log.saveAsync();
+            await log.save();
           }
         }
         return new Date().valueOf();

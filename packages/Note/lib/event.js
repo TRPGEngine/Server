@@ -60,7 +60,7 @@ exports.save = async function save(data, cb, db) {
     // 之前已存在， 更新内容
     note.title = noteTitle;
     note.content = noteContent;
-    await note.saveAsync();
+    await note.save();
   } else {
     note = await db.models.note_note.createAsync({
       uuid: noteUUID,

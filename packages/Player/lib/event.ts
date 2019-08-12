@@ -109,7 +109,7 @@ exports.login = async function login(data, cb, db) {
     // 更新登录信息
     user.last_login = new Date();
     user.last_ip = ip;
-    await user.saveAsync();
+    await user.save();
 
     // 添加登录记录
     await db.models.player_login_log.createAsync({
@@ -190,7 +190,7 @@ exports.loginWithToken = async function loginWithToken(data, cb, db) {
     // 更新登录信息
     user.last_login = new Date();
     user.last_ip = ip;
-    await user.saveAsync();
+    await user.save();
 
     // 添加登录记录
     await db.models.player_login_log.createAsync({
@@ -296,7 +296,7 @@ exports.updateInfo = async function updateInfo(data, cb, db) {
   let user = await db.models.player_user.findByPk(userId);
   // TODO: 检测用户信息合法性(如禁止敏感字符作为昵称)
   user.updateInfo(data);
-  await user.saveAsync();
+  await user.save();
   return { user: user.getInfo(true) };
 };
 
@@ -320,7 +320,7 @@ exports.changePassword = async function changePassword(data, cb, db) {
   }
 
   user.password = newPassword;
-  await user.saveAsync();
+  await user.save();
   return { user: user.getInfo(true) };
 };
 
@@ -536,7 +536,7 @@ exports.agreeFriendInvite = async function agreeFriendInvite(data, cb, db) {
 
   invite.is_agree = true;
   await db.transactionAsync(async () => {
-    await invite.saveAsync();
+    await invite.save();
     // 设定好友关系
     let uuid1 = invite.from_uuid;
     let uuid2 = invite.to_uuid;
@@ -648,7 +648,7 @@ exports.saveSettings = async function saveSettings(data, cb, db) {
       settings.system_settings,
       systemSettings
     );
-    await settings.saveAsync();
+    await settings.save();
   }
 
   return {

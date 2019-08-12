@@ -81,7 +81,7 @@ function initFunction() {
 
       let res = await db.models.chat_log.findOne({ where: { uuid: msg_uuid } });
       Object.assign(res, payload);
-      res = await res.saveAsync();
+      res = await res.save();
       notify();
 
       return res;
