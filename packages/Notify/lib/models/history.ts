@@ -29,7 +29,7 @@ export default function NotifyHistoryDefinition(Sequelize, db) {
       user_tags: {
         type: Sequelize.JSON,
       },
-      notification: {
+      title: {
         type: Sequelize.STRING,
       },
       message: {

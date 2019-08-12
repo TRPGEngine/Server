@@ -2429,8 +2429,8 @@
                     "field": "user_tags",
                     "seqType": "Sequelize.JSON"
                 },
-                "notification": {
-                    "field": "notification",
+                "title": {
+                    "field": "title",
                     "seqType": "Sequelize.STRING"
                 },
                 "message": {
@@ -2560,5 +2560,5 @@
             "indexes": []
         }
     },
-    "revision": 18
+    "revision": 19
 }

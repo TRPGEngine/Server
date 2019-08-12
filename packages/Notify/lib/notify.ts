@@ -55,6 +55,7 @@ function initFunction() {
   app.notify = {
     JPush,
     _client,
+    // JPush
     async addNotifyHistory(options) {
       const ret = await db.models.notify_history.create({
         type: 'jpush',
@@ -62,6 +63,7 @@ function initFunction() {
       });
       return ret;
     },
+    // JPush
     async sendNotifyMsg(userUUID, title, msg, options = {}) {
       // TODO: 需要做频率限制与在线监测
       const platform = _.get(options, 'platform', JPush.ALL);
@@ -71,7 +73,7 @@ function initFunction() {
       app.notify.addNotifyHistory({
         platform: 'all',
         user_uuid: userUUID,
-        notification: title,
+        title,
         message: msg,
       });
 
@@ -84,6 +86,7 @@ function initFunction() {
         .setOptions(null, 60)
         .send();
     },
+    // JPush
     async sendNotifyMsgByRegistrationId(
       registrationId,
       title,
@@ -102,7 +105,7 @@ function initFunction() {
       app.notify.addNotifyHistory({
         platform: 'all',
         registration_id: registrationId,
-        notification: title,
+        title,
         message: msg,
       });
 
