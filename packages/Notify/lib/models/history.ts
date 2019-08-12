@@ -1,4 +1,4 @@
-import { Model } from 'trpg/core';
+import { Model, Orm, DBInstance } from 'trpg/core';
 
 export class NotifyHistory extends Model {
   type: string;
@@ -10,7 +10,10 @@ export class NotifyHistory extends Model {
   message: string;
 }
 
-export default function NotifyHistoryDefinition(Sequelize, db) {
+export default function NotifyHistoryDefinition(
+  Sequelize: Orm,
+  db: DBInstance
+) {
   NotifyHistory.init(
     {
       type: {
@@ -28,12 +31,17 @@ export default function NotifyHistoryDefinition(Sequelize, db) {
       },
       user_tags: {
         type: Sequelize.JSON,
+        comment:
+          'user tags when send notify use. if not use any user tag to send, keep it null',
       },
       title: {
         type: Sequelize.STRING,
       },
       message: {
         type: Sequelize.STRING,
+      },
+      data: {
+        type: Sequelize.JSON,
       },
     },
     {

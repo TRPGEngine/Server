@@ -2426,6 +2426,7 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "user_tags": {
+                    "comment": "user tags when send notify use. if not use any user tag to send, keep it null",
                     "field": "user_tags",
                     "seqType": "Sequelize.JSON"
                 },
@@ -2436,6 +2437,10 @@
                 "message": {
                     "field": "message",
                     "seqType": "Sequelize.STRING"
+                },
+                "data": {
+                    "field": "data",
+                    "seqType": "Sequelize.JSON"
                 },
                 "createdAt": {
                     "allowNull": false,
@@ -2560,5 +2565,5 @@
             "indexes": []
         }
     },
-    "revision": 19
+    "revision": 20
 }

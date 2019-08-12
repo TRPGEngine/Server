@@ -2,6 +2,7 @@ import { Model, Orm, DBInstance, TRPGApplication } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import md5Encrypt from 'packages/Player/lib/utils/md5';
 import _ from 'lodash';
+import { NotifyHistory } from './history';
 
 // 友盟push
 
@@ -27,7 +28,7 @@ export class NotifyUPush extends Model {
   is_active: boolean;
 
   /**
-   * 向当前设备发送推送信息
+   * 向当前实例设备发送推送信息
    */
   async sendNotifyMsg(
     app: TRPGApplication,
@@ -77,7 +78,19 @@ export class NotifyUPush extends Model {
         `${UPUSH_URL}?sign=${sign}`,
         body
       );
-      // TODO: 创建历史记录
+
+      // 创建历史记录
+      await NotifyHistory.create({
+        type: 'upush',
+        platform: 'android',
+        registration_id: this.registration_id,
+        user_uuid: this.user_uuid,
+        title,
+        message: text,
+        data: {
+          upushResponse: res,
+        },
+      });
 
       return res.data.msg_id;
     } catch (err) {
