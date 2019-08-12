@@ -14,7 +14,7 @@ let router = new Router();
 router.post(
   '/',
   auth(),
-  upload('public/avatar/').single('avatar'),
+  upload('public/avatar/').single('avatar') as any,
   allowMIME(['image/jpeg', 'image/png']),
   sha256(),
   thumbnail(128, 128),

@@ -59,7 +59,7 @@ function appendFieldsFkAssociations(
       // 一对多关系
       // 即当前模型上有外键字段指向外部模型的id
       const targetModel = association.target; // 目标模型
-      const identifierField = association.identifierField; // 连接字段
+      const identifier = association.identifier; // 连接字段
       const type = _.get(queryConfig, ['fields', targetModel.name, 'type']); // 该类型为之前注册过的模型的graphql类型
       if (!_.isNil(type)) {
         _.set(fields, `fk_${name}`, {
@@ -68,7 +68,7 @@ function appendFieldsFkAssociations(
           resolve: resolver(targetModel, {
             list: false,
             before: (findOptions, args, context, info) => {
-              const id = _.get(info, ['source', identifierField]);
+              const id = _.get(info, ['source', identifier]);
               findOptions.where = { id };
               return findOptions;
             },
