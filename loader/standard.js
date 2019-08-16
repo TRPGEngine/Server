@@ -15,7 +15,7 @@ const notify = require('../packages/Notify');
 
 module.exports = function loadModules(app) {
   app.load(player);
-  app.load(file());
+  app.load(file);
   app.load(actor);
   app.load(chat);
   app.load(chatEmotion);
