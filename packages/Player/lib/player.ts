@@ -224,19 +224,30 @@ export default class Player extends BasePackage {
 
     app.registerStatJob('playerLoginIPParse', async () => {
       try {
-        let logs = await PlayerLoginLog.findAll({
+        const logs = await PlayerLoginLog.findAll({
           where: {
             ip_address: null,
           },
         });
-        for (let log of logs) {
+        const cacheMap = {}; // 缓存, Key 为IP. 值为地址 仅缓存当次任务的信息记录
+        for (const log of logs) {
           let ip = log.ip;
           if (ip.indexOf(':') >= 0) {
-            let tmp = ip.split(':');
+            const tmp = ip.split(':');
             ip = tmp[tmp.length - 1];
           }
+
+          if (cacheMap[ip]) {
+            // 如果缓存中已经有记录, 则从缓存中更新地址
+            const ip_address = cacheMap[ip];
+            debug('从缓存中更新ip地址:', ip, ip_address);
+            log.ip_address = ip_address;
+            await log.save();
+            continue;
+          }
+
           debug('请求ip信息地址:', ip);
-          let info = await app.request.post(
+          const info = await app.request.post(
             'http://ip.taobao.com/service/getIpInfo2.php',
             'ip=' + ip,
             {
@@ -244,11 +255,14 @@ export default class Player extends BasePackage {
             }
           );
           if (info.code === 0) {
-            let data = info.data;
-            log.ip_address = `[${data.isp}]${data.country} ${data.region} ${
+            // 请求成功
+            const data = info.data;
+            const ip_address = `[${data.isp}]${data.country} ${data.region} ${
               data.city
             } ${data.county}`;
-            debug('请求ip信息结果:', log.ip_address);
+            log.ip_address = ip_address;
+            debug('请求ip信息结果:', ip_address);
+            cacheMap[ip] = ip_address;
             await log.save();
           }
         }
