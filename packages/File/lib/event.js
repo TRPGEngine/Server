@@ -14,7 +14,7 @@ exports.bindAttachUUID = async function(data, cb, db) {
     where: { uuid: avatar_uuid },
   });
   avatar.attach_uuid = attach_uuid;
-  await avatar.saveAsync();
+  await avatar.save();
   return {
     avatar: avatar.getObject(),
   };

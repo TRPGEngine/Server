@@ -2,13 +2,12 @@ import BasePackage from 'lib/package';
 import CoreSystemLogDefinition from './models/system-log';
 import CoreGlobalConfigDefinition from './models/global-config';
 import CoreMetricsDefinition, { CoreMetrics } from './models/metrics';
-import { ApolloServer, gql } from 'apollo-server-koa';
 import Debug from 'debug';
 const debug = Debug('trpg:component:internal');
 
 import CoreRouter from './routers/core';
 import GraphQLRouter from './routers/graphql';
-import { generateSchema } from './graphql/generate-schema';
+import { getGlobalConfig } from './event';
 
 const SOCKET_PREFIX = 'metrics:socket:event:';
 const WEBSERVICE_PREFIX = 'metrics:webservice:route:';
@@ -24,6 +23,8 @@ export default class Core extends BasePackage {
 
     this.regRoute(CoreRouter);
     this.regRoute(GraphQLRouter);
+
+    this.regSocketEvent('getGlobalConfig', getGlobalConfig);
 
     // 每小时执行一次收集事件调用时间
     this.regScheduleJob(

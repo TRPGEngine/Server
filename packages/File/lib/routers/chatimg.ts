@@ -12,7 +12,7 @@ let router = new Router();
 router.post(
   '/upload',
   auth(),
-  upload(config.path.chatimgDir).single('image'),
+  upload(config.path.chatimgDir).single('image') as any,
   sha265(),
   chatimgStorage,
   async (ctx, next) => {

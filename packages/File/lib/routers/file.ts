@@ -14,7 +14,7 @@ const ret = async (ctx) => {
 router.post(
   '/upload/persistence',
   auth(),
-  upload(true).single('file'),
+  upload(true).single('file') as any,
   sha256(),
   fileStorage(true),
   ret
@@ -22,7 +22,7 @@ router.post(
 router.post(
   '/upload/temporary',
   auth(),
-  upload(false).single('file'),
+  upload(false).single('file') as any,
   sha256(),
   fileStorage(false),
   ret

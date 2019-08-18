@@ -40,7 +40,7 @@ export const addUserEmotionWithSecretSignal: EventFunc<{
   const { code } = data;
   const secretSignal = await ChatEmotionSecretSignal.findOne({
     where: {
-      code,
+      code: _.upperCase(code),
     },
     include: [
       {

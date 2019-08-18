@@ -25,7 +25,7 @@ router.get('/getEmotionList', async (ctx) => {
 router.post(
   '/upload/item',
   auth(),
-  upload(true).single('file'),
+  upload(true).single('file') as any,
   allowMIME(['image/jpeg', 'image/gif', 'image/png']),
   move(emotionsDir),
   imageResize(256, 256),

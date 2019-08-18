@@ -83,7 +83,7 @@ exports.bindMail = async function bindMail(data, cb, db) {
     body
   );
   if (!res.is_success) {
-    await mail.removeAsync(); // 如果邮件发送失败，则删除邮件列表里的记录
+    await mail.destroy(); // 如果邮件发送失败，则删除邮件列表里的记录
     throw `邮件发送失败:${res.error}`;
   }
 

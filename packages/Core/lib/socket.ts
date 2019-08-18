@@ -173,7 +173,14 @@ export default class SocketService {
         } catch (err) {
           // 若event.fn内没有进行异常处理，进行统一的异常处理
           if (cb && typeof cb === 'function') {
-            cb({ result: false, msg: err.toString() || '系统忙' });
+            let errorMsg: string;
+            if (err instanceof Error) {
+              errorMsg = err.message;
+            } else {
+              errorMsg = err.toString();
+            }
+
+            cb({ result: false, msg: errorMsg || '系统忙' });
             if (typeof err === 'string') {
               // 如果不是一个带有堆栈信息的错误。则修改err为一个带其他信息的字符串
               err = `${err}\nEvent Name: ${eventName}\nReceive:\n${JSON.stringify(

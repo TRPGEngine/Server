@@ -101,7 +101,7 @@ router.get('/callback', async (ctx, next) => {
       } else {
         player.token = token;
       }
-      await player.saveAsync();
+      await player.save();
       res = {
         uuid: player.uuid,
         token,
