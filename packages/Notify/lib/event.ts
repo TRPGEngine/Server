@@ -79,13 +79,13 @@ export const bindUPushNotifyInfo: EventFunc<{
 
   const upushInfo = await NotifyUPush.findOne({
     where: {
-      device_tokens: registrationID,
+      registration_id: registrationID,
     },
   });
   if (!upushInfo) {
     // 没有记录则创建
     await NotifyUPush.create({
-      device_tokens: registrationID,
+      registration_id: registrationID,
       user_uuid: userUUID,
       is_active: true,
       userId,
