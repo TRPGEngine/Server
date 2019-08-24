@@ -1,6 +1,7 @@
 import { EventFunc } from 'trpg/core';
 import { NotifyJPush } from './models/jpush';
 import { NotifyUPush } from './models/upush';
+import { PlayerSettings } from 'packages/Player/lib/models/settings';
 
 // 绑定通知信息: 极光推送
 export const bindJPushNotifyInfo: EventFunc<{
@@ -98,5 +99,62 @@ export const bindUPushNotifyInfo: EventFunc<{
     upushInfo.save();
   }
 
+  return true;
+};
+
+/**
+ * 启用推送通知
+ */
+export const activeNofifyEvent: EventFunc<{
+  info: {
+    userUUID: string;
+    registrationID: string;
+  };
+}> = async function(data, cb, db) {
+  const userUUID = _.get(data, 'info.userUUID', '');
+  const registrationID = _.get(data, 'info.registrationID');
+
+  const setting = await PlayerSettings.getByUserUUID(userUUID);
+  const upush = await NotifyUPush.findByRegistrationAndUserUUID(
+    registrationID,
+    userUUID
+  );
+
+  if (_.isNil(upush) || _.isNil(setting)) {
+    throw new Error('没有对应记录, 无法启用');
+  }
+
+  await setting.setSystemSetting('disableNotify', false);
+  upush.is_active = true;
+  await upush.save();
+  return true;
+};
+
+/**
+ * 取消推送通知
+ * 操作: 在该用户的通知设置上设置不推送。取消该设备的绑定性
+ */
+export const deactiveNofifyEvent: EventFunc<{
+  info: {
+    userUUID: string;
+    registrationID: string;
+  };
+}> = async function(data, cb, db) {
+  const userUUID = _.get(data, 'info.userUUID', '');
+  const registrationID = _.get(data, 'info.registrationID');
+
+  const setting = await PlayerSettings.getByUserUUID(userUUID);
+  const upush = await NotifyUPush.findByRegistrationAndUserUUID(
+    registrationID,
+    userUUID
+  );
+
+  if (_.isNil(upush) || _.isNil(setting)) {
+    throw new Error('没有对应记录, 无法取消');
+  }
+
+  await setting.setSystemSetting('disableNotify', true);
+  upush.is_active = false;
+  await upush.save();
   return true;
 };

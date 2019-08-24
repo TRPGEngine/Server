@@ -28,6 +28,23 @@ export class NotifyUPush extends Model {
   is_active: boolean;
 
   /**
+   * 根据设备id与用户uuid获取唯一设备
+   * @param registration_id 设备id
+   * @param user_uuid 用户uuid
+   */
+  static findByRegistrationAndUserUUID(
+    registration_id: string,
+    user_uuid: string
+  ): Promise<NotifyUPush> {
+    return NotifyUPush.findOne({
+      where: {
+        registration_id,
+        user_uuid,
+      },
+    });
+  }
+
+  /**
    * 向当前实例设备发送推送信息
    */
   async sendNotifyMsg(
