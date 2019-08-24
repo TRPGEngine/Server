@@ -187,7 +187,7 @@ export interface TRPGModelInitOptions<M extends Model<any, any> = Model>
 }
 export abstract class TRPGModel extends Model {
   public static init<M extends TRPGModel = TRPGModel>(
-    this: { new (): M } & typeof TRPGModel,
+    this: { new (): M } & typeof Model,
     attributes: TRPGModelAttributes,
     options: TRPGModelInitOptions<M>
   ) {
