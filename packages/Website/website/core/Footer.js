@@ -36,18 +36,16 @@ class Footer extends React.Component {
             )}
           </a>
           <div>
-            <h5>Docs</h5>
-            <a href={this.docUrl('doc1.html', this.props.language)}>
-              Getting Started (or other categories)
+            <h5>文档</h5>
+            <a href={this.docUrl('getstart.html', this.props.language)}>
+              普通用户
             </a>
-            <a href={this.docUrl('doc2.html', this.props.language)}>
-              Guides (or other categories)
+            <a href={this.docUrl('develop.html', this.props.language)}>
+              开发者
             </a>
-            <a href={this.docUrl('doc3.html', this.props.language)}>
-              API Reference (or other categories)
-            </a>
+            {/* <a href={this.docUrl('doc3.html', this.props.language)}>第三方</a> */}
           </div>
-          <div>
+          {/* <div>
             <h5>Community</h5>
             <a href={this.pageUrl('users.html', this.props.language)}>
               User Showcase
@@ -67,10 +65,10 @@ class Footer extends React.Component {
             >
               Twitter
             </a>
-          </div>
+          </div> */}
           <div>
-            <h5>More</h5>
-            <a href={`${this.props.config.baseUrl}blog`}>Blog</a>
+            <h5>更多</h5>
+            <a href={`${this.props.config.baseUrl}blog`}>博客</a>
             <a href="https://github.com/TRPGEngine">GitHub</a>
             <a
               className="github-button"
@@ -86,7 +84,7 @@ class Footer extends React.Component {
           </div>
         </section>
 
-        <a
+        {/* <a
           href="https://opensource.facebook.com/"
           target="_blank"
           rel="noreferrer noopener"
@@ -98,7 +96,7 @@ class Footer extends React.Component {
             width="170"
             height="45"
           />
-        </a>
+        </a> */}
         <section className="copyright">{this.props.config.copyright}</section>
       </footer>
     );
