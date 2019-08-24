@@ -15,6 +15,7 @@
     "db:migrate:run": "node ./cli.js run-migrate",
     "db:seeder:generate": "node ./cli.js generate-seeder",
     "db:seeder:run": "node ./cli.js run-seeder",
+    "doc:start": "cd ./packages/Website && npm start",
     "playground": "node ./playground/playground.js --experimental-repl-await",
     "bench": "node ./test/bench/index.js && cat ./test/bench/out.log",
     "test": "jest --config=./test/jest.config.js --runInBand"

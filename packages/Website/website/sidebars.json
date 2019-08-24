@@ -5,6 +5,7 @@
     "配置设置": ["doc3"]
   },
   "develop": {
-    "开发": ["develop", "doc5"]
+    "开发": ["develop", "config", "doc5"],
+    "包": ["package-core"]
   }
 }

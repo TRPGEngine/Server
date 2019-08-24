@@ -42,6 +42,7 @@ const siteConfig = {
     { doc: 'develop', label: '开发' },
     { page: 'help', label: '帮助' },
     { blog: true, label: '博客' },
+    { href: 'https://github.com/orgs/TRPGEngine/', label: 'Github' },
     { languages: false },
     { search: false },
     { href: 'http://moonrailgun.com', label: '关于作者' },
