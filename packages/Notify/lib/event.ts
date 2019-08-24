@@ -2,6 +2,7 @@ import { EventFunc } from 'trpg/core';
 import { NotifyJPush } from './models/jpush';
 import { NotifyUPush } from './models/upush';
 import { PlayerSettings } from 'packages/Player/lib/models/settings';
+import _ from 'lodash';
 
 // 绑定通知信息: 极光推送
 export const bindJPushNotifyInfo: EventFunc<{
