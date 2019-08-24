@@ -1,6 +1,16 @@
-module.exports = function ChatConverse(Sequelize, db) {
-  let ChatConverse = db.define(
-    'chat_converse',
+import { Model, DBInstance, Orm } from 'trpg/core';
+
+export type ChatConverseType = 'user' | 'channel' | 'group' | 'system';
+
+export class ChatConverse extends Model {
+  uuid: string;
+  type: ChatConverseType;
+  name: string;
+  icon: string;
+}
+
+export default function ChatConverseDefinition(Sequelize: Orm, db: DBInstance) {
+  ChatConverse.init(
     {
       uuid: {
         type: Sequelize.UUID,
@@ -15,11 +25,8 @@ module.exports = function ChatConverse(Sequelize, db) {
       icon: { type: Sequelize.STRING },
     },
     {
-      validations: {
-        // uuid: orm.enforce.unique({ scope: ['owner_id'] }, 'uuid already taken!'),
-      },
-      hooks: {},
-      methods: {},
+      tableName: 'chat_converse',
+      sequelize: db,
     }
   );
 
@@ -38,4 +45,4 @@ module.exports = function ChatConverse(Sequelize, db) {
   }
 
   return ChatConverse;
-};
+}
