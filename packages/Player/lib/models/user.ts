@@ -28,7 +28,15 @@ export class PlayerUser extends Model {
     return md5Encrypt(randomString(16));
   }
 
-  getName() {
+  static findByUUID(userUUID: string): Promise<PlayerUser> {
+    return PlayerUser.findOne({
+      where: {
+        uuid: userUUID,
+      },
+    });
+  }
+
+  getName(): string {
     return this.nickname || this.username;
   }
 
