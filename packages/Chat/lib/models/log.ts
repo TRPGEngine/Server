@@ -1,6 +1,31 @@
-module.exports = function Log(Sequelize, db) {
-  let ChatLog = db.define(
-    'chat_log',
+import { Model, Orm, DBInstance } from 'trpg/core';
+
+export type ChatMessageType =
+  | 'normal'
+  | 'system'
+  | 'ooc'
+  | 'speak'
+  | 'action'
+  | 'cmd'
+  | 'card'
+  | 'tip'
+  | 'file';
+
+export class ChatLog extends Model {
+  uuid: string;
+  sender_uuid: string;
+  to_uuid: string;
+  converse_uuid: string;
+  message: string;
+  type: ChatMessageType;
+  data: object;
+  is_group: boolean;
+  is_public: boolean;
+  date: string;
+}
+
+export default function LogDefinition(Sequelize: Orm, db: DBInstance) {
+  ChatLog.init(
     {
       uuid: {
         type: Sequelize.UUID,
@@ -30,10 +55,10 @@ module.exports = function Log(Sequelize, db) {
       date: { type: Sequelize.DATE },
     },
     {
-      hooks: {},
-      methods: {},
+      tableName: 'chat_log',
+      sequelize: db,
     }
   );
 
   return ChatLog;
-};
+}

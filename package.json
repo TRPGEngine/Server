@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,7 @@
     "db:migrate:run": "node ./cli.js run-migrate",
     "db:seeder:generate": "node ./cli.js generate-seeder",
     "db:seeder:run": "node ./cli.js run-seeder",
+    "doc:start": "cd ./packages/Website && npm start",
     "playground": "node ./playground/playground.js --experimental-repl-await",
     "bench": "node ./test/bench/index.js && cat ./test/bench/out.log",
     "test": "jest --config=./test/jest.config.js --runInBand"
@@ -49,7 +50,7 @@
     "memoize-one": "^5.0.4",
     "mysql2": "^1.6.5",
     "nodemon": "^1.19.1",
-    "sequelize": "^5.13.1",
+    "sequelize": "^5.16.0",
     "ts-node": "^8.1.0",
     "tsconfig-paths": "^3.8.0",
     "typescript": "^3.4.5",
@@ -59,6 +60,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^7.0.0",
+    "@types/jest": "^24.0.18",
     "@types/koa-bodyparser": "^4.3.0",
     "@types/koa-router": "^7.0.42",
     "@types/lodash": "^4.14.126",
@@ -72,6 +74,7 @@
     "prettier": "^1.16.4",
     "sequelize-auto-migrations": "github:TRPGEngine/sequelize-auto-migrations",
     "socket.io-client": "^2.2.0",
+    "ts-jest": "^24.0.2",
     "websocket-bench": "^0.2.0"
   }
 }

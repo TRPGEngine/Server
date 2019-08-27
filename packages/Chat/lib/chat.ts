@@ -1,6 +1,8 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:chat');
 import * as event from './event';
+import LogDefinition from './models/log';
+import ChatConverseDefinition from './models/converse';
 
 module.exports = ChatComponent;
 
@@ -21,8 +23,8 @@ export default function ChatComponent(app) {
 function initStorage() {
   let app = this;
   let storage = app.storage;
-  storage.registerModel(require('./models/log'));
-  storage.registerModel(require('./models/converse'));
+  storage.registerModel(LogDefinition);
+  storage.registerModel(ChatConverseDefinition);
 
   app.on('initCompleted', function(app) {
     // 数据信息统计

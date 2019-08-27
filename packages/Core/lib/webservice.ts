@@ -131,7 +131,7 @@ export default class WebService {
     this.use(helmet());
     this.use(cors());
     this.use(bodyParser());
-    this.use(serve(publicDir));
+    this.use(serve(publicDir, { maxage: 14 * 24 * 60 * 60 * 1000 })); // 缓存14天
     this.use(session(this.sessionOpt, this._app));
     this.use(async (ctx, next) => {
       const url = ctx.url;

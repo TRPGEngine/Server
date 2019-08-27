@@ -74,6 +74,8 @@ module.exports = {
     upush: {
       appKey: '',
       masterSecret: '',
+      mipush: true,
+      mi_activity: 'com.moonrailgun.trpg.MipushActivity',
     },
   },
 };
