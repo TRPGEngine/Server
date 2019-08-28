@@ -44,7 +44,7 @@ class Application extends events.EventEmitter {
   timers = []; // 计时器列表
   webApi = {}; // 网页服务api
   statInfoJob = []; // 统计信息任务
-  job = null; // node-schedule定时任务(每日凌晨2点)
+  job: Job = null; // node-schedule定时任务(每日凌晨2点)
   scheduleJob: ScheduleJob[] = []; // 计划任务列表
   testcase = [];
   [packageInject: string]: any; // 包注入的方法
@@ -123,14 +123,14 @@ class Application extends events.EventEmitter {
     }
   }
   initStatJob() {
-    let run = async () => {
+    const run = async () => {
       try {
         applog('start statistics project info...');
         let info: any = {};
         for (let job of this.statInfoJob) {
-          let name = job.name;
-          let fn = job.fn;
-          let res = await fn();
+          const name = job.name;
+          const fn = job.fn;
+          const res = await fn();
           applog('|- [%s]:%o', name, res);
           if (res) {
             info[name] = res;
@@ -301,6 +301,7 @@ class Application extends events.EventEmitter {
     }
     this.timers = [];
     this.job.cancel();
+    this.scheduleJob.forEach(({ job }) => job.cancel()); // 关闭计划任务列表
     this.cache.close(); // 关闭redis连接
     this.emit('close');
     debug('close completed!');
