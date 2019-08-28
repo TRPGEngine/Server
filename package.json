@@ -48,6 +48,7 @@
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
     "memoize-one": "^5.0.4",
+    "moment": "^2.24.0",
     "mysql2": "^1.6.5",
     "nodemon": "^1.19.1",
     "sequelize": "^5.16.0",

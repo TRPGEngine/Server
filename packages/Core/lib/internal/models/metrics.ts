@@ -1,5 +1,25 @@
-import { Model, Orm, DBInstance } from 'trpg/core';
+import { Model, Orm, DBInstance, Op } from 'trpg/core';
+import _ from 'lodash';
+import { getDate } from 'lib/helper/date-helper';
+import { MomentInput } from 'moment';
 
+interface MetricsStatisCellInfo {
+  count: number;
+  avg_usage: number;
+  max_usage: number;
+  min_usage: number;
+}
+interface MetricsStatisInfo {
+  [name: string]: {
+    date: string;
+    info: MetricsStatisCellInfo;
+  };
+}
+interface MetricsStatisInfoRet {
+  info: MetricsStatisInfo;
+  startDate: string;
+  endDate: string;
+}
 export class CoreMetrics extends Model {
   id: number;
   name: string;
@@ -9,6 +29,60 @@ export class CoreMetrics extends Model {
   max_usage?: number;
   min_usage?: number;
   count: number;
+
+  // 返回时间段内数据统计情况
+  static async getStatisInfo(
+    startDate: MomentInput,
+    endDate: MomentInput
+  ): Promise<MetricsStatisInfoRet> {
+    startDate = getDate(startDate);
+    endDate = getDate(endDate);
+
+    const list = await CoreMetrics.findAll({
+      where: {
+        date: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+    });
+
+    const info: MetricsStatisInfo = _(list)
+      .groupBy('type')
+      .mapValues((t) =>
+        _(t)
+          .groupBy('name')
+          .mapValues((n) => {
+            const size = n.length;
+
+            const cellInfo: MetricsStatisCellInfo = n.reduce(
+              (prev, curr) => {
+                return {
+                  count: prev.count + curr.count,
+                  max_usage: Math.max(prev.max_usage, curr.max_usage),
+                  min_usage: Math.min(prev.min_usage, curr.min_usage),
+                  avg_usage: prev.avg_usage + curr.avg_usage,
+                };
+              },
+              {
+                count: 0,
+                avg_usage: 0,
+                max_usage: 0,
+                min_usage: 0,
+              }
+            );
+
+            // 计算平均值
+            cellInfo.avg_usage = cellInfo.avg_usage / size;
+
+            return cellInfo;
+          })
+      )
+      .value() as any;
+
+    // TODO
+
+    return { info, startDate, endDate };
+  }
 }
 
 export default function CoreMetricsDefinition(Sequelize: Orm, db: DBInstance) {
