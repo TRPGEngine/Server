@@ -1,6 +1,3 @@
-const trpgapp = global.trpgapp;
-const emitEvent = global.emitEvent;
-
 describe('internal module', () => {
   test('getGlobalConfig should be ok', async () => {
     const ret = await emitEvent('core::getGlobalConfig');
