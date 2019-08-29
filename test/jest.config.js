@@ -2,12 +2,10 @@
 // https://jestjs.io/docs/en/configuration.html
 const { pathsToModuleNameMapper } = require('ts-jest/utils');
 const { compilerOptions } = require('../tsconfig');
-const _ = require('lodash');
 
-const moduleNameMapper = _.mapValues(
-  pathsToModuleNameMapper(compilerOptions.paths),
-  (v) => `<rootDir>/${v}`
-);
+const moduleNameMapper = pathsToModuleNameMapper(compilerOptions.paths, {
+  prefix: '<rootDir>/',
+});
 
 module.exports = {
   // All imported modules in your tests should be mocked automatically
