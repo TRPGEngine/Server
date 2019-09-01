@@ -6,6 +6,7 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:internal');
 
 import CoreRouter from './routers/core';
+import MetricsRouter from './routers/metrics';
 import GraphQLRouter from './routers/graphql';
 import { getGlobalConfig } from './event';
 
@@ -22,6 +23,7 @@ export default class Core extends BasePackage {
     this.regModel(CoreMetricsDefinition);
 
     this.regRoute(CoreRouter);
+    this.regRoute(MetricsRouter);
     this.regRoute(GraphQLRouter);
 
     this.regSocketEvent('getGlobalConfig', getGlobalConfig);

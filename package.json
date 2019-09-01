@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -48,6 +48,7 @@
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
     "memoize-one": "^5.0.4",
+    "moment": "^2.24.0",
     "mysql2": "^1.6.5",
     "nodemon": "^1.19.1",
     "sequelize": "^5.16.0",
@@ -58,6 +59,7 @@
     "yargs": "^13.2.2"
   },
   "devDependencies": {
+    "@types/config": "0.0.34",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^7.0.0",
     "@types/jest": "^24.0.18",

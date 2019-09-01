@@ -1,6 +1,8 @@
 import md5Encrypt from '../utils/md5';
 import randomString from 'crypto-random-string';
 import { Model, DBInstance, Orm } from 'trpg/core';
+import config from 'config';
+import _ from 'lodash';
 
 export class PlayerUser extends Model {
   id: number;
@@ -38,6 +40,15 @@ export class PlayerUser extends Model {
 
   getName(): string {
     return this.nickname || this.username;
+  }
+
+  getAvatarUrl(): string {
+    if (this.avatar && this.avatar.startsWith('/')) {
+      const apihost = _.get(config, 'apihost', '');
+      return apihost + this.avatar;
+    }
+
+    return this.avatar;
   }
 
   getJWTPayload() {

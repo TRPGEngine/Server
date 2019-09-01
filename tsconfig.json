@@ -16,5 +16,5 @@
       "packages/*": ["packages/*"]
     }
   },
-  "include": ["./node_modules/@types/**/*", "packages/**/*", "lib/**/*", "types/**/*"]
+  "include": ["./node_modules/@types/**/*", "packages/**/*", "lib/**/*", "test/**/*", "types/**/*"]
 }
