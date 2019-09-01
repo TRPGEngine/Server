@@ -60,7 +60,8 @@ export class NotifyUPush extends Model {
   async sendNotifyMsg(
     app: TRPGApplication,
     text: string,
-    title: string = '通知'
+    title: string = '通知',
+    extraBody?: {}
   ) {
     const upushConfig = app.get<NotifyPushConfig>('notify.upush');
     const { appKey, masterSecret, mipush, mi_activity } = upushConfig;
@@ -80,6 +81,7 @@ export class NotifyUPush extends Model {
           ticker: '来自TRPG的通知',
           title,
           text,
+          ...extraBody,
         },
       },
     };

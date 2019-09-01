@@ -148,7 +148,12 @@ function initFunction() {
 
       // 发送通知
       const title = senderInfo.getName();
-      await upush.sendNotifyMsg(app, message, title);
+      const extraBody = {};
+      if (_.isString(senderInfo.getAvatarUrl())) {
+        // 如果有头像， 则推送时带上头像
+        _.set(extraBody, 'img', senderInfo.getAvatarUrl());
+      }
+      await upush.sendNotifyMsg(app, message, title, extraBody);
       debug(
         'send chat notify finished! to uuid %s[%s]: %s, %s',
         to_uuid,
