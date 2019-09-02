@@ -30,6 +30,10 @@ export class PlayerUser extends Model {
     return md5Encrypt(randomString(16));
   }
 
+  /**
+   * 根据用户UUID查找用户
+   * @param userUUID 用户UUID
+   */
   static findByUUID(userUUID: string): Promise<PlayerUser> {
     return PlayerUser.findOne({
       where: {
@@ -38,10 +42,17 @@ export class PlayerUser extends Model {
     });
   }
 
+  /**
+   * 返回用户显示名
+   */
   getName(): string {
     return this.nickname || this.username;
   }
 
+  /**
+   * 获取可以直接访问的用户头像的url地址
+   * 主要是处理了一下相对路径
+   */
   getAvatarUrl(): string {
     if (this.avatar && this.avatar.startsWith('/')) {
       const apihost = _.get(config, 'apihost', '');
@@ -51,6 +62,9 @@ export class PlayerUser extends Model {
     return this.avatar;
   }
 
+  /**
+   * 获取用于生产JWT数据的payload对象
+   */
   getJWTPayload() {
     return {
       uuid: this.uuid,
@@ -59,6 +73,10 @@ export class PlayerUser extends Model {
     };
   }
 
+  /**
+   * 获取用户信息
+   * @param includeToken 是否包含token
+   */
   getInfo(includeToken = false) {
     return {
       username: this.username,
@@ -75,6 +93,10 @@ export class PlayerUser extends Model {
     };
   }
 
+  /**
+   * 更新用户数据。保护数据不更新一些敏感数据
+   * @param data 用户数据
+   */
   updateInfo(data) {
     // 数据保护
     delete data.id;
