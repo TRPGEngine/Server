@@ -511,41 +511,62 @@ exports.refuseFriendInvite = async function refuseFriendInvite(data, cb, db) {
   invite.is_refuse = true;
   await invite.save();
 
+  if (app.chat) {
+    // 如果 chat 模块已注册
+    app.chat.sendSystemMsg(
+      invite.from_uuid,
+      '',
+      '',
+      `${_.get(player, 'user.username', '') ||
+        _.get(player, 'user.nickname', '')} 已拒绝你的好友申请`
+    );
+  }
+
   return { res: invite };
 };
 
 exports.agreeFriendInvite = async function agreeFriendInvite(data, cb, db) {
-  let app = this.app;
-  let socket = this.socket;
+  const app = this.app;
+  const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.list.find(socket);
   if (!player) {
     throw '用户状态异常';
   }
 
-  let inviteUUID = data.uuid;
-  let invite = await db.models.player_invite.findOne({
+  const inviteUUID = data.uuid;
+  const invite = await db.models.player_invite.findOne({
     where: {
       uuid: inviteUUID,
       to_uuid: player.uuid,
     },
   });
   if (!invite) {
-    throw '没有找到该邀请';
+    throw '没有找到该好友申请';
   }
 
   invite.is_agree = true;
   await db.transactionAsync(async () => {
     await invite.save();
     // 设定好友关系
-    let uuid1 = invite.from_uuid;
-    let uuid2 = invite.to_uuid;
+    const uuid1 = invite.from_uuid; // 邀请发起人
+    const uuid2 = invite.to_uuid; // 邀请接受人(同意好友邀请的人)
     await app.player.makeFriendAsync(uuid1, uuid2, db);
 
     // 发送更新好友的通知
-    let player1 = app.player.list.get(uuid1);
+    const player1 = app.player.list.get(uuid1);
     if (player1) {
       player1.socket.emit('player::appendFriend', { uuid: uuid2 });
+    }
+    if (app.chat) {
+      // 如果 chat 模块已注册
+      app.chat.sendSystemMsg(
+        uuid1,
+        '',
+        '',
+        `${_.get(player, 'user.username', '') ||
+          _.get(player, 'user.nickname', '')} 已同意你的好友申请`
+      );
     }
   });
 
