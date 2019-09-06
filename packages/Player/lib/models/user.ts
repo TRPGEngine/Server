@@ -4,7 +4,7 @@ import randomString from 'crypto-random-string';
 import { Model, DBInstance, Orm } from 'trpg/core';
 import config from 'config';
 import _ from 'lodash';
-import { fn, col } from 'sequelize/types';
+import { fn, col } from 'sequelize';
 
 export class PlayerUser extends Model {
   id: number;

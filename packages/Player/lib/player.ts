@@ -5,12 +5,29 @@ import Router from 'koa-router';
 const Geetest = require('gt3-sdk');
 import md5 from './utils/md5';
 import sha1 from './utils/sha1';
-const event = require('./event');
 import PlayerList from './list';
 import PlayerUserDefinition, { PlayerUser } from './models/user';
 import PlayerInviteDefinition from './models/invite';
 import PlayerLoginLogDefinition, { PlayerLoginLog } from './models/login-log';
 import PlayerSettingsDefinition from './models/settings';
+import {
+  login,
+  loginWithToken,
+  register,
+  getInfo,
+  updateInfo,
+  changePassword,
+  logout,
+  findUser,
+  getFriends,
+  sendFriendInvite,
+  refuseFriendInvite,
+  agreeFriendInvite,
+  getFriendsInvite,
+  checkUserOnline,
+  getSettings,
+  saveSettings,
+} from './event';
 
 export default class Player extends BasePackage {
   public name: string = 'Player';
@@ -171,23 +188,22 @@ export default class Player extends BasePackage {
   }
 
   private initSocket() {
-    this.regSocketEvent('player::login', event.login);
-    this.regSocketEvent('player::loginWithToken', event.loginWithToken);
-    this.regSocketEvent('player::register', event.register);
-    this.regSocketEvent('player::getInfo', event.getInfo);
-    this.regSocketEvent('player::updateInfo', event.updateInfo);
-    this.regSocketEvent('player::changePassword', event.changePassword);
-    this.regSocketEvent('player::logout', event.logout);
-    this.regSocketEvent('player::findUser', event.findUser);
-    // this.regSocketEvent('player::addFriend', event.addFriend); // 禁止直接加好友接口
-    this.regSocketEvent('player::getFriends', event.getFriends);
-    this.regSocketEvent('player::sendFriendInvite', event.sendFriendInvite);
-    this.regSocketEvent('player::refuseFriendInvite', event.refuseFriendInvite);
-    this.regSocketEvent('player::agreeFriendInvite', event.agreeFriendInvite);
-    this.regSocketEvent('player::getFriendsInvite', event.getFriendsInvite);
-    this.regSocketEvent('player::checkUserOnline', event.checkUserOnline);
-    this.regSocketEvent('player::getSettings', event.getSettings);
-    this.regSocketEvent('player::saveSettings', event.saveSettings);
+    this.regSocketEvent('player::login', login);
+    this.regSocketEvent('player::loginWithToken', loginWithToken);
+    this.regSocketEvent('player::register', register);
+    this.regSocketEvent('player::getInfo', getInfo);
+    this.regSocketEvent('player::updateInfo', updateInfo);
+    this.regSocketEvent('player::changePassword', changePassword);
+    this.regSocketEvent('player::logout', logout);
+    this.regSocketEvent('player::findUser', findUser);
+    this.regSocketEvent('player::getFriends', getFriends);
+    this.regSocketEvent('player::sendFriendInvite', sendFriendInvite);
+    this.regSocketEvent('player::refuseFriendInvite', refuseFriendInvite);
+    this.regSocketEvent('player::agreeFriendInvite', agreeFriendInvite);
+    this.regSocketEvent('player::getFriendsInvite', getFriendsInvite);
+    this.regSocketEvent('player::checkUserOnline', checkUserOnline);
+    this.regSocketEvent('player::getSettings', getSettings);
+    this.regSocketEvent('player::saveSettings', saveSettings);
 
     // TODO:需要考虑到断线重连的问题
     const app = this.app;
