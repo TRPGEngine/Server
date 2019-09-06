@@ -1,10 +1,18 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
+declare module 'socket.io' {
+  interface Socket {
+    iosession?: SessionContext;
+    websession?: SessionContext;
+  }
+}
+
+// Socket
 export function IOSessionMiddleware(webapp, opt) {
   const store = opt.store;
   const key = opt.key || 'koa:sess';
 
-  return async function(socket, next) {
+  return async function(socket: SocketIO.Socket, next) {
     if (!socket.iosession) {
       socket.iosession = new SessionContext(`io:${socket.id}`, store);
     }
@@ -40,31 +48,36 @@ export function WebSessionMiddleware(webapp, opt) {
   };
 }
 
-function SessionContext(sid, store) {
-  this.sid = sid;
-  this.store = store;
+class SessionContext {
+  sid: number;
+  store: any;
+
+  constructor(sid, store) {
+    this.sid = sid;
+    this.store = store;
+  }
+
+  // 如果path为空则返回所有
+  async get(path) {
+    const session = await this.store.get(this.sid);
+    if (path && typeof path === 'string') {
+      return _.get(session, path);
+    }
+
+    return session;
+  }
+
+  async set(path = '', value) {
+    let session = await this.store.get(this.sid);
+    if (!session) {
+      session = {};
+    }
+    _.set(session, path, value);
+    await this.store.set(this.sid, session);
+    return session;
+  }
+
+  async destroy() {
+    return this.store.destroy(this.sid);
+  }
 }
-
-// 如果path为空则返回所有
-SessionContext.prototype.get = async function(path) {
-  const session = await this.store.get(this.sid);
-  if (path && typeof path === 'string') {
-    return _.get(session, path);
-  }
-
-  return session;
-};
-
-SessionContext.prototype.set = async function(path = '', value) {
-  let session = await this.store.get(this.sid);
-  if (!session) {
-    session = {};
-  }
-  _.set(session, path, value);
-  await this.store.set(this.sid, session);
-  return session;
-};
-
-SessionContext.prototype.destroy = function() {
-  return this.store.destroy(this.sid);
-};
