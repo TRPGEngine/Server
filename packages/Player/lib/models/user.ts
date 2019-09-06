@@ -1,8 +1,10 @@
 import md5Encrypt from '../utils/md5';
+import sha1Encrypt from '../utils/sha1';
 import randomString from 'crypto-random-string';
 import { Model, DBInstance, Orm } from 'trpg/core';
 import config from 'config';
 import _ from 'lodash';
+import { fn, col } from 'sequelize/types';
 
 export class PlayerUser extends Model {
   id: number;
@@ -31,6 +33,16 @@ export class PlayerUser extends Model {
   }
 
   /**
+   * 生成一个存储于数据库的密码hash
+   * 最终加密结果为: sha1(md5(md5(*realpass*)) + salt)
+   * @param realPassword 客户端传来的密码(已经过客户端)
+   * @param salt 盐值
+   */
+  static genPassword(clientPassword: string, salt: string): string {
+    return sha1Encrypt(md5Encrypt(clientPassword) + salt);
+  }
+
+  /**
    * 根据用户UUID查找用户
    * @param userUUID 用户UUID
    */
@@ -38,6 +50,23 @@ export class PlayerUser extends Model {
     return PlayerUser.findOne({
       where: {
         uuid: userUUID,
+      },
+    });
+  }
+
+  /**
+   * 根据用户名和密码查找用户
+   * @param username 用户名
+   * @param password 密码
+   */
+  static findByUsernameAndPassword(
+    username: string,
+    password: string
+  ): Promise<PlayerUser> {
+    return PlayerUser.findOne({
+      where: {
+        username,
+        password: fn('SHA1', fn('CONCAT', fn('MD5', password), col('salt'))),
       },
     });
   }

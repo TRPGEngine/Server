@@ -4,6 +4,7 @@ import md5 from './utils/md5';
 import sha1 from './utils/sha1';
 import uuid from 'uuid/v1';
 import _ from 'lodash';
+import { PlayerUser } from './models/user';
 
 export {};
 
@@ -54,20 +55,7 @@ exports.login = async function login(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  const Sequelize = app.storage._Sequelize;
-  const user = await db.models.player_user.findOne({
-    where: {
-      username,
-      password: Sequelize.fn(
-        'SHA1',
-        Sequelize.fn(
-          'CONCAT',
-          Sequelize.fn('MD5', password),
-          Sequelize.col('salt')
-        )
-      ),
-    },
-  });
+  const user = await PlayerUser.findByUsernameAndPassword(username, password);
 
   if (!user) {
     debug('login fail, try to login [%s] and password error', username);
@@ -231,8 +219,7 @@ exports.register = async function register(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let modelUser = db.models.player_user;
-  let user = await modelUser.findOne({
+  const user = await PlayerUser.findOne({
     where: { username },
   });
 
@@ -241,10 +228,10 @@ exports.register = async function register(data, cb, db) {
     throw '用户名已存在';
   }
 
-  const salt = modelUser.genSalt();
-  let results = await modelUser.create({
+  const salt = PlayerUser.genSalt();
+  const results = await PlayerUser.create({
     username,
-    password: sha1(md5(password) + salt), // 存储密码为sha1(md5(md5(realpass)) + salt)
+    password: PlayerUser.genPassword(password, salt), // 存储密码为sha1(md5(md5(realpass)) + salt)
     salt,
   });
   debug('register success: %o', results);
@@ -310,16 +297,19 @@ exports.changePassword = async function changePassword(data, cb, db) {
   }
 
   let { oldPassword, newPassword } = data;
-  oldPassword = md5(oldPassword);
-  newPassword = md5(newPassword);
+  // oldPassword = md5(oldPassword);
+  // newPassword = md5(newPassword);
 
-  let userId = player.user.id;
-  let user = await db.models.player_user.findByPk(userId);
-  if (user.password !== oldPassword) {
+  const username = player.user.username;
+  const user = await PlayerUser.findByUsernameAndPassword(
+    username,
+    oldPassword
+  );
+  if (!user) {
     throw '原密码不正确';
   }
 
-  user.password = newPassword;
+  user.password = PlayerUser.genPassword(newPassword, user.salt); // 还是用原来的盐值
   await user.save();
   return { user: user.getInfo(true) };
 };
