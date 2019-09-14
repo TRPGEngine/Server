@@ -18,7 +18,8 @@
     "doc:start": "cd ./packages/Website && npm start",
     "playground": "node ./playground/playground.js --experimental-repl-await",
     "bench": "node ./test/bench/index.js && cat ./test/bench/out.log",
-    "test": "jest --config=./test/jest.config.js --runInBand"
+    "test": "jest --config=./test/jest.config.js --runInBand",
+    "test:watch": "jest --config=./test/jest.config.js --runInBand --watch"
   },
   "husky": {
     "hooks": {
