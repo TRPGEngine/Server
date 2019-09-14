@@ -16,9 +16,7 @@
     "url": "https://github.com/TRPGEngine/Player/issues"
   },
   "homepage": "https://github.com/TRPGEngine/Player#readme",
-  "devDependencies": {
-    "trpg-core": "github:trpgengine/Core"
-  },
+  "devDependencies": {},
   "dependencies": {
     "crypto": "0.0.3",
     "gt3-sdk": "^2.0.0",
