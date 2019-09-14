@@ -1,5 +1,6 @@
 import BasePackage from 'lib/package';
 import DeployVersionDefinition from './models/version';
+import versionRouter from './routers/version';
 
 export default class Deploy extends BasePackage {
   public name: string = 'deploy';
@@ -8,5 +9,7 @@ export default class Deploy extends BasePackage {
 
   onInit(): void {
     this.regModel(DeployVersionDefinition);
+
+    this.regRoute(versionRouter);
   }
 }

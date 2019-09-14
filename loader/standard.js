@@ -12,6 +12,7 @@ const qqconnect = require('../packages/QQConnect');
 const report = require('../packages/Report');
 const mail = require('../packages/Mail');
 const notify = require('../packages/Notify');
+const deploy = require('../packages/Deploy');
 
 module.exports = function loadModules(app) {
   app.load(player);
@@ -27,6 +28,7 @@ module.exports = function loadModules(app) {
   app.load(report); // 尚未测试
   app.load(mail); // 尚未测试
   app.load(notify);
+  app.load(deploy);
 
   app.load(dashboard); // 尚未测试
 

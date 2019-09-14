@@ -145,14 +145,12 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "username": {
-                    "required": true,
-                    "unique": true,
                     "allowNull": false,
+                    "unique": true,
                     "field": "username",
                     "seqType": "Sequelize.STRING"
                 },
                 "password": {
-                    "required": true,
                     "allowNull": false,
                     "field": "password",
                     "seqType": "Sequelize.STRING"
@@ -162,12 +160,10 @@
                     "seqType": "Sequelize.STRING"
                 },
                 "nickname": {
-                    "required": false,
                     "field": "nickname",
                     "seqType": "Sequelize.STRING"
                 },
                 "avatar": {
-                    "required": false,
                     "defaultValue": {
                         "value": ""
                     },
@@ -2563,7 +2559,50 @@
                 }
             },
             "indexes": []
+        },
+        "deploy_version": {
+            "tableName": "deploy_version",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "version": {
+                    "allowNull": false,
+                    "validate": {},
+                    "field": "version",
+                    "seqType": "Sequelize.STRING"
+                },
+                "platform": {
+                    "allowNull": false,
+                    "field": "platform",
+                    "seqType": "Sequelize.ENUM('android', 'ios', 'windows', 'mac', 'linux')"
+                },
+                "download_url": {
+                    "comment": "二进制文件完整下载地址",
+                    "field": "download_url",
+                    "seqType": "Sequelize.STRING"
+                },
+                "describe": {
+                    "comment": "版本更新内容",
+                    "field": "describe",
+                    "seqType": "Sequelize.TEXT"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
         }
     },
-    "revision": 20
+    "revision": 21
 }
