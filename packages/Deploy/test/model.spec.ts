@@ -1,25 +1,10 @@
 import { DeployVersion } from '../lib/models/version';
-
-const mockDataset = {
-  version: [
-    {
-      version: '1.0.0',
-    },
-    {
-      version: '2.1.0',
-    },
-    {
-      version: '1.1.0',
-    },
-  ],
-};
+import { mockVersionFindAll } from './dataset';
 
 describe('models', () => {
   describe('deploy version', () => {
     beforeAll(() => {
-      DeployVersion.findAll = jest
-        .fn()
-        .mockImplementation(() => Promise.resolve(mockDataset.version));
+      DeployVersion.findAll = mockVersionFindAll;
     });
 
     it('models findLatestVersion should be ok', async () => {
