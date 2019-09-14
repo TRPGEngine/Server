@@ -2,8 +2,16 @@ import { Model, DBInstance, Orm } from 'trpg/core';
 import semver from 'semver';
 import _ from 'lodash';
 
+export type DeployVersionPlatform =
+  | 'android'
+  | 'ios'
+  | 'windows'
+  | 'mac'
+  | 'linux';
+
 export class DeployVersion extends Model {
   version: string;
+  platform: DeployVersionPlatform;
   downloadUrl: string;
   describe: string;
 
@@ -27,8 +35,14 @@ export class DeployVersion extends Model {
    * 获取所有发布版本数据并获取版本号最大的一条作为最新记录
    * TODO: 可能需要增加缓存
    */
-  static async findLatestVersion(): Promise<DeployVersion> {
-    const allVersions: DeployVersion[] = await DeployVersion.findAll({});
+  static async findLatestVersion(
+    platform: DeployVersionPlatform = 'android'
+  ): Promise<DeployVersion> {
+    const allVersions: DeployVersion[] = await DeployVersion.findAll({
+      where: {
+        platform,
+      },
+    });
 
     const sortedVersions = allVersions.sort((a, b) =>
       semver.gt(a.version, b.version) ? 1 : -1
@@ -47,8 +61,12 @@ export default function DeployVersionDefinition(
         type: Sequelize.STRING,
         allowNull: false,
         validate: {
-          isValidSemver: (value) => !_.isNull(semver.valid(value)),
+          isValidSemver: (value: string) => !_.isNull(semver.valid(value)),
         },
+      },
+      platform: {
+        type: Sequelize.ENUM('android', 'ios', 'windows', 'mac', 'linux'),
+        allowNull: false,
       },
       download_url: {
         type: Sequelize.STRING,

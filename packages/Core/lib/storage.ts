@@ -219,6 +219,9 @@ export abstract class TRPGModel extends Model {
     return this.create(values, options);
   }
 
+  /**
+   * 获取应用app对象
+   */
   public static getApplication(): TRPGApplication {
     throw new Error('Not inject application!');
   }
