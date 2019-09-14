@@ -4,8 +4,10 @@ const io = require('socket.io-client');
 const lodash = require('lodash');
 const randomString = require('crypto-random-string');
 const config = require('config');
+const axios = require('axios').default;
 let trpgapp = null;
-const socket = io(`ws://127.0.0.1:${lodash.get(config, 'port', 23256)}`, {
+const port = lodash.get(config, 'port', 23256);
+const socket = io(`ws://127.0.0.1:${port}`, {
   autoConnect: false,
 });
 
@@ -36,6 +38,7 @@ class TRPGEnvironment extends NodeEnvironment {
     this.global.trpgapp = trpgapp;
     this.global.db = db;
     this.global.socket = socket;
+    this.global.port = port;
     this.global.testEvent = (eventFn, data) => {
       // 测试直接处理信息
       return new Promise(async function(resolve) {
@@ -84,7 +87,6 @@ class TRPGEnvironment extends NodeEnvironment {
     this.global.generateRandomStr = (length = 10) => {
       return randomString(length);
     };
-
     await super.setup();
   }
 

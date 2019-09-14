@@ -150,19 +150,19 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
       },
       username: {
         type: Sequelize.STRING,
-        required: true,
+        allowNull: false,
         unique: true,
       },
-      password: { type: Sequelize.STRING, required: true },
+      password: { type: Sequelize.STRING, allowNull: false },
       salt: { type: Sequelize.STRING },
-      nickname: { type: Sequelize.STRING, required: false },
+      nickname: { type: Sequelize.STRING },
       name: {
         type: Sequelize.VIRTUAL,
         get() {
           return this.nickname || this.username;
         },
       },
-      avatar: { type: Sequelize.STRING, required: false, defaultValue: '' },
+      avatar: { type: Sequelize.STRING, defaultValue: '' },
       last_login: { type: Sequelize.DATE },
       last_ip: { type: Sequelize.STRING },
       token: { type: Sequelize.STRING },
