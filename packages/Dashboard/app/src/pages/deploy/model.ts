@@ -5,7 +5,7 @@ import _get from 'lodash/get';
 import { DeployVersionType } from './data';
 
 export interface StateType {
-  versions: DeployVersionType[];
+  deploys: DeployVersionType[];
 }
 
 export type Effect = (
@@ -30,7 +30,7 @@ const Model: ModelType = {
   namespace: 'deployPanel',
 
   state: {
-    versions: [],
+    deploys: [],
   },
 
   effects: {
@@ -38,7 +38,7 @@ const Model: ModelType = {
       const response = yield call(fetchDeployList, page, 100);
       yield put({
         type: 'updateDeploy',
-        payload: _get(response, 'data.version'),
+        payload: _get(response, 'data.deploys'),
       });
     },
   },
@@ -47,7 +47,7 @@ const Model: ModelType = {
     updateDeploy(state, { payload }) {
       return {
         ...state,
-        versions: payload,
+        deploys: payload,
       };
     },
   },

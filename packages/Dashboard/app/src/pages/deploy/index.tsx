@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { Table, Divider, Tag } from 'antd';
+import { Table, Button } from 'antd';
 import { connect } from 'dva';
 import { StateType } from './model';
 import { Dispatch } from 'redux';
 import _get from 'lodash/get';
-// import SendNotify from './components/modals/SendNotify';
+import CreateDeploy from './components/modals/CreateDeploy';
+import { DeployVersionType } from './data';
+import { ColumnProps } from 'antd/es/table/interface';
 
 interface Props {
   deployPanel: StateType;
@@ -17,7 +19,7 @@ interface Props {
     deployPanel,
     loading,
   }: {
-    deployPanel: any;
+    deployPanel: StateType;
     loading: {
       effects: { [key: string]: boolean };
     };
@@ -28,15 +30,14 @@ interface Props {
 )
 class Notify extends Component<Props> {
   state = {
-    sendNotifyVisible: false,
-    selectedRegistrationId: '',
+    createDeployVisible: false,
   };
 
   componentDidMount() {
-    this.fetchDevices(1);
+    this.fetchDeploy(1);
   }
 
-  fetchDevices(page: number) {
+  fetchDeploy(page: number) {
     const { dispatch } = this.props;
     dispatch({
       type: 'deployPanel/fetch',
@@ -44,24 +45,31 @@ class Notify extends Component<Props> {
     });
   }
 
-  // renderModal() {
-  //   const { sendNotifyVisible, selectedRegistrationId } = this.state;
+  createDeploy = () => {
+    this.setState({ createDeployVisible: true });
+  };
 
-  //   return (
-  //     <div>
-  //       <SendNotify
-  //         visible={sendNotifyVisible}
-  //         registrationId={selectedRegistrationId}
-  //         onClose={() => this.setState({ sendNotifyVisible: false })}
-  //       />
-  //     </div>
-  //   );
-  // }
+  renderModal() {
+    const { createDeployVisible } = this.state;
+
+    return (
+      <div>
+        <CreateDeploy
+          visible={createDeployVisible}
+          onCreate={() => {
+            this.setState({ createDeployVisible: false });
+            this.fetchDeploy(1);
+          }}
+          onClose={() => this.setState({ createDeployVisible: false })}
+        />
+      </div>
+    );
+  }
 
   renderTable() {
     const { loading, deployPanel } = this.props;
 
-    const columns = [
+    const columns: Array<ColumnProps<DeployVersionType>> = [
       {
         title: 'ID',
         dataIndex: 'id',
@@ -90,27 +98,15 @@ class Notify extends Component<Props> {
       {
         title: 'Action',
         key: 'action',
-        render: (_: any, record: any) => (
+        render: (_, record) => (
           <span>
-            <a
-              href="javascript:;"
-              onClick={() =>
-                this.setState({
-                  sendNotifyVisible: true,
-                  selectedRegistrationId: record.registration_id,
-                })
-              }
-            >
-              发送通知
-            </a>
-            <Divider type="vertical" />
-            <a href="javascript:;">查看历史</a>
+            <a href="javascript:;">删除</a>
           </span>
         ),
       },
     ];
 
-    const data = deployPanel.versions || [];
+    const data = deployPanel.deploys || [];
 
     return (
       <Table
@@ -124,14 +120,16 @@ class Notify extends Component<Props> {
   }
 
   render() {
-    const { deployPanel } = this.props;
-    const { versions } = deployPanel;
-
     return (
       <div>
         <p style={{ textAlign: 'center' }}>部署列表</p>
+        <div style={{ marginBottom: 16 }}>
+          <Button type="primary" onClick={this.createDeploy}>
+            创建部署记录
+          </Button>
+        </div>
         {this.renderTable()}
-        {/* {this.renderModal()} */}
+        {this.renderModal()}
       </div>
     );
   }

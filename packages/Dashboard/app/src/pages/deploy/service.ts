@@ -1,6 +1,6 @@
 import gqlQuery from '@/utils/gql';
+import request from '@/utils/request';
 import { DeployVersionType } from './data';
-// import request from '@/utils/request';
 
 // 获取获取发布列表
 export async function fetchDeployList(page: number, limit = 10) {
@@ -22,4 +22,14 @@ export async function fetchDeployList(page: number, limit = 10) {
       offset,
     }
   );
+}
+
+/**
+ * 创建一条部署记录
+ * @param data 数据
+ */
+export function createDeploy(data: {}) {
+  return request.post('/dashboard/api/v2/deploy/create', {
+    data,
+  });
 }

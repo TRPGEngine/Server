@@ -6,28 +6,28 @@ const TextArea = Input.TextArea;
 import _isNull from 'lodash/isNull';
 import { sendNotify } from '../../service';
 
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 6 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 18 },
+  },
+};
+
 interface Props {
   visible: boolean;
   registrationId: string;
   form: WrappedFormUtils;
   onClose: () => void;
 }
-
 const SendNotify = (props: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { visible, onClose, registrationId, form } = props;
 
   const { getFieldDecorator } = form;
-  const formItemLayout = {
-    labelCol: {
-      xs: { span: 24 },
-      sm: { span: 6 },
-    },
-    wrapperCol: {
-      xs: { span: 24 },
-      sm: { span: 18 },
-    },
-  };
 
   const onSubmit = () => {
     form.validateFields((errors, values) => {
