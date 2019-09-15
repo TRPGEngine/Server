@@ -12,6 +12,7 @@ export async function fetchDeployList(page: number, limit = 10) {
           id,
           version,
           platform,
+          download_url,
           describe,
           createdAt,
         }

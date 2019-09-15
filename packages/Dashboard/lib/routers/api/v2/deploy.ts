@@ -11,7 +11,7 @@ router.post('/create', async (ctx, next) => {
   const info: DeployVersion = await DeployVersion.create({
     version,
     platform,
-    downloadUrl,
+    download_url: downloadUrl,
     describe,
   });
 

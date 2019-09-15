@@ -86,6 +86,11 @@ class Notify extends Component<Props> {
         key: 'platform',
       },
       {
+        title: '下载地址',
+        dataIndex: 'download_url',
+        key: 'download_url',
+      },
+      {
         title: '描述',
         dataIndex: 'describe',
         key: 'describe',
