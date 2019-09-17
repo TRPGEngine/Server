@@ -25,8 +25,11 @@ class TRPGEnvironment extends NodeEnvironment {
     debug('Setup TRPG Test Environment');
 
     // 创建trpg实例
-    trpgapp = generateTRPGInstance();
-    const db = trpgapp.storage.db;
+    if (!lodash.get(process, 'env.npm_config_noserver', false)) {
+      trpgapp = generateTRPGInstance();
+    }
+
+    const db = lodash.get(trpgapp, 'storage.db');
 
     socket.open();
     socket.on('error', (err) => {
