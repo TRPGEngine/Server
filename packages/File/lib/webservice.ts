@@ -1,6 +1,6 @@
-const Router = require('koa-router');
+import Router from 'koa-router';
 
-module.exports = function initFileService(app) {
+export function initFileService(app) {
   const webservice = app.webservice;
   const router = new Router();
 
@@ -11,4 +11,4 @@ module.exports = function initFileService(app) {
   router.use('/file/avatar', avatar.routes());
   router.use('/file/chatimg', chatimg.routes());
   webservice.use(router.routes());
-};
+}

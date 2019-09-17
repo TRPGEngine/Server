@@ -1,9 +1,13 @@
-const debug = require('debug')('trpg:component:file');
-const fs = require('fs-extra');
-const event = require('./event');
-const config = require('./config');
-const filesize = require('filesize');
-const initFileService = require('./webservice');
+import Debug from 'debug';
+const debug = Debug('trpg:component:file');
+import fs from 'fs-extra';
+import filesize from 'filesize';
+import config from './config';
+import { initFileService } from './webservice';
+import { bindAttachUUID, getFileInfo } from './event';
+import FileAvatarDefinition from './models/avatar';
+import FileChatimgDefinition from './models/chatimg';
+import FileFileDefinition from './models/file';
 
 function deleteall(path) {
   var files = [];
@@ -43,9 +47,10 @@ function checkDir() {
 
 module.exports = function FileComponent(app) {
   checkDir(); // 创建上传文件夹
-  app.storage.registerModel(require('./models/avatar.js'));
-  app.storage.registerModel(require('./models/chatimg.js'));
-  app.storage.registerModel(require('./models/file.js'));
+  app.storage.registerModel(FileAvatarDefinition);
+  app.storage.registerModel(FileChatimgDefinition);
+  app.storage.registerModel(FileFileDefinition);
+
   app.on('initCompleted', function(app) {
     // 数据信息统计
     debug('storage has been load 3 file db model');
@@ -60,8 +65,8 @@ module.exports = function FileComponent(app) {
     debug('file disk storage reset completed!');
   });
 
-  app.registerEvent('file::bindAttachUUID', event.bindAttachUUID);
-  app.registerEvent('file::getFileInfo', event.getFileInfo);
+  app.registerEvent('file::bindAttachUUID', bindAttachUUID);
+  app.registerEvent('file::getFileInfo', getFileInfo);
 
   // Timer
   app.registerTimer(async function clearTemporaryFile() {

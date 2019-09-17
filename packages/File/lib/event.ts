@@ -1,4 +1,4 @@
-exports.bindAttachUUID = async function(data, cb, db) {
+export const bindAttachUUID = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -20,7 +20,7 @@ exports.bindAttachUUID = async function(data, cb, db) {
   };
 };
 
-exports.getFileInfo = async function(data, cb, db) {
+export const getFileInfo = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 

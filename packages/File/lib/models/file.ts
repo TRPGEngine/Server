@@ -1,7 +1,7 @@
-const path = require('path');
-const config = require('../config');
+import path from 'path';
+import config from '../config';
 
-module.exports = function File(Sequelize, db) {
+export default function FileFileDefinition(Sequelize, db) {
   let File = db.define(
     'file_file',
     {
@@ -90,4 +90,4 @@ module.exports = function File(Sequelize, db) {
   }
 
   return File;
-};
+}

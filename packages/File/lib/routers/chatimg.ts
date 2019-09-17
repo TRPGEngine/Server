@@ -1,8 +1,8 @@
 import Router from 'koa-router';
 import upload from '../middleware/upload';
 import sha265 from '../middleware/sha256';
-const config = require('../config');
-const chatimgStorage = require('../middleware/storage/chatimg')();
+import config from '../config';
+const chatimgStorage = require('../middleware/storage/chatimg');
 const auth = require('../middleware/auth');
 import uuid from 'uuid/v1';
 import _ from 'lodash';
@@ -14,7 +14,7 @@ router.post(
   auth(),
   upload(config.path.chatimgDir).single('image') as any,
   sha265(),
-  chatimgStorage,
+  chatimgStorage(),
   async (ctx, next) => {
     let filename = _.get(ctx, 'req.file.filename');
     let size = _.get(ctx, 'req.file.size');
