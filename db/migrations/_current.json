@@ -680,6 +680,78 @@
             },
             "indexes": []
         },
+        "file_oss": {
+            "tableName": "file_oss",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "platform": {
+                    "allowNull": false,
+                    "field": "platform",
+                    "seqType": "Sequelize.ENUM('qiniu')"
+                },
+                "bucket": {
+                    "field": "bucket",
+                    "seqType": "Sequelize.STRING"
+                },
+                "key": {
+                    "field": "key",
+                    "seqType": "Sequelize.STRING"
+                },
+                "hash": {
+                    "field": "hash",
+                    "seqType": "Sequelize.STRING"
+                },
+                "size": {
+                    "field": "size",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "mimetype": {
+                    "field": "mimetype",
+                    "seqType": "Sequelize.STRING"
+                },
+                "extra_data": {
+                    "comment": "额外信息，如图片的信息之类的",
+                    "field": "extra_data",
+                    "seqType": "Sequelize.JSON"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "fileId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "file_file",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "fileId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
         "actor_actor": {
             "tableName": "actor_actor",
             "schema": {
@@ -2604,5 +2676,5 @@
             "indexes": []
         }
     },
-    "revision": 21
+    "revision": 22
 }
