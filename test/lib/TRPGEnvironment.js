@@ -27,6 +27,8 @@ class TRPGEnvironment extends NodeEnvironment {
     // 创建trpg实例
     if (!lodash.get(process, 'env.npm_config_noserver', false)) {
       trpgapp = generateTRPGInstance();
+    } else {
+      console.log('run test with noserver mode');
     }
 
     const db = lodash.get(trpgapp, 'storage.db');
