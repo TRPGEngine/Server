@@ -12,11 +12,12 @@ import SequelizeStatic, {
 import Debug from 'debug';
 const debug = Debug('trpg:storage');
 const debugSQL = Debug('trpg:storage:sql');
-import { ModelFn } from 'trpg/core';
+import { ModelFn, TRPGApplication } from 'trpg/core';
 
 import { getLogger } from './logger';
 const appLogger = getLogger('application');
 import _set from 'lodash/set';
+import _constant from 'lodash/constant';
 
 export type ModelFn = (
   Sequelize: typeof SequelizeStatic,
@@ -62,13 +63,15 @@ const defaultDbOptions: Options = {
 };
 
 export default class Storage {
+  _app: TRPGApplication;
   db: DBInstance;
   _Sequelize = SequelizeStatic;
   Op = Op;
   models: (typeof TRPGModel)[] = [];
 
-  constructor(dbconfig: TRPGDbOptions) {
+  constructor(dbconfig: TRPGDbOptions, app: TRPGApplication) {
     this.db = this.initDb(dbconfig);
+    this._app = app;
 
     redefineDb(this.db);
   }
@@ -110,6 +113,7 @@ export default class Storage {
     debug('register model %o success!', modelFn);
     appLogger.info('register model %o success!', modelFn);
     const model = modelFn(this._Sequelize, this.db);
+    model.getApplication = _constant(this._app); // 注入增加app对象获取的方法
     this.models.push(model);
     return model;
   }
@@ -213,5 +217,12 @@ export abstract class TRPGModel extends Model {
     options?: CreateOptions
   ) {
     return this.create(values, options);
+  }
+
+  /**
+   * 获取应用app对象
+   */
+  public static getApplication(): TRPGApplication {
+    throw new Error('Not inject application!');
   }
 }

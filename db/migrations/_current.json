@@ -145,14 +145,12 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "username": {
-                    "required": true,
-                    "unique": true,
                     "allowNull": false,
+                    "unique": true,
                     "field": "username",
                     "seqType": "Sequelize.STRING"
                 },
                 "password": {
-                    "required": true,
                     "allowNull": false,
                     "field": "password",
                     "seqType": "Sequelize.STRING"
@@ -162,12 +160,10 @@
                     "seqType": "Sequelize.STRING"
                 },
                 "nickname": {
-                    "required": false,
                     "field": "nickname",
                     "seqType": "Sequelize.STRING"
                 },
                 "avatar": {
-                    "required": false,
                     "defaultValue": {
                         "value": ""
                     },
@@ -679,6 +675,78 @@
                     "onDelete": "SET NULL",
                     "onUpdate": "CASCADE",
                     "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "file_oss": {
+            "tableName": "file_oss",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "platform": {
+                    "allowNull": false,
+                    "field": "platform",
+                    "seqType": "Sequelize.ENUM('qiniu')"
+                },
+                "bucket": {
+                    "field": "bucket",
+                    "seqType": "Sequelize.STRING"
+                },
+                "key": {
+                    "field": "key",
+                    "seqType": "Sequelize.STRING"
+                },
+                "hash": {
+                    "field": "hash",
+                    "seqType": "Sequelize.STRING"
+                },
+                "size": {
+                    "field": "size",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "mimetype": {
+                    "field": "mimetype",
+                    "seqType": "Sequelize.STRING"
+                },
+                "extra_data": {
+                    "comment": "额外信息，如图片的信息之类的",
+                    "field": "extra_data",
+                    "seqType": "Sequelize.JSON"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "fileId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "file_file",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "fileId",
                     "seqType": "Sequelize.INTEGER"
                 }
             },
@@ -2563,7 +2631,50 @@
                 }
             },
             "indexes": []
+        },
+        "deploy_version": {
+            "tableName": "deploy_version",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "version": {
+                    "allowNull": false,
+                    "validate": {},
+                    "field": "version",
+                    "seqType": "Sequelize.STRING"
+                },
+                "platform": {
+                    "allowNull": false,
+                    "field": "platform",
+                    "seqType": "Sequelize.ENUM('android', 'ios', 'windows', 'mac', 'linux')"
+                },
+                "download_url": {
+                    "comment": "二进制文件完整下载地址",
+                    "field": "download_url",
+                    "seqType": "Sequelize.STRING"
+                },
+                "describe": {
+                    "comment": "版本更新内容",
+                    "field": "describe",
+                    "seqType": "Sequelize.TEXT"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
         }
     },
-    "revision": 20
+    "revision": 22
 }

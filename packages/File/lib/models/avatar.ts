@@ -1,18 +1,15 @@
-module.exports = function Avatar(Sequelize, db) {
-  let Image = db.define(
-    'file_chatimg',
+export default function FileAvatarDefinition(Sequelize, db) {
+  let Avatar = db.define(
+    'file_avatar',
     {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       name: { type: Sequelize.STRING, require: true },
-      url: { type: Sequelize.STRING },
       size: { type: Sequelize.INTEGER, require: true },
       width: { type: Sequelize.INTEGER },
       height: { type: Sequelize.INTEGER },
-      type: { type: Sequelize.ENUM('file', 'url') },
+      type: { type: Sequelize.ENUM('actor', 'user', 'group') },
       has_thumbnail: { type: Sequelize.BOOLEAN, defaultValue: false },
-      mimetype: { type: Sequelize.STRING },
-      encoding: { type: Sequelize.STRING },
-      ext: { type: Sequelize.JSON },
+      attach_uuid: { type: Sequelize.STRING },
     },
     {
       methods: {
@@ -20,8 +17,9 @@ module.exports = function Avatar(Sequelize, db) {
           return {
             uuid: this.uuid,
             name: this.name,
-            url: this.url,
+            type: this.type,
             createAt: this.createAt,
+            attach_uuid: this.attach_uuid,
           };
         },
       },
@@ -30,9 +28,9 @@ module.exports = function Avatar(Sequelize, db) {
 
   let User = db.models.player_user;
   if (!!User) {
-    Image.belongsTo(User, { as: 'owner' });
-    // Avatar.hasOne('owner', User, {reverse: 'chat_image'});
+    // Avatar.hasOne('owner', User, {reverse: 'avatar_file'});
+    Avatar.belongsTo(User, { as: 'owner' });
   }
 
-  return Image;
-};
+  return Avatar;
+}

@@ -4,10 +4,10 @@ import sha256 from '../middleware/sha256';
 import thumbnail from '../middleware/thumbnail';
 import allowMIME from '../middleware/allow-mime';
 import _ from 'lodash';
+import { encodeStr2Int } from '../utils';
+import config from '../config';
 const avatarStorage = require('../middleware/storage/avatar');
 const auth = require('../middleware/auth');
-const utils = require('../utils');
-const config = require('../config');
 
 let router = new Router();
 
@@ -41,7 +41,7 @@ router.get('/svg', async (ctx, next) => {
     ctx.body = 'need name';
     return;
   }
-  let nameid = utils.encodeStr2Int(name);
+  let nameid = encodeStr2Int(name);
   let shortName = name[0].toUpperCase();
   let width = 100;
   let height = 100;

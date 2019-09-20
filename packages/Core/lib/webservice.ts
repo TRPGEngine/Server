@@ -96,7 +96,7 @@ export default class WebService {
     this.initError();
   }
 
-  get app() {
+  get app(): Koa {
     return this._app;
   }
 

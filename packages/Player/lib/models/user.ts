@@ -1,8 +1,10 @@
 import md5Encrypt from '../utils/md5';
+import sha1Encrypt from '../utils/sha1';
 import randomString from 'crypto-random-string';
 import { Model, DBInstance, Orm } from 'trpg/core';
 import config from 'config';
 import _ from 'lodash';
+import { fn, col } from 'sequelize';
 
 export class PlayerUser extends Model {
   id: number;
@@ -30,6 +32,20 @@ export class PlayerUser extends Model {
     return md5Encrypt(randomString(16));
   }
 
+  /**
+   * 生成一个存储于数据库的密码hash
+   * 最终加密结果为: sha1(md5(md5(*realpass*)) + salt)
+   * @param realPassword 客户端传来的密码(已经过客户端)
+   * @param salt 盐值
+   */
+  static genPassword(clientPassword: string, salt: string): string {
+    return sha1Encrypt(md5Encrypt(clientPassword) + salt);
+  }
+
+  /**
+   * 根据用户UUID查找用户
+   * @param userUUID 用户UUID
+   */
   static findByUUID(userUUID: string): Promise<PlayerUser> {
     return PlayerUser.findOne({
       where: {
@@ -38,10 +54,34 @@ export class PlayerUser extends Model {
     });
   }
 
+  /**
+   * 根据用户名和密码查找用户
+   * @param username 用户名
+   * @param password 密码
+   */
+  static findByUsernameAndPassword(
+    username: string,
+    password: string
+  ): Promise<PlayerUser> {
+    return PlayerUser.findOne({
+      where: {
+        username,
+        password: fn('SHA1', fn('CONCAT', fn('MD5', password), col('salt'))),
+      },
+    });
+  }
+
+  /**
+   * 返回用户显示名
+   */
   getName(): string {
     return this.nickname || this.username;
   }
 
+  /**
+   * 获取可以直接访问的用户头像的url地址
+   * 主要是处理了一下相对路径
+   */
   getAvatarUrl(): string {
     if (this.avatar && this.avatar.startsWith('/')) {
       const apihost = _.get(config, 'apihost', '');
@@ -51,6 +91,9 @@ export class PlayerUser extends Model {
     return this.avatar;
   }
 
+  /**
+   * 获取用于生产JWT数据的payload对象
+   */
   getJWTPayload() {
     return {
       uuid: this.uuid,
@@ -59,6 +102,10 @@ export class PlayerUser extends Model {
     };
   }
 
+  /**
+   * 获取用户信息
+   * @param includeToken 是否包含token
+   */
   getInfo(includeToken = false) {
     return {
       username: this.username,
@@ -75,6 +122,10 @@ export class PlayerUser extends Model {
     };
   }
 
+  /**
+   * 更新用户数据。保护数据不更新一些敏感数据
+   * @param data 用户数据
+   */
   updateInfo(data) {
     // 数据保护
     delete data.id;
@@ -99,19 +150,19 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
       },
       username: {
         type: Sequelize.STRING,
-        required: true,
+        allowNull: false,
         unique: true,
       },
-      password: { type: Sequelize.STRING, required: true },
+      password: { type: Sequelize.STRING, allowNull: false },
       salt: { type: Sequelize.STRING },
-      nickname: { type: Sequelize.STRING, required: false },
+      nickname: { type: Sequelize.STRING },
       name: {
         type: Sequelize.VIRTUAL,
         get() {
           return this.nickname || this.username;
         },
       },
-      avatar: { type: Sequelize.STRING, required: false, defaultValue: '' },
+      avatar: { type: Sequelize.STRING, defaultValue: '' },
       last_login: { type: Sequelize.DATE },
       last_ip: { type: Sequelize.STRING },
       token: { type: Sequelize.STRING },

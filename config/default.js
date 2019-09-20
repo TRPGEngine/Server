@@ -43,6 +43,15 @@ module.exports = {
   },
   redisUrl: '',
   webserviceHomepage: '/admin/home',
+  file: {
+    oss: {
+      qiniu: {
+        accessKey: '',
+        secretKey: '',
+        bucket: '',
+      },
+    },
+  },
   oauth: {
     // qq互联相关信息 required!
     qqconnect: {

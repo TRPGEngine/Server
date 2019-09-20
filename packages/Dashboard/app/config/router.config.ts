@@ -45,6 +45,12 @@ export const routes: IRoute[] = [
         component: './notify',
       },
       {
+        path: '/deploy',
+        name: 'deploy',
+        icon: 'cloud-upload',
+        component: './deploy',
+      },
+      {
         component: './404',
       },
     ],

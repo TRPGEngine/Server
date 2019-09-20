@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   limits: {
     fileSize: 8 * 1024 * 1024, // 1MB
   },
@@ -40,3 +40,5 @@ module.exports = {
     'png',
   ],
 };
+
+export default config;

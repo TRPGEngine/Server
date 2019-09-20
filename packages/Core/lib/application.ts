@@ -112,7 +112,7 @@ class Application extends events.EventEmitter {
 
   initStorage() {
     const dbconfig = this.get('db') as TRPGDbOptions;
-    this.storage = new Storage(dbconfig);
+    this.storage = new Storage(dbconfig, this);
   }
   initCache() {
     const redisUrl = this.get('redisUrl').toString();

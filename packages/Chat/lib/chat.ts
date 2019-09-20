@@ -129,7 +129,13 @@ function initFunction() {
 
       return log;
     },
-    sendSystemMsg: function(to_uuid, type, title, content, mergeData) {
+    sendSystemMsg: function(
+      to_uuid: string,
+      type: string, // 卡片信息的类型 , 如果为空字符串则为普通信息
+      title: string,
+      content: string,
+      mergeData?: any
+    ) {
       let pkg = {
         message: content,
         type: 'card',

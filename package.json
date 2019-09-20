@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,9 @@
     "doc:start": "cd ./packages/Website && npm start",
     "playground": "node ./playground/playground.js --experimental-repl-await",
     "bench": "node ./test/bench/index.js && cat ./test/bench/out.log",
-    "test": "jest --config=./test/jest.config.js --runInBand"
+    "test": "jest --config=./test/jest.config.js --runInBand",
+    "test:noserver": "npm run test --noserver",
+    "test:watch": "jest --config=./test/jest.config.js --runInBand --watch"
   },
   "husky": {
     "hooks": {
@@ -39,6 +41,7 @@
   },
   "homepage": "https://github.com/TRPGEngine/Server#readme",
   "dependencies": {
+    "axios": "^0.19.0",
     "config": "^3.1.0",
     "crypto-random-string": "^2.0.0",
     "debug": "^4.1.1",

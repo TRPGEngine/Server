@@ -16,6 +16,20 @@
         "DEBUG": "trpg:*",
         "NODE_ENV": "development"
       }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "server debugger for makemigration",
+      "program": "${workspaceFolder}/node_modules/sequelize-auto-migrations/bin/makemigration.js",
+      "args": ["--models-path", "./db/models.js", "--migrations-path", "./db/migrations", "--name", "test"],
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "DEBUG": "trpg:*",
+        "NODE_ENV": "development"
+      }
     }
   ]
 }
