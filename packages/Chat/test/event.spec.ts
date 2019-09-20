@@ -1,8 +1,8 @@
-const event = require('../lib/event');
 const db = global.db;
-const testEvent = global.testEvent;
 const emitEvent = global.emitEvent;
 const socket = global.socket;
+
+export {};
 
 let listenedEvent = {};
 
@@ -39,7 +39,7 @@ describe('message action', () => {
 });
 
 describe('chat event action', () => {
-  let userInfo = {};
+  let userInfo: any = {};
   let userInfoDbInstance = null;
 
   beforeAll(async () => {
