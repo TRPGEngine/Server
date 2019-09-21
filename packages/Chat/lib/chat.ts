@@ -3,6 +3,7 @@ const debug = Debug('trpg:component:chat');
 import * as event from './event';
 import LogDefinition from './models/log';
 import ChatConverseDefinition from './models/converse';
+import { ChatMessagePartial } from '../types/message';
 
 module.exports = ChatComponent;
 
@@ -88,25 +89,33 @@ function initFunction() {
 
       return res;
     },
-    sendMsg: function(from_uuid, to_uuid, info) {
+    sendMsg: function(from_uuid: string, to_uuid: string, info: any) {
       // 不检测发送者uuid, 用于系统发送消息
-      let converse_uuid = info.converse_uuid;
-      let pkg = {
-        message: info.message || '',
+      const {
+        converse_uuid,
+        message = '',
+        type = 'normal',
+        is_public = false,
+        is_group = false,
+        data = null,
+      } = info;
+
+      const pkg: ChatMessagePartial = {
+        message,
         sender_uuid: from_uuid,
         to_uuid: to_uuid,
         converse_uuid,
-        type: info.type || 'normal',
-        is_public: info.is_public || false,
-        is_group: info.is_group || false,
-        data: info.data || null,
+        type,
+        is_public,
+        is_group,
+        data,
       };
       debug('发送消息: [to %s] %o', to_uuid, pkg);
 
-      let log = event.addChatLog.call(app, pkg);
+      const log = event.addChatLog.call(app, pkg);
       if (!pkg.is_public) {
         // 是私密消息
-        let other = app.player.list.get(to_uuid);
+        const other = app.player.list.get(to_uuid);
         if (!!other) {
           other.socket.emit('chat::message', log);
         } else {
@@ -119,7 +128,7 @@ function initFunction() {
           // 疑问: 什么情况下会出现公开的用户信息？
           app.io.sockets.emit('chat::message', log);
         } else {
-          let sender = app.player.list.get(from_uuid);
+          const sender = app.player.list.get(from_uuid);
           if (sender) {
             sender.socket.broadcast
               .to(converse_uuid)
