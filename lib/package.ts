@@ -100,11 +100,18 @@ export default abstract class BasePackage {
     this.router.use(`/${scope}`, route.routes());
   }
 
+  protected regPackageData(name: string, defaultValue?: any) {
+    const packageName = this.getPackageName();
+    this.app[packageName] = Object.assign({}, this.app[packageName], {
+      [name]: defaultValue,
+    });
+  }
+
   /**
    *
    * @param methods 方法列表对象
    */
-  protected regMethod(methods: PackageMethodsType) {
+  protected regMethods(methods: PackageMethodsType) {
     const packageName = this.getPackageName();
     this.app[packageName] = Object.assign({}, this.app[packageName], methods);
   }
