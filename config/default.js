@@ -46,6 +46,7 @@ module.exports = {
   file: {
     oss: {
       qiniu: {
+        domain: '', // 外链站点 http://example.com/
         accessKey: '',
         secretKey: '',
         bucket: '',
