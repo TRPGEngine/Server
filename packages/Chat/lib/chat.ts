@@ -105,6 +105,7 @@ function initFunction() {
 
       let log = event.addChatLog.call(app, pkg);
       if (!pkg.is_public) {
+        // 是私密消息
         let other = app.player.list.get(to_uuid);
         if (!!other) {
           other.socket.emit('chat::message', log);
@@ -112,8 +113,10 @@ function initFunction() {
           debug('[用户:%s]: 接收方%s不在线', from_uuid, to_uuid);
         }
       } else {
-        // 群聊
+        // 是公开消息
         if (!pkg.is_group) {
+          // TODO: 这里好像有问题
+          // 疑问: 什么情况下会出现公开的用户信息？
           app.io.sockets.emit('chat::message', log);
         } else {
           let sender = app.player.list.get(from_uuid);
