@@ -89,6 +89,10 @@ export default class SocketService {
     }
   }
 
+  get sockets() {
+    return this._io.sockets;
+  }
+
   initIOEvent() {
     const app = this._app;
 
