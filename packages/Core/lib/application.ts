@@ -50,7 +50,7 @@ class Application extends events.EventEmitter {
   [packageInject: string]: any; // 包注入的方法
 
   get io() {
-    return _.get(this, 'socketservice.sockets');
+    return this.socketservice;
   }
 
   run() {
