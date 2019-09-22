@@ -208,7 +208,7 @@ export default class Chat extends BasePackage {
         debug('通知更新聊天内容:', converseUUID, isGroup, payload);
         if (isGroup) {
           // 团聊更新
-          app.io.to(converseUUID).emit('chat::updateMessage', {
+          app.io.sockets.to(converseUUID).emit('chat::updateMessage', {
             converseUUID,
             payload,
           });
