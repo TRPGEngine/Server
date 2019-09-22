@@ -1,6 +1,8 @@
 const app = global.trpgapp;
 const db = global.db;
 
+export {};
+
 describe('register', () => {
   test('app.player should be exist', () => {
     expect(app.player).toBeTruthy();

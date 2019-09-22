@@ -90,6 +90,7 @@ function initFunction() {
           converse_uuid: is_group ? to_uuid : '',
           type: 'tip',
           is_public: true,
+          is_group,
         });
       } else {
         // 私人投骰
@@ -98,12 +99,14 @@ function initFunction() {
           converse_uuid: null,
           type: 'tip',
           is_public: false,
+          is_group,
         });
         app.chat.sendMsg(to_uuid, sender_uuid, {
           message: roll_msg,
           converse_uuid: null,
           type: 'tip',
           is_public: false,
+          is_group,
         });
       }
     },

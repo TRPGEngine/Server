@@ -10,11 +10,7 @@ import { getUserEmotionCatalog, addUserEmotionWithSecretSignal } from './event';
 
 export default class ChatEmotion extends BasePackage {
   public name: string = 'ChatEmotion';
-  public require: string[] = [
-    'PlayerComponent',
-    'FileComponent',
-    'ChatComponent',
-  ];
+  public require: string[] = ['Player', 'File', 'Chat'];
   public desc: string = '表情包服务';
 
   onInit(): void {

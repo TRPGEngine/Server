@@ -47,7 +47,7 @@ export type EventFunc<DataType extends BaseDataType = BaseDataType> = (
   data: DataType,
   cb: SocketCallbackFn,
   db: DBInstance
-) => Promise<EventRet>;
+) => Promise<EventRet> | EventRet;
 
 const applog = (formatter: string, ...args: any[]) => {
   debug(formatter, ...args);

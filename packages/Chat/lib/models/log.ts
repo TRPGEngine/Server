@@ -1,17 +1,10 @@
 import { Model, Orm, DBInstance } from 'trpg/core';
+import {
+  ChatMessageType,
+  ChatMessagePayload,
+} from 'packages/Chat/types/message';
 
-export type ChatMessageType =
-  | 'normal'
-  | 'system'
-  | 'ooc'
-  | 'speak'
-  | 'action'
-  | 'cmd'
-  | 'card'
-  | 'tip'
-  | 'file';
-
-export class ChatLog extends Model {
+export class ChatLog extends Model implements ChatMessagePayload {
   uuid: string;
   sender_uuid: string;
   to_uuid: string;
