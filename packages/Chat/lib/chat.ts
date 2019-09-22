@@ -138,7 +138,7 @@ export default class Chat extends BasePackage {
                 .to(converse_uuid)
                 .emit('chat::message', log);
             } else {
-              app.io.sockets.in(converse_uuid).emit('chat::message', log);
+              app.io.sockets.to(converse_uuid).emit('chat::message', log);
             }
           }
         }
