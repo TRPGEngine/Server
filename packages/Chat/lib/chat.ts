@@ -249,6 +249,7 @@ export default class Chat extends BasePackage {
     });
 
     app.on('close', function() {
+      debug('remove save chat log timer');
       clearInterval(timer);
     });
   }
