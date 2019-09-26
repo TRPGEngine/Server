@@ -258,7 +258,7 @@ class Application extends events.EventEmitter {
   }
 
   request = {
-    get<T = any>(url: string, query: any, config?: AxiosRequestConfig) {
+    get<T = any>(url: string, query?: any, config?: AxiosRequestConfig) {
       return axios({
         url,
         method: 'get',
