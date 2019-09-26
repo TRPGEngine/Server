@@ -53,13 +53,14 @@ export class InfoWebsite extends Model {
         .substr(0, 150)
         .replace(/\s/g, '');
 
-    const icon = urlParser.resolve(
-      url,
+    let icon =
       $('meta[property="og:image"]').attr('content') ||
-        $('img[src]:not([src$=".gif"])')
-          .first()
-          .attr('src')
-    );
+      $('img[src]:not([src$=".gif"])')
+        .first()
+        .attr('src');
+    if (_.isString(icon)) {
+      icon = urlParser.resolve(url, icon);
+    }
 
     await InfoWebsite.create({
       url,

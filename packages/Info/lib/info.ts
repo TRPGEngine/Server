@@ -1,5 +1,6 @@
 import BasePackage from 'lib/package';
 import InfoWebsiteDefinition from './models/Website';
+import WebsiteRouter from './routers/website';
 
 export default class Info extends BasePackage {
   public name: string = 'info';
@@ -8,5 +9,7 @@ export default class Info extends BasePackage {
 
   onInit(): void {
     this.regModel(InfoWebsiteDefinition);
+
+    this.regRoute(WebsiteRouter);
   }
 }

@@ -293,7 +293,6 @@ class Application extends events.EventEmitter {
   }
 
   errorWithContext(err, context) {
-    console.error('Error', err);
     this.reportservice.reportErrorWithContext(err, context);
   }
 

@@ -165,6 +165,12 @@ export default class WebService {
     this.use(async (ctx, next) => {
       try {
         await next();
+
+        if (typeof ctx.body === 'object' && !_.isBoolean(ctx.body.result)) {
+          // 如果没有状态则补全状态
+          ctx.body.result = true;
+        }
+
         if (ctx.body === undefined) {
           let msg = '';
           if (ctx.status === 404) {
@@ -183,14 +189,13 @@ export default class WebService {
           };
         }
       } catch (e) {
-        console.error('[WebService]', e);
         if (ctx.status === 404) {
           // 404为状态默认值
           ctx.status = 500;
         }
         ctx.body = {
           result: false,
-          msg: e.toString(),
+          msg: e instanceof Error ? e.message : e.toString(),
         };
 
         if (typeof e === 'string') {
