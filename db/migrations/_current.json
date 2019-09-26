@@ -2674,7 +2674,51 @@
                 }
             },
             "indexes": []
+        },
+        "info_website": {
+            "tableName": "info_website",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "url": {
+                    "allowNull": false,
+                    "unique": true,
+                    "validate": {
+                        "isUrl": true
+                    },
+                    "field": "url",
+                    "seqType": "Sequelize.STRING"
+                },
+                "title": {
+                    "field": "title",
+                    "seqType": "Sequelize.STRING"
+                },
+                "content": {
+                    "field": "content",
+                    "seqType": "Sequelize.STRING"
+                },
+                "icon": {
+                    "field": "icon",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
         }
     },
-    "revision": 22
+    "revision": 23
 }

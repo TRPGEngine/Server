@@ -10,12 +10,32 @@ interface WebsiteInfo {
 }
 
 export class InfoWebsite extends Model {
+  url: string;
+  title: string;
+  content: string;
+  icon: string;
+
   /**
    * 获取网站标准信息
    * 以og标准为优先
    * @param url 网址
    */
   static async getWebsiteInfo(url: string): Promise<WebsiteInfo> {
+    // 尝试从数据库获取数据
+    const info: InfoWebsite = await InfoWebsite.findOne({
+      where: {
+        url,
+      },
+    });
+    if (info) {
+      const { title, content, icon } = info;
+      return {
+        title,
+        content,
+        icon,
+      };
+    }
+
     const app = InfoWebsite.getApplication();
     const body = await app.request.get(url);
     const $ = cheerio.load(body);
@@ -40,6 +60,13 @@ export class InfoWebsite extends Model {
           .first()
           .attr('src')
     );
+
+    await InfoWebsite.create({
+      url,
+      title,
+      content,
+      icon,
+    });
 
     return {
       title,
