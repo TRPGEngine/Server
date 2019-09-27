@@ -254,6 +254,9 @@ export default class Chat extends BasePackage {
     });
   }
 
+  /**
+   * 初始化获取所有的会话列表
+   */
   async initData() {
     const app = this.app;
     const db = app.storage.db;

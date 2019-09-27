@@ -100,11 +100,17 @@ export default abstract class BasePackage {
     this.router.use(`/${scope}`, route.routes());
   }
 
+  /**
+   * 注册一个变量到包数据中
+   * @param name 数据名
+   * @param defaultValue 数据默认值
+   */
   protected regPackageData(name: string, defaultValue?: any) {
     const packageName = this.getPackageName();
-    this.app[packageName] = Object.assign({}, this.app[packageName], {
+    this.app[packageName] = {
+      ...this.app[packageName],
       [name]: defaultValue,
-    });
+    };
   }
 
   /**
