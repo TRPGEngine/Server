@@ -62,6 +62,20 @@ router.post('/smms', auth(), async (ctx, next) => {
 });
 
 /**
+ * 获取上传图片的接口信息
+ * 前端根据该接口构造返回数据的格式
+ */
+router.get('/upload/info', (ctx) => {
+  ctx.body = {
+    url: ctx.trpgapp.get('apihost') + '/file/chatimg/forward',
+    imageField: 'image',
+    otherData: {
+      apiSelect: 'sougou',
+    },
+  };
+});
+
+/**
  * 上传图片数据转发
  */
 router.post('/forward', (ctx) => {
