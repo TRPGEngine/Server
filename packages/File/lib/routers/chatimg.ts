@@ -69,6 +69,7 @@ router.get('/upload/info', (ctx) => {
   ctx.body = {
     url: ctx.trpgapp.get('apihost') + '/file/chatimg/forward',
     imageField: 'image',
+    imagePath: 'data.url',
     otherData: {
       apiSelect: 'sougou',
     },
