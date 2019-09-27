@@ -1,7 +1,8 @@
-import { Model, Orm, DBInstance } from 'trpg/core';
+import { Model, Orm, DBInstance, CacheValue } from 'trpg/core';
 import {
   ChatMessageType,
   ChatMessagePayload,
+  ChatMessagePartial,
 } from 'packages/Chat/types/message';
 
 export class ChatLog extends Model implements ChatMessagePayload {
@@ -15,6 +16,24 @@ export class ChatLog extends Model implements ChatMessagePayload {
   is_group: boolean;
   is_public: boolean;
   date: string;
+
+  /**
+   * NOTE: 未实装
+   * 获取缓存的聊天记录
+   */
+  public static getCachedChatLog(): Promise<CacheValue[]> {
+    const trpgapp = ChatLog.getApplication();
+    return trpgapp.cache.lget('chat:log-cache');
+  }
+
+  /**
+   * NOTE: 未实装
+   * 往缓存的聊天记录里塞数据
+   */
+  public static async appendCachedChatLog(payload: ChatMessagePartial) {
+    const trpgapp = ChatLog.getApplication();
+    await trpgapp.cache.rpush('chat:log-cache', payload);
+  }
 }
 
 export default function LogDefinition(Sequelize: Orm, db: DBInstance) {

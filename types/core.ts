@@ -11,3 +11,4 @@ export {
   EventFunc,
   Socket,
 } from '../packages/Core/types/socket';
+export { CacheValue } from '../packages/Core/types/cache';
