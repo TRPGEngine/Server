@@ -91,7 +91,10 @@ export class Cache implements ICache {
     }
 
     this.data[key].push(...values);
-    debug('[cache]', `rpush ${key} with ${values.join(',')}`);
+    debug(
+      '[cache]',
+      `rpush ${key} with ${values.map((s) => JSON.stringify(s)).join(',')}`
+    );
     return Promise.resolve();
   }
 
@@ -119,7 +122,7 @@ export class Cache implements ICache {
     if (tmp) {
       if (!tmp.expires || tmp.expires < new Date().valueOf()) {
         // 若expires不存在或expires存在但尚未过期
-        return Promise.resolve(tmp.rawData);
+        return Promise.resolve(_.clone(tmp.rawData));
       }
     }
     return Promise.resolve(null);
@@ -132,13 +135,14 @@ export class Cache implements ICache {
         .map((key) => this.data[key])
         .filter((x) => !x.expires || x.expires < new Date().valueOf())
         .map((val) => val.rawData);
-      return _.zipObject(keys, values);
+      return _.clone(_.zipObject(keys, values));
     }
     return null;
   }
 
   async lget(key: string): Promise<CacheValue[]> {
-    const arr = await this.get(key);
+    // NOTE: 列表没有过期机制. 因此不走内部的get
+    const arr = _.clone(this.data[key]);
 
     if (Array.isArray(arr)) {
       return arr;
@@ -216,7 +220,10 @@ export class RedisCache implements ICache {
       key,
       ...values.map((v) => (_.isObject(v) ? JSON.stringify(v) : v))
     );
-    debug('[redis]', `rpush ${key} with ${values.join(',')}`);
+    debug(
+      '[redis]',
+      `rpush ${key} with ${values.map((s) => JSON.stringify(s)).join(',')}`
+    );
   }
 
   // ltrim 为保留一部分。即清理的逻辑下保留的数据应为 (start + size, -1)
