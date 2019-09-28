@@ -26,11 +26,24 @@ describe('chat log func', () => {
   });
 
   it('ChatLog.getCachedChatLog should be ok', async () => {
-    await trpgapp.cache.rpush('chat:log-cache', testChatLogPayload);
+    await app.cache.rpush('chat:log-cache', testChatLogPayload);
 
     const logList = await ChatLog.getCachedChatLog();
     expect(logList).toMatchObject([testChatLogPayload]);
 
     await app.cache.lclear(logCacheKey, logList.length - 1, 1); // 清除最后一条
+  });
+
+  it('ChatLog.dumpCachedChatLog should be ok', async () => {
+    await app.cache.rpush('chat:log-cache', testChatLogPayload);
+    const mockBulkCreate = jest.fn();
+    ChatLog.bulkCreate = mockBulkCreate;
+
+    await ChatLog.dumpCachedChatLog();
+
+    expect(mockBulkCreate).toBeCalledTimes(1);
+    expect(mockBulkCreate.mock.calls[0][0]).toMatchObject([testChatLogPayload]);
+
+    expect(await app.cache.lget(ChatLog.CACHE_KEY)).toMatchObject([]);
   });
 });

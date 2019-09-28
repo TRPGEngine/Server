@@ -6,6 +6,8 @@ import {
 } from 'packages/Chat/types/message';
 
 export class ChatLog extends Model implements ChatMessagePayload {
+  static CACHE_KEY = 'chat:log-cache';
+
   uuid: string;
   sender_uuid: string;
   to_uuid: string;
@@ -23,16 +25,32 @@ export class ChatLog extends Model implements ChatMessagePayload {
    */
   public static getCachedChatLog(): Promise<CacheValue[]> {
     const trpgapp = ChatLog.getApplication();
-    return trpgapp.cache.lget('chat:log-cache');
+    return trpgapp.cache.lget(ChatLog.CACHE_KEY);
   }
 
   /**
    * NOTE: 未实装
    * 往缓存的聊天记录里塞数据
    */
-  public static async appendCachedChatLog(payload: ChatMessagePartial) {
+  public static async appendCachedChatLog(
+    payload: ChatMessagePartial
+  ): Promise<void> {
     const trpgapp = ChatLog.getApplication();
-    await trpgapp.cache.rpush('chat:log-cache', payload);
+    await trpgapp.cache.rpush(ChatLog.CACHE_KEY, payload);
+  }
+
+  /**
+   * NOTE: 未实装
+   * 将缓存的聊天记录推送到数据库中
+   */
+  public static async dumpCachedChatLog(): Promise<void> {
+    const trpgapp = ChatLog.getApplication();
+    const logs: {}[] = await ChatLog.getCachedChatLog();
+    const size = logs.length;
+    if (size > 0) {
+      await trpgapp.cache.lclear(ChatLog.CACHE_KEY, 0, size);
+      await ChatLog.bulkCreate(logs);
+    }
   }
 }
 
