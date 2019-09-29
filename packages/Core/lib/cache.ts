@@ -23,7 +23,13 @@ export interface ICache {
     value: CacheValue,
     options?: CacheOptions
   ): Promise<CacheValue>;
-  rpush(key: string, ...values: any[]): void;
+
+  /**
+   * 往列表末尾追加数据
+   * @param key 唯一键
+   * @param values 追加的数据
+   */
+  rpush(key: string, ...values: any[]): Promise<void>;
 
   /**
    * 清理列表一定范围内的数据
@@ -31,7 +37,7 @@ export interface ICache {
    * @param start 起始索引
    * @param size 清理列表长度
    */
-  lclear(key: string, start: number, size: number): void;
+  lclear(key: string, start: number, size: number): Promise<void>;
 
   /**
    * 返回存储中符合条件的键值列表
@@ -42,7 +48,7 @@ export interface ICache {
   getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }>;
 
   /**
-   * 获取列表
+   * 获取列表的所有内容
    * @param key 键
    */
   lget(key: string): Promise<CacheValue[]>;
@@ -79,16 +85,20 @@ export class Cache implements ICache {
     return Promise.resolve(value);
   }
 
-  rpush(key: string, ...values: any[]): void {
+  rpush(key: string, ...values: any[]): Promise<void> {
     if (!this.data[key] || !Array.isArray(this.data[key])) {
       this.data[key] = [];
     }
 
     this.data[key].push(...values);
-    debug('[cache]', `rpush ${key} with ${values.join(',')}`);
+    debug(
+      '[cache]',
+      `rpush ${key} with ${values.map((s) => JSON.stringify(s)).join(',')}`
+    );
+    return Promise.resolve();
   }
 
-  lclear(key: string, start: number, size: number): void {
+  lclear(key: string, start: number, size: number): Promise<void> {
     if (!this.data[key] || !Array.isArray(this.data[key])) {
       return;
     }
@@ -96,6 +106,8 @@ export class Cache implements ICache {
     const arr: any[] = this.data[key];
     arr.splice(start, size);
     debug('[cache]', `lclear ${key} in range [${start}, ${start + size}]`);
+
+    return Promise.resolve();
   }
 
   keys(glob: string): Promise<string[]> {
@@ -110,7 +122,7 @@ export class Cache implements ICache {
     if (tmp) {
       if (!tmp.expires || tmp.expires < new Date().valueOf()) {
         // 若expires不存在或expires存在但尚未过期
-        return Promise.resolve(tmp.rawData);
+        return Promise.resolve(_.clone(tmp.rawData));
       }
     }
     return Promise.resolve(null);
@@ -123,13 +135,14 @@ export class Cache implements ICache {
         .map((key) => this.data[key])
         .filter((x) => !x.expires || x.expires < new Date().valueOf())
         .map((val) => val.rawData);
-      return _.zipObject(keys, values);
+      return _.clone(_.zipObject(keys, values));
     }
     return null;
   }
 
   async lget(key: string): Promise<CacheValue[]> {
-    const arr = await this.get(key);
+    // NOTE: 列表没有过期机制. 因此不走内部的get
+    const arr = _.clone(this.data[key]);
 
     if (Array.isArray(arr)) {
       return arr;
@@ -176,6 +189,14 @@ export class RedisCache implements ICache {
     return key;
   }
 
+  private parseVal(val: string): any {
+    try {
+      return JSON.parse(val);
+    } catch (e) {
+      return val;
+    }
+  }
+
   set(
     key: string,
     value: CacheValue,
@@ -193,16 +214,22 @@ export class RedisCache implements ICache {
     return this.redis.set(key, JSON.stringify(value));
   }
 
-  rpush(key: string, ...values: any[]): void {
+  async rpush(key: string, ...values: any[]): Promise<void> {
     key = this.genKey(key);
-    this.redis.rpush(key, ...values);
-    debug('[redis]', `rpush ${key} with ${values.join(',')}`);
+    await this.redis.rpush(
+      key,
+      ...values.map((v) => (_.isObject(v) ? JSON.stringify(v) : v))
+    );
+    debug(
+      '[redis]',
+      `rpush ${key} with ${values.map((s) => JSON.stringify(s)).join(',')}`
+    );
   }
 
   // ltrim 为保留一部分。即清理的逻辑下保留的数据应为 (start + size, -1)
-  lclear(key: string, start: number, size: number): void {
+  async lclear(key: string, start: number, size: number): Promise<void> {
     key = this.genKey(key);
-    this.redis.ltrim(key, start + size, -1);
+    await this.redis.ltrim(key, start + size, -1);
     debug('[redis]', `lclear ${key} in range [${start}, ${start + size}]`);
   }
 
@@ -235,8 +262,8 @@ export class RedisCache implements ICache {
 
   async lget(key: string): Promise<CacheValue[]> {
     key = this.genKey(key);
-    const arr = await this.redis.lrange(key, 0, -1); // 获取所有值
-    return arr;
+    const arr: string[] = await this.redis.lrange(key, 0, -1); // 获取所有值
+    return arr.map(this.parseVal);
   }
 
   remove(key: string): Promise<number> {

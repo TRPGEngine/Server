@@ -52,6 +52,12 @@ module.exports = {
         bucket: '',
       },
     },
+    forward: {
+      chatimg: {
+        url: '',
+        headers: {},
+      },
+    },
   },
   oauth: {
     // qq互联相关信息 required!

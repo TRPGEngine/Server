@@ -199,12 +199,14 @@ class Application extends events.EventEmitter {
 
   // loopNum 循环次数,不传则为无限循环
   registerTimer(fn: () => void, millisec: number, loopNum: number) {
-    var indexNum = 0;
-    let timer = setInterval(function() {
+    let indexNum = 0;
+    const timer = setInterval(() => {
       fn();
       indexNum++;
       if (!!loopNum && loopNum >= indexNum) {
         clearInterval(timer);
+        const i = this.timers.findIndex((v) => v === timer);
+        this.timers.splice(i, 1); // 删除该项
       }
     }, millisec);
 
@@ -258,7 +260,7 @@ class Application extends events.EventEmitter {
   }
 
   request = {
-    get<T = any>(url: string, query: any, config?: AxiosRequestConfig) {
+    get<T = any>(url: string, query?: any, config?: AxiosRequestConfig) {
       return axios({
         url,
         method: 'get',
@@ -291,7 +293,6 @@ class Application extends events.EventEmitter {
   }
 
   errorWithContext(err, context) {
-    console.error('Error', err);
     this.reportservice.reportErrorWithContext(err, context);
   }
 
