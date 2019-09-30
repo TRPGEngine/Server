@@ -172,7 +172,7 @@ exports.requestJoinGroup = async function requestJoinGroup(data, cb, db) {
   }
 
   // 检测该用户是否已加入团
-  let groupMembers = await group.getMembersAsync();
+  let groupMembers = await group.getMembers();
   if (groupMembers.indexOf(from_uuid) >= 0) {
     throw '您已加入该团';
   }
