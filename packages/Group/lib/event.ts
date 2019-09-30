@@ -4,7 +4,12 @@ import uuid from 'uuid/v4';
 import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
 
-exports.create = async function create(data, cb, db) {
+export const create: EventFunc<{
+  name: string;
+  sub_name: string;
+  desc: string;
+  avatar: string;
+}> = async function create(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -43,7 +48,9 @@ exports.create = async function create(data, cb, db) {
   return { group };
 };
 
-exports.getInfo = async function getInfo(data, cb, db) {
+export const getInfo: EventFunc<{
+  uuid: string;
+}> = async function getInfo(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -61,7 +68,15 @@ exports.getInfo = async function getInfo(data, cb, db) {
   return { group };
 };
 
-exports.updateInfo = async function updateInfo(data, cb, db) {
+export const updateInfo: EventFunc<{
+  groupUUID: string;
+  groupInfo: {
+    avatar: string;
+    name: string;
+    sub_name: string;
+    desc: string;
+  };
+}> = async function updateInfo(data, cb, db) {
   let { app, socket } = this;
 
   if (!app.player) {
@@ -105,17 +120,20 @@ exports.updateInfo = async function updateInfo(data, cb, db) {
   return { group };
 };
 
-exports.findGroup = async function findGroup(data, cb, db) {
+export const findGroup: EventFunc<{
+  text: string;
+  type: 'uuid' | 'groupname' | 'groupdesc';
+}> = async function findGroup(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
   const Op = app.storage.Op;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.list.find(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let { text, type } = data;
+  const { text, type } = data;
   if (!text || !type) {
     throw '缺少参数';
   }
@@ -149,7 +167,9 @@ exports.findGroup = async function findGroup(data, cb, db) {
   return { results };
 };
 
-exports.requestJoinGroup = async function requestJoinGroup(data, cb, db) {
+export const requestJoinGroup: EventFunc<{
+  group_uuid: string;
+}> = async function requestJoinGroup(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -221,7 +241,9 @@ exports.requestJoinGroup = async function requestJoinGroup(data, cb, db) {
   return { request: groupRequest };
 };
 
-exports.agreeGroupRequest = async function agreeGroupRequest(data, cb, db) {
+export const agreeGroupRequest: EventFunc<{
+  request_uuid: string;
+}> = async function agreeGroupRequest(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -278,7 +300,9 @@ exports.agreeGroupRequest = async function agreeGroupRequest(data, cb, db) {
   };
 };
 
-exports.refuseGroupRequest = async function refuseGroupRequest(data, cb, db) {
+export const refuseGroupRequest: EventFunc<{
+  request_uuid: string;
+}> = async function refuseGroupRequest(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -325,7 +349,10 @@ exports.refuseGroupRequest = async function refuseGroupRequest(data, cb, db) {
   );
 };
 
-exports.sendGroupInvite = async function sendGroupInvite(data, cb, db) {
+export const sendGroupInvite: EventFunc<{
+  group_uuid: string;
+  to_uuid: string;
+}> = async function sendGroupInvite(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -396,7 +423,9 @@ exports.sendGroupInvite = async function sendGroupInvite(data, cb, db) {
   return { invite };
 };
 
-exports.refuseGroupInvite = async function refuseGroupInvite(data, cb, db) {
+export const refuseGroupInvite: EventFunc<{
+  uuid: string;
+}> = async function refuseGroupInvite(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -428,7 +457,9 @@ exports.refuseGroupInvite = async function refuseGroupInvite(data, cb, db) {
   return { res: invite };
 };
 
-exports.agreeGroupInvite = async function agreeGroupInvite(data, cb, db) {
+export const agreeGroupInvite: EventFunc<{
+  uuid: string;
+}> = async function agreeGroupInvite(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -472,7 +503,11 @@ exports.agreeGroupInvite = async function agreeGroupInvite(data, cb, db) {
  * 获取所有未处理的团邀请列表
  * 未处理的定义: 未同意且未拒绝
  */
-exports.getGroupInvite = async function getGroupInvite(data, cb, db) {
+export const getGroupInvite: EventFunc<{}> = async function getGroupInvite(
+  data,
+  cb,
+  db
+) {
   const app = this.app;
   const socket = this.socket;
 
@@ -493,7 +528,11 @@ exports.getGroupInvite = async function getGroupInvite(data, cb, db) {
   return { res };
 };
 
-exports.getGroupList = async function getGroupList(data, cb, db) {
+export const getGroupList: EventFunc<{}> = async function getGroupList(
+  data,
+  cb,
+  db
+) {
   const app = this.app;
   const socket = this.socket;
 
@@ -510,7 +549,9 @@ exports.getGroupList = async function getGroupList(data, cb, db) {
 };
 
 // TODO: selected_actor_uuid相关可能会有问题。需要处理
-exports.getGroupMembers = async function getGroupMembers(data, cb, db) {
+export const getGroupMembers: EventFunc<{
+  groupUUID: string;
+}> = async function getGroupMembers(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -535,7 +576,9 @@ exports.getGroupMembers = async function getGroupMembers(data, cb, db) {
   return { members };
 };
 
-exports.getGroupActors = async function getGroupActors(data, cb, db) {
+export const getGroupActors: EventFunc<{
+  groupUUID: string;
+}> = async function getGroupActors(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -567,7 +610,7 @@ exports.getGroupActors = async function getGroupActors(data, cb, db) {
  * 获取团所有成员选择的人物卡的uuid
  * 返回一个mapping: {成员UUID: 团人物卡UUID}
  */
-const getGroupActorMapping: EventFunc<{
+export const getGroupActorMapping: EventFunc<{
   groupUUID: string;
 }> = async function getGroupActorMapping(data, cb, db) {
   const app = this.app;
@@ -610,12 +653,14 @@ const getGroupActorMapping: EventFunc<{
 
   return { mapping };
 };
-exports.getGroupActorMapping = getGroupActorMapping;
 
 /**
  * 添加团人物
  */
-exports.addGroupActor = async function addGroupActor(data, cb, db) {
+export const addGroupActor: EventFunc<{
+  groupUUID: string;
+  actorUUID: string;
+}> = async function addGroupActor(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -669,7 +714,10 @@ exports.addGroupActor = async function addGroupActor(data, cb, db) {
   return { groupActor };
 };
 
-exports.removeGroupActor = async function(data, cb, db) {
+export const removeGroupActor: EventFunc<{
+  groupUUID: string;
+  groupActorUUID: string;
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -727,7 +775,10 @@ exports.removeGroupActor = async function(data, cb, db) {
   return true;
 };
 
-exports.agreeGroupActor = async function agreeGroupActor(data, cb, db) {
+export const agreeGroupActor: EventFunc<{
+  groupUUID: string;
+  groupActorUUID: string;
+}> = async function agreeGroupActor(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -765,7 +816,10 @@ exports.agreeGroupActor = async function agreeGroupActor(data, cb, db) {
   return { groupActor };
 };
 
-exports.refuseGroupActor = async function refuseGroupActor(data, cb, db) {
+export const refuseGroupActor: EventFunc<{
+  groupUUID: string;
+  groupActorUUID: string;
+}> = async function refuseGroupActor(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -801,11 +855,11 @@ exports.refuseGroupActor = async function refuseGroupActor(data, cb, db) {
   return true;
 };
 
-exports.updateGroupActorInfo = async function updateGroupActorInfo(
-  data,
-  cb,
-  db
-) {
+export const updateGroupActorInfo: EventFunc<{
+  groupUUID: string;
+  groupActorUUID: string;
+  groupActorInfo: string;
+}> = async function updateGroupActorInfo(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -844,7 +898,7 @@ exports.updateGroupActorInfo = async function updateGroupActorInfo(
   return true;
 };
 
-const setPlayerSelectedGroupActor: EventFunc<{
+export const setPlayerSelectedGroupActor: EventFunc<{
   groupUUID: string;
   groupActorUUID: string;
 }> = async function setPlayerSelectedGroupActor(data, cb, db) {
@@ -894,13 +948,11 @@ const setPlayerSelectedGroupActor: EventFunc<{
     data: { groupUUID, groupActorUUID },
   };
 };
-exports.setPlayerSelectedGroupActor = setPlayerSelectedGroupActor;
 
-exports.getPlayerSelectedGroupActor = async function getPlayerSelectedGroupActor(
-  data,
-  cb,
-  db
-) {
+export const getPlayerSelectedGroupActor: EventFunc<{
+  groupUUID: string;
+  groupMemberUUID: string;
+}> = async function getPlayerSelectedGroupActor(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -941,7 +993,9 @@ exports.getPlayerSelectedGroupActor = async function getPlayerSelectedGroupActor
 };
 
 // 退出团
-exports.quitGroup = async function quitGroup(data, cb, db) {
+export const quitGroup: EventFunc<{
+  groupUUID: string;
+}> = async function quitGroup(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -981,7 +1035,9 @@ exports.quitGroup = async function quitGroup(data, cb, db) {
 };
 
 // 解散团
-exports.dismissGroup = async function dismissGroup(data, cb, db) {
+export const dismissGroup: EventFunc<{
+  groupUUID: string;
+}> = async function dismissGroup(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -1021,7 +1077,10 @@ exports.dismissGroup = async function dismissGroup(data, cb, db) {
   // TODO: 解散socket房间
 };
 
-exports.tickMember = async function tickMember(data, cb, db) {
+export const tickMember: EventFunc<{
+  groupUUID: string;
+  memberUUID: string;
+}> = async function tickMember(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -1082,7 +1141,10 @@ exports.tickMember = async function tickMember(data, cb, db) {
 };
 
 // 将普通用户提升为管理员
-exports.setMemberToManager = async function setMemberToManager(data, cb, db) {
+export const setMemberToManager: EventFunc<{
+  groupUUID: string;
+  memberUUID: string;
+}> = async function setMemberToManager(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -1143,7 +1205,9 @@ exports.setMemberToManager = async function setMemberToManager(data, cb, db) {
 };
 
 // 获取团状态
-exports.getGroupStatus = async function getGroupStatus(data, cb) {
+export const getGroupStatus: EventFunc<{
+  groupUUID: string;
+}> = async function getGroupStatus(data, cb) {
   const app = this.app;
   const socket = this.socket;
 
@@ -1156,7 +1220,10 @@ exports.getGroupStatus = async function getGroupStatus(data, cb) {
 };
 
 // 设置团状态： 开团、闭团
-exports.setGroupStatus = async function setGroupStatus(data, cb, db) {
+export const setGroupStatus: EventFunc<{
+  groupUUID: string;
+  groupStatus: boolean;
+}> = async function setGroupStatus(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 

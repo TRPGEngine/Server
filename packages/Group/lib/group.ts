@@ -1,6 +1,6 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:group');
-const event = require('./event');
+import * as event from './event';
 import BasePackage from 'lib/package';
 
 export default class Group extends BasePackage {
