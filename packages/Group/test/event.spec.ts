@@ -3,6 +3,8 @@ const emitEvent = global.emitEvent;
 const _ = global._;
 const generateRandomStr = global.generateRandomStr;
 
+export {};
+
 beforeAll(async () => {
   const loginInfo = await emitEvent('player::login', {
     username: 'admin1',
