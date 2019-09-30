@@ -3,6 +3,8 @@ const emitEvent = global.emitEvent;
 const _ = global._;
 const generateRandomStr = global.generateRandomStr;
 
+export {};
+
 beforeAll(async () => {
   const loginInfo = await emitEvent('player::login', {
     username: 'admin1',
@@ -86,7 +88,26 @@ describe('group action', () => {
 
   test.todo('findGroup should be ok');
 
-  test.todo('requestJoinGroup should be ok');
+  test('requestJoinGroup should be ok', async () => {
+    const ret = await emitEvent('group::requestJoinGroup', {
+      group_uuid: this.testGroup.uuid,
+    });
+    expect(ret.result).toBe(true);
+    expect(ret).toHaveProperty('request');
+    expect(ret.request.is_agree).toBe(false);
+    expect(ret.request.is_refuse).toBe(false);
+    expect(ret.request.group_uuid).toBe(this.testGroup.uuid);
+    expect(ret.request.from_uuid).toBe(this.userInfo.uuid);
+
+    const groupRequestUUID = ret.request.uuid;
+    const requestIns = await db.models.group_request.findOne({
+      where: {
+        uuid: groupRequestUUID,
+      },
+    });
+    expect(requestIns).toBeTruthy();
+    await requestIns.destroy();
+  });
 
   test.todo('agreeGroupRequest should be ok');
 

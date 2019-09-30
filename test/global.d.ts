@@ -7,6 +7,6 @@ declare namespace NodeJS {
     port: string;
     testEvent<T = any>(eventFn: any, data?: any): Promise<T>;
     emitEvent<T = any>(eventName: string, data?: any): Promise<T>;
-    generateRandomStr(length: number): string;
+    generateRandomStr(length?: number): string;
   }
 }
