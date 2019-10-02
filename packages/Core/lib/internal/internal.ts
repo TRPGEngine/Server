@@ -48,6 +48,11 @@ export default class Core extends BasePackage {
           this.app.cache.lclear(key, 0, vals.length);
           const arr = vals.map((v) => Number(v) || 0);
 
+          if (arr.length === 0) {
+            // 如果没有数据。则跳出循环
+            continue;
+          }
+
           // 计算平均值与最大最小值
           const avg = arr.reduce((prev, cur) => prev + cur, 0);
           const max = Math.max(...arr);
@@ -75,6 +80,11 @@ export default class Core extends BasePackage {
           const vals = await this.app.cache.lget(key);
           this.app.cache.lclear(key, 0, vals.length);
           const arr = vals.map((v) => Number(v) || 0);
+
+          if (arr.length === 0) {
+            // 如果没有数据。则跳出循环
+            continue;
+          }
 
           // 计算平均值与最大最小值
           const avg = arr.reduce((prev, cur) => prev + cur, 0);
