@@ -4,6 +4,7 @@ import {
   ChatMessagePayload,
   ChatMessagePartial,
 } from 'packages/Chat/types/message';
+import _ from 'lodash';
 
 export class ChatLog extends Model implements ChatMessagePayload {
   static CACHE_KEY = 'chat:log-cache';
@@ -20,16 +21,15 @@ export class ChatLog extends Model implements ChatMessagePayload {
   date: string;
 
   /**
-   * NOTE: 未实装
    * 获取缓存的聊天记录
    */
-  public static getCachedChatLog(): Promise<CacheValue[]> {
+  public static async getCachedChatLog(): Promise<ChatMessagePartial[]> {
     const trpgapp = ChatLog.getApplication();
-    return trpgapp.cache.lget(ChatLog.CACHE_KEY);
+    const cachedList = await trpgapp.cache.lget(ChatLog.CACHE_KEY);
+    return cachedList.filter<object>((i): i is object => _.isObject(i));
   }
 
   /**
-   * NOTE: 未实装
    * 往缓存的聊天记录里塞数据
    */
   public static async appendCachedChatLog(
@@ -40,7 +40,19 @@ export class ChatLog extends Model implements ChatMessagePayload {
   }
 
   /**
-   * NOTE: 未实装
+   * 更新缓存的聊天记录的数据
+   * @param index 缓存位置
+   * @param payload 内容
+   */
+  public static async updateCachedChatLog(
+    index: number,
+    payload: ChatMessagePartial
+  ): Promise<void> {
+    const trpgapp = ChatLog.getApplication();
+    await trpgapp.cache.lset(ChatLog.CACHE_KEY, index, payload);
+  }
+
+  /**
    * 将缓存的聊天记录推送到数据库中
    */
   public static async dumpCachedChatLog(): Promise<void> {

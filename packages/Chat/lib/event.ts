@@ -1,12 +1,20 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:chat:event');
-const generateUUID = require('uuid/v4');
+import generateUUID from 'uuid/v4';
+import { ChatMessagePartial } from '../types/message';
+import { ChatLog } from './models/log';
 
-export const addChatLog = function addChatLog(messagePkg) {
-  let app = this;
-  let log = app.chat.log;
-  if (!!log && !!messagePkg) {
-    let pkg = {
+/**
+ * 增加聊天消息
+ * @param messagePkg 消息内容
+ */
+export const addChatLog = function addChatLog(
+  messagePkg: ChatMessagePartial
+): ChatMessagePartial | false {
+  const app = this;
+  if (!!messagePkg) {
+    const date = messagePkg.date ? new Date(messagePkg.date) : new Date();
+    const pkg: ChatMessagePartial = {
       uuid: messagePkg.uuid || generateUUID(),
       sender_uuid: messagePkg.sender_uuid,
       to_uuid: messagePkg.to_uuid,
@@ -15,10 +23,11 @@ export const addChatLog = function addChatLog(messagePkg) {
       type: messagePkg.type,
       is_group: messagePkg.is_group,
       is_public: messagePkg.is_public,
-      date: messagePkg.date ? new Date(messagePkg.date) : new Date(),
+      date: date.toISOString(),
       data: messagePkg.data,
     };
-    log.push(pkg);
+
+    ChatLog.appendCachedChatLog(pkg);
 
     return pkg;
   } else {
@@ -32,7 +41,7 @@ export const addChatLog = function addChatLog(messagePkg) {
 export const getUserChatLog = async function getUserChatLog(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
-  const logList = app.chat.log;
+
   const Op = app.storage.Op;
   let userUUID = data.user_uuid;
   let offsetDate = data.offsetDate || '';
@@ -71,6 +80,7 @@ export const getUserChatLog = async function getUserChatLog(data, cb, db) {
     }
     list = list.concat(logs);
     // 获取缓存中的聊天记录
+    const logList = await ChatLog.getCachedChatLog();
     for (const log of logList) {
       if (
         !log.converse_uuid &&
@@ -111,7 +121,6 @@ export const getConverseChatLog = async function getConverseChatLog(
 ) {
   const app = this.app;
   const socket = this.socket;
-  const logList = app.chat.log;
   const Op = app.storage.Op;
   let converse_uuid = data.converse_uuid;
   let offsetDate = data.offsetDate || '';
@@ -150,6 +159,7 @@ export const getConverseChatLog = async function getConverseChatLog(
     }
     list = list.concat(logs);
     // 获取缓存中的聊天记录
+    const logList = await ChatLog.getCachedChatLog();
     for (let log of logList) {
       if (
         log.converse_uuid === converse_uuid &&
@@ -193,7 +203,8 @@ export const getAllUserConverse = async function getAllUserConverse(
 
   let senders = [];
   // 获取缓存中的会话列表
-  for (let log of app.chat.log) {
+  const logList = await ChatLog.getCachedChatLog();
+  for (let log of logList) {
     if (
       !/^trpg/.test(log.sender_uuid) &&
       log.to_uuid === player.uuid &&
@@ -259,7 +270,8 @@ export const getOfflineUserConverse = async function getOfflineUserConverse(
   let senders = [];
 
   // 获取缓存中的聊天记录
-  for (let log of app.chat.log) {
+  const logList = await ChatLog.getCachedChatLog();
+  for (let log of logList) {
     if (
       new Date(log.date) > new Date(lastLoginDate) &&
       !/^trpg/.test(log.sender_uuid) &&
@@ -440,15 +452,15 @@ export const updateCardChatData = async function updateCardChatData(
   const socket = this.socket;
   const Op = app.storage.Op;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.list.find(socket);
   if (!player) {
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
 
-  let { chatUUID, newData } = data;
+  const { chatUUID, newData } = data;
   let log = null;
   // 在内存中查找
-  let logs = app.chat.log;
+  const logs = await ChatLog.getCachedChatLog();
   for (let l of logs) {
     if (
       l.uuid === chatUUID &&

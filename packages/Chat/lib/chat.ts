@@ -1,7 +1,7 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:chat');
 import * as event from './event';
-import LogDefinition from './models/log';
+import LogDefinition, { ChatLog } from './models/log';
 import ChatConverseDefinition from './models/converse';
 import { ChatMessagePartial } from '../types/message';
 import BasePackage from 'lib/package';
@@ -36,7 +36,6 @@ export default class Chat extends BasePackage {
     const app = this.app;
     const db = this.db;
 
-    this.regPackageData('log', []); // 聊天记录缓存，每10分钟会把记录存储到数据库中
     this.regPackageData('converses', {}); // 会话信息缓存.用于检测会话是否创建
 
     this.regMethods({
@@ -47,8 +46,9 @@ export default class Chat extends BasePackage {
         app.chat.converses[userUUID] = next;
       },
       findMsgAsync: async function(msg_uuid: string) {
-        for (var i = 0; i < app.chat.log.length; i++) {
-          let log = app.chat.log[i];
+        const logList = await ChatLog.getCachedChatLog();
+        for (var i = 0; i < logList.length; i++) {
+          let log = logList[i];
           if (log.uuid === msg_uuid) {
             return log;
           }
@@ -74,11 +74,12 @@ export default class Chat extends BasePackage {
           }
         };
 
-        for (var i = 0; i < app.chat.log.length; i++) {
-          let log = app.chat.log[i];
+        const logList = await ChatLog.getCachedChatLog();
+        for (var i = 0; i < logList.length; i++) {
+          let log = logList[i];
           if (log.uuid === msg_uuid) {
             // 如果在内存数据库中找到则直接通知并返回
-            app.chat.log[i] = payload;
+            ChatLog.updateCachedChatLog(i, payload);
             notify();
             return payload;
           }
@@ -179,18 +180,12 @@ export default class Chat extends BasePackage {
         app.chat.sendSystemMsg(to_uuid, '', '', msg, null);
       },
       saveChatLogAsync: async function() {
-        let logList = app.chat.log;
-        let cacheList = Object.assign([], logList);
-        logList.splice(0, cacheList.length); // 清除cache里的数据
         try {
-          let res = await db.models.chat_log.bulkCreate(cacheList);
+          await ChatLog.dumpCachedChatLog();
           debug('save chat log success!');
-          return res;
         } catch (err) {
           console.error('save chat log error', err);
         }
-
-        return false;
       },
       getChatLogSumAsync: async function() {
         let res = await db.models.chat_log.count();
