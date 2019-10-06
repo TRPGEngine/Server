@@ -54,6 +54,14 @@ export interface ICache {
   lget(key: string): Promise<CacheValue[]>;
 
   /**
+   * 设置指定索引位置的列表的值
+   * @param key 键
+   * @param index 索引
+   * @param value 值
+   */
+  lset(key: string, index: number, value: CacheValue): Promise<CacheValue>;
+
+  /**
    * 返回集合中的所有的成
    * @param key 键
    */
@@ -149,6 +157,16 @@ export class Cache implements ICache {
     } else {
       return [arr];
     }
+  }
+
+  async lset(
+    key: string,
+    index: number,
+    value: CacheValue
+  ): Promise<CacheValue> {
+    _.set(this.data, [key, index], value);
+
+    return value;
   }
 
   async smembers(key: string): Promise<string[]> {
@@ -264,6 +282,20 @@ export class RedisCache implements ICache {
     key = this.genKey(key);
     const arr: string[] = await this.redis.lrange(key, 0, -1); // 获取所有值
     return arr.map(this.parseVal);
+  }
+
+  async lset(
+    key: string,
+    index: number,
+    value: CacheValue
+  ): Promise<CacheValue> {
+    await this.redis.lset(
+      key,
+      index,
+      _.isObject(value) ? JSON.stringify(value) : value
+    );
+
+    return value;
   }
 
   remove(key: string): Promise<number> {
