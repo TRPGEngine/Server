@@ -42,7 +42,7 @@ module.exports = {
     ],
   },
   redisUrl: '',
-  webserviceHomepage: '/admin/home',
+  webserviceHomepage: '/dashboard/home',
   file: {
     oss: {
       qiniu: {

@@ -7,7 +7,7 @@ module.exports = {
       //   result: false,
       //   msg: 'No Access Permission'
       // }
-      ctx.redirect('/admin/login');
+      ctx.redirect('/dashboard/login');
     }
   },
   authAjax: async (ctx, next) => {
