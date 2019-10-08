@@ -62,10 +62,17 @@ export interface ICache {
   lset(key: string, index: number, value: CacheValue): Promise<CacheValue>;
 
   /**
-   * 返回集合中的所有的成
+   * 向集合中放入一个值，该值在集合中只能存在一个
+   * @param key 键
+   * @param value 值
+   */
+  sadd(key: string, value: CacheValue): Promise<void>;
+
+  /**
+   * 返回集合中的所有的成员
    * @param key 键
    */
-  smembers(key: string): Promise<string[]>;
+  smembers(key: string): Promise<CacheValue[]>;
   remove(key: string): Promise<any>;
   close(): void;
 }
@@ -169,13 +176,22 @@ export class Cache implements ICache {
     return value;
   }
 
-  async smembers(key: string): Promise<string[]> {
-    const vals = await this.get(key);
-    if (Array.isArray(vals)) {
-      return vals.filter((item, index, arr) => arr.indexOf(item) === index); // 数组去重
-    } else {
-      return vals as any;
+  async sadd(key: string, value: CacheValue): Promise<void> {
+    let data: Set<CacheValue> = this.data[key];
+    if (!data) {
+      data = this.data[key] = new Set<CacheValue>();
     }
+
+    data.add(value);
+  }
+
+  async smembers(key: string): Promise<CacheValue[]> {
+    const d = this.data[key];
+    if (_.isSet(d)) {
+      return Array.from(d);
+    }
+
+    return [];
   }
 
   remove(key: string) {
@@ -272,10 +288,18 @@ export class RedisCache implements ICache {
     return Promise.resolve(null);
   }
 
-  async smembers(key: string): Promise<string[]> {
+  async sadd(key: string, value: CacheValue): Promise<void> {
+    key = this.genKey(key);
+    if (_.isObject(value)) {
+      value = JSON.stringify(value);
+    }
+    await this.redis.sadd(key, value);
+  }
+
+  async smembers(key: string): Promise<CacheValue[]> {
     key = this.genKey(key);
     const members = await this.redis.smembers(key);
-    return members;
+    return members.map(this.parseVal);
   }
 
   async lget(key: string): Promise<CacheValue[]> {
@@ -289,6 +313,7 @@ export class RedisCache implements ICache {
     index: number,
     value: CacheValue
   ): Promise<CacheValue> {
+    key = this.genKey(key);
     await this.redis.lset(
       key,
       index,
