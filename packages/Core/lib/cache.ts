@@ -69,6 +69,13 @@ export interface ICache {
   sadd(key: string, value: CacheValue): Promise<void>;
 
   /**
+   * 从集合中移除一个值
+   * @param key 键
+   * @param value 值
+   */
+  srem(key: string, value: CacheValue): Promise<void>;
+
+  /**
    * 返回集合中的所有的成员
    * @param key 键
    */
@@ -185,6 +192,13 @@ export class Cache implements ICache {
     data.add(value);
   }
 
+  async srem(key: string, value: CacheValue): Promise<void> {
+    const data: Set<CacheValue> = this.data[key];
+    if (_.isSet(data)) {
+      data.delete(value);
+    }
+  }
+
   async smembers(key: string): Promise<CacheValue[]> {
     const d = this.data[key];
     if (_.isSet(d)) {
@@ -294,6 +308,15 @@ export class RedisCache implements ICache {
       value = JSON.stringify(value);
     }
     await this.redis.sadd(key, value);
+  }
+
+  async srem(key: string, value: CacheValue): Promise<void> {
+    key = this.genKey(key);
+    if (_.isObject(value)) {
+      value = JSON.stringify(value);
+    }
+
+    await this.redis.srem(key, value);
   }
 
   async smembers(key: string): Promise<CacheValue[]> {
