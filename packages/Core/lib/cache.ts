@@ -80,6 +80,14 @@ export interface ICache {
    * @param key 键
    */
   smembers(key: string): Promise<CacheValue[]>;
+
+  /**
+   * 判定是否在该set中
+   * @param key 键
+   * @param value 值
+   */
+  sismember(key: string, value: CacheValue): Promise<boolean>;
+
   remove(key: string): Promise<any>;
   close(): void;
 }
@@ -208,6 +216,15 @@ export class Cache implements ICache {
     return [];
   }
 
+  async sismember(key: string, value: CacheValue): Promise<boolean> {
+    const d = this.data[key];
+    if (_.isSet(d)) {
+      return d.has(value);
+    }
+
+    return false;
+  }
+
   remove(key: string) {
     if (this.data[key]) {
       delete this.data[key];
@@ -243,6 +260,21 @@ export class RedisCache implements ICache {
     } catch (e) {
       return val;
     }
+  }
+
+  /**
+   * 归一化缓存值。将其转化为字符串
+   * @param val 值
+   */
+  private normalizeVal(val: CacheValue): string {
+    let ret: string;
+    if (_.isObject(val) || _.isNumber(val)) {
+      ret = JSON.stringify(val);
+    } else {
+      ret = val;
+    }
+
+    return ret;
   }
 
   set(
@@ -304,25 +336,27 @@ export class RedisCache implements ICache {
 
   async sadd(key: string, value: CacheValue): Promise<void> {
     key = this.genKey(key);
-    if (_.isObject(value)) {
-      value = JSON.stringify(value);
-    }
-    await this.redis.sadd(key, value);
+    await this.redis.sadd(key, this.normalizeVal(value));
   }
 
   async srem(key: string, value: CacheValue): Promise<void> {
     key = this.genKey(key);
-    if (_.isObject(value)) {
-      value = JSON.stringify(value);
-    }
 
-    await this.redis.srem(key, value);
+    await this.redis.srem(key, this.normalizeVal(value));
   }
 
   async smembers(key: string): Promise<CacheValue[]> {
     key = this.genKey(key);
     const members = await this.redis.smembers(key);
     return members.map(this.parseVal);
+  }
+
+  async sismember(key: string, value: CacheValue): Promise<boolean> {
+    key = this.genKey(key);
+
+    const ret = await this.redis.sismember(key, this.normalizeVal(value));
+
+    return Boolean(ret);
   }
 
   async lget(key: string): Promise<CacheValue[]> {
