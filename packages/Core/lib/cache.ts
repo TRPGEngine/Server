@@ -90,6 +90,11 @@ export interface ICache {
 
   remove(key: string): Promise<any>;
   close(): void;
+
+  // 分布式锁
+  // 仅redis有效
+  lock(key: string): Promise<boolean>;
+  unlock(key: string): Promise<void>;
 }
 
 export class Cache implements ICache {
@@ -236,6 +241,9 @@ export class Cache implements ICache {
     debug('start closing cache');
     this.data = {};
   }
+
+  lock = _.noop as any;
+  unlock = _.noop as any;
 }
 
 export class RedisCache implements ICache {
@@ -388,5 +396,21 @@ export class RedisCache implements ICache {
   close(): void {
     debug('start closing redis cli');
     this.redis.disconnect();
+  }
+
+  async lock(key: string): Promise<boolean> {
+    key = 'lock:' + this.genKey(key);
+    const timestamp = new Date().valueOf().toString(); // 锁的值任意
+    const ret = await this.redis.set(key, timestamp, 'EX', 10, 'NX');
+    if (ret === 'OK') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async unlock(key: string): Promise<void> {
+    key = 'lock:' + this.genKey(key);
+    await this.redis.del(key);
   }
 }
