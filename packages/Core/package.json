@@ -28,7 +28,6 @@
     "graphql": "^14.4.2",
     "graphql-relay": "^0.6.0",
     "graphql-sequelize": "^9.3.6",
-    "ioredis": "^4.14.1",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.4.1",
     "koa-bodyparser": "^4.2.0",

@@ -4,30 +4,104 @@
  */
 import _ from 'lodash';
 import { Socket } from 'trpg/core';
-import { Redis } from 'ioredis';
+import Redis from 'ioredis';
 import { Platform } from 'packages/Player/types/player';
 import { ICache } from 'packages/Core/lib/cache';
+import { EventEmitter } from 'events';
+import Debug from 'debug';
+const debug = Debug('trpg:component:player:manager');
 
 const ONLINE_PLAYER_KEY = 'online_player_uuid_list';
+const CHANNEL_KEY = 'player_manager_channel';
 
-interface PlayerManagerOptions {
-  redis?: Redis;
-  cache?: ICache;
+export interface PlayerMsgPayload {
+  uuid: string; // 用户UUID
+  platform: Platform; // 平台
+  uuidKey?: string; // uuidkey。通过用户UUID和平台算出
+  [other: string]: any;
 }
 
-class PlayerManager {
-  players = {}; // 玩家列表Map, key为UUIDKey, 此处保存本地的映射
+interface PlayerManagerPlayerMap {
+  [uuidKey: string]: Socket;
+}
+
+interface PlayerManagerOptions {
+  redisUrl: string;
+  cache: ICache;
+}
+
+class PlayerManager extends EventEmitter {
+  players: PlayerManagerPlayerMap = {}; // 玩家列表Map, key为UUIDKey, 此处保存本地的映射
   onlinePlayerUUIDList: string[] = []; // 仅用于无redis环境
-  redis: Redis;
   cache: ICache;
 
+  pubClient: Redis.Redis;
+  subClient: Redis.Redis;
+
   constructor(options: PlayerManagerOptions) {
-    this.redis = options.redis;
+    super();
+
+    const redisUrl = options.redisUrl;
+    if (!redisUrl) {
+      throw new Error(
+        '[PlayerManager] require redisUrl to build pub/sub service'
+      );
+    }
+
     this.cache = options.cache;
+    this.pubClient = new Redis(redisUrl);
+    this.subClient = new Redis(redisUrl);
+
+    this.initListener();
   }
 
-  get isRedis(): boolean {
-    return !!this.redis;
+  /**
+   * 初始化监听器
+   * 通过redis作为一个MQ系统来获取分布式通信
+   */
+  initListener() {
+    this.subClient.subscribe(CHANNEL_KEY);
+    this.subClient.on('message', (channel, message) => {
+      if (channel === CHANNEL_KEY) {
+        try {
+          const payload: PlayerMsgPayload = JSON.parse(message);
+
+          const uuidKey = payload.uuidKey;
+          if (_.isString(uuidKey) && this.players[uuidKey]) {
+            // 仅当当前有该key存储时。处理数据
+            const socket = this.players[uuidKey];
+            this.emit('message', payload, socket);
+          }
+        } catch (e) {
+          debug('receive redis sub message error with %s :%o', message, e);
+        }
+      }
+    });
+  }
+
+  /**
+   * 接受到远程消息的回调
+   * @param listener 监听器
+   */
+  onMessage(listener: (payload: PlayerMsgPayload, socket: Socket) => void) {
+    this.on('message', listener);
+  }
+
+  /**
+   * 向公用通道发送用户消息
+   * @param payload 消息体
+   */
+  async emitPlayerMsg(payload: PlayerMsgPayload): Promise<void> {
+    payload.uuidKey = this.getUUIDKey(payload.uuid, payload.platform); // 计算UUIDKey
+    await this.pubClient.publish(CHANNEL_KEY, JSON.stringify(payload));
+  }
+
+  /**
+   * 关闭所有的pubsub连接
+   */
+  close() {
+    _.invoke(this.pubClient, 'disconnect');
+    _.invoke(this.subClient, 'disconnect');
   }
 
   private getUUIDKey(uuid: string, platform: string): string {
@@ -119,3 +193,5 @@ export const getPlayerManager = (options: PlayerManagerOptions) => {
 
   return playerManager;
 };
+
+export type PlayerManagerCls = PlayerManager;
