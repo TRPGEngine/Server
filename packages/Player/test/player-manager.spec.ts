@@ -6,8 +6,17 @@ import {
 import Config from 'config';
 import { RedisCache } from 'packages/Core/lib/cache';
 import { sleep } from 'test/utils/utils';
+import _ from 'lodash';
+import { Socket } from 'trpg/core';
 
 const redisUrl = Config.get<string>('redisUrl');
+const getFakeSocket = (): Socket => {
+  const emit = jest.fn() as any;
+  return {
+    id: _.uniqueId('socket_'),
+    emit,
+  } as Socket;
+};
 
 describe('player-manager class test', () => {
   let cache: RedisCache;
@@ -25,12 +34,12 @@ describe('player-manager class test', () => {
     return sleep(5000);
   }, 10000);
 
-  afterAll(() => {
+  afterAll(async () => {
+    await playerManager.close();
     cache.close();
-    playerManager.close();
   });
 
-  it('pubsub should be ok', async () => {
+  it('onMessage should be ok', async () => {
     const testMsgPayload: PlayerMsgPayload = {
       uuid: 'test-uuid-key',
       platform: 'web',
@@ -45,4 +54,21 @@ describe('player-manager class test', () => {
 
     expect(payload).toMatchObject(testMsgPayload);
   }, 10000);
+
+  it('addPlayer should be ok', async () => {
+    const socket = getFakeSocket();
+    const isSuccess = await playerManager.addPlayer('testUUID', socket, 'web');
+
+    expect(isSuccess).toBe(true);
+    expect(playerManager.players).toMatchObject({
+      [socket.id]: {
+        uuid: 'testUUID',
+        platform: 'web',
+        socket,
+        rooms: new Set(),
+      },
+    });
+  });
+
+  describe('single instance', () => {});
 });
