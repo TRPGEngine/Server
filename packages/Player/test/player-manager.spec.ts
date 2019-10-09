@@ -34,20 +34,15 @@ describe('player-manager class test', () => {
     const testMsgPayload: PlayerMsgPayload = {
       uuid: 'test-uuid-key',
       platform: 'web',
-    };
-    const testPlayerMap = {
-      'web#test-uuid-key': 'socket test string' as any,
-    };
-    playerManager.players = testPlayerMap;
+    } as any;
     playerManager.emitPlayerMsg(testMsgPayload);
 
-    const { payload, socket } = await new Promise((resolve, reject) => {
-      playerManager.onMessage((payload, socket) => {
-        resolve({ payload, socket });
+    const { payload } = await new Promise((resolve, reject) => {
+      playerManager.onMessage((payload) => {
+        resolve({ payload });
       });
     });
 
     expect(payload).toMatchObject(testMsgPayload);
-    expect(socket).toBe('socket test string');
   }, 10000);
 });

@@ -72,12 +72,7 @@ class PlayerManager extends EventEmitter {
         try {
           const payload: PlayerMsgPayload = JSON.parse(message);
 
-          const uuidKey = payload.uuidKey;
-          if (_.isString(uuidKey) && this.players[uuidKey]) {
-            // 仅当当前有该key存储时。处理数据
-            const socket = this.players[uuidKey];
-            this.emit('message', payload, socket);
-          }
+          this.emit('message', payload); // 将所有接受到的payload都转发到监听
         } catch (e) {
           debug('receive redis sub message error with %s :%o', message, e);
         }
@@ -89,7 +84,7 @@ class PlayerManager extends EventEmitter {
    * 接受到远程消息的回调
    * @param listener 监听器
    */
-  onMessage(listener: (payload: PlayerMsgPayload, socket: Socket) => void) {
+  onMessage(listener: (payload: PlayerMsgPayload) => void) {
     this.on('message', listener);
   }
 
