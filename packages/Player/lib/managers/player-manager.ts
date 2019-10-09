@@ -26,7 +26,7 @@ export interface PlayerMsgPayload {
 
 interface PlayerManagerPlayerMapItem {
   uuid: string;
-  platform: string;
+  platform: Platform;
   socket: Socket;
   rooms: Set<string>; //加入的房间的列表
 }
@@ -227,10 +227,22 @@ class PlayerManager extends EventEmitter {
 
   /**
    * 关闭所有的pubsub连接
+   * 移除所有的用户数据
    */
-  close() {
-    _.invoke(this.pubClient, 'disconnect');
-    _.invoke(this.subClient, 'disconnect');
+  async close() {
+    try {
+      _.invoke(this.pubClient, 'disconnect');
+      _.invoke(this.subClient, 'disconnect');
+
+      // 移除用户
+      await Promise.all(
+        Object.values(this.players).map((player) =>
+          this.removePlayer(player.uuid, player.platform)
+        )
+      ).then(() => debug('[PlayerManager] 移除所有用户成功'));
+    } catch (err) {
+      console.error('[PlayerManager] close error', err);
+    }
   }
 
   private getUUIDKey(uuid: string, platform: string): string {
@@ -306,22 +318,38 @@ class PlayerManager extends EventEmitter {
   }
 
   /**
+   * 根据用户UUID和平台查找用户信息
+   * @param uuid 用户UUID
+   */
+  findPlayerWithUUIDPlatform(
+    uuid: string,
+    platform: Platform
+  ): PlayerManagerPlayerMapItem {
+    return Object.values(this.players).find(
+      (item) => item.uuid === uuid && item.platform === platform
+    );
+  }
+
+  /**
    * 移除玩家
    * @param uuid uuid
    * @param platform 平台
    */
-  removePlayer(uuid: string, platform: Platform = 'web') {
+  async removePlayer(uuid: string, platform: Platform = 'web'): Promise<void> {
+    debug('[PlayerManager] remove player %s[%s]', uuid, platform);
     const uuidKey = this.getUUIDKey(uuid, platform);
 
     // 从在线列表中移除
-    this.cache.srem(ONLINE_PLAYER_KEY, uuidKey);
+    await this.cache.srem(ONLINE_PLAYER_KEY, uuidKey);
 
-    const player = this.players[uuidKey];
+    const player = this.findPlayerWithUUIDPlatform(uuid, platform);
     const rooms = Array.from(player.rooms); // 浅拷贝一波
     const socket = player.socket;
-    rooms.forEach((roomUUID) => {
-      this.leaveRoom(roomUUID, socket); // 离开房间
-    });
+
+    // 离开房间
+    await Promise.all(
+      rooms.map((roomUUID) => this.leaveRoom(roomUUID, socket))
+    ).then(() => debug(`[PlayerManager] 用户[${uuid}]已离开所有房间`));
 
     // 从本地的会话管理列表中移除
     delete this.players[uuidKey];
