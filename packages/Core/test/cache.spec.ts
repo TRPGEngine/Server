@@ -19,20 +19,23 @@ describe('cache', () => {
   });
 
   describe(isRedis ? 'redis cache' : 'memory cache', () => {
-    if (isRedis) {
-      it('lock', async () => {
-        const key = 'test-lock';
-        expect(await cache.lock(key)).toBe(true);
-        expect(await cache.lock(key)).toBe(false);
-      });
-
-      it('unlock', async () => {
-        const key = 'test-lock2';
-        expect(await cache.lock(key)).toBe(true);
-        expect(await cache.lock(key)).toBe(false);
-        await cache.unlock(key);
-        expect(await cache.lock(key)).toBe(true);
-      });
+    if (!isRedis) {
+      console.warn('this test case require redis url');
+      return;
     }
+
+    it('lock', async () => {
+      const key = 'test-lock';
+      expect(await cache.lock(key)).toBe(true);
+      expect(await cache.lock(key)).toBe(false);
+    });
+
+    it('unlock', async () => {
+      const key = 'test-lock2';
+      expect(await cache.lock(key)).toBe(true);
+      expect(await cache.lock(key)).toBe(false);
+      await cache.unlock(key);
+      expect(await cache.lock(key)).toBe(true);
+    });
   });
 });
