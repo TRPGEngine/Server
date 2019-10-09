@@ -161,6 +161,27 @@ class PlayerManager extends EventEmitter {
   }
 
   /**
+   * 根据socket连接查找用户
+   * @param socket Socket连接
+   */
+  findPlayer(socket: Socket): PlayerManagerPlayerMapItem | null {
+    if (!socket) {
+      return null;
+    }
+
+    const socketId = socket.id;
+    return this.players[socketId] || null;
+  }
+
+  /**
+   * 根据用户UUID查找用户信息
+   * @param uuid 用户UUID
+   */
+  findPlayerWithUUID(uuid: string): PlayerManagerPlayerMapItem[] {
+    return Object.values(this.players).filter((item) => item.uuid === uuid);
+  }
+
+  /**
    * 移除玩家
    * @param uuid uuid
    * @param platform 平台
