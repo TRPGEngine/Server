@@ -13,18 +13,22 @@ const debug = Debug('trpg:component:player:manager');
 
 const ONLINE_PLAYER_KEY = 'online_player_uuid_list';
 const CHANNEL_KEY = 'player_manager_channel';
+const getRoomKey = (uuid: string) => `player_manager_room#${uuid}`;
 
+// 消息类型: 单播 房间广播 全体广播
+type PlayerMsgPayloadType = 'unicast' | 'roomcase' | 'broadcast';
 export interface PlayerMsgPayload {
-  uuid: string; // 用户UUID
-  platform: Platform; // 平台
-  uuidKey?: string; // uuidkey。通过用户UUID和平台算出
-  [other: string]: any;
+  type: PlayerMsgPayloadType;
+  target?: string; // UUID 如果为单播则为用户UUID， 如果为房间广播则为房间UUID 如果为广播则不填
+  eventName: string;
+  data: {};
 }
 
 interface PlayerManagerPlayerMapItem {
   uuid: string;
   platform: string;
   socket: Socket;
+  rooms: Set<string>; //加入的房间的列表
 }
 
 interface PlayerManagerPlayerMap {
@@ -71,6 +75,7 @@ class PlayerManager extends EventEmitter {
       if (channel === CHANNEL_KEY) {
         try {
           const payload: PlayerMsgPayload = JSON.parse(message);
+          this.handleMessage(payload);
 
           this.emit('message', payload); // 将所有接受到的payload都转发到监听
         } catch (e) {
@@ -78,6 +83,45 @@ class PlayerManager extends EventEmitter {
         }
       }
     });
+  }
+
+  private async handleMessage(payload: PlayerMsgPayload) {
+    const { type, target, eventName, data } = payload;
+    let waitToSendPlayers: PlayerManagerPlayerMapItem[] = []; // 本地涉及到的Player列表
+
+    if (type === 'unicast') {
+      // 单播
+      const playerUUID = target;
+      waitToSendPlayers.push(...this.findPlayerWithUUID(playerUUID));
+    } else if (type === 'roomcase') {
+      // 房间广播
+      const roomUUID = target;
+      const allSocketIds = await this.getRoomAllSocketIds(roomUUID);
+      const localSocketIds = allSocketIds.filter(
+        (socketId) => !!this.players[socketId]
+      );
+      waitToSendPlayers.push(
+        ...localSocketIds.map((socketId) => this.players[socketId])
+      );
+    } else if (type === 'broadcast') {
+      waitToSendPlayers.push(...Object.values(this.players));
+    }
+
+    for (const player of waitToSendPlayers) {
+      // 循环发送消息
+      this.emitToPlayer(player, eventName, data);
+    }
+  }
+
+  private async emitToPlayer(
+    player: PlayerManagerPlayerMapItem,
+    eventName: string,
+    data: {}
+  ) {
+    const socket = player.socket;
+    if (socket.connected) {
+      socket.emit(eventName, data);
+    }
   }
 
   /**
@@ -93,8 +137,92 @@ class PlayerManager extends EventEmitter {
    * @param payload 消息体
    */
   async emitPlayerMsg(payload: PlayerMsgPayload): Promise<void> {
-    payload.uuidKey = this.getUUIDKey(payload.uuid, payload.platform); // 计算UUIDKey
     await this.pubClient.publish(CHANNEL_KEY, JSON.stringify(payload));
+  }
+
+  /**
+   * 加入房间
+   * 在Redis存储一个Set记录每个房间的成员
+   * 值为socketId
+   * @param roomUUID 房间UUID
+   * @param socket socket连接
+   */
+  async joinRoom(roomUUID: string, socket: Socket): Promise<void> {
+    const roomKey = getRoomKey(roomUUID);
+    const socketId = socket.id;
+    const player = this.players[socketId];
+    if (player) {
+      // 只有在用户有记录的情况下才能加入房间。离开的时候不用关心
+      await this.cache.sadd(roomKey, socketId);
+      player.rooms.add(roomUUID);
+    } else {
+      debug('join room fail, not found player in local %s', socketId);
+    }
+  }
+
+  /**
+   * 离开房间
+   * @param roomUUID 房间UUID
+   * @param socket socket连接
+   */
+  async leaveRoom(roomUUID: string, socket: Socket): Promise<void> {
+    const roomKey = getRoomKey(roomUUID);
+    const socketId = socket.id;
+    await this.cache.srem(roomKey, socketId);
+    const player = this.players[socketId];
+    player.rooms.delete(roomUUID);
+  }
+
+  async getRoomAllSocketIds(roomUUID: string): Promise<string[]> {
+    return (await this.cache.smembers(getRoomKey(roomUUID))) as string[];
+  }
+
+  /**
+   * 向指定用户发送socket事件(全平台)
+   * @param uuid 用户UUID
+   * @param eventName 事件名
+   * @param data 数据
+   */
+  async unicastSocketEvent(uuid: string, eventName: string, data: {}) {
+    const payload: PlayerMsgPayload = {
+      type: 'unicast',
+      target: uuid,
+      eventName,
+      data,
+    };
+
+    await this.emitPlayerMsg(payload);
+  }
+
+  /**
+   * 向房间中所有的用户发送socket事件
+   * @param roomUUID 房间UUID
+   * @param eventName 事件名
+   * @param data 数据
+   */
+  async roomcastSocketEvent(roomUUID: string, eventName: string, data: {}) {
+    const payload: PlayerMsgPayload = {
+      type: 'roomcase',
+      target: roomUUID,
+      eventName,
+      data,
+    };
+
+    await this.emitPlayerMsg(payload);
+  }
+  /**
+   * 向所有连接发送广播socket事件
+   * @param eventName 事件名
+   * @param data 数据
+   */
+  async broadcastSocketEvent(eventName: string, data: {}) {
+    const payload: PlayerMsgPayload = {
+      type: 'broadcast',
+      eventName,
+      data,
+    };
+
+    await this.emitPlayerMsg(payload);
   }
 
   /**
@@ -150,6 +278,7 @@ class PlayerManager extends EventEmitter {
       uuid,
       platform,
       socket,
+      rooms: new Set(),
     };
 
     return true;
@@ -186,6 +315,13 @@ class PlayerManager extends EventEmitter {
 
     // 从在线列表中移除
     this.cache.srem(ONLINE_PLAYER_KEY, uuidKey);
+
+    const player = this.players[uuidKey];
+    const rooms = Array.from(player.rooms); // 浅拷贝一波
+    const socket = player.socket;
+    rooms.forEach((roomUUID) => {
+      this.leaveRoom(roomUUID, socket); // 离开房间
+    });
 
     // 从本地的会话管理列表中移除
     delete this.players[uuidKey];
