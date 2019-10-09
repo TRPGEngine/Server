@@ -21,8 +21,14 @@ export interface PlayerMsgPayload {
   [other: string]: any;
 }
 
+interface PlayerManagerPlayerMapItem {
+  uuid: string;
+  platform: string;
+  socket: Socket;
+}
+
 interface PlayerManagerPlayerMap {
-  [uuidKey: string]: Socket;
+  [socketId: string]: PlayerManagerPlayerMapItem;
 }
 
 interface PlayerManagerOptions {
@@ -31,7 +37,7 @@ interface PlayerManagerOptions {
 }
 
 class PlayerManager extends EventEmitter {
-  players: PlayerManagerPlayerMap = {}; // 玩家列表Map, key为UUIDKey, 此处保存本地的映射
+  players: PlayerManagerPlayerMap = {}; // 玩家列表Map, 此处保存本地的映射
   onlinePlayerUUIDList: string[] = []; // 仅用于无redis环境
   cache: ICache;
 
@@ -145,7 +151,11 @@ class PlayerManager extends EventEmitter {
     await this.cache.unlock(ONLINE_PLAYER_KEY);
 
     // 添加到本地的会话管理
-    this.players[uuidKey] = socket;
+    this.players[socket.id] = {
+      uuid,
+      platform,
+      socket,
+    };
 
     return true;
   }
