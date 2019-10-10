@@ -167,6 +167,8 @@ describe('player-manager class test', () => {
     const emitFn = socket.emit as jest.Mock;
     const disconnectFn = socket.disconnect as jest.Mock;
 
+    await sleep(500);
+
     expect(emitFn).toBeCalled();
     expect(emitFn).toBeCalledTimes(1);
     expect(emitFn.mock.calls[0][0]).toBe('player::tick');
@@ -178,5 +180,75 @@ describe('player-manager class test', () => {
     expect(disconnectFn).toBeCalledTimes(1);
   });
 
-  describe('single instance', () => {});
+  describe('single instance', () => {
+    it('unicastSocketEvent should be ok', async () => {
+      const socket1 = getFakeSocket();
+      const socket2 = getFakeSocket();
+      await playerManager.addPlayer('test1', socket1, 'web');
+      await playerManager.addPlayer('test1', socket2, 'app');
+      await playerManager.unicastSocketEvent('test1', 'testEvent', { test: 1 });
+
+      await sleep(500);
+
+      const emit1 = socket1.emit as jest.Mock;
+      const emit2 = socket1.emit as jest.Mock;
+      expect(emit1).toBeCalled();
+      expect(emit1).toBeCalledTimes(1);
+      expect(emit2).toBeCalled();
+      expect(emit2).toBeCalledTimes(1);
+      expect(emit1.mock.calls[0][0]).toBe('testEvent');
+      expect(emit1.mock.calls[0][1]).toEqual({ test: 1 });
+      expect(emit2.mock.calls[0][0]).toBe('testEvent');
+      expect(emit2.mock.calls[0][1]).toEqual({ test: 1 });
+    });
+
+    it('roomcastSocketEvent should be ok', async () => {
+      const socket1 = getFakeSocket();
+      const socket2 = getFakeSocket();
+      const roomUUID = 'roomUUID';
+      await playerManager.addPlayer('test1', socket1, 'web');
+      await playerManager.addPlayer('test2', socket2, 'web');
+      await playerManager.joinRoom(roomUUID, socket1);
+      await playerManager.joinRoom(roomUUID, socket2);
+      await playerManager.roomcastSocketEvent(roomUUID, 'testEvent', {
+        test: 1,
+      });
+
+      await sleep(500);
+
+      const emit1 = socket1.emit as jest.Mock;
+      const emit2 = socket1.emit as jest.Mock;
+      expect(emit1).toBeCalled();
+      expect(emit1).toBeCalledTimes(1);
+      expect(emit2).toBeCalled();
+      expect(emit2).toBeCalledTimes(1);
+      expect(emit1.mock.calls[0][0]).toBe('testEvent');
+      expect(emit1.mock.calls[0][1]).toEqual({ test: 1 });
+      expect(emit2.mock.calls[0][0]).toBe('testEvent');
+      expect(emit2.mock.calls[0][1]).toEqual({ test: 1 });
+    });
+
+    it('broadcastSocketEvent should be ok', async () => {
+      const socket1 = getFakeSocket();
+      const socket2 = getFakeSocket();
+      await playerManager.addPlayer('test1', socket1, 'web');
+      await playerManager.addPlayer('test2', socket2, 'web');
+      await playerManager.broadcastSocketEvent('testEvent', {
+        test: 1,
+      });
+
+      await sleep(500);
+
+      const emit1 = socket1.emit as jest.Mock;
+      const emit2 = socket1.emit as jest.Mock;
+      expect(emit1).toBeCalled();
+      expect(emit1).toBeCalledTimes(1);
+      expect(emit2).toBeCalled();
+      expect(emit2).toBeCalledTimes(1);
+      expect(emit1.mock.calls[0][0]).toBe('testEvent');
+      expect(emit1.mock.calls[0][1]).toEqual({ test: 1 });
+      expect(emit2.mock.calls[0][0]).toBe('testEvent');
+      expect(emit2.mock.calls[0][1]).toEqual({ test: 1 });
+    });
+  });
 });
