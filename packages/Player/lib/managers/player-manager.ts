@@ -13,6 +13,7 @@ const debug = Debug('trpg:component:player:manager');
 
 const ONLINE_PLAYER_KEY = 'online_player_uuid_list';
 const CHANNEL_KEY = 'player_manager_channel';
+const TICK_PLAYER_EVENTNAME = 'player::tick';
 const getRoomKey = (uuid: string) => `player_manager_room#${uuid}`;
 
 // 消息类型: 单播 房间广播 全体广播
@@ -131,6 +132,12 @@ class PlayerManager extends EventEmitter {
     const socket = player.socket;
     if (socket.connected) {
       socket.emit(eventName, data);
+
+      if (eventName === TICK_PLAYER_EVENTNAME) {
+        // 如果为踢出的话。还要断开连接并移除player
+        socket.disconnect();
+        this.removePlayer(player.uuid, player.platform);
+      }
     }
   }
 
@@ -255,7 +262,7 @@ class PlayerManager extends EventEmitter {
     }
   }
 
-  private getUUIDKey(uuid: string, platform: string): string {
+  private getUUIDKey(uuid: string, platform: Platform): string {
     return `${platform}#${uuid}`;
   }
 
@@ -294,9 +301,12 @@ class PlayerManager extends EventEmitter {
 
     const isExist = await this.cache.sismember(ONLINE_PLAYER_KEY, uuidKey);
     if (isExist) {
-      return false;
+      // 如果已存在则踢掉用户
+      await this.tickPlayer(uuid, platform);
+    } else {
+      // 不存在则新增
+      await this.cache.sadd(ONLINE_PLAYER_KEY, uuidKey);
     }
-    await this.cache.sadd(ONLINE_PLAYER_KEY, uuidKey);
     await this.cache.unlock(ONLINE_PLAYER_KEY);
 
     // 添加到本地的会话管理
@@ -356,17 +366,28 @@ class PlayerManager extends EventEmitter {
     // 从在线列表中移除
     await this.cache.srem(ONLINE_PLAYER_KEY, uuidKey);
 
+    // 离开房间
     const player = this.findPlayerWithUUIDPlatform(uuid, platform);
     const rooms = Array.from(player.rooms); // 浅拷贝一波
     const socket = player.socket;
-
-    // 离开房间
     await Promise.all(
       rooms.map((roomUUID) => this.leaveRoom(roomUUID, socket))
     ).then(() => debug(`[PlayerManager] 用户[${uuid}]已离开所有房间`));
 
     // 从本地的会话管理列表中移除
     delete this.players[uuidKey];
+  }
+
+  /**
+   * 踢掉用户
+   * @param uuid 用户UUID
+   * @param platform 用户平台
+   */
+  async tickPlayer(uuid: string, platform: Platform): Promise<void> {
+    const uuidKey = this.getUUIDKey(uuid, platform);
+    await this.unicastSocketEvent(uuidKey, TICK_PLAYER_EVENTNAME, {
+      msg: '你已在其他地方登陆',
+    });
   }
 
   /**
