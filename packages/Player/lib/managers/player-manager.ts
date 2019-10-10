@@ -19,7 +19,7 @@ const getRoomKey = (uuid: string) => `player_manager_room#${uuid}`;
 type PlayerMsgPayloadType = 'unicast' | 'roomcase' | 'broadcast';
 export interface PlayerMsgPayload {
   type: PlayerMsgPayloadType;
-  target?: string; // UUID 如果为单播则为用户UUID， 如果为房间广播则为房间UUID 如果为广播则不填
+  target?: string; // UUID 如果为单播则为用户UUID或UUIDKey， 如果为房间广播则为房间UUID 如果为广播则不填
   eventName: string;
   data: {};
 }
@@ -91,8 +91,18 @@ class PlayerManager extends EventEmitter {
 
     if (type === 'unicast') {
       // 单播
-      const playerUUID = target;
-      waitToSendPlayers.push(...this.findPlayerWithUUID(playerUUID));
+      if (this.isUUIDKey(target)) {
+        // 是UUIDkey. 则精确检测
+        const playerUUID = this.getUUIDFromKey(target);
+        const platform = this.getPlatformFromKey(target);
+        const socket = this.findPlayerWithUUIDPlatform(playerUUID, platform);
+        if (!_.isUndefined(socket)) {
+          waitToSendPlayers.push(socket);
+        }
+      } else {
+        const playerUUID = target;
+        waitToSendPlayers.push(...this.findPlayerWithUUID(playerUUID));
+      }
     } else if (type === 'roomcase') {
       // 房间广播
       const roomUUID = target;
@@ -249,12 +259,16 @@ class PlayerManager extends EventEmitter {
     return `${platform}#${uuid}`;
   }
 
+  private isUUIDKey(key: string): boolean {
+    return key.indexOf('#') >= 0;
+  }
+
   private getUUIDFromKey(uuidKey: string): string {
     return _.last(uuidKey.split('#'));
   }
 
-  private getPlatformFromKey(uuidKey: string): string {
-    return _.head(uuidKey.split('#'));
+  private getPlatformFromKey(uuidKey: string): Platform {
+    return _.head(uuidKey.split('#')) as Platform;
   }
 
   /**
@@ -324,7 +338,7 @@ class PlayerManager extends EventEmitter {
   findPlayerWithUUIDPlatform(
     uuid: string,
     platform: Platform
-  ): PlayerManagerPlayerMapItem {
+  ): PlayerManagerPlayerMapItem | undefined {
     return Object.values(this.players).find(
       (item) => item.uuid === uuid && item.platform === platform
     );
