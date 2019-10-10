@@ -11,10 +11,10 @@ import { EventEmitter } from 'events';
 import Debug from 'debug';
 const debug = Debug('trpg:component:player:manager');
 
-const ONLINE_PLAYER_KEY = 'online_player_uuid_list';
-const CHANNEL_KEY = 'player_manager_channel';
+const ONLINE_PLAYER_KEY = 'player:online_player_uuid_list';
+const CHANNEL_KEY = 'player:player_manager_channel';
 const TICK_PLAYER_EVENTNAME = 'player::tick';
-const getRoomKey = (uuid: string) => `player_manager_room#${uuid}`;
+const getRoomKey = (uuid: string) => `player:player_manager_room#${uuid}`;
 
 // 消息类型: 单播 房间广播 全体广播
 type PlayerMsgPayloadType = 'unicast' | 'roomcase' | 'broadcast';
@@ -32,7 +32,7 @@ interface PlayerManagerPlayerMapItem {
   rooms: Set<string>; //加入的房间的列表
 }
 
-interface PlayerManagerPlayerMap {
+export interface PlayerManagerPlayerMap {
   [socketId: string]: PlayerManagerPlayerMapItem;
 }
 
@@ -375,7 +375,7 @@ class PlayerManager extends EventEmitter {
     ).then(() => debug(`[PlayerManager] 用户[${uuid}]已离开所有房间`));
 
     // 从本地的会话管理列表中移除
-    delete this.players[uuidKey];
+    delete this.players[socket.id];
   }
 
   /**

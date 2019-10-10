@@ -2,6 +2,7 @@ import {
   getPlayerManager,
   PlayerManagerCls,
   PlayerMsgPayload,
+  PlayerManagerPlayerMap,
 } from '../lib/managers/player-manager';
 import Config from 'config';
 import { RedisCache } from 'packages/Core/lib/cache';
@@ -33,6 +34,13 @@ describe('player-manager class test', () => {
 
     return sleep(5000);
   }, 10000);
+
+  afterEach(async () => {
+    // 每次测试用例结束后清除players列表
+    for (const player of Object.values(playerManager.players)) {
+      await playerManager.removePlayer(player.uuid, player.platform);
+    }
+  });
 
   afterAll(async () => {
     await playerManager.close();
@@ -68,6 +76,73 @@ describe('player-manager class test', () => {
         rooms: new Set(),
       },
     });
+  });
+
+  it('removePlayer should be ok', async () => {
+    const socket = getFakeSocket();
+    playerManager.players = {
+      [socket.id]: {
+        uuid: 'testUUID',
+        platform: 'web',
+        socket,
+        rooms: new Set(),
+      },
+    };
+
+    await playerManager.removePlayer('testUUID', 'web');
+    expect(_.isEmpty(playerManager.players)).toBe(true);
+  });
+
+  it('findPlayerWithUUID', async () => {
+    const socket = getFakeSocket();
+    const socket2 = getFakeSocket();
+    const players: PlayerManagerPlayerMap = {
+      [socket.id]: {
+        uuid: 'testUUID',
+        platform: 'web',
+        socket,
+        rooms: new Set(),
+      },
+      [socket2.id]: {
+        uuid: 'testUUID',
+        platform: 'app',
+        socket: socket2,
+        rooms: new Set(),
+      },
+    };
+    playerManager.players = players;
+
+    expect(playerManager.findPlayerWithUUID('testUUID')).toEqual(
+      Object.values(players)
+    );
+    expect(playerManager.findPlayerWithUUID('testUUID2')).toEqual([]);
+  });
+
+  it('findPlayerWithUUIDPlatform', async () => {
+    const socket = getFakeSocket();
+    const socket2 = getFakeSocket();
+    const players: PlayerManagerPlayerMap = {
+      [socket.id]: {
+        uuid: 'testUUID',
+        platform: 'web',
+        socket,
+        rooms: new Set(),
+      },
+      [socket2.id]: {
+        uuid: 'testUUID',
+        platform: 'app',
+        socket: socket2,
+        rooms: new Set(),
+      },
+    };
+    playerManager.players = players;
+
+    expect(playerManager.findPlayerWithUUIDPlatform('testUUID', 'web')).toEqual(
+      Object.values(players)[0]
+    );
+    expect(
+      playerManager.findPlayerWithUUIDPlatform('testUUID2', 'web')
+    ).toEqual(undefined);
   });
 
   describe('single instance', () => {});
