@@ -96,9 +96,9 @@ class PlayerManager extends EventEmitter {
         // 是UUIDkey. 则精确检测
         const playerUUID = this.getUUIDFromKey(target);
         const platform = this.getPlatformFromKey(target);
-        const socket = this.findPlayerWithUUIDPlatform(playerUUID, platform);
-        if (!_.isUndefined(socket)) {
-          waitToSendPlayers.push(socket);
+        const player = this.findPlayerWithUUIDPlatform(playerUUID, platform);
+        if (!_.isUndefined(player)) {
+          waitToSendPlayers.push(player);
         }
       } else {
         const playerUUID = target;
@@ -368,6 +368,9 @@ class PlayerManager extends EventEmitter {
 
     // 离开房间
     const player = this.findPlayerWithUUIDPlatform(uuid, platform);
+    if (!player) {
+      return;
+    }
     const rooms = Array.from(player.rooms); // 浅拷贝一波
     const socket = player.socket;
     await Promise.all(
