@@ -3,15 +3,16 @@ const debug = Debug('trpg:component:chat:event');
 import generateUUID from 'uuid/v4';
 import { ChatMessagePartial } from '../types/message';
 import { ChatLog } from './models/log';
+import { EventFunc } from 'trpg/core';
 
 /**
  * 增加聊天消息
  * @param messagePkg 消息内容
  */
-export const addChatLog = function addChatLog(
+export const addChatLog: EventFunc = function addChatLog(
   messagePkg: ChatMessagePartial
 ): ChatMessagePartial | false {
-  const app = this;
+  const app = this.app;
   if (!!messagePkg) {
     const date = messagePkg.date ? new Date(messagePkg.date) : new Date();
     const pkg: ChatMessagePartial = {
@@ -38,7 +39,11 @@ export const addChatLog = function addChatLog(
 /**
  * 获取某一用户与当前用户的聊天记录
  */
-export const getUserChatLog = async function getUserChatLog(data, cb, db) {
+export const getUserChatLog: EventFunc = async function getUserChatLog(
+  data,
+  cb,
+  db
+) {
   const app = this.app;
   const socket = this.socket;
 
@@ -114,7 +119,7 @@ export const getUserChatLog = async function getUserChatLog(data, cb, db) {
 /**
  * 获取会话聊天记录
  */
-export const getConverseChatLog = async function getConverseChatLog(
+export const getConverseChatLog: EventFunc = async function getConverseChatLog(
   data,
   cb,
   db
@@ -187,7 +192,7 @@ export const getConverseChatLog = async function getConverseChatLog(
   return { list, nomore };
 };
 
-export const getAllUserConverse = async function getAllUserConverse(
+export const getAllUserConverse: EventFunc = async function getAllUserConverse(
   data,
   cb,
   db
@@ -250,7 +255,7 @@ export const getAllUserConverse = async function getAllUserConverse(
   return { senders };
 };
 
-export const getOfflineUserConverse = async function getOfflineUserConverse(
+export const getOfflineUserConverse: EventFunc = async function getOfflineUserConverse(
   data,
   cb,
   db
@@ -322,7 +327,7 @@ export const getOfflineUserConverse = async function getOfflineUserConverse(
   return { senders };
 };
 
-export const message = function message(data, cb) {
+export const message: EventFunc = function message(data, cb) {
   let app = this.app;
   let socket = this.socket;
   if (!!app.player) {
@@ -390,7 +395,11 @@ export const message = function message(data, cb) {
   }
 };
 
-export const removeConverse = async function removeConverse(data, cb, db) {
+export const removeConverse: EventFunc = async function removeConverse(
+  data,
+  cb,
+  db
+) {
   let app = this.app;
   let socket = this.socket;
 
@@ -421,7 +430,11 @@ export const removeConverse = async function removeConverse(data, cb, db) {
 /**
  * 获取多人会话列表
  */
-export const getConverses = async function getConverses(data, cb, db) {
+export const getConverses: EventFunc = async function getConverses(
+  data,
+  cb,
+  db
+) {
   let app = this.app;
   let socket = this.socket;
 
@@ -443,7 +456,7 @@ export const getConverses = async function getConverses(data, cb, db) {
 /**
  * 更新卡片消息内置数据
  */
-export const updateCardChatData = async function updateCardChatData(
+export const updateCardChatData: EventFunc = async function updateCardChatData(
   data,
   cb,
   db
@@ -498,7 +511,11 @@ export const updateCardChatData = async function updateCardChatData(
 /**
  * 发送正在输入信号
  */
-export const startWriting = async function startWriting(data, cb, db) {
+export const startWriting: EventFunc = async function startWriting(
+  data,
+  cb,
+  db
+) {
   const app = this.app;
   const socket = this.socket;
   const player = app.player.list.find(socket);
@@ -524,7 +541,7 @@ export const startWriting = async function startWriting(data, cb, db) {
 /**
  * 发送停止输入信号
  */
-export const stopWriting = async function stopWriting(data, cb, db) {
+export const stopWriting: EventFunc = async function stopWriting(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
   const player = app.player.list.find(socket);
