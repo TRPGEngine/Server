@@ -4,6 +4,7 @@ import generateUUID from 'uuid/v4';
 import { ChatMessagePartial } from '../types/message';
 import { ChatLog } from './models/log';
 import { EventFunc } from 'trpg/core';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
 /**
  * 增加聊天消息
@@ -56,7 +57,7 @@ export const getUserChatLog: EventFunc = async function getUserChatLog(
     throw '缺少必要参数';
   }
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '尚未登录';
   }
@@ -134,7 +135,7 @@ export const getConverseChatLog: EventFunc = async function getConverseChatLog(
     throw '缺少必要参数';
   }
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '尚未登录';
   }
@@ -201,7 +202,7 @@ export const getAllUserConverse: EventFunc = async function getAllUserConverse(
   const socket = this.socket;
   const Op = app.storage.Op;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '尚未登录';
   }
@@ -228,7 +229,7 @@ export const getAllUserConverse: EventFunc = async function getAllUserConverse(
   }
 
   let ret1 = await db.models.chat_log
-    .aggregate('sender_uuid', 'DISTINCT', {
+    .aggregate('sender_uuid' as any, 'DISTINCT', {
       where: {
         sender_uuid: { [Op.notLike]: 'trpg%' },
         to_uuid: player.uuid,
@@ -239,7 +240,7 @@ export const getAllUserConverse: EventFunc = async function getAllUserConverse(
     })
     .then((list) => list.map((item) => item['DISTINCT']));
   let ret2 = await db.models.chat_log
-    .aggregate('to_uuid', 'DISTINCT', {
+    .aggregate('to_uuid' as any, 'DISTINCT', {
       where: {
         sender_uuid: player.uuid,
         to_uuid: { [Op.notLike]: 'trpg%' },
@@ -268,7 +269,7 @@ export const getOfflineUserConverse: EventFunc = async function getOfflineUserCo
     throw '缺少必要参数';
   }
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '尚未登录';
   }
@@ -298,7 +299,7 @@ export const getOfflineUserConverse: EventFunc = async function getOfflineUserCo
 
   let dateCond = { [Op.gte]: new Date(lastLoginDate) };
   let ret1 = await db.models.chat_log
-    .aggregate('sender_uuid', 'DISTINCT', {
+    .aggregate('sender_uuid' as any, 'DISTINCT', {
       where: {
         sender_uuid: { [Op.notLike]: 'trpg%' },
         to_uuid: player.uuid,
@@ -310,7 +311,7 @@ export const getOfflineUserConverse: EventFunc = async function getOfflineUserCo
     })
     .then((list) => list.map((item) => item['DISTINCT']));
   let ret2 = await db.models.chat_log
-    .aggregate('to_uuid', 'DISTINCT', {
+    .aggregate('to_uuid' as any, 'DISTINCT', {
       where: {
         sender_uuid: player.uuid,
         to_uuid: { [Op.notLike]: 'trpg%' },
@@ -333,7 +334,7 @@ export const message: EventFunc = function message(data, cb) {
   if (!!app.player) {
     let player = app.player;
     let message = data.message;
-    message = app.xss(message); // 将传输的信息进行xss处理 // TODO: 可能需要处理单独的发送< 与 > 的情况
+    message = (app.xss as any)(message); // 将传输的信息进行xss处理 // TODO: 可能需要处理单独的发送< 与 > 的情况
     let sender_uuid = data.sender_uuid;
     let to_uuid = data.to_uuid;
     let converse_uuid = data.converse_uuid;
@@ -368,9 +369,9 @@ export const message: EventFunc = function message(data, cb) {
         // 仅个人可见
         if (sender_uuid !== to_uuid) {
           // 私聊
-          let other = player.list.get(to_uuid);
-          if (!!other) {
-            other.socket.emit('chat::message', pkg);
+          const isOnline = player.manager.checkPlayerOnline(to_uuid);
+          if (isOnline) {
+            player.manager.unicastSocketEvent(to_uuid, 'chat::message', pkg);
           } else {
             debug('[用户:%s]: 接收方%s不在线', sender_uuid, to_uuid);
             app.chat.tryNotify(pkg);
@@ -380,10 +381,14 @@ export const message: EventFunc = function message(data, cb) {
         // 所有人可见
         if (!is_group) {
           // 公聊
-          socket.broadcast.emit('chat::message', pkg);
+          player.manager.broadcastSocketEvent('chat::message', pkg);
         } else {
           // 群聊
-          socket.broadcast.to(converse_uuid).emit('chat::message', pkg);
+          player.manager.roomcastSocketEvent(
+            converse_uuid,
+            'chat::message',
+            pkg
+          );
         }
       }
       cb({ result: true, pkg });
@@ -403,11 +408,11 @@ export const removeConverse: EventFunc = async function removeConverse(
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
-  let user = player.user;
+  const user = await PlayerUser.findByUUID(player.uuid);
   let converse_uuid = data.converseUUID;
   if (!converse_uuid) {
     throw '缺少必要字段';
@@ -442,7 +447,7 @@ export const getConverses: EventFunc = async function getConverses(
     throw new Error('[ChatComponent] require component [PlayerComponent]');
   }
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
@@ -465,7 +470,7 @@ export const updateCardChatData: EventFunc = async function updateCardChatData(
   const socket = this.socket;
   const Op = app.storage.Op;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
@@ -518,7 +523,7 @@ export const startWriting: EventFunc = async function startWriting(
 ) {
   const app = this.app;
   const socket = this.socket;
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
@@ -530,11 +535,10 @@ export const startWriting: EventFunc = async function startWriting(
 
   if (type === 'user') {
     // 对user发送的信息
-    const other = app.player.list.get(to_uuid);
-    if (other) {
-      // 如果该用户在线，则对该用户发送信息
-      other.socket.emit('chat::startWriting', { type, from: from_uuid });
-    }
+    app.player.manager.unicastSocketEvent(to_uuid, 'chat::startWriting', {
+      type,
+      from: from_uuid,
+    });
   }
 };
 
@@ -544,7 +548,7 @@ export const startWriting: EventFunc = async function startWriting(
 export const stopWriting: EventFunc = async function stopWriting(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
@@ -556,10 +560,9 @@ export const stopWriting: EventFunc = async function stopWriting(data, cb, db) {
 
   if (type === 'user') {
     // 对user发送的信息
-    const other = app.player.list.get(to_uuid);
-    if (other) {
-      // 如果该用户在线，则对该用户发送信息
-      other.socket.emit('chat::stopWriting', { type, from: from_uuid });
-    }
+    app.player.manager.unicastSocketEvent(to_uuid, 'chat::stopWriting', {
+      type,
+      from: from_uuid,
+    });
   }
 };

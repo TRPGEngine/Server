@@ -1,5 +1,6 @@
 import Debug from 'debug';
 import { EventFunc } from 'trpg/core';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 const debug = Debug('trpg:component:dice:event');
 
 const rolldiceAsync = async function(data) {
@@ -42,7 +43,7 @@ export const roll: EventFunc = async function roll(data, cb) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -67,11 +68,11 @@ export const sendDiceRequest: EventFunc = async function sendDiceRequest(
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
-  let sender_uuid = player.user.uuid;
+  let sender_uuid = player.uuid;
   let { to_uuid, is_group, dice_request, reason } = data;
   if (!to_uuid || is_group === undefined || !dice_request) {
     throw '缺少必要参数';
@@ -87,8 +88,9 @@ export const sendDiceRequest: EventFunc = async function sendDiceRequest(
   // 发送信息
   let converse_uuid = is_group ? to_uuid : null;
   to_uuid = is_group ? null : to_uuid; // 覆写to_uuid
+  const user = await PlayerUser.findByUUID(player.uuid);
   let chatLog = app.chat.sendMsg(sender_uuid, to_uuid, {
-    message: `${player.user.getName()} 因为 ${reason} 请求投骰: ${dice_request}`,
+    message: `${user.getName()} 因为 ${reason} 请求投骰: ${dice_request}`,
     converse_uuid,
     type: 'card',
     is_public: is_group,
@@ -111,7 +113,7 @@ export const acceptDiceRequest: EventFunc = async function acceptDiceRequest(
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -168,11 +170,11 @@ export const sendDiceInvite: EventFunc = async function sendDiceInvite(
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
-  let sender_uuid = player.user.uuid;
+  let sender_uuid = player.uuid;
   let {
     to_uuid,
     is_group,
@@ -191,8 +193,9 @@ export const sendDiceInvite: EventFunc = async function sendDiceInvite(
   // 发送信息
   let converse_uuid = is_group ? to_uuid : null;
   to_uuid = is_group ? null : to_uuid; // 覆写to_uuid
+  const user = await PlayerUser.findByUUID(player.uuid);
   let chatLog = app.chat.sendMsg(sender_uuid, to_uuid, {
-    message: `${player.user.getName()} 因为 ${reason} 邀请 ${inviteNameList.join(
+    message: `${user.getName()} 因为 ${reason} 邀请 ${inviteNameList.join(
       ','
     )} 投骰: ${dice_request}`,
     converse_uuid,
@@ -217,7 +220,7 @@ export const acceptDiceInvite: EventFunc = async function acceptDiceInvite(
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -278,12 +281,12 @@ export const sendQuickDice: EventFunc = async function sendQuickDice(
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let sender_uuid = player.user.uuid;
+  let sender_uuid = player.uuid;
   let { to_uuid, is_group, dice_request } = data;
   if (!to_uuid || is_group === undefined || !dice_request) {
     throw '缺少必要参数';
@@ -301,7 +304,8 @@ export const sendQuickDice: EventFunc = async function sendQuickDice(
     pkg.to_uuid = to_uuid; // 用户信息
   }
   let rollResult = await rolldiceAsync.call(app, pkg);
-  let message = `${player.user.getName()} 发起快速投骰 结果: ${
+  const user = await PlayerUser.findByUUID(player.uuid);
+  let message = `${user.getName()} 发起快速投骰 结果: ${
     rollResult.dice_expression
   }`;
   app.dice.sendDiceResult(

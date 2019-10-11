@@ -28,6 +28,22 @@ import {
   getSettings,
   saveSettings,
 } from './event';
+import {
+  getPlayerManager,
+  PlayerManagerCls,
+  PlayerManagerPlayerMapItem,
+} from './managers/player-manager';
+import { Socket } from 'trpg/core';
+
+// 注入方法声明
+declare module 'packages/Core/lib/application' {
+  interface Application {
+    player: {
+      manager: PlayerManagerCls;
+      [others: string]: any;
+    };
+  }
+}
 
 export default class Player extends BasePackage {
   public name: string = 'Player';
@@ -66,8 +82,14 @@ export default class Player extends BasePackage {
   private initFunction() {
     const app = this.app;
 
+    const manager = getPlayerManager({
+      redisUrl: app.get('redisUrl'),
+      cache: app.cache,
+    });
+
     app.player = {
-      list: new PlayerList(),
+      manager,
+      // list: new PlayerList(),
       getPlayer: async function getPlayer(id, cb) {
         if (typeof id != 'number') {
           throw new Error(`id must be a Number, not a ${typeof id}`);
@@ -113,29 +135,20 @@ export default class Player extends BasePackage {
         let friends = await user.getFriend();
         return friends;
       },
-      joinSocketRoom: function(userUUID, roomUUID) {
+      joinSocketRoom: async function(userUUID: string, roomUUID: string) {
         try {
-          let player = app.player.list.get(userUUID);
-          if (player) {
-            player.socket.join(roomUUID);
+          const isOnline = await app.player.manager.checkPlayerOnline(userUUID);
+          if (isOnline) {
+            app.player.manager.joinRoomWithUUID(roomUUID, userUUID);
           } else {
-            console.error('加入房间失败:', `玩家${roomUUID}不在线`);
+            console.error('加入房间失败:', `玩家${userUUID}不在线`);
           }
         } catch (e) {
           console.error('加入房间失败:', e);
         }
       },
-      leaveSocketRoom: function(userUUID, roomUUID) {
-        try {
-          let player = app.player.list.get(userUUID);
-          if (player) {
-            player.socket.leave(roomUUID);
-          } else {
-            console.error('离开房间失败:', `玩家${roomUUID}不在线`);
-          }
-        } catch (e) {
-          console.error('离开房间失败:', e);
-        }
+      leaveSocketRoom: async function(userUUID, roomUUID) {
+        await app.player.manager.leaveRoomWithUUID(roomUUID, userUUID);
       },
       // 服务端直接创建用户
       createNewAsync: async function(username, password, options) {
@@ -154,8 +167,8 @@ export default class Player extends BasePackage {
         return player;
       },
       // 记录用户离线时间
-      recordUserOfflineDate: async function(socket) {
-        const player = app.player.list.find(socket);
+      recordUserOfflineDate: async function(socket: Socket) {
+        const player = app.player.manager.findPlayer(socket);
         if (player) {
           // 如果该用户已登录
           const lastLog = await PlayerLoginLog.findOne({
@@ -208,10 +221,11 @@ export default class Player extends BasePackage {
     // TODO:需要考虑到断线重连的问题
     const app = this.app;
     app.on('disconnect', function(socket) {
-      let player = app.player.list.find(socket);
+      const player = app.player.manager.findPlayer(socket);
+
       if (player) {
         debug('user[%s] disconnect, remove it from list', player.uuid);
-        app.player.list.remove(player.uuid);
+        app.player.manager.removePlayer(player.uuid, player.platform);
       }
     });
   }

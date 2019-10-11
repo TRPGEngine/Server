@@ -120,12 +120,7 @@ export default class Chat extends BasePackage {
         const log = event.addChatLog.call(app, pkg);
         if (!pkg.is_public) {
           // 是私密消息
-          const other = app.player.list.get(to_uuid);
-          if (!!other) {
-            other.socket.emit('chat::message', log);
-          } else {
-            debug('[用户:%s]: 接收方%s不在线', from_uuid, to_uuid);
-          }
+          app.player.manager.unicastSocketEvent(to_uuid, 'chat::message', log);
         } else {
           // 是公开消息
           if (!pkg.is_group) {
@@ -133,14 +128,12 @@ export default class Chat extends BasePackage {
             // 疑问: 什么情况下会出现公开的用户信息？
             app.io.sockets.emit('chat::message', log);
           } else {
-            const sender = app.player.list.get(from_uuid);
-            if (sender) {
-              sender.socket.broadcast
-                .to(converse_uuid)
-                .emit('chat::message', log);
-            } else {
-              app.io.sockets.to(converse_uuid).emit('chat::message', log);
-            }
+            // TODO: 需要校验
+            app.player.manager.roomcastSocketEvent(
+              converse_uuid,
+              'chat::message',
+              log
+            );
           }
         }
 
@@ -209,20 +202,15 @@ export default class Chat extends BasePackage {
           });
         } else if (converseUUID instanceof Array) {
           let [uuid1, uuid2] = converseUUID;
-          let player1 = app.player.list.get(uuid1);
-          let player2 = app.player.list.get(uuid2);
-          if (player1) {
-            player1.socket.emit('chat::updateMessage', {
-              converseUUID: uuid2,
-              payload,
-            });
-          }
-          if (player2) {
-            player2.socket.emit('chat::updateMessage', {
-              converseUUID: uuid1,
-              payload,
-            });
-          }
+
+          app.player.manager.unicastSocketEvent(uuid1, 'chat::updateMessage', {
+            converseUUID: uuid2,
+            payload,
+          });
+          app.player.manager.unicastSocketEvent(uuid2, 'chat::updateMessage', {
+            converseUUID: uuid1,
+            payload,
+          });
         }
       },
       tryNotify(messagePkg) {
