@@ -1,6 +1,6 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:actor');
-const event = require('./event');
+import * as event from './event';
 import at from 'trpg-actor-template';
 import ActorTemplateDefinition from './models/template';
 import ActorDefinition from './models/actor';

@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { ActorTemplate } from './models/template';
 const debug = Debug('trpg:component:actor:event');
 
-exports.getTemplate = async function(data, cb, db) {
+export const getTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -37,7 +37,7 @@ exports.getTemplate = async function(data, cb, db) {
 /**
  * 获取推荐角色模板
  */
-const getSuggestTemplate: EventFunc = async function(data, cb, db) {
+export const getSuggestTemplate: EventFunc = async function(data, cb, db) {
   const templates = await ActorTemplate.findAll({
     where: {
       built_in: true,
@@ -46,9 +46,8 @@ const getSuggestTemplate: EventFunc = async function(data, cb, db) {
 
   return { templates };
 };
-exports.getSuggestTemplate = getSuggestTemplate;
 
-exports.findTemplate = async function(data, cb, db) {
+export const findTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -62,7 +61,7 @@ exports.findTemplate = async function(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let templates = await db.models.actor_template.findTemplateAsync(
+  let templates = await (db.models.actor_template as any).findTemplateAsync(
     nameFragment
   );
   for (let template of templates) {
@@ -74,7 +73,7 @@ exports.findTemplate = async function(data, cb, db) {
   return { templates };
 };
 
-exports.createTemplate = async function(data, cb, db) {
+export const createTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -113,7 +112,7 @@ exports.createTemplate = async function(data, cb, db) {
   return { template };
 };
 
-exports.updateTemplate = async function(data, cb, db) {
+export const updateTemplate: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
@@ -155,7 +154,7 @@ exports.updateTemplate = async function(data, cb, db) {
   return { template };
 };
 
-exports.removeTemplate = async function(data, cb, db) {
+export const removeTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -178,7 +177,7 @@ exports.removeTemplate = async function(data, cb, db) {
   return true;
 };
 
-exports.createActor = async function(data, cb, db) {
+export const createActor: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
@@ -227,7 +226,7 @@ exports.createActor = async function(data, cb, db) {
   }
 };
 
-exports.getActor = async function(data, cb, db) {
+export const getActor: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
@@ -251,7 +250,7 @@ exports.getActor = async function(data, cb, db) {
   }
 };
 
-exports.removeActor = async function(data, cb, db) {
+export const removeActor: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -287,7 +286,7 @@ exports.removeActor = async function(data, cb, db) {
   return true;
 };
 
-exports.updateActor = async function(data, cb, db) {
+export const updateActor: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
