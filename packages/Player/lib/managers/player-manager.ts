@@ -335,6 +335,7 @@ class PlayerManager extends EventEmitter {
 
   /**
    * 根据用户UUID查找用户信息
+   * NOTE: 只能获取本地，可能会漏
    * @param uuid 用户UUID
    */
   findPlayerWithUUID(uuid: string): PlayerManagerPlayerMapItem[] {
@@ -405,6 +406,15 @@ class PlayerManager extends EventEmitter {
     } else if (uniq === true) {
       return _.uniqBy(members, this.getUUIDFromKey).length;
     }
+  }
+
+  /**
+   * 检测用户是否在线
+   * @param uuid 用户UUID
+   */
+  async checkPlayerOnline(uuid: string): Promise<boolean> {
+    const members = await this.cache.smembers(ONLINE_PLAYER_KEY);
+    return members.map(this.getUUIDFromKey).findIndex(x => x === uuid) > 0
   }
 }
 
