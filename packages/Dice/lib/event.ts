@@ -1,4 +1,6 @@
-const debug = require('debug')('trpg:component:dice:event');
+import Debug from 'debug';
+import { EventFunc } from 'trpg/core';
+const debug = Debug('trpg:component:dice:event');
 
 const rolldiceAsync = async function(data) {
   let app = this;
@@ -36,7 +38,7 @@ const rolldiceAsync = async function(data) {
   return log;
 };
 
-exports.roll = async function roll(data, cb) {
+export const roll: EventFunc = async function roll(data, cb) {
   const app = this.app;
   const socket = this.socket;
 
@@ -57,7 +59,11 @@ exports.roll = async function roll(data, cb) {
   return { log };
 };
 
-exports.sendDiceRequest = async function sendDiceRequest(data, cb, db) {
+export const sendDiceRequest: EventFunc = async function sendDiceRequest(
+  data,
+  cb,
+  db
+) {
   const app = this.app;
   const socket = this.socket;
 
@@ -98,7 +104,10 @@ exports.sendDiceRequest = async function sendDiceRequest(data, cb, db) {
   return { pkg: chatLog };
 };
 
-exports.acceptDiceRequest = async function acceptDiceRequest(data, cb) {
+export const acceptDiceRequest: EventFunc = async function acceptDiceRequest(
+  data,
+  cb
+) {
   const app = this.app;
   const socket = this.socket;
 
@@ -152,7 +161,10 @@ exports.acceptDiceRequest = async function acceptDiceRequest(data, cb) {
   }
 };
 
-exports.sendDiceInvite = async function sendDiceInvite(data, cb) {
+export const sendDiceInvite: EventFunc = async function sendDiceInvite(
+  data,
+  cb
+) {
   const app = this.app;
   const socket = this.socket;
 
@@ -198,7 +210,10 @@ exports.sendDiceInvite = async function sendDiceInvite(data, cb) {
   return { pkg: chatLog };
 };
 
-exports.acceptDiceInvite = async function acceptDiceInvite(data, cb) {
+export const acceptDiceInvite: EventFunc = async function acceptDiceInvite(
+  data,
+  cb
+) {
   const app = this.app;
   const socket = this.socket;
 
@@ -255,7 +270,11 @@ exports.acceptDiceInvite = async function acceptDiceInvite(data, cb) {
   }
 };
 
-exports.sendQuickDice = async function sendQuickDice(data, cb, db) {
+export const sendQuickDice: EventFunc = async function sendQuickDice(
+  data,
+  cb,
+  db
+) {
   let app = this.app;
   let socket = this.socket;
 
@@ -270,7 +289,7 @@ exports.sendQuickDice = async function sendQuickDice(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let pkg = {
+  let pkg: any = {
     sender_uuid,
     is_group: is_group,
     is_private: !is_group,
