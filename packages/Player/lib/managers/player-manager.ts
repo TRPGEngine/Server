@@ -25,7 +25,7 @@ export interface PlayerMsgPayload {
   data: {};
 }
 
-interface PlayerManagerPlayerMapItem {
+export interface PlayerManagerPlayerMapItem {
   uuid: string;
   platform: Platform;
   socket: Socket;
@@ -86,6 +86,23 @@ class PlayerManager extends EventEmitter {
     });
   }
 
+  private internalFn = {
+    _remoteJoinRoom(
+      this: PlayerManager,
+      player: PlayerManagerPlayerMapItem,
+      data: { roomUUID: string }
+    ) {
+      this.joinRoom(data.roomUUID, player.socket);
+    },
+    _remoteLeaveRoom(
+      this: PlayerManager,
+      player: PlayerManagerPlayerMapItem,
+      data: { roomUUID: string }
+    ) {
+      this.leaveRoom(data.roomUUID, player.socket);
+    },
+  };
+
   private async handleMessage(payload: PlayerMsgPayload) {
     const { type, target, eventName, data } = payload;
     let waitToSendPlayers: PlayerManagerPlayerMapItem[] = []; // 本地涉及到的Player列表
@@ -120,7 +137,13 @@ class PlayerManager extends EventEmitter {
 
     for (const player of waitToSendPlayers) {
       // 循环发送消息
-      this.emitToPlayer(player, eventName, data);
+      if (this.internalFn[eventName]) {
+        // 如果有内部处理方法
+        this.internalFn[eventName].call(this, player, data);
+      } else {
+        // 发送到客户端
+        this.emitToPlayer(player, eventName, data);
+      }
     }
   }
 
@@ -177,6 +200,10 @@ class PlayerManager extends EventEmitter {
     }
   }
 
+  async joinRoomWithUUID(roomUUID: string, uuid: string): Promise<void> {
+    await this.unicastSocketEvent(uuid, '_remoteJoinRoom', { roomUUID });
+  }
+
   /**
    * 离开房间
    * @param roomUUID 房间UUID
@@ -188,6 +215,10 @@ class PlayerManager extends EventEmitter {
     await this.cache.srem(roomKey, socketId);
     const player = this.players[socketId];
     player.rooms.delete(roomUUID);
+  }
+
+  async leaveRoomWithUUID(roomUUID: string, uuid: string): Promise<void> {
+    await this.unicastSocketEvent(uuid, '_remoteLeaveRoom', { roomUUID });
   }
 
   async getRoomAllSocketIds(roomUUID: string): Promise<string[]> {
@@ -414,7 +445,7 @@ class PlayerManager extends EventEmitter {
    */
   async checkPlayerOnline(uuid: string): Promise<boolean> {
     const members = await this.cache.smembers(ONLINE_PLAYER_KEY);
-    return members.map(this.getUUIDFromKey).findIndex(x => x === uuid) > 0
+    return members.map(this.getUUIDFromKey).findIndex((x) => x === uuid) > 0;
   }
 }
 
