@@ -28,7 +28,7 @@ export default class Group extends BasePackage {
             where: { uuid: groupUUID },
           });
           let user = await (db.models.player_user as any).findOne({
-            uuid: userUUID,
+            where: { uuid: userUUID },
           });
           if (group && user) {
             let members = await group.getMembers();
