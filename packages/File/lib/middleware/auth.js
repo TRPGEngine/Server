@@ -9,7 +9,7 @@ module.exports = function() {
       throw '缺少必要参数';
     }
 
-    const player = trpgapp.player.manager.findPlayerByUUID(user_uuid); // TODO: 此处需要检查
+    const player = trpgapp.player.manager.findPlayerWithUUID(user_uuid); // TODO: 此处需要检查
     if (!player) {
       ctx.response.status = 403;
       throw '用户不在线，请检查登录状态';

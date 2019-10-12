@@ -18,8 +18,6 @@ export const getUserEmotionCatalog: EventFunc = async function getUserEmotionCat
     throw new Error('用户不存在，请检查登录状态');
   }
 
-  // const userId = player.user.id;
-
   const user = await PlayerUser.findByUUID(player.uuid);
   const catalogs = await (user as any).getEmotionCatalogs();
 
