@@ -2,7 +2,7 @@ import Router from 'koa-router';
 import send from 'koa-send';
 import upload from '../middleware/upload';
 import sha256 from '../middleware/sha256';
-const auth = require('../middleware/auth');
+import auth from '../middleware/auth';
 const fileStorage = require('../middleware/storage/file');
 
 const router = new Router();

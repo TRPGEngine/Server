@@ -1,6 +1,9 @@
-module.exports = function() {
+import { TRPGApplication } from 'trpg/core';
+import { PlayerUser } from 'packages/Player/lib/models/user';
+
+export default function auth() {
   return async (ctx, next) => {
-    let trpgapp = ctx.trpgapp;
+    const trpgapp: TRPGApplication = ctx.trpgapp;
 
     // TODO: 目前先基于header的user-uuid 之后改成jwt校验防止伪造
     let user_uuid = ctx.request.header['user-uuid'];
@@ -14,8 +17,9 @@ module.exports = function() {
       ctx.response.status = 403;
       throw '用户不在线，请检查登录状态';
     } else {
-      ctx.player = player;
+      const user = await PlayerUser.findByUUID(user_uuid);
+      ctx.player = { ...player, user };
       return next();
     }
   };
-};
+}
