@@ -251,9 +251,12 @@ export class Cache implements ICache {
     this.data = {};
   }
 
-  lock = _.noop as any;
+  lock = _.constant(true) as any;
   unlock = _.noop as any;
-  lockScope = _.noop as any;
+  lockScope(key: string, scope: () => Promise<void>): Promise<void> {
+    // 如果是内存Cache则直接执行lockScope
+    return scope();
+  }
 }
 
 export class RedisCache implements ICache {

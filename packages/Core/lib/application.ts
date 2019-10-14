@@ -127,29 +127,30 @@ export class Application extends events.EventEmitter {
     }
   }
   initStatJob() {
-    const run = async () => {
-      try {
-        applog('start statistics project info...');
-        let info: any = {};
-        for (let job of this.statInfoJob) {
-          const name = job.name;
-          const fn = job.fn;
-          const res = await fn();
-          applog('|- [%s]:%o', name, res);
-          if (res) {
-            info[name] = res;
+    const run = () =>
+      this.cache.lockScope('core:statjob', async () => {
+        try {
+          applog('start statistics project info...');
+          let info: any = {};
+          for (let job of this.statInfoJob) {
+            const name = job.name;
+            const fn = job.fn;
+            const res = await fn();
+            applog('|- [%s]:%o', name, res);
+            if (res) {
+              info[name] = res;
+            }
           }
+          info._updated = new Date().getTime();
+          await fs.writeJson(path.resolve(process.cwd(), './stat.json'), info, {
+            spaces: 2,
+          });
+          applog('statistics completed!');
+        } catch (e) {
+          console.error('statistics error:', e);
+          this.error(e);
         }
-        info._updated = new Date().getTime();
-        await fs.writeJson(path.resolve(process.cwd(), './stat.json'), info, {
-          spaces: 2,
-        });
-        applog('statistics completed!');
-      } catch (e) {
-        console.error('statistics error:', e);
-        this.error(e);
-      }
-    };
+      });
 
     // 每天凌晨2点统计一遍
     this.job = schedule.scheduleJob('0 0 2 * * *', run);
@@ -223,7 +224,7 @@ export class Application extends events.EventEmitter {
     this.webApi[path] = fn;
   }
 
-  registerStatJob(statName, statCb) {
+  registerStatJob(statName: string, statCb) {
     for (let s of this.statInfoJob) {
       if (s.name === statName) {
         applog(`stat info [${statName}] has been registered`);
@@ -245,14 +246,19 @@ export class Application extends events.EventEmitter {
    * @param fn 计划任务方法
    */
   registerScheduleJob(name: string, rule: string, fn: JobCallback) {
-    for (let s of this.statInfoJob) {
+    for (let s of this.scheduleJob) {
       if (s.name === name) {
         applog(`schedule job [${name}] has been registered`);
         return;
       }
     }
 
-    const job = schedule.scheduleJob(name, rule, fn);
+    const job = schedule.scheduleJob(name, rule, (fireDate: Date) => {
+      // 计划任务方法
+      this.cache.lockScope(`core:scheduleJob:${name}`, async () => {
+        fn(fireDate);
+      });
+    });
     applog(
       'register schedule job [%s](nextDate: %o)',
       name,
