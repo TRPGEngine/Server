@@ -95,6 +95,15 @@ export interface ICache {
   // 仅redis有效
   lock(key: string): Promise<boolean>;
   unlock(key: string): Promise<void>;
+  /**
+   * 创建一个锁范围
+   * 进入时加锁
+   * 离开时解锁
+   * 如果没有取到锁。则跳过
+   * @param key 锁名
+   * @param scope 锁作用范围
+   */
+  lockScope(key: string, scope: () => Promise<void>): Promise<void>;
 }
 
 export class Cache implements ICache {
@@ -244,6 +253,7 @@ export class Cache implements ICache {
 
   lock = _.noop as any;
   unlock = _.noop as any;
+  lockScope = _.noop as any;
 }
 
 export class RedisCache implements ICache {
@@ -412,5 +422,17 @@ export class RedisCache implements ICache {
   async unlock(key: string): Promise<void> {
     key = 'lock:' + this.genKey(key);
     await this.redis.del(key);
+  }
+
+  async lockScope(key: string, scope: () => Promise<void>) {
+    const isSuccess = await this.lock(key);
+    if (!isSuccess) {
+      // 如果没有获得锁，则跳过
+      return;
+    }
+
+    await scope();
+
+    await this.unlock(key);
   }
 }
