@@ -32,7 +32,7 @@ type ScheduleJob = {
   job: Job;
 };
 
-class Application extends events.EventEmitter {
+export class Application extends events.EventEmitter {
   settings: AppSettings = {}; // 设置配置列表
   storage: Storage = null; // 数据库服务列表
   cache: ICache = null; // 缓存服务

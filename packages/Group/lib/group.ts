@@ -39,12 +39,15 @@ export default class Group extends BasePackage {
             }
             let res = await group.addMember(user);
 
-            // 检查是否在线, 如果在线则发送一条更新通知
             if (app.player) {
-              let player = app.player.list.get(user.uuid);
-              if (player) {
-                player.socket.emit('group::addGroupSuccess', { group });
-                app.player.joinSocketRoom(user.uuid, group.uuid);
+              if (await app.player.manager.checkPlayerOnline(user.uuid)) {
+                // 检查是否在线, 如果在线则发送一条更新通知
+                app.player.manager.unicastSocketEvent(
+                  user.uuid,
+                  'group::addGroupSuccess',
+                  { group }
+                );
+                app.player.manager.joinRoomWithUUID(group.uuid, user.uuid);
               }
             }
 

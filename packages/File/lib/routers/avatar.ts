@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { encodeStr2Int } from '../utils';
 import config from '../config';
 const avatarStorage = require('../middleware/storage/avatar');
-const auth = require('../middleware/auth');
+import auth from '../middleware/auth';
 
 let router = new Router();
 

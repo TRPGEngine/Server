@@ -1,8 +1,10 @@
-export const bindAttachUUID = async function(data, cb, db) {
+import { EventFunc } from 'trpg/core';
+
+export const bindAttachUUID: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }

@@ -3,6 +3,7 @@ import { NotifyJPush } from './models/jpush';
 import { NotifyUPush } from './models/upush';
 import { PlayerSettings } from 'packages/Player/lib/models/settings';
 import _ from 'lodash';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
 // 绑定通知信息: 极光推送
 export const bindJPushNotifyInfo: EventFunc<{
@@ -18,16 +19,16 @@ export const bindJPushNotifyInfo: EventFunc<{
     throw '缺少必要字段';
   }
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '尚未登录';
   }
   const selfUUID = player.uuid;
-  const userId = player.user.id;
   if (selfUUID !== userUUID) {
     throw '非法操作, UUID不匹配';
   }
 
+  const { id: userId } = await PlayerUser.findByUUID(selfUUID);
   const jpushInfo = await NotifyJPush.findOne({
     where: {
       registration_id: registrationID,
@@ -68,17 +69,17 @@ export const bindUPushNotifyInfo: EventFunc<{
     throw '缺少必要字段';
   }
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '尚未登录';
   }
   const selfUUID = player.uuid;
-  const userId = player.user.id;
 
   if (selfUUID !== userUUID) {
     throw '非法操作, UUID不匹配';
   }
 
+  const { id: userId } = await PlayerUser.findByUUID(selfUUID);
   const upushInfo = await NotifyUPush.findOne({
     where: {
       registration_id: registrationID,

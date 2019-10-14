@@ -2,13 +2,14 @@ import Debug from 'debug';
 import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
 import { ActorTemplate } from './models/template';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 const debug = Debug('trpg:component:actor:event');
 
 export const getTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -51,7 +52,7 @@ export const findTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -77,7 +78,7 @@ export const createTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -102,13 +103,14 @@ export const createTemplate: EventFunc = async function(data, cb, db) {
     throw '该模板名字已存在';
   }
 
+  const user = await PlayerUser.findByUUID(player.uuid);
   let template = await db.models.actor_template.create({
     name,
     desc,
     avatar,
     info,
   });
-  await template.setCreator(player.user);
+  await template.setCreator(user);
   return { template };
 };
 
@@ -116,7 +118,7 @@ export const updateTemplate: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -134,7 +136,8 @@ export const updateTemplate: EventFunc = async function(data, cb, db) {
   let template = await db.models.actor_template.findOne({
     where: { uuid },
   });
-  if (template.creatorId !== player.user.id) {
+  const user = await PlayerUser.findByUUID(player.uuid);
+  if (template.creatorId !== user.id) {
     throw '您不是该模板的所有者，无法修改模板';
   }
   if (name) {
@@ -158,16 +161,17 @@ export const removeTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
   let uuid = data.uuid;
+  const user = await PlayerUser.findByUUID(player.uuid);
   let template = await db.models.actor_template.findOne({
     where: {
       uuid,
-      creatorId: player.user.id,
+      creatorId: user.id,
     },
   });
   if (!template) {
@@ -181,7 +185,7 @@ export const createActor: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -204,7 +208,8 @@ export const createActor: EventFunc = async function(data, cb, db) {
       info,
       template_uuid,
     });
-    await actor.setOwner(player.user);
+    const user = await PlayerUser.findByUUID(player.uuid);
+    await actor.setOwner(user);
     if (!!avatar) {
       let tmp = avatar.split('/');
       let avatarModel = await db.models.file_avatar.findOne({
@@ -230,7 +235,7 @@ export const getActor: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -254,7 +259,7 @@ export const removeActor: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -264,10 +269,11 @@ export const removeActor: EventFunc = async function(data, cb, db) {
   }
 
   await db.transactionAsync(async () => {
+    const user = await PlayerUser.findByUUID(player.uuid);
     let actor = await db.models.actor_actor.findOne({
       where: {
         uuid,
-        ownerId: player.user.id,
+        ownerId: user.id,
       },
     });
     if (!actor) {
@@ -290,11 +296,12 @@ export const updateActor: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
-  const userId = player.user.id;
+  const user = await PlayerUser.findByUUID(player.uuid);
+  const userId = user.id;
 
   let uuid = data.uuid;
   let name = data.name;
@@ -325,9 +332,11 @@ export const updateActor: EventFunc = async function(data, cb, db) {
 
     if (db.models.file_avatar && oldAvatar && oldAvatar !== avatar) {
       // 更新avatar的attach
+
+      const user = await PlayerUser.findByUUID(player.uuid);
       let oldtmp = oldAvatar.split('/');
       let tmp = avatar.split('/');
-      let userId = player.user.id;
+      let userId = user.id;
       let oldAvatarInstance = await db.models.file_avatar.findOne({
         where: {
           name: oldtmp[oldtmp.length - 1],

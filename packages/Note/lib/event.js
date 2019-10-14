@@ -8,7 +8,8 @@ exports.get = async function get(data, cb, db) {
     debug('[GroupComponent] need [PlayerComponent]');
     return;
   }
-  let player = app.player.list.find(socket);
+
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -38,7 +39,8 @@ exports.save = async function save(data, cb, db) {
     debug('[GroupComponent] need [PlayerComponent]');
     return;
   }
-  let player = app.player.list.find(socket);
+
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -50,10 +52,13 @@ exports.save = async function save(data, cb, db) {
 
   noteContent = xss(noteContent); // 进行防xss处理
 
+  const { id } = await db.models.player_user.findOne({
+    where: { uuid: player.uuid },
+  });
   let note = await db.models.note_note.findOne({
     where: {
       uuid: noteUUID,
-      ownerId: player.user.id,
+      ownerId: id,
     },
   });
   if (note) {
@@ -66,7 +71,7 @@ exports.save = async function save(data, cb, db) {
       uuid: noteUUID,
       title: noteTitle,
       content: noteContent,
-      ownerId: player.user.id,
+      ownerId: id,
     });
   }
 
