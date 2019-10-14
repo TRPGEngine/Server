@@ -328,7 +328,7 @@ export const getOfflineUserConverse: EventFunc = async function getOfflineUserCo
   return { senders };
 };
 
-export const message: EventFunc = function message(data, cb) {
+export const message: EventFunc = async function message(data, cb) {
   let app = this.app;
   let socket = this.socket;
   if (!!app.player) {
@@ -369,7 +369,7 @@ export const message: EventFunc = function message(data, cb) {
         // 仅个人可见
         if (sender_uuid !== to_uuid) {
           // 私聊
-          const isOnline = player.manager.checkPlayerOnline(to_uuid);
+          const isOnline = await player.manager.checkPlayerOnline(to_uuid);
           if (isOnline) {
             player.manager.unicastSocketEvent(to_uuid, 'chat::message', pkg);
           } else {
