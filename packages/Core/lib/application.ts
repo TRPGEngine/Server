@@ -252,10 +252,15 @@ class Application extends events.EventEmitter {
       }
     }
 
-    applog('register schedule job [%s]', name);
+    const job = schedule.scheduleJob(name, rule, fn);
+    applog(
+      'register schedule job [%s](nextDate: %o)',
+      name,
+      job.nextInvocation()
+    );
     this.scheduleJob.push({
       name,
-      job: schedule.scheduleJob(name, rule, fn),
+      job,
     });
   }
 

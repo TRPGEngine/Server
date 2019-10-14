@@ -233,19 +233,14 @@ export default class Chat extends BasePackage {
 
   initTimer() {
     const app = this.app;
-    const timer = setInterval(function saveChat() {
-      // event.saveChatLog.call(app);
+
+    app.registerScheduleJob('saveChatLog', '0 0,10,20,30,40,50 * * * *', () => {
       app.chat.saveChatLogAsync();
-    }, 1000 * 60 * 10);
+    });
 
     this.regStatJob('chatLogCount', async () => {
       await app.chat.saveChatLogAsync();
       return await app.chat.getChatLogSumAsync();
-    });
-
-    app.on('close', function() {
-      debug('remove save chat log timer');
-      clearInterval(timer);
     });
   }
 
