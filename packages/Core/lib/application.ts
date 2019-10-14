@@ -1,7 +1,7 @@
 import events from 'events';
 import Debug from 'debug';
 const debug = Debug('trpg:application');
-import schedule, { JobCallback, Job } from 'node-schedule';
+import schedule, { Job } from 'node-schedule';
 import fs from 'fs-extra';
 import path from 'path';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
@@ -17,6 +17,7 @@ const logger = getLogger();
 const appLogger = getLogger('application');
 import xss from 'xss';
 import BasePackage from 'lib/package';
+import { CoreSchedulejobRecord } from './internal/models/schedulejob-record';
 
 type AppSettings = {
   [key: string]: string | number | {};
@@ -31,6 +32,11 @@ type ScheduleJob = {
   name: string;
   job: Job;
 };
+
+type ScheduleJobFnRet = void | string;
+export type ScheduleJobFn = (
+  fireDate: Date
+) => Promise<ScheduleJobFnRet> | ScheduleJobFnRet;
 
 export class Application extends events.EventEmitter {
   settings: AppSettings = {}; // 设置配置列表
@@ -129,9 +135,13 @@ export class Application extends events.EventEmitter {
   initStatJob() {
     const run = () =>
       this.cache.lockScope('core:statjob', async () => {
+        applog('start statistics project info...');
+        const record = await CoreSchedulejobRecord.createRecord(
+          'stat-info',
+          'stat'
+        );
         try {
-          applog('start statistics project info...');
-          let info: any = {};
+          const info: any = {};
           for (let job of this.statInfoJob) {
             const name = job.name;
             const fn = job.fn;
@@ -145,10 +155,20 @@ export class Application extends events.EventEmitter {
           await fs.writeJson(path.resolve(process.cwd(), './stat.json'), info, {
             spaces: 2,
           });
+
+          // 记录结果
+          record.completed = true;
+          record.result = JSON.stringify(info);
+          record.save();
           applog('statistics completed!');
         } catch (e) {
           console.error('statistics error:', e);
           this.error(e);
+
+          // 记录结果
+          record.completed = false;
+          record.result = String(e);
+          record.save();
         }
       });
 
@@ -245,7 +265,7 @@ export class Application extends events.EventEmitter {
    * @param rule 计划任务执行规则
    * @param fn 计划任务方法
    */
-  registerScheduleJob(name: string, rule: string, fn: JobCallback) {
+  registerScheduleJob(name: string, rule: string, fn: ScheduleJobFn) {
     for (let s of this.scheduleJob) {
       if (s.name === name) {
         applog(`schedule job [${name}] has been registered`);
@@ -256,7 +276,23 @@ export class Application extends events.EventEmitter {
     const job = schedule.scheduleJob(name, rule, (fireDate: Date) => {
       // 计划任务方法
       this.cache.lockScope(`core:scheduleJob:${name}`, async () => {
-        fn(fireDate);
+        const record = await CoreSchedulejobRecord.createRecord(
+          name,
+          'schedule'
+        );
+        try {
+          applog(`start schedule job ${name}`);
+          const result = await fn(fireDate);
+          record.completed = true;
+          record.result = result || null;
+          record.save();
+        } catch (err) {
+          console.error('schedule job error:', err);
+          this.error(err);
+          record.completed = false;
+          record.result = String(err);
+          record.save();
+        }
       });
     });
     applog(

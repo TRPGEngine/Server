@@ -125,6 +125,49 @@
             },
             "indexes": []
         },
+        "core_schedulejob_history": {
+            "tableName": "core_schedulejob_history",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "name": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "type": {
+                    "defaultValue": {
+                        "value": "unknown"
+                    },
+                    "field": "type",
+                    "seqType": "Sequelize.ENUM('stat', 'schedule', 'custom', 'unknown')"
+                },
+                "hostname": {
+                    "field": "hostname",
+                    "seqType": "Sequelize.STRING"
+                },
+                "result": {
+                    "field": "result",
+                    "seqType": "Sequelize.STRING"
+                },
+                "completed": {
+                    "field": "completed",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
         "player_user": {
             "tableName": "player_user",
             "schema": {
@@ -2720,5 +2763,5 @@
             "indexes": []
         }
     },
-    "revision": 23
+    "revision": 24
 }

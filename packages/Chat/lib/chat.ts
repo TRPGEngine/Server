@@ -178,6 +178,7 @@ export default class Chat extends BasePackage {
           debug('save chat log success!');
         } catch (err) {
           console.error('save chat log error', err);
+          throw err;
         }
       },
       getChatLogSumAsync: async function() {
@@ -222,9 +223,9 @@ export default class Chat extends BasePackage {
   initTimer() {
     const app = this.app;
 
-    app.registerScheduleJob('saveChatLog', '0 0,10,20,30,40,50 * * * *', () => {
-      app.chat.saveChatLogAsync();
-    });
+    this.regScheduleJob('saveChatLog', '0 0,10,20,30,40,50 * * * *', () =>
+      app.chat.saveChatLogAsync()
+    );
 
     this.regStatJob('chatLogCount', async () => {
       await app.chat.saveChatLogAsync();

@@ -434,8 +434,10 @@ export class RedisCache implements ICache {
       return;
     }
 
-    await scope();
-
-    await this.unlock(key);
+    try {
+      await scope();
+    } finally {
+      await this.unlock(key);
+    }
   }
 }

@@ -1,4 +1,4 @@
-export { TRPGApplication, JobCallback } from 'packages/Core/types/app';
+export { TRPGApplication, ScheduleJobFn } from 'packages/Core/types/app';
 export {
   Orm,
   DBInstance,
