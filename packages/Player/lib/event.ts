@@ -6,36 +6,54 @@ import uuid from 'uuid/v1';
 import _ from 'lodash';
 import { EventFunc } from 'trpg/core';
 import { PlayerUser } from './models/user';
+import { TRPGApplication, Socket } from 'trpg/core';
+import { Platform } from '../types/player';
 
-let autoJoinSocketRoom = async function autoJoinSocketRoom(socket) {
+/**
+ * 自动加入房间
+ * @param socket 连接
+ */
+const autoJoinSocketRoom = async function autoJoinSocketRoom(
+  this: TRPGApplication,
+  socket: Socket
+) {
   if (!socket) {
     debug('add room error. not find this socket');
     return;
   }
 
   const app = this;
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    debug('add room error. not find this socket attach player');
+    debug('Add room error. not find this socket attach player');
     return;
   }
 
   if (!app.group) {
-    debug('add room error. need group component');
+    debug('Add room error. need group component');
     return;
   }
 
-  let groups = await player.user.getGroups();
-  for (let group of groups) {
-    let uuid = group.uuid;
-    socket.join(uuid);
+  const user = await PlayerUser.findByUUID(player.uuid);
+  if (!user) {
+    debug('Add room error. Not found user');
+    return;
   }
+
+  const groups = await (user as any).getGroups();
+  await Promise.all(
+    groups
+      .map((group) => group.uuid)
+      .map((roomUUID: string) => app.player.manager.joinRoom(roomUUID, socket))
+  ).catch((err) => {
+    debug('auto join room error: %o', err);
+  });
 };
 
 export const login: EventFunc<{
   username: string;
   password: string;
-  platform: string;
+  platform: Platform;
   isApp: boolean;
 }> = async function login(data, cb, db) {
   const app = this.app;
@@ -86,7 +104,7 @@ export const login: EventFunc<{
 
     // 加入到列表中
     if (!!app.player) {
-      app.player.list.add(user, socket);
+      await app.player.manager.addPlayer(user.uuid, socket, platform);
       await autoJoinSocketRoom.call(app, socket);
     }
 
@@ -120,7 +138,7 @@ export const login: EventFunc<{
 export const loginWithToken: EventFunc<{
   uuid: string;
   token: string;
-  platform: string;
+  platform: Platform;
   isApp: boolean;
   channel: string;
 }> = async function loginWithToken(data, cb, db) {
@@ -170,7 +188,7 @@ export const loginWithToken: EventFunc<{
 
     // 加入到列表中
     if (!!app.player) {
-      app.player.list.add(user, socket);
+      await app.player.manager.addPlayer(user.uuid, socket, platform);
       await autoJoinSocketRoom.call(app, socket);
     }
     await socket.iosession.set('user', user.getInfo(true)); // 将用户信息加入到session中
@@ -253,14 +271,15 @@ export const getInfo: EventFunc<{
   }
 
   if (type === 'self') {
-    let player = app.player.list.find(socket);
+    const player = app.player.manager.findPlayer(socket);
     if (!!player) {
-      cb({ result: true, info: player.user });
+      const user = await PlayerUser.findByUUID(player.uuid);
+      return { info: user.getInfo() };
     } else {
-      cb({ result: false, msg: '用户不存在，请检查登录状态' });
+      throw new Error('用户不存在，请检查登录状态');
     }
   } else if (type === 'user') {
-    let user = await db.models.player_user.findOne({ where: { uuid } });
+    let user = await PlayerUser.findByUUID(uuid);
     if (!!user) {
       return {
         info: user.getInfo(),
@@ -277,14 +296,12 @@ export const updateInfo: EventFunc = async function updateInfo(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  const userId = player.user.id;
-
-  const user = await db.models.player_user.findByPk(userId);
+  const user = await PlayerUser.findByUUID(player.uuid);
   // TODO: 检测用户信息合法性(如禁止敏感字符作为昵称)
   user.updateInfo(data);
   await user.save();
@@ -298,16 +315,16 @@ export const changePassword: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let { oldPassword, newPassword } = data;
+  const { oldPassword, newPassword } = data;
   // oldPassword = md5(oldPassword);
   // newPassword = md5(newPassword);
 
-  const username = player.user.username;
+  const { username } = await PlayerUser.findByUUID(player.uuid);
   const user = await PlayerUser.findByUsernameAndPassword(
     username,
     oldPassword
@@ -355,7 +372,7 @@ export const logout: EventFunc<{
 
     // 从列表中移除
     if (!!app.player) {
-      app.player.list.remove(user.uuid);
+      app.player.manager.removePlayer(user.uuid, isApp ? 'app' : 'web');
     }
 
     return true;
@@ -412,12 +429,12 @@ export const getFriends: EventFunc = async function getFriends(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
 
-  let uuid = player.user.uuid;
+  const uuid = player.uuid;
   let list = await app.player.getFriendsAsync(uuid, db);
   list = list.map((i) => i.getInfo());
   return { list };
@@ -429,12 +446,12 @@ export const sendFriendInvite: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
 
-  const from_uuid = player.user.uuid;
+  const from_uuid = player.uuid;
   const to_uuid = data.to;
 
   const Invite = db.models.player_invite;
@@ -452,14 +469,11 @@ export const sendFriendInvite: EventFunc<{
   }
 
   let invite = await Invite.create({ from_uuid, to_uuid });
-  let to_player = app.player.list.get(to_uuid);
-  if (!!to_player) {
-    let socket = to_player.socket;
-    socket.emit('player::invite', invite);
-  }
+  app.player.manager.unicastSocketEvent(to_uuid, 'player::invite', invite);
 
+  const user = await PlayerUser.findByUUID(from_uuid);
   if (app.chat && app.chat.sendMsg) {
-    let msg = `${player.user.nickname || player.user.username} 想添加您为好友`;
+    let msg = `${user.nickname || user.username} 想添加您为好友`;
     app.chat.sendSystemMsg(to_uuid, 'friendInvite', '好友邀请', msg, {
       invite,
     });
@@ -474,7 +488,7 @@ export const refuseFriendInvite: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
@@ -514,7 +528,7 @@ export const agreeFriendInvite: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
@@ -539,10 +553,9 @@ export const agreeFriendInvite: EventFunc<{
     await app.player.makeFriendAsync(uuid1, uuid2, db);
 
     // 发送更新好友的通知
-    const player1 = app.player.list.get(uuid1);
-    if (player1) {
-      player1.socket.emit('player::appendFriend', { uuid: uuid2 });
-    }
+    app.player.manager.unicastSocketEvent(uuid1, 'player::appendFriend', {
+      uuid: uuid2,
+    });
     if (app.chat) {
       // 如果 chat 模块已注册
       app.chat.sendSystemMsg(
@@ -563,16 +576,16 @@ export const getFriendsInvite: EventFunc = async function getFriendsInvite(
   cb,
   db
 ) {
-  let app = this.app;
-  let socket = this.socket;
+  const app = this.app;
+  const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
 
-  let uuid = player.user.uuid;
-  let res = await db.models.player_invite.findAll({
+  const uuid = player.uuid;
+  const res = await db.models.player_invite.findAll({
     where: {
       to_uuid: uuid,
       is_agree: false,
@@ -587,16 +600,16 @@ export const getFriendsInvite: EventFunc = async function getFriendsInvite(
 export const checkUserOnline: EventFunc<{
   uuid: string;
 }> = async function checkUserOnline(data, cb, db) {
-  let app = this.app;
-  let socket = this.socket;
+  const app = this.app;
+  const socket = this.socket;
 
-  let uuid = data.uuid;
+  const uuid = data.uuid;
   if (!uuid) {
     throw '缺少必要参数';
   }
-  let player = app.player.list.get(uuid);
+  const isOnline = await app.player.manager.checkPlayerOnline(uuid);
   return {
-    isOnline: !!player,
+    isOnline,
   };
 };
 
@@ -604,7 +617,7 @@ export const getSettings: EventFunc = async function getSettings(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '当前用户不存在';
   }
@@ -637,7 +650,7 @@ export const saveSettings: EventFunc<{
 
   let { userSettings, systemSettings } = data;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '当前用户不存在';
   }

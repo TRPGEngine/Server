@@ -23,7 +23,7 @@
           <input type="text" name="_captcha" lay-verify="required" placeholder="请输入验证码" maxlength="4" autocomplete="off" class="layui-input">
         </div>
         <div class="layui-input-inline">
-          <img class="captcha" src="/admin/captcha" />
+          <img class="captcha" src="/dashboard/captcha" />
         </div>
       </div>
       <div class="layui-form-item">
@@ -37,12 +37,12 @@
     layui.use('form', function(){
       var form = layui.form;
       var updateCaptcha = function() {
-        $(".captcha").attr('src', '/admin/captcha?' + Math.random())
+        $(".captcha").attr('src', '/dashboard/captcha?' + Math.random())
       }
 
       //监听提交
       form.on('submit(loginForm)', function(data){
-        $.post('/admin/api/system/_login', {
+        $.post('/dashboard/api/system/_login', {
           username: data.field.username,
           password: data.field.password,
           _captcha: data.field._captcha,
@@ -50,7 +50,7 @@
           if(data.result) {
             layer.msg('登录成功');
             setTimeout(function() {
-              location.href = "/admin/home";
+              location.href = "/dashboard/home";
             }, 1000);
           }else {
             layer.msg(data.msg);

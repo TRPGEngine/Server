@@ -1,5 +1,6 @@
-const debug = require('debug')('trpg:component:dice');
-const event = require('./event');
+import Debug from 'debug';
+const debug = Debug('trpg:component:dice');
+import * as event from './event';
 
 module.exports = function DiceComponent(app) {
   initStorage.call(app);
@@ -28,8 +29,8 @@ function initFunction() {
   let app = this;
   app.dice = {
     rollPoint: function rollPoint(maxPoint, minPoint = 1) {
-      maxPoint = parseInt(maxPoint);
-      minPoint = parseInt(minPoint);
+      maxPoint = parseInt(String(maxPoint));
+      minPoint = parseInt(String(minPoint));
       if (maxPoint <= 1) {
         maxPoint = 100;
       }

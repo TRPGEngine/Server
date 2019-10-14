@@ -13,7 +13,7 @@ const chat = require('./view/chat');
 const group = require('./view/group');
 const system = require('./view/system');
 router.get('/', async (ctx) => {
-  ctx.redirect('/admin/home');
+  ctx.redirect('/dashboard/home');
 });
 router.use('/*', auth);
 router.use('/home', home.routes(), home.allowedMethods());

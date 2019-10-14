@@ -3,7 +3,7 @@ import upload from '../middleware/upload';
 import sha265 from '../middleware/sha256';
 import config from '../config';
 const chatimgStorage = require('../middleware/storage/chatimg');
-const auth = require('../middleware/auth');
+import auth from '../middleware/auth';
 import uuid from 'uuid/v1';
 import _ from 'lodash';
 import request from 'request';

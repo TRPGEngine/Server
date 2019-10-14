@@ -22,7 +22,7 @@ router.get('/_list', async (ctx, next) => {
 });
 
 router.get('/_onlineCount', async (ctx, next) => {
-  let count = ctx.trpgapp.player.list.list.length;
+  const count = await ctx.trpgapp.player.manager.getOnlinePlayerCount();
 
   ctx.body = count;
 });

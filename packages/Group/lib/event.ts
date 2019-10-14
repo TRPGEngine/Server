@@ -3,6 +3,7 @@ const debug = Debug('trpg:component:group:event');
 import uuid from 'uuid/v4';
 import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
 export const create: EventFunc<{
   name: string;
@@ -13,11 +14,11 @@ export const create: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
-  const user = player.user;
+  const userUUID = player.uuid;
 
   const { name, sub_name, desc, avatar } = data;
   if (!name) {
@@ -31,20 +32,21 @@ export const create: EventFunc<{
     throw '该团名已存在';
   }
 
-  let group = await db.models.group_group.create({
+  const user = await PlayerUser.findByUUID(userUUID);
+  const group = await db.models.group_group.create({
     type: 'group',
     name,
     sub_name,
     desc,
     avatar,
-    creator_uuid: user.uuid,
-    owner_uuid: user.uuid,
+    creator_uuid: userUUID,
+    owner_uuid: userUUID,
     managers_uuid: [],
     maps_uuid: [],
   });
 
   await group.setOwner(user);
-  await app.group.addGroupMemberAsync(group.uuid, user.uuid);
+  await app.group.addGroupMemberAsync(group.uuid, userUUID);
   return { group };
 };
 
@@ -83,7 +85,7 @@ export const updateInfo: EventFunc<{
     debug('[GroupComponent] need [PlayerComponent]');
     return;
   }
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -128,7 +130,7 @@ export const findGroup: EventFunc<{
   const socket = this.socket;
   const Op = app.storage.Op;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -173,12 +175,12 @@ export const requestJoinGroup: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
 
-  let from_uuid = player.user.uuid;
+  let from_uuid = player.uuid;
   let { group_uuid } = data;
   if (!group_uuid) {
     throw '缺少必要参数';
@@ -247,7 +249,7 @@ export const agreeGroupRequest: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
@@ -278,7 +280,8 @@ export const agreeGroupRequest: EventFunc<{
   await request.agreeAsync();
 
   // 发送入团成功消息
-  let systemMsg = `管理员 ${player.user.getName()} 已同意您加入团 [${
+  const user = await PlayerUser.findByUUID(player.uuid);
+  let systemMsg = `管理员 ${user.getName()} 已同意您加入团 [${
     group.name
   }] ,和大家打个招呼吧!`;
   app.chat.sendSystemMsg(
@@ -306,7 +309,7 @@ export const refuseGroupRequest: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
@@ -337,7 +340,8 @@ export const refuseGroupRequest: EventFunc<{
   await request.refuseAsync();
   cb({ result: true });
 
-  let systemMsg = `管理员 ${player.user.getName()} 已拒绝您加入团 ${
+  const user = await PlayerUser.findByUUID(player.uuid);
+  let systemMsg = `管理员 ${user.getName()} 已拒绝您加入团 ${
     group.name
   }, 请等待其他管理员的验证。`;
   app.chat.sendSystemMsg(
@@ -356,13 +360,13 @@ export const sendGroupInvite: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
 
   let group_uuid = data.group_uuid;
-  let from_uuid = player.user.uuid;
+  let from_uuid = player.uuid;
   let to_uuid = data.to_uuid;
   if (from_uuid === to_uuid) {
     throw '你不能邀请自己';
@@ -397,17 +401,12 @@ export const sendGroupInvite: EventFunc<{
     from_uuid,
     to_uuid,
   });
-  let to_player = app.player.list.get(to_uuid);
-  if (!!to_player) {
-    let socket = to_player.socket;
-    socket.emit('group::invite', invite);
-  }
+  app.player.manager.unicastSocketEvent(to_uuid, 'group::invite', invite);
 
   if (app.chat && app.chat.sendMsg) {
     // 发送系统信息
-    let msg = `${player.user.nickname || player.user.username} 想邀请您加入团 ${
-      group.name
-    }`;
+    const user = await PlayerUser.findByUUID(player.uuid);
+    let msg = `${user.getName()} 想邀请您加入团 ${group.name}`;
     app.chat.sendMsg('trpgsystem', to_uuid, {
       message: msg,
       type: 'card',
@@ -429,7 +428,7 @@ export const refuseGroupInvite: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
@@ -463,7 +462,7 @@ export const agreeGroupInvite: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -511,12 +510,12 @@ export const getGroupInvite: EventFunc<{}> = async function getGroupInvite(
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户状态异常';
   }
 
-  let uuid = player.user.uuid;
+  let uuid = player.uuid;
   let res = await db.models.group_invite.findAll({
     where: {
       to_uuid: uuid,
@@ -536,7 +535,7 @@ export const getGroupList: EventFunc<{}> = async function getGroupList(
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -555,7 +554,7 @@ export const getGroupMembers: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -582,7 +581,7 @@ export const getGroupActors: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -616,12 +615,12 @@ export const getGroupActorMapping: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  const selfUUID = player.user.uuid;
+  const selfUUID = player.uuid;
   const { groupUUID } = data;
 
   const group = await (db.models.group_group as any).findOne({
@@ -664,7 +663,7 @@ export const addGroupActor: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -693,6 +692,8 @@ export const addGroupActor: EventFunc<{
     throw '该角色已存在';
   }
 
+  const user = await PlayerUser.findByUUID(player.uuid);
+
   let groupActor;
   await db.transactionAsync(async () => {
     groupActor = await db.models.group_actor.create({
@@ -702,7 +703,7 @@ export const addGroupActor: EventFunc<{
       actor_info: {},
       avatar: actor.avatar,
       passed: false,
-      ownerId: player.user.id,
+      ownerId: user.id,
     });
     groupActor = await groupActor.setActor(actor);
     groupActor = await groupActor.setGroup(group);
@@ -721,7 +722,7 @@ export const removeGroupActor: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -782,7 +783,7 @@ export const agreeGroupActor: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -799,7 +800,7 @@ export const agreeGroupActor: EventFunc<{
   if (!group) {
     throw '找不到团';
   }
-  if (!group.isManagerOrOwner(player.user.uuid)) {
+  if (!group.isManagerOrOwner(player.uuid)) {
     throw '没有操作权限';
   }
   let groupActor = await db.models.group_actor.findOne({
@@ -823,7 +824,7 @@ export const refuseGroupActor: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -839,7 +840,7 @@ export const refuseGroupActor: EventFunc<{
   if (!group) {
     throw '找不到团';
   }
-  if (!group.isManagerOrOwner(player.user.uuid)) {
+  if (!group.isManagerOrOwner(player.uuid)) {
     throw '没有操作权限';
   }
   let groupActor = await db.models.group_actor.findOne({
@@ -863,7 +864,7 @@ export const updateGroupActorInfo: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -905,12 +906,12 @@ export const setPlayerSelectedGroupActor: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  const userUUID = player.user.uuid;
+  const userUUID = player.uuid;
   const groupUUID = data.groupUUID;
   const groupActorUUID = data.groupActorUUID; // 可以为null 即取消选择
   if (!groupUUID) {
@@ -956,7 +957,7 @@ export const getPlayerSelectedGroupActor: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -999,7 +1000,7 @@ export const quitGroup: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -1018,13 +1019,14 @@ export const quitGroup: EventFunc<{
     throw '作为团主持人你无法直接退出群';
   }
 
-  let removeMember = await group.removeMember(player.user);
+  const user = await PlayerUser.findByUUID(player.uuid);
+  let removeMember = await group.removeMember(user);
 
   // 系统通知
   let managers_uuid = group.getManagerUUIDs();
-  let systemMsg = `用户 ${player.user.getName()} 退出了团 [${group.name}]`;
+  let systemMsg = `用户 ${user.getName()} 退出了团 [${group.name}]`;
   managers_uuid.forEach((uuid) => {
-    if (uuid !== player.user.uuid) {
+    if (uuid !== user.uuid) {
       app.chat.sendSystemSimpleMsg(uuid, systemMsg);
     }
   });
@@ -1041,7 +1043,7 @@ export const dismissGroup: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -1084,7 +1086,7 @@ export const tickMember: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -1093,7 +1095,7 @@ export const tickMember: EventFunc<{
   if (!groupUUID || !memberUUID) {
     throw '缺少必要参数';
   }
-  if (player.user.uuid === memberUUID) {
+  if (player.uuid === memberUUID) {
     throw '您不能踢出你自己';
   }
 
@@ -1109,12 +1111,12 @@ export const tickMember: EventFunc<{
   if (!member) {
     throw '找不到该成员';
   }
-  if (!group.isManagerOrOwner(player.user.uuid)) {
+  if (!group.isManagerOrOwner(player.uuid)) {
     // 操作人不是管理
     throw '您没有该权限';
   } else if (
     group.isManagerOrOwner(memberUUID) &&
-    group.owner_uuid !== player.user.uuid
+    group.owner_uuid !== player.uuid
   ) {
     // 被踢人是管理但操作人不是团所有人
     throw '您没有该权限';
@@ -1148,7 +1150,7 @@ export const setMemberToManager: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -1157,7 +1159,7 @@ export const setMemberToManager: EventFunc<{
   if (!groupUUID || !memberUUID) {
     throw '缺少必要参数';
   }
-  if (player.user.uuid === memberUUID) {
+  if (player.uuid === memberUUID) {
     throw '你不能将自己提升为管理员';
   }
   let group = await db.models.group_group.findOne({
@@ -1172,7 +1174,7 @@ export const setMemberToManager: EventFunc<{
   if (!member) {
     throw '找不到该成员';
   }
-  if (group.owner_uuid !== player.user.uuid) {
+  if (group.owner_uuid !== player.uuid) {
     // 操作人不是管理
     throw '您不是团的所有者';
   }
@@ -1227,7 +1229,7 @@ export const setGroupStatus: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }

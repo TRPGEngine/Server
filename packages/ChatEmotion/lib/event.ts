@@ -3,20 +3,23 @@ import { EventFunc } from 'trpg/core';
 import { ChatEmotionSecretSignal } from './models/secret-signal';
 import { ChatEmotionCatalog } from './models/catalog';
 import { ChatEmotionItem } from './models/item';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
-export async function getUserEmotionCatalog(data, cb, db) {
+export const getUserEmotionCatalog: EventFunc = async function getUserEmotionCatalog(
+  data,
+  cb,
+  db
+) {
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
 
-  const userId = player.user.id;
-
-  const user = await db.models.player_user.findByPk(userId);
-  const catalogs = await user.getEmotionCatalogs();
+  const user = await PlayerUser.findByUUID(player.uuid);
+  const catalogs = await (user as any).getEmotionCatalogs();
 
   for (let catalog of catalogs) {
     const items = await catalog.getItems();
@@ -24,7 +27,7 @@ export async function getUserEmotionCatalog(data, cb, db) {
   }
 
   return { catalogs };
-}
+};
 
 export const addUserEmotionWithSecretSignal: EventFunc<{
   code: string;
@@ -32,7 +35,7 @@ export const addUserEmotionWithSecretSignal: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
@@ -61,8 +64,8 @@ export const addUserEmotionWithSecretSignal: EventFunc<{
     throw new Error('该表情包不存在');
   }
 
-  const user = await (db.models.player_user as any).findByPk(player.user.id);
-  await user.addEmotionCatalog(catalog);
+  const user = await PlayerUser.findByUUID(player.uuid);
+  await (user as any).addEmotionCatalog(catalog);
 
   return { catalog };
 };

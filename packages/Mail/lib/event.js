@@ -33,7 +33,7 @@ exports.bindMail = async function bindMail(data, cb, db) {
     debug('[MailComponent] need [PlayerComponent]');
     return;
   }
-  let player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -54,10 +54,13 @@ exports.bindMail = async function bindMail(data, cb, db) {
 
   // TODO: 需要增加限制处理，防止被识别为垃圾邮件
   // TODO: 需要对多次发起同一请求进行处理
+  const user = await db.models.player_user.findOne({
+    where: { uuid: userUUID },
+  });
   let mail = await db.models.mail_list.createAsync({
     user_uuid: userUUID,
     email_address: address,
-    ownerId: player.user.id,
+    ownerId: user.id,
   });
 
   const subject = '绑定TRPG账户电子邮箱';

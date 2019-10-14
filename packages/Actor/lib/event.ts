@@ -2,13 +2,14 @@ import Debug from 'debug';
 import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
 import { ActorTemplate } from './models/template';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 const debug = Debug('trpg:component:actor:event');
 
-exports.getTemplate = async function(data, cb, db) {
+export const getTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -37,7 +38,7 @@ exports.getTemplate = async function(data, cb, db) {
 /**
  * 获取推荐角色模板
  */
-const getSuggestTemplate: EventFunc = async function(data, cb, db) {
+export const getSuggestTemplate: EventFunc = async function(data, cb, db) {
   const templates = await ActorTemplate.findAll({
     where: {
       built_in: true,
@@ -46,13 +47,12 @@ const getSuggestTemplate: EventFunc = async function(data, cb, db) {
 
   return { templates };
 };
-exports.getSuggestTemplate = getSuggestTemplate;
 
-exports.findTemplate = async function(data, cb, db) {
+export const findTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  const player = app.player.list.find(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -62,7 +62,7 @@ exports.findTemplate = async function(data, cb, db) {
     throw '缺少必要参数';
   }
 
-  let templates = await db.models.actor_template.findTemplateAsync(
+  let templates = await (db.models.actor_template as any).findTemplateAsync(
     nameFragment
   );
   for (let template of templates) {
@@ -74,11 +74,11 @@ exports.findTemplate = async function(data, cb, db) {
   return { templates };
 };
 
-exports.createTemplate = async function(data, cb, db) {
+export const createTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -103,21 +103,22 @@ exports.createTemplate = async function(data, cb, db) {
     throw '该模板名字已存在';
   }
 
+  const user = await PlayerUser.findByUUID(player.uuid);
   let template = await db.models.actor_template.create({
     name,
     desc,
     avatar,
     info,
   });
-  await template.setCreator(player.user);
+  await template.setCreator(user);
   return { template };
 };
 
-exports.updateTemplate = async function(data, cb, db) {
+export const updateTemplate: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -135,7 +136,8 @@ exports.updateTemplate = async function(data, cb, db) {
   let template = await db.models.actor_template.findOne({
     where: { uuid },
   });
-  if (template.creatorId !== player.user.id) {
+  const user = await PlayerUser.findByUUID(player.uuid);
+  if (template.creatorId !== user.id) {
     throw '您不是该模板的所有者，无法修改模板';
   }
   if (name) {
@@ -155,20 +157,21 @@ exports.updateTemplate = async function(data, cb, db) {
   return { template };
 };
 
-exports.removeTemplate = async function(data, cb, db) {
+export const removeTemplate: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
   let uuid = data.uuid;
+  const user = await PlayerUser.findByUUID(player.uuid);
   let template = await db.models.actor_template.findOne({
     where: {
       uuid,
-      creatorId: player.user.id,
+      creatorId: user.id,
     },
   });
   if (!template) {
@@ -178,11 +181,11 @@ exports.removeTemplate = async function(data, cb, db) {
   return true;
 };
 
-exports.createActor = async function(data, cb, db) {
+export const createActor: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -205,7 +208,8 @@ exports.createActor = async function(data, cb, db) {
       info,
       template_uuid,
     });
-    await actor.setOwner(player.user);
+    const user = await PlayerUser.findByUUID(player.uuid);
+    await actor.setOwner(user);
     if (!!avatar) {
       let tmp = avatar.split('/');
       let avatarModel = await db.models.file_avatar.findOne({
@@ -227,11 +231,11 @@ exports.createActor = async function(data, cb, db) {
   }
 };
 
-exports.getActor = async function(data, cb, db) {
+export const getActor: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -251,11 +255,11 @@ exports.getActor = async function(data, cb, db) {
   }
 };
 
-exports.removeActor = async function(data, cb, db) {
+export const removeActor: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
@@ -265,10 +269,11 @@ exports.removeActor = async function(data, cb, db) {
   }
 
   await db.transactionAsync(async () => {
+    const user = await PlayerUser.findByUUID(player.uuid);
     let actor = await db.models.actor_actor.findOne({
       where: {
         uuid,
-        ownerId: player.user.id,
+        ownerId: user.id,
       },
     });
     if (!actor) {
@@ -287,15 +292,16 @@ exports.removeActor = async function(data, cb, db) {
   return true;
 };
 
-exports.updateActor = async function(data, cb, db) {
+export const updateActor: EventFunc = async function(data, cb, db) {
   let app = this.app;
   let socket = this.socket;
 
-  let player = app.player.list.find(socket);
+  let player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
-  const userId = player.user.id;
+  const user = await PlayerUser.findByUUID(player.uuid);
+  const userId = user.id;
 
   let uuid = data.uuid;
   let name = data.name;
@@ -326,9 +332,11 @@ exports.updateActor = async function(data, cb, db) {
 
     if (db.models.file_avatar && oldAvatar && oldAvatar !== avatar) {
       // 更新avatar的attach
+
+      const user = await PlayerUser.findByUUID(player.uuid);
       let oldtmp = oldAvatar.split('/');
       let tmp = avatar.split('/');
-      let userId = player.user.id;
+      let userId = user.id;
       let oldAvatarInstance = await db.models.file_avatar.findOne({
         where: {
           name: oldtmp[oldtmp.length - 1],

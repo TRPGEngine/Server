@@ -34,9 +34,11 @@ const getServerInfo = memoizeOne(
 
 router.get('/health', async (ctx) => {
   const serverInfo = await getServerInfo();
+  const trpgapp = ctx.trpgapp;
   ctx.body = {
     version: _.get(serverInfo, 'packageConf.version', ''),
     hash: _.get(serverInfo, 'gitVersion', ''),
+    env: trpgapp.get('env'),
   };
 });
 

@@ -32,7 +32,7 @@ type ScheduleJob = {
   job: Job;
 };
 
-class Application extends events.EventEmitter {
+export class Application extends events.EventEmitter {
   settings: AppSettings = {}; // 设置配置列表
   storage: Storage = null; // 数据库服务列表
   cache: ICache = null; // 缓存服务
@@ -252,10 +252,15 @@ class Application extends events.EventEmitter {
       }
     }
 
-    applog('register schedule job [%s]', name);
+    const job = schedule.scheduleJob(name, rule, fn);
+    applog(
+      'register schedule job [%s](nextDate: %o)',
+      name,
+      job.nextInvocation()
+    );
     this.scheduleJob.push({
       name,
-      job: schedule.scheduleJob(name, rule, fn),
+      job,
     });
   }
 

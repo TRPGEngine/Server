@@ -54,12 +54,47 @@ export interface ICache {
   lget(key: string): Promise<CacheValue[]>;
 
   /**
-   * 返回集合中的所有的成
+   * 设置指定索引位置的列表的值
+   * @param key 键
+   * @param index 索引
+   * @param value 值
+   */
+  lset(key: string, index: number, value: CacheValue): Promise<CacheValue>;
+
+  /**
+   * 向集合中放入一个值，该值在集合中只能存在一个
+   * @param key 键
+   * @param value 值
+   */
+  sadd(key: string, value: CacheValue): Promise<void>;
+
+  /**
+   * 从集合中移除一个值
+   * @param key 键
+   * @param value 值
+   */
+  srem(key: string, value: CacheValue): Promise<void>;
+
+  /**
+   * 返回集合中的所有的成员
    * @param key 键
    */
-  smembers(key: string): Promise<string[]>;
+  smembers(key: string): Promise<CacheValue[]>;
+
+  /**
+   * 判定是否在该set中
+   * @param key 键
+   * @param value 值
+   */
+  sismember(key: string, value: CacheValue): Promise<boolean>;
+
   remove(key: string): Promise<any>;
   close(): void;
+
+  // 分布式锁
+  // 仅redis有效
+  lock(key: string): Promise<boolean>;
+  unlock(key: string): Promise<void>;
 }
 
 export class Cache implements ICache {
@@ -151,13 +186,48 @@ export class Cache implements ICache {
     }
   }
 
-  async smembers(key: string): Promise<string[]> {
-    const vals = await this.get(key);
-    if (Array.isArray(vals)) {
-      return vals.filter((item, index, arr) => arr.indexOf(item) === index); // 数组去重
-    } else {
-      return vals as any;
+  async lset(
+    key: string,
+    index: number,
+    value: CacheValue
+  ): Promise<CacheValue> {
+    _.set(this.data, [key, index], value);
+
+    return value;
+  }
+
+  async sadd(key: string, value: CacheValue): Promise<void> {
+    let data: Set<CacheValue> = this.data[key];
+    if (!data) {
+      data = this.data[key] = new Set<CacheValue>();
     }
+
+    data.add(value);
+  }
+
+  async srem(key: string, value: CacheValue): Promise<void> {
+    const data: Set<CacheValue> = this.data[key];
+    if (_.isSet(data)) {
+      data.delete(value);
+    }
+  }
+
+  async smembers(key: string): Promise<CacheValue[]> {
+    const d = this.data[key];
+    if (_.isSet(d)) {
+      return Array.from(d);
+    }
+
+    return [];
+  }
+
+  async sismember(key: string, value: CacheValue): Promise<boolean> {
+    const d = this.data[key];
+    if (_.isSet(d)) {
+      return d.has(value);
+    }
+
+    return false;
   }
 
   remove(key: string) {
@@ -171,6 +241,9 @@ export class Cache implements ICache {
     debug('start closing cache');
     this.data = {};
   }
+
+  lock = _.noop as any;
+  unlock = _.noop as any;
 }
 
 export class RedisCache implements ICache {
@@ -195,6 +268,21 @@ export class RedisCache implements ICache {
     } catch (e) {
       return val;
     }
+  }
+
+  /**
+   * 归一化缓存值。将其转化为字符串
+   * @param val 值
+   */
+  private normalizeVal(val: CacheValue): string {
+    let ret: string;
+    if (_.isObject(val) || _.isNumber(val)) {
+      ret = JSON.stringify(val);
+    } else {
+      ret = val;
+    }
+
+    return ret;
   }
 
   set(
@@ -254,16 +342,50 @@ export class RedisCache implements ICache {
     return Promise.resolve(null);
   }
 
-  async smembers(key: string): Promise<string[]> {
+  async sadd(key: string, value: CacheValue): Promise<void> {
+    key = this.genKey(key);
+    await this.redis.sadd(key, this.normalizeVal(value));
+  }
+
+  async srem(key: string, value: CacheValue): Promise<void> {
+    key = this.genKey(key);
+
+    await this.redis.srem(key, this.normalizeVal(value));
+  }
+
+  async smembers(key: string): Promise<CacheValue[]> {
     key = this.genKey(key);
     const members = await this.redis.smembers(key);
-    return members;
+    return members.map(this.parseVal);
+  }
+
+  async sismember(key: string, value: CacheValue): Promise<boolean> {
+    key = this.genKey(key);
+
+    const ret = await this.redis.sismember(key, this.normalizeVal(value));
+
+    return Boolean(ret);
   }
 
   async lget(key: string): Promise<CacheValue[]> {
     key = this.genKey(key);
     const arr: string[] = await this.redis.lrange(key, 0, -1); // 获取所有值
     return arr.map(this.parseVal);
+  }
+
+  async lset(
+    key: string,
+    index: number,
+    value: CacheValue
+  ): Promise<CacheValue> {
+    key = this.genKey(key);
+    await this.redis.lset(
+      key,
+      index,
+      _.isObject(value) ? JSON.stringify(value) : value
+    );
+
+    return value;
   }
 
   remove(key: string): Promise<number> {
@@ -274,5 +396,21 @@ export class RedisCache implements ICache {
   close(): void {
     debug('start closing redis cli');
     this.redis.disconnect();
+  }
+
+  async lock(key: string): Promise<boolean> {
+    key = 'lock:' + this.genKey(key);
+    const timestamp = new Date().valueOf().toString(); // 锁的值任意
+    const ret = await this.redis.set(key, timestamp, 'EX', 10, 'NX');
+    if (ret === 'OK') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async unlock(key: string): Promise<void> {
+    key = 'lock:' + this.genKey(key);
+    await this.redis.del(key);
   }
 }
