@@ -28,6 +28,11 @@ type InternalEvents = {
   [eventName: string]: Array<InternalEventFunc>;
 };
 
+type CloseTaskFunc = () => Promise<void>;
+type CloseTasks = {
+  [packageName: string]: CloseTaskFunc;
+};
+
 type ScheduleJob = {
   name: string;
   job: Job;
@@ -52,6 +57,7 @@ export class Application extends events.EventEmitter {
   statInfoJob = []; // 统计信息任务
   job: Job = null; // node-schedule定时任务(每日凌晨2点)
   scheduleJob: ScheduleJob[] = []; // 计划任务列表
+  closeTasks: CloseTasks = {}; // 关闭任务队列(当触发关闭应用时执行这些任务)
   testcase = [];
   [packageInject: string]: any; // 包注入的方法
 
@@ -306,6 +312,19 @@ export class Application extends events.EventEmitter {
     });
   }
 
+  /**
+   * 注册关闭事件， 当应用进程退出时执行
+   * @param fn 事件方法
+   */
+  registerCloseTask(packageName: string, fn: CloseTaskFunc): void {
+    if (this.closeTasks[packageName]) {
+      debug(`add [${packageName}] close task failed: exist one`);
+      return;
+    }
+    debug(`add [${packageName}] close task`);
+    this.closeTasks[packageName] = fn;
+  }
+
   request = {
     get<T = any>(url: string, query?: any, config?: AxiosRequestConfig) {
       return axios({
@@ -345,17 +364,29 @@ export class Application extends events.EventEmitter {
 
   async close() {
     debug('closing....');
-    await this.storage.close();
-    await this.socketservice.close();
     // 清理timer
+    await this.socketservice
+      .close()
+      .then(() => debug('closed socketservice service'));
     for (let timer of this.timers) {
       clearInterval(timer);
     }
     this.timers = [];
     this.job.cancel();
     this.scheduleJob.forEach(({ job }) => job.cancel()); // 关闭计划任务列表
+    debug('closed all scheduleJob');
     this.cache.close(); // 关闭redis连接
+    // 执行关闭事件
+    await Promise.all(
+      Object.entries(this.closeTasks).map(([packageName, fn]) =>
+        fn()
+          .then(() => debug(`closeTask: [${packageName}] success`))
+          .catch((err) => debug(`closeTask: [${packageName}] error %o`, err))
+      )
+    ).then(() => debug('completed all close task'));
     this.emit('close');
+    await this.storage.close().then(() => debug('closed storage service'));
+
     debug('close completed!');
   }
 

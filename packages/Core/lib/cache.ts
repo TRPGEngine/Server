@@ -415,8 +415,8 @@ export class RedisCache implements ICache {
   }
 
   close(): void {
-    debug('start closing redis cli');
     this.redis.disconnect();
+    debug('closed redis cli');
   }
 
   async lock(key: string): Promise<boolean> {

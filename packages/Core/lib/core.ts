@@ -2,6 +2,7 @@ import Application from './application';
 import Debug from 'debug';
 const debug = Debug('trpg:core');
 import internal from './internal/internal';
+import exitHook from 'async-exit-hook';
 
 type Config = {
   [name: string]: string | number | {};
@@ -16,6 +17,12 @@ export default function createApplication(conf: Config): Application {
 
   // 注册内部模块
   app.load(internal);
+
+  exitHook(async (cb) => {
+    console.log('正在关闭应用...');
+    await app.close();
+    cb();
+  });
 
   return app;
 }
