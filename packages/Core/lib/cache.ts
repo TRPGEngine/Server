@@ -307,12 +307,14 @@ export class RedisCache implements ICache {
     options = Object.assign({}, defaultOption, options);
 
     debug('[redis]', `set ${key} to ${JSON.stringify(value)}`);
-    this.redis.set(key, JSON.stringify(value));
-    if (options.expires > 0) {
-      // 使用redis内置的过期机制
-      this.redis.pexpire(key, options.expires);
+
+    const expires = options.expires;
+    if (_.isNumber(expires) && expires > 0) {
+      // 增加过期时间且以毫秒为单位
+      return this.redis.set(key, JSON.stringify(value), 'PX', options.expires);
+    } else {
+      return this.redis.set(key, JSON.stringify(value));
     }
-    return this.redis.set(key, JSON.stringify(value));
   }
 
   async rpush(key: string, ...values: any[]): Promise<void> {
