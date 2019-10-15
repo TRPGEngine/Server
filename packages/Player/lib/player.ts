@@ -6,6 +6,7 @@ const Geetest = require('gt3-sdk');
 import md5 from './utils/md5';
 import sha1 from './utils/sha1';
 import PlayerList from './list';
+import memoizeOne from 'memoize-one';
 import PlayerUserDefinition, { PlayerUser } from './models/user';
 import PlayerInviteDefinition from './models/invite';
 import PlayerLoginLogDefinition, { PlayerLoginLog } from './models/login-log';
@@ -34,6 +35,7 @@ import {
   PlayerManagerPlayerMapItem,
 } from './managers/player-manager';
 import { Socket } from 'trpg/core';
+import { AxiosResponse } from 'axios';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -283,13 +285,7 @@ export default class Player extends BasePackage {
           }
 
           debug('请求ip信息地址:', ip);
-          const info = await app.request.post(
-            'http://ip.taobao.com/service/getIpInfo2.php',
-            'ip=' + ip,
-            {
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            }
-          );
+          const info = await this.requestIpInfo(ip);
           if (info.code === 0) {
             // 请求成功
             const data = info.data;
@@ -309,6 +305,32 @@ export default class Player extends BasePackage {
       }
     });
   }
+
+  /**
+   * 请求IP信息
+   * 缓存相同IP的信息
+   */
+  private requestIpInfo = memoizeOne(
+    (
+      ip: string
+    ): Promise<
+      AxiosResponse<{
+        city: string;
+        country: string;
+        county: string;
+        isp: string;
+        region: string;
+      }> & { code: number }
+    > => {
+      return this.app.request.post(
+        'http://ip.taobao.com/service/getIpInfo2.php',
+        `ip=${ip}`,
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
+    }
+  );
 }
 
 // function initReset() {
