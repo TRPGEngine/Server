@@ -343,11 +343,13 @@ export class RedisCache implements ICache {
   async get(key: string): Promise<CacheValue> {
     key = this.genKey(key);
     const val = await this.redis.get(key);
+    debug('[redis]', `get ${key}: ${JSON.stringify(val)}`);
     return JSON.parse(val);
   }
 
   async getWithGlob(glob: string): Promise<{ [key: string]: CacheValue }> {
     const keys = await this.keys(glob);
+    debug('[redis]', `get keys with ${glob}`);
     if (keys.length > 0) {
       const values = await Promise.all(keys.map((key) => this.get(key)));
       return _.zipObject(keys, values);
@@ -358,17 +360,20 @@ export class RedisCache implements ICache {
   async sadd(key: string, value: CacheValue): Promise<void> {
     key = this.genKey(key);
     await this.redis.sadd(key, this.normalizeVal(value));
+    debug('[redis]', `sadd ${key} with ${JSON.stringify(value)}`);
   }
 
   async srem(key: string, value: CacheValue): Promise<void> {
     key = this.genKey(key);
 
     await this.redis.srem(key, this.normalizeVal(value));
+    debug('[redis]', `srem ${key} with ${JSON.stringify(value)}`);
   }
 
   async smembers(key: string): Promise<CacheValue[]> {
     key = this.genKey(key);
     const members = await this.redis.smembers(key);
+    debug('[redis]', `smembers ${key}: ${JSON.stringify(members)}`);
     return members.map(this.parseVal);
   }
 
@@ -376,13 +381,14 @@ export class RedisCache implements ICache {
     key = this.genKey(key);
 
     const ret = await this.redis.sismember(key, this.normalizeVal(value));
-
+    debug('[redis]', `sismember ${key}: ${ret}`);
     return Boolean(ret);
   }
 
   async lget(key: string): Promise<CacheValue[]> {
     key = this.genKey(key);
     const arr: string[] = await this.redis.lrange(key, 0, -1); // 获取所有值
+    debug('[redis]', `lget ${key}: ${JSON.stringify(arr)}`);
     return arr.map(this.parseVal);
   }
 
@@ -397,12 +403,14 @@ export class RedisCache implements ICache {
       index,
       _.isObject(value) ? JSON.stringify(value) : value
     );
+    debug('[redis]', `lset ${key}[${index}]: ${value}`);
 
     return value;
   }
 
   remove(key: string): Promise<number> {
     key = this.genKey(key);
+    debug('[redis]', `remove ${key}`);
     return this.redis.del(key);
   }
 
@@ -416,6 +424,7 @@ export class RedisCache implements ICache {
     const timestamp = new Date().valueOf().toString(); // 锁的值任意
     const ret = await this.redis.set(key, timestamp, 'EX', 10, 'NX');
     if (ret === 'OK') {
+      debug('[redis]', `lock ${key} success`);
       return true;
     } else {
       return false;
@@ -424,6 +433,7 @@ export class RedisCache implements ICache {
 
   async unlock(key: string): Promise<void> {
     key = 'lock:' + this.genKey(key);
+    debug('[redis]', `unlock ${key}`);
     await this.redis.del(key);
   }
 
