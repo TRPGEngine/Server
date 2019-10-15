@@ -47,6 +47,9 @@ export const create: EventFunc<{
 
   await group.setOwner(user);
   await app.group.addGroupMemberAsync(group.uuid, userUUID);
+
+  await app.player.manager.joinRoom(group.uuid, socket); // 加入房间
+
   return { group };
 };
 

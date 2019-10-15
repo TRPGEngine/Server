@@ -427,6 +427,7 @@ export class RedisCache implements ICache {
       debug('[redis]', `lock ${key} success`);
       return true;
     } else {
+      debug('[redis]', `lock ${key} failed`);
       return false;
     }
   }

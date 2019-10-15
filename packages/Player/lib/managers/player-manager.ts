@@ -398,19 +398,18 @@ class PlayerManager extends EventEmitter {
     // 从在线列表中移除
     await this.cache.srem(ONLINE_PLAYER_KEY, uuidKey);
 
-    // 离开房间
     const player = this.findPlayerWithUUIDPlatform(uuid, platform);
+    const socket = player.socket;
+    delete this.players[socket.id]; // 从本地的会话管理列表中移除
+
+    // 离开房间
     if (!player) {
       return;
     }
     const rooms = Array.from(player.rooms); // 浅拷贝一波
-    const socket = player.socket;
     await Promise.all(
       rooms.map((roomUUID) => this.leaveRoom(roomUUID, socket))
     ).then(() => debug(`[PlayerManager] 用户[${uuid}]已离开所有房间`));
-
-    // 从本地的会话管理列表中移除
-    delete this.players[socket.id];
   }
 
   /**
