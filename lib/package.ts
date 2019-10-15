@@ -3,7 +3,7 @@ import {
   ModelFn,
   Model,
   EventFunc,
-  JobCallback,
+  ScheduleJobFn,
 } from 'trpg/core';
 import Router from 'koa-router';
 import Debug, { Debugger } from 'debug';
@@ -137,7 +137,7 @@ export default abstract class BasePackage {
    * @param rule 计划任务执行规则
    * @param fn 计划任务方法
    */
-  protected regScheduleJob(name: string, rule: string, fn: JobCallback) {
+  protected regScheduleJob(name: string, rule: string, fn: ScheduleJobFn) {
     this.app.registerScheduleJob(name, rule, fn);
   }
 

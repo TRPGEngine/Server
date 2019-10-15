@@ -372,7 +372,7 @@ export const logout: EventFunc<{
 
     // 从列表中移除
     if (!!app.player) {
-      app.player.manager.removePlayer(user.uuid, isApp ? 'app' : 'web');
+      await app.player.manager.removePlayer(user.uuid, isApp ? 'app' : 'web');
     }
 
     return true;

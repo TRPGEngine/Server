@@ -1,7 +1,7 @@
 import events from 'events';
 import Debug from 'debug';
 const debug = Debug('trpg:application');
-import schedule, { JobCallback, Job } from 'node-schedule';
+import schedule, { Job } from 'node-schedule';
 import fs from 'fs-extra';
 import path from 'path';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
@@ -17,6 +17,7 @@ const logger = getLogger();
 const appLogger = getLogger('application');
 import xss from 'xss';
 import BasePackage from 'lib/package';
+import { CoreSchedulejobRecord } from './internal/models/schedulejob-record';
 
 type AppSettings = {
   [key: string]: string | number | {};
@@ -27,10 +28,20 @@ type InternalEvents = {
   [eventName: string]: Array<InternalEventFunc>;
 };
 
+type CloseTaskFunc = () => Promise<void>;
+type CloseTasks = {
+  [packageName: string]: CloseTaskFunc;
+};
+
 type ScheduleJob = {
   name: string;
   job: Job;
 };
+
+type ScheduleJobFnRet = void | string;
+export type ScheduleJobFn = (
+  fireDate: Date
+) => Promise<ScheduleJobFnRet> | ScheduleJobFnRet;
 
 export class Application extends events.EventEmitter {
   settings: AppSettings = {}; // 设置配置列表
@@ -46,6 +57,7 @@ export class Application extends events.EventEmitter {
   statInfoJob = []; // 统计信息任务
   job: Job = null; // node-schedule定时任务(每日凌晨2点)
   scheduleJob: ScheduleJob[] = []; // 计划任务列表
+  closeTasks: CloseTasks = {}; // 关闭任务队列(当触发关闭应用时执行这些任务)
   testcase = [];
   [packageInject: string]: any; // 包注入的方法
 
@@ -127,29 +139,44 @@ export class Application extends events.EventEmitter {
     }
   }
   initStatJob() {
-    const run = async () => {
-      try {
+    const run = () =>
+      this.cache.lockScope('core:statjob', async () => {
         applog('start statistics project info...');
-        let info: any = {};
-        for (let job of this.statInfoJob) {
-          const name = job.name;
-          const fn = job.fn;
-          const res = await fn();
-          applog('|- [%s]:%o', name, res);
-          if (res) {
-            info[name] = res;
+        const record = await CoreSchedulejobRecord.createRecord(
+          'stat-info',
+          'stat'
+        );
+        try {
+          const info: any = {};
+          for (let job of this.statInfoJob) {
+            const name = job.name;
+            const fn = job.fn;
+            const res = await fn();
+            applog('|- [%s]:%o', name, res);
+            if (res) {
+              info[name] = res;
+            }
           }
+          info._updated = new Date().getTime();
+          await fs.writeJson(path.resolve(process.cwd(), './stat.json'), info, {
+            spaces: 2,
+          });
+
+          // 记录结果
+          record.completed = true;
+          record.result = JSON.stringify(info);
+          record.save();
+          applog('statistics completed!');
+        } catch (e) {
+          console.error('statistics error:', e);
+          this.error(e);
+
+          // 记录结果
+          record.completed = false;
+          record.result = String(e);
+          record.save();
         }
-        info._updated = new Date().getTime();
-        await fs.writeJson(path.resolve(process.cwd(), './stat.json'), info, {
-          spaces: 2,
-        });
-        applog('statistics completed!');
-      } catch (e) {
-        console.error('statistics error:', e);
-        this.error(e);
-      }
-    };
+      });
 
     // 每天凌晨2点统计一遍
     this.job = schedule.scheduleJob('0 0 2 * * *', run);
@@ -223,7 +250,7 @@ export class Application extends events.EventEmitter {
     this.webApi[path] = fn;
   }
 
-  registerStatJob(statName, statCb) {
+  registerStatJob(statName: string, statCb) {
     for (let s of this.statInfoJob) {
       if (s.name === statName) {
         applog(`stat info [${statName}] has been registered`);
@@ -244,15 +271,36 @@ export class Application extends events.EventEmitter {
    * @param rule 计划任务执行规则
    * @param fn 计划任务方法
    */
-  registerScheduleJob(name: string, rule: string, fn: JobCallback) {
-    for (let s of this.statInfoJob) {
+  registerScheduleJob(name: string, rule: string, fn: ScheduleJobFn) {
+    for (let s of this.scheduleJob) {
       if (s.name === name) {
         applog(`schedule job [${name}] has been registered`);
         return;
       }
     }
 
-    const job = schedule.scheduleJob(name, rule, fn);
+    const job = schedule.scheduleJob(name, rule, (fireDate: Date) => {
+      // 计划任务方法
+      this.cache.lockScope(`core:scheduleJob:${name}`, async () => {
+        const record = await CoreSchedulejobRecord.createRecord(
+          name,
+          'schedule'
+        );
+        try {
+          applog(`start schedule job ${name}`);
+          const result = await fn(fireDate);
+          record.completed = true;
+          record.result = result || null;
+          record.save();
+        } catch (err) {
+          console.error('schedule job error:', err);
+          this.error(err);
+          record.completed = false;
+          record.result = String(err);
+          record.save();
+        }
+      });
+    });
     applog(
       'register schedule job [%s](nextDate: %o)',
       name,
@@ -262,6 +310,19 @@ export class Application extends events.EventEmitter {
       name,
       job,
     });
+  }
+
+  /**
+   * 注册关闭事件， 当应用进程退出时执行
+   * @param fn 事件方法
+   */
+  registerCloseTask(packageName: string, fn: CloseTaskFunc): void {
+    if (this.closeTasks[packageName]) {
+      debug(`add [${packageName}] close task failed: exist one`);
+      return;
+    }
+    debug(`add [${packageName}] close task`);
+    this.closeTasks[packageName] = fn;
   }
 
   request = {
@@ -303,17 +364,29 @@ export class Application extends events.EventEmitter {
 
   async close() {
     debug('closing....');
-    await this.storage.close();
-    await this.socketservice.close();
     // 清理timer
+    await this.socketservice
+      .close()
+      .then(() => debug('closed socketservice service'));
     for (let timer of this.timers) {
       clearInterval(timer);
     }
     this.timers = [];
     this.job.cancel();
     this.scheduleJob.forEach(({ job }) => job.cancel()); // 关闭计划任务列表
+    debug('closed all scheduleJob');
     this.cache.close(); // 关闭redis连接
+    // 执行关闭事件
+    await Promise.all(
+      Object.entries(this.closeTasks).map(([packageName, fn]) =>
+        fn()
+          .then(() => debug(`closeTask: [${packageName}] success`))
+          .catch((err) => debug(`closeTask: [${packageName}] error %o`, err))
+      )
+    ).then(() => debug('completed all close task'));
     this.emit('close');
+    await this.storage.close().then(() => debug('closed storage service'));
+
     debug('close completed!');
   }
 

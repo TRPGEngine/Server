@@ -2,6 +2,7 @@ import BasePackage from 'lib/package';
 import CoreSystemLogDefinition from './models/system-log';
 import CoreGlobalConfigDefinition from './models/global-config';
 import CoreMetricsDefinition, { CoreMetrics } from './models/metrics';
+import CoreSchedulejobHistoryDefinition from './models/schedulejob-record';
 import Debug from 'debug';
 const debug = Debug('trpg:component:internal');
 
@@ -21,6 +22,7 @@ export default class Core extends BasePackage {
     this.regModel(CoreSystemLogDefinition);
     this.regModel(CoreGlobalConfigDefinition);
     this.regModel(CoreMetricsDefinition);
+    this.regModel(CoreSchedulejobHistoryDefinition);
 
     this.regRoute(CoreRouter);
     this.regRoute(MetricsRouter);

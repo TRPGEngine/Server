@@ -11,10 +11,10 @@ import { EventEmitter } from 'events';
 import Debug from 'debug';
 const debug = Debug('trpg:component:player:manager');
 
-const ONLINE_PLAYER_KEY = 'player:online_player_uuid_list';
-const CHANNEL_KEY = 'player:player_manager_channel';
+const ONLINE_PLAYER_KEY = 'player:manager:online_player_uuid_list';
+const CHANNEL_KEY = 'player:manager:channel';
 const TICK_PLAYER_EVENTNAME = 'player::tick';
-const getRoomKey = (uuid: string) => `player:player_manager_room#${uuid}`;
+const getRoomKey = (uuid: string) => `player:manager:room#${uuid}`;
 
 // 消息类型: 单播 房间广播 全体广播
 type PlayerMsgPayloadType = 'unicast' | 'roomcase' | 'broadcast';
@@ -157,8 +157,7 @@ class PlayerManager extends EventEmitter {
       socket.emit(eventName, data);
 
       if (eventName === TICK_PLAYER_EVENTNAME) {
-        // 如果为踢出的话。还要断开连接并移除player
-        socket.disconnect();
+        // 如果为踢出的话。还要移除player
         this.removePlayer(player.uuid, player.platform);
       }
     }
@@ -214,7 +213,9 @@ class PlayerManager extends EventEmitter {
     const socketId = socket.id;
     await this.cache.srem(roomKey, socketId);
     const player = this.players[socketId];
-    player.rooms.delete(roomUUID);
+    if (player && _.isSet(player.rooms)) {
+      player.rooms.delete(roomUUID);
+    }
   }
 
   async leaveRoomWithUUID(roomUUID: string, uuid: string): Promise<void> {
@@ -279,17 +280,17 @@ class PlayerManager extends EventEmitter {
    */
   async close() {
     try {
-      _.invoke(this.pubClient, 'disconnect');
-      _.invoke(this.subClient, 'disconnect');
-
       // 移除用户
       await Promise.all(
         Object.values(this.players).map((player) =>
           this.removePlayer(player.uuid, player.platform)
         )
       ).then(() => debug('[PlayerManager] 移除所有用户成功'));
+
+      _.invoke(this.pubClient, 'disconnect');
+      _.invoke(this.subClient, 'disconnect');
     } catch (err) {
-      console.error('[PlayerManager] close error', err);
+      console.error('[PlayerManager] 关闭失败', err);
     }
   }
 
@@ -398,19 +399,22 @@ class PlayerManager extends EventEmitter {
     // 从在线列表中移除
     await this.cache.srem(ONLINE_PLAYER_KEY, uuidKey);
 
-    // 离开房间
     const player = this.findPlayerWithUUIDPlatform(uuid, platform);
+    const socket = player.socket;
+    delete this.players[socket.id]; // 从本地的会话管理列表中移除
+
+    if (!socket.connected) {
+      socket.disconnect();
+    }
+
+    // 离开房间
     if (!player) {
       return;
     }
     const rooms = Array.from(player.rooms); // 浅拷贝一波
-    const socket = player.socket;
     await Promise.all(
       rooms.map((roomUUID) => this.leaveRoom(roomUUID, socket))
     ).then(() => debug(`[PlayerManager] 用户[${uuid}]已离开所有房间`));
-
-    // 从本地的会话管理列表中移除
-    delete this.players[socket.id];
   }
 
   /**
