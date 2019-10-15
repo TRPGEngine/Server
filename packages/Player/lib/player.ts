@@ -58,6 +58,8 @@ export default class Player extends BasePackage {
     this.initSocket();
     this.initRouters();
     this.initTimer();
+
+    this.app.registerCloseTask('Player', () => this.app.player.manager.close());
   }
 
   private initConfig() {
@@ -168,21 +170,25 @@ export default class Player extends BasePackage {
       },
       // 记录用户离线时间
       recordUserOfflineDate: async function(socket: Socket) {
-        const player = app.player.manager.findPlayer(socket);
-        if (player) {
-          // 如果该用户已登录
-          const lastLog = await PlayerLoginLog.findOne({
-            where: {
-              user_uuid: player.uuid,
-              socket_id: socket.id,
-            },
-            order: [['id', 'desc']],
-          });
-          if (lastLog) {
-            // 如果有记录则更新，没有记录则无视
-            lastLog.offline_date = new Date();
-            await lastLog.save();
+        try {
+          const player = app.player.manager.findPlayer(socket);
+          if (player) {
+            // 如果该用户已登录
+            const lastLog = await PlayerLoginLog.findOne({
+              where: {
+                user_uuid: player.uuid,
+                socket_id: socket.id,
+              },
+              order: [['id', 'desc']],
+            });
+            if (lastLog) {
+              // 如果有记录则更新，没有记录则无视
+              lastLog.offline_date = new Date();
+              await lastLog.save();
+            }
           }
+        } catch (err) {
+          console.error('recordUserOfflineDate error', err);
         }
       },
       /**
