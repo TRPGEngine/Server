@@ -15,6 +15,8 @@ const ONLINE_PLAYER_KEY = 'player:manager:online_player_uuid_list';
 const CHANNEL_KEY = 'player:manager:channel';
 const TICK_PLAYER_EVENTNAME = 'player::tick';
 const getRoomKey = (uuid: string) => `player:manager:room#${uuid}`;
+const getProtectOnlinePlayerLockKey = (uuid: string, platform: Platform) =>
+  `player:manager:player:protect:${uuid}:${platform}`; // 用于保护自己踢自己时不会在登录后被踢出导致明明登录了却在在线列表上不存在的问题
 
 // 消息类型: 单播 房间广播 全体广播
 type PlayerMsgPayloadType = 'unicast' | 'roomcase' | 'broadcast';
@@ -334,6 +336,7 @@ class PlayerManager extends EventEmitter {
     const isExist = await this.cache.sismember(ONLINE_PLAYER_KEY, uuidKey);
     if (isExist) {
       // 如果已存在则踢掉用户
+      await this.cache.lock(getProtectOnlinePlayerLockKey(uuid, platform));
       await this.tickPlayer(uuid, platform);
     } else {
       // 不存在则新增
@@ -396,9 +399,6 @@ class PlayerManager extends EventEmitter {
     debug('[PlayerManager] remove player %s[%s]', uuid, platform);
     const uuidKey = this.getUUIDKey(uuid, platform);
 
-    // 从在线列表中移除
-    await this.cache.srem(ONLINE_PLAYER_KEY, uuidKey);
-
     const player = this.findPlayerWithUUIDPlatform(uuid, platform);
     const socket = player.socket;
     delete this.players[socket.id]; // 从本地的会话管理列表中移除
@@ -406,6 +406,18 @@ class PlayerManager extends EventEmitter {
     if (!socket.connected) {
       socket.disconnect();
     }
+
+    // 检查该在线用户是否受保护
+    const isProtect = await this.cache.lock(
+      getProtectOnlinePlayerLockKey(uuid, platform)
+    );
+    if (!isProtect) {
+      // 如果没有受到删除保护，则移除
+      // 从在线列表中移除
+      await this.cache.srem(ONLINE_PLAYER_KEY, uuidKey);
+    }
+    // 该保护只生效一次
+    await this.cache.unlock(getProtectOnlinePlayerLockKey(uuid, platform));
 
     // 离开房间
     if (!player) {
