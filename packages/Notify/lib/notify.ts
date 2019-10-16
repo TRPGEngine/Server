@@ -155,7 +155,7 @@ function initFunction() {
       }
       await upush.sendNotifyMsg(app, message, title, extraBody);
       debug(
-        'send chat notify finished! to uuid %s[%s]: %s, %s',
+        'send chat notify finished! to uuid %s[%s]: {%s: %s}',
         to_uuid,
         upush.registration_id,
         title,
