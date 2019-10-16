@@ -15,8 +15,6 @@ const ONLINE_PLAYER_KEY = 'player:manager:online_player_uuid_list';
 const CHANNEL_KEY = 'player:manager:channel';
 const TICK_PLAYER_EVENTNAME = 'player::tick';
 const getRoomKey = (uuid: string) => `player:manager:room#${uuid}`;
-const getProtectOnlinePlayerLockKey = (uuid: string, platform: Platform) =>
-  `player:manager:player:protect:${uuid}:${platform}`; // 用于保护自己踢自己时不会在登录后被踢出导致明明登录了却在在线列表上不存在的问题
 
 // 消息类型: 单播 房间广播 全体广播
 type PlayerMsgPayloadType = 'unicast' | 'roomcase' | 'broadcast';
@@ -160,7 +158,11 @@ class PlayerManager extends EventEmitter {
 
       if (eventName === TICK_PLAYER_EVENTNAME) {
         // 如果为踢出的话。还要移除player
-        this.removePlayer(player.uuid, player.platform);
+        this.removePlayer(
+          player.uuid,
+          player.platform,
+          _.get(data, 'by') === 'self'
+        );
       }
     }
   }
@@ -336,8 +338,7 @@ class PlayerManager extends EventEmitter {
     const isExist = await this.cache.sismember(ONLINE_PLAYER_KEY, uuidKey);
     if (isExist) {
       // 如果已存在则踢掉用户
-      await this.cache.lock(getProtectOnlinePlayerLockKey(uuid, platform));
-      await this.tickPlayer(uuid, platform);
+      await this.tickPlayer(uuid, platform, 'self');
     } else {
       // 不存在则新增
       await this.cache.sadd(ONLINE_PLAYER_KEY, uuidKey);
@@ -394,12 +395,20 @@ class PlayerManager extends EventEmitter {
    * 移除玩家
    * @param uuid uuid
    * @param platform 平台
+   * @param retainStatus 是否保留用户登录状态，用于用户自己踢自己
    */
-  async removePlayer(uuid: string, platform: Platform = 'web'): Promise<void> {
+  async removePlayer(
+    uuid: string,
+    platform: Platform = 'web',
+    retainStatus: boolean = false
+  ): Promise<void> {
     debug('[PlayerManager] remove player %s[%s]', uuid, platform);
     const uuidKey = this.getUUIDKey(uuid, platform);
 
     const player = this.findPlayerWithUUIDPlatform(uuid, platform);
+    if (!player) {
+      return;
+    }
     const socket = player.socket;
     delete this.players[socket.id]; // 从本地的会话管理列表中移除
 
@@ -407,26 +416,17 @@ class PlayerManager extends EventEmitter {
       socket.disconnect();
     }
 
-    // 检查该在线用户是否受保护
-    const isProtect = await this.cache.lock(
-      getProtectOnlinePlayerLockKey(uuid, platform)
-    );
-    if (!isProtect) {
-      // 如果没有受到删除保护，则移除
-      // 从在线列表中移除
-      await this.cache.srem(ONLINE_PLAYER_KEY, uuidKey);
+    if (!retainStatus) {
+      // 离开房间
+      await Promise.all([
+        this.cache.srem(ONLINE_PLAYER_KEY, uuidKey), // 如果不需要保留登录状态 则移除用户的登录状态
+        ...Array.from(player.rooms).map((roomUUID) =>
+          this.leaveRoom(roomUUID, socket)
+        ),
+      ]).then(() =>
+        debug(`[PlayerManager] 用户[${uuid}]已移除登录状态并已离开所有房间并`)
+      );
     }
-    // 该保护只生效一次
-    await this.cache.unlock(getProtectOnlinePlayerLockKey(uuid, platform));
-
-    // 离开房间
-    if (!player) {
-      return;
-    }
-    const rooms = Array.from(player.rooms); // 浅拷贝一波
-    await Promise.all(
-      rooms.map((roomUUID) => this.leaveRoom(roomUUID, socket))
-    ).then(() => debug(`[PlayerManager] 用户[${uuid}]已离开所有房间`));
   }
 
   /**
@@ -434,10 +434,16 @@ class PlayerManager extends EventEmitter {
    * @param uuid 用户UUID
    * @param platform 用户平台
    */
-  async tickPlayer(uuid: string, platform: Platform): Promise<void> {
+  async tickPlayer(
+    uuid: string,
+    platform: Platform,
+    by: string = ''
+  ): Promise<void> {
+    debug(`用户[${platform}#${uuid}]被踢出 by ${by}`);
     const uuidKey = this.getUUIDKey(uuid, platform);
     await this.unicastSocketEvent(uuidKey, TICK_PLAYER_EVENTNAME, {
       msg: '你已在其他地方登陆',
+      by,
     });
   }
 
