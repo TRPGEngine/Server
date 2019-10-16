@@ -9,7 +9,7 @@ import _ from 'lodash';
 import { IOSessionMiddleware } from './utils/iosession';
 import Storage, { TRPGDbOptions } from './storage';
 import { Cache, RedisCache, ICache } from './cache';
-const ReportService = require('./report');
+import ReportService from './report';
 import WebService from './webservice';
 import SocketService, { EventFunc } from './socket';
 import { getLogger } from './logger';
@@ -47,7 +47,7 @@ export class Application extends events.EventEmitter {
   settings: AppSettings = {}; // 设置配置列表
   storage: Storage = null; // 数据库服务列表
   cache: ICache = null; // 缓存服务
-  reportservice = null; // 汇报服务
+  reportservice: ReportService = null; // 汇报服务
   webservice: WebService = null; // 网页服务
   socketservice: SocketService = null; // websocket服务
   components: BasePackage[] | Function[] = []; // 组件列表
