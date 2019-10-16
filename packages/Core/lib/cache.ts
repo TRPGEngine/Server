@@ -1,9 +1,9 @@
-const util = require('util');
 import Redis from 'ioredis';
 import Debug from 'debug';
 const debug = Debug('trpg:cache');
 import _ from 'lodash';
 import minimatch from 'minimatch';
+import { sleep } from 'lib/helper/utils';
 
 export type CacheValue = string | number | {};
 interface CacheOptions {
@@ -11,6 +11,13 @@ interface CacheOptions {
 }
 interface RedisOpts {
   url: string;
+}
+
+interface LockScopeOpts {
+  /**
+   * 任务完成后延迟解锁 单位毫秒
+   */
+  unlockDelay: number;
 }
 
 const defaultOption: CacheOptions = {
@@ -103,7 +110,11 @@ export interface ICache {
    * @param key 锁名
    * @param scope 锁作用范围
    */
-  lockScope(key: string, scope: () => Promise<void>): Promise<void>;
+  lockScope(
+    key: string,
+    scope: () => Promise<void>,
+    options?: LockScopeOpts
+  ): Promise<void>;
 }
 
 export class Cache implements ICache {
@@ -440,7 +451,11 @@ export class RedisCache implements ICache {
     await this.redis.del(key);
   }
 
-  async lockScope(key: string, scope: () => Promise<void>) {
+  async lockScope(
+    key: string,
+    scope: () => Promise<void>,
+    options?: LockScopeOpts
+  ) {
     const isSuccess = await this.lock(key);
     if (!isSuccess) {
       // 如果没有获得锁，则跳过
@@ -449,6 +464,11 @@ export class RedisCache implements ICache {
 
     try {
       await scope();
+
+      const unlockDelay = _.get(options, 'unlockDelay');
+      if (_.isNumber(unlockDelay) && unlockDelay > 0) {
+        await sleep(unlockDelay);
+      }
     } finally {
       await this.unlock(key);
     }
