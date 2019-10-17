@@ -467,7 +467,7 @@ class PlayerManager extends EventEmitter {
    */
   async checkPlayerOnline(uuid: string): Promise<boolean> {
     const members = await this.cache.smembers(ONLINE_PLAYER_KEY);
-    return members.map(this.getUUIDFromKey).findIndex((x) => x === uuid) > 0;
+    return members.map(this.getUUIDFromKey).includes(uuid);
   }
 }
 

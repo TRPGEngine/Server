@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -9,12 +9,14 @@
     "pro": "cross-env NODE_ENV=production npm run run:standard",
     "run:standard": "node standard.js",
     "run:nodemon": "nodemon standard.js",
-    "packages:install": "sh packages/foreach.sh 'npm install'",
+    "packages:install": "bash packages/foreach.sh 'npm install'",
     "prettier:all": "prettier --write \"./packages/**/*.{js,ts}\"",
     "db:migrate:generate": "node ./cli.js generate-migrate",
     "db:migrate:run": "node ./cli.js run-migrate",
     "db:seeder:generate": "node ./cli.js generate-seeder",
     "db:seeder:run": "node ./cli.js run-seeder",
+    "docker:dev:build": "docker build . -t trpg-server:dev",
+    "docker:dev:shell": "docker run -it --rm --name=\"trpg-dev\" trpg-server:dev bash",
     "doc:start": "cd ./packages/Website && npm start",
     "playground": "node ./playground/playground.js --experimental-repl-await",
     "bench": "node ./test/bench/index.js && cat ./test/bench/out.log",

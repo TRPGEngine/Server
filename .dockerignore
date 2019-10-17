@@ -1,4 +1,8 @@
 node_modules
+packages/**/node_modules
+public/
+logs/
+
 npm-debug.log
 Dockerfile*
 docker-compose*

@@ -9,7 +9,7 @@ import _ from 'lodash';
 import { IOSessionMiddleware } from './utils/iosession';
 import Storage, { TRPGDbOptions } from './storage';
 import { Cache, RedisCache, ICache } from './cache';
-const ReportService = require('./report');
+import ReportService from './report';
 import WebService from './webservice';
 import SocketService, { EventFunc } from './socket';
 import { getLogger } from './logger';
@@ -47,7 +47,7 @@ export class Application extends events.EventEmitter {
   settings: AppSettings = {}; // 设置配置列表
   storage: Storage = null; // 数据库服务列表
   cache: ICache = null; // 缓存服务
-  reportservice = null; // 汇报服务
+  reportservice: ReportService = null; // 汇报服务
   webservice: WebService = null; // 网页服务
   socketservice: SocketService = null; // websocket服务
   components: BasePackage[] | Function[] = []; // 组件列表
@@ -140,43 +140,53 @@ export class Application extends events.EventEmitter {
   }
   initStatJob() {
     const run = () =>
-      this.cache.lockScope('core:statjob', async () => {
-        applog('start statistics project info...');
-        const record = await CoreSchedulejobRecord.createRecord(
-          'stat-info',
-          'stat'
-        );
-        try {
-          const info: any = {};
-          for (let job of this.statInfoJob) {
-            const name = job.name;
-            const fn = job.fn;
-            const res = await fn();
-            applog('|- [%s]:%o', name, res);
-            if (res) {
-              info[name] = res;
+      this.cache.lockScope(
+        'core:statjob',
+        async () => {
+          applog('start statistics project info...');
+          const record = await CoreSchedulejobRecord.createRecord(
+            'stat-info',
+            'stat'
+          );
+          try {
+            const info: any = {};
+            for (let job of this.statInfoJob) {
+              const name = job.name;
+              const fn = job.fn;
+              const res = await fn();
+              applog('|- [%s]:%o', name, res);
+              if (res) {
+                info[name] = res;
+              }
             }
+            info._updated = new Date().getTime();
+            await fs.writeJson(
+              path.resolve(process.cwd(), './stat.json'),
+              info,
+              {
+                spaces: 2,
+              }
+            );
+
+            // 记录结果
+            record.completed = true;
+            record.result = JSON.stringify(info);
+            record.save();
+            applog('statistics completed!');
+          } catch (e) {
+            console.error('statistics error:', e);
+            this.error(e);
+
+            // 记录结果
+            record.completed = false;
+            record.result = String(e);
+            record.save();
           }
-          info._updated = new Date().getTime();
-          await fs.writeJson(path.resolve(process.cwd(), './stat.json'), info, {
-            spaces: 2,
-          });
-
-          // 记录结果
-          record.completed = true;
-          record.result = JSON.stringify(info);
-          record.save();
-          applog('statistics completed!');
-        } catch (e) {
-          console.error('statistics error:', e);
-          this.error(e);
-
-          // 记录结果
-          record.completed = false;
-          record.result = String(e);
-          record.save();
+        },
+        {
+          unlockDelay: 2000,
         }
-      });
+      );
 
     // 每天凌晨2点统计一遍
     this.job = schedule.scheduleJob('0 0 2 * * *', run);
@@ -281,25 +291,31 @@ export class Application extends events.EventEmitter {
 
     const job = schedule.scheduleJob(name, rule, (fireDate: Date) => {
       // 计划任务方法
-      this.cache.lockScope(`core:scheduleJob:${name}`, async () => {
-        const record = await CoreSchedulejobRecord.createRecord(
-          name,
-          'schedule'
-        );
-        try {
-          applog(`start schedule job ${name}`);
-          const result = await fn(fireDate);
-          record.completed = true;
-          record.result = result || null;
-          record.save();
-        } catch (err) {
-          console.error('schedule job error:', err);
-          this.error(err);
-          record.completed = false;
-          record.result = String(err);
-          record.save();
+      this.cache.lockScope(
+        `core:scheduleJob:${name}`,
+        async () => {
+          const record = await CoreSchedulejobRecord.createRecord(
+            name,
+            'schedule'
+          );
+          try {
+            applog(`start schedule job ${name}`);
+            const result = await fn(fireDate);
+            record.completed = true;
+            record.result = result || null;
+            record.save();
+          } catch (err) {
+            console.error('schedule job error:', err);
+            this.error(err);
+            record.completed = false;
+            record.result = String(err);
+            record.save();
+          }
+        },
+        {
+          unlockDelay: 2000,
         }
-      });
+      );
     });
     applog(
       'register schedule job [%s](nextDate: %o)',

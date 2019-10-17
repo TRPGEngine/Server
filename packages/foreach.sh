@@ -1,4 +1,6 @@
 #!/bin/bash
+#set -e
+
 cd `dirname $0`
 dirs=$(ls -l | awk '/^d/ {print $NF}')
 
