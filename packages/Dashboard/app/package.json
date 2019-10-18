@@ -121,7 +121,7 @@
     "umi-types": "^0.3.8",
     "webpack-theme-color-replacer": "^1.2.15"
   },
-  "optionalDependencies": {
+  "peerDependencies": {
     "puppeteer": "^1.17.0"
   },
   "engines": {
