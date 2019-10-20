@@ -424,7 +424,7 @@ class PlayerManager extends EventEmitter {
           this.leaveRoom(roomUUID, socket)
         ),
       ]).then(() =>
-        debug(`[PlayerManager] 用户[${uuid}]已移除登录状态并已离开所有房间并`)
+        debug(`[PlayerManager] 用户[${uuid}]已移除登录状态并已离开所有房间`)
       );
     }
   }
