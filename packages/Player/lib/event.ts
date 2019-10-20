@@ -219,6 +219,26 @@ export const loginWithToken: EventFunc<{
   }
 };
 
+/**
+ * 签发jwt 用于通用验证
+ */
+export const getWebToken: EventFunc<{}> = async function getWebToken(
+  data,
+  cb,
+  db
+) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '当前用户不存在';
+  }
+
+  const jwt = await PlayerUser.signJWT(player.uuid);
+
+  return { jwt };
+};
+
 export const register: EventFunc<{
   username: string;
   password: string;

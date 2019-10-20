@@ -14,6 +14,7 @@ import PlayerSettingsDefinition from './models/settings';
 import {
   login,
   loginWithToken,
+  getWebToken,
   register,
   getInfo,
   updateInfo,
@@ -211,6 +212,7 @@ export default class Player extends BasePackage {
   private initSocket() {
     this.regSocketEvent('player::login', login);
     this.regSocketEvent('player::loginWithToken', loginWithToken);
+    this.regSocketEvent('player::getWebToken', getWebToken);
     this.regSocketEvent('player::register', register);
     this.regSocketEvent('player::getInfo', getInfo);
     this.regSocketEvent('player::updateInfo', updateInfo);

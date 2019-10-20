@@ -43,6 +43,32 @@ export class PlayerUser extends Model {
   }
 
   /**
+   * 签发JWT
+   * 会进行缓存。在系统中缓存半天 签证1天过期
+   */
+  static async signJWT(uuid: string): Promise<string> {
+    const app = PlayerUser.getApplication();
+    const cacheKey = `player:jwt:${uuid}`;
+
+    const cachedJWT = await app.cache.get(cacheKey);
+    if (_.isString(cachedJWT) && cachedJWT !== '') {
+      return cachedJWT;
+    }
+
+    const user = await PlayerUser.findByUUID(uuid);
+
+    const jwt = app.jwtSign({
+      uuid: user.uuid,
+      name: user.getName(),
+      avatar: user.getAvatarUrl(),
+    });
+
+    await app.cache.set(cacheKey, jwt, { expires: 1000 * 60 * 60 * 12 });
+
+    return jwt;
+  }
+
+  /**
    * 根据用户UUID查找用户
    * @param userUUID 用户UUID
    */
