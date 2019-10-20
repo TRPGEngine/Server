@@ -37,6 +37,7 @@ import {
 } from './managers/player-manager';
 import { Socket } from 'trpg/core';
 import { AxiosResponse } from 'axios';
+import SSORouter from './routers/sso';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -251,6 +252,8 @@ export default class Player extends BasePackage {
       return next();
     });
     router.use('/player/register', register.routes());
+    this.regRoute(SSORouter);
+
     webservice.use(router.routes());
   }
 
