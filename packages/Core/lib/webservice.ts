@@ -161,6 +161,25 @@ export default class WebService {
       });
     }
 
+    // 返回结果处理
+    this.use(async (ctx, next) => {
+      const ret = await next();
+
+      if (!_.isUndefined(ret) && _.isUndefined(ctx.body)) {
+        if (typeof ret === 'boolean') {
+          ctx.body = {
+            result: ret,
+          };
+        } else if (typeof ret === 'string' || typeof ret === 'number') {
+          ctx.body = {
+            msg: ret,
+          };
+        } else if (typeof ret === 'object') {
+          ctx.body = ret;
+        }
+      }
+    });
+
     // 错误处理机制
     this.use(async (ctx, next) => {
       try {
