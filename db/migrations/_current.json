@@ -240,6 +240,11 @@
                     "field": "sign",
                     "seqType": "Sequelize.STRING"
                 },
+                "alignment": {
+                    "comment": "阵营: LG守序善良 NG中立善良 CG混乱善良 LN守序中立 TN绝对中立 CN混乱中立 LE守序邪恶 NE中立邪恶 CE混乱邪恶",
+                    "field": "alignment",
+                    "seqType": "Sequelize.ENUM('LG', 'NG', 'CG', 'LN', 'TN', 'CN', 'LE', 'NE', 'CE')"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -2763,5 +2768,5 @@
             "indexes": []
         }
     },
-    "revision": 24
+    "revision": 25
 }

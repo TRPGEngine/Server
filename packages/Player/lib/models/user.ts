@@ -6,6 +6,18 @@ import config from 'config';
 import _ from 'lodash';
 import { fn, col } from 'sequelize';
 
+// 阵营九宫格
+export type Alignment =
+  | 'LG'
+  | 'NG'
+  | 'CG'
+  | 'LN'
+  | 'TN'
+  | 'CN'
+  | 'LE'
+  | 'NE'
+  | 'CE';
+
 export class PlayerUser extends Model {
   id: number;
   uuid: string;
@@ -21,6 +33,7 @@ export class PlayerUser extends Model {
   app_token: string;
   sex: '男' | '女' | '其他' | '保密';
   sign: string;
+  alignment: Alignment;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
@@ -134,17 +147,18 @@ export class PlayerUser extends Model {
    */
   getInfo(includeToken = false) {
     return {
+      id: this.id,
+      uuid: this.uuid,
       username: this.username,
       nickname: this.nickname || this.username,
-      uuid: this.uuid,
       last_login: this.last_login,
-      createAt: this.createdAt,
-      id: this.id,
       avatar: this.avatar,
       token: includeToken ? this.token : '',
       app_token: includeToken ? this.app_token : '',
       sex: this.sex,
       sign: this.sign,
+      alignment: this.alignment,
+      createAt: this.createdAt,
     };
   }
 
@@ -198,6 +212,22 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
         defaultValue: '保密',
       },
       sign: { type: Sequelize.STRING },
+      alignment: {
+        // https://zh.moegirl.org/zh-hans/%E9%98%B5%E8%90%A5%E4%B9%9D%E5%AE%AB%E6%A0%BC
+        type: Sequelize.ENUM(
+          'LG',
+          'NG',
+          'CG',
+          'LN',
+          'TN',
+          'CN',
+          'LE',
+          'NE',
+          'CE'
+        ),
+        comment:
+          '阵营: LG守序善良 NG中立善良 CG混乱善良 LN守序中立 TN绝对中立 CN混乱中立 LE守序邪恶 NE中立邪恶 CE混乱邪恶',
+      },
     },
     {
       tableName: 'player_user',
