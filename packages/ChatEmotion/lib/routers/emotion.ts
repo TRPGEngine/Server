@@ -33,7 +33,7 @@ router.post(
   fileStorage(true, 'emotion'),
   async (ctx) => {
     const playerId = _.get(ctx, 'player.user.id');
-    const fileInfo = ctx.fileinfo;
+    const fileInfo = _.get(ctx, 'fileinfo');
     const fileId = fileInfo.id;
     const fileOriginalName = fileInfo.originalname;
     const uploadUrl = fileInfo.upload_url;

@@ -248,7 +248,7 @@ export default class Player extends BasePackage {
 
     const register = require('./routers/register');
     router.use((ctx, next) => {
-      ctx.geetest = this.geetest; // 中间件声明全局实例
+      (ctx as any).geetest = this.geetest; // 中间件声明全局实例
       return next();
     });
     router.use('/player/register', register.routes());

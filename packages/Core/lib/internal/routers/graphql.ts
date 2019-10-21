@@ -1,12 +1,12 @@
-import Router from 'koa-router';
-const router = new Router();
 import { renderPlaygroundPage } from '@apollographql/graphql-playground-html';
 import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo';
 import memoizeOne from 'memoize-one';
 import { isDev } from '../../utils/middleware';
 import { auth } from '../../utils/jwtauth';
 import { generateSchema } from '../graphql/generate-schema';
+import { TRPGRouter } from 'trpg/core';
 
+const router = new TRPGRouter();
 const getSchema = memoizeOne((db) => generateSchema(db));
 
 router.get('/graphql/playground', isDev(), (ctx) => {

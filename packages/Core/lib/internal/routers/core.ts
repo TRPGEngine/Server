@@ -1,9 +1,9 @@
-import Router from 'koa-router';
-const router = new Router();
 import fs from 'fs-extra';
 import path from 'path';
 import _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import { TRPGRouter } from 'trpg/core';
+const router = new TRPGRouter();
 
 const rootDir = path.resolve(__dirname, '../../../../../');
 
