@@ -8,8 +8,8 @@ log4js.configure({
   appenders: {
     datelog: {
       type: 'dateFile',
-      filename: './logs/',
-      pattern: 'debug/yyyyMMddhh.log',
+      filename: './logs/debug/log',
+      pattern: 'yyyyMMddhh',
       // "absolute": false,
       alwaysIncludePattern: true,
       compress: true,
