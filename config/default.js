@@ -60,6 +60,7 @@ module.exports = {
     },
   },
   oauth: {
+    enabled: ['qq'],
     // qq互联相关信息 required!
     qqconnect: {
       appid: '',
