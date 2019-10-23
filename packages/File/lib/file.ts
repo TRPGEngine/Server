@@ -9,6 +9,7 @@ import FileAvatarDefinition from './models/avatar';
 import FileChatimgDefinition from './models/chatimg';
 import FileFileDefinition from './models/file';
 import FileOSSDefinition from './models/oss';
+import FileDocumentDefinition from './models/document';
 
 function deleteall(path) {
   var files = [];
@@ -52,6 +53,7 @@ module.exports = function FileComponent(app) {
   app.storage.registerModel(FileChatimgDefinition);
   app.storage.registerModel(FileFileDefinition);
   app.storage.registerModel(FileOSSDefinition);
+  app.storage.registerModel(FileDocumentDefinition);
 
   app.on('initCompleted', function(app) {
     // 数据信息统计
