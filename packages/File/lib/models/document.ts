@@ -1,6 +1,6 @@
 import { Model, Orm, DBInstance } from 'trpg/core';
 
-class FileDocument extends Model {
+export class FileDocument extends Model {
   uuid: string;
   name: string;
   link: string;
