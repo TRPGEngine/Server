@@ -15,7 +15,7 @@ documentRouter.get('/document/view/:uuid', async (ctx) => {
   const uuid = ctx.params.uuid;
   const link = await FileDocument.viewDocumentLink(uuid);
 
-  return { link };
+  ctx.body = { link };
 });
 
 export default documentRouter;
