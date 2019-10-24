@@ -240,6 +240,11 @@
                     "field": "sign",
                     "seqType": "Sequelize.STRING"
                 },
+                "alignment": {
+                    "comment": "阵营: LG守序善良 NG中立善良 CG混乱善良 LN守序中立 TN绝对中立 CN混乱中立 LE守序邪恶 NE中立邪恶 CE混乱邪恶",
+                    "field": "alignment",
+                    "seqType": "Sequelize.ENUM('LG', 'NG', 'CG', 'LN', 'TN', 'CN', 'LE', 'NE', 'CE')"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -791,6 +796,58 @@
                     "onUpdate": "CASCADE",
                     "field": "fileId",
                     "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "file_document": {
+            "tableName": "file_document",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "required": true,
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "allowNull": false,
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "link": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "link",
+                    "seqType": "Sequelize.STRING"
+                },
+                "views": {
+                    "defaultValue": {
+                        "value": 0
+                    },
+                    "field": "views",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
                 }
             },
             "indexes": []
@@ -2763,5 +2820,5 @@
             "indexes": []
         }
     },
-    "revision": 24
+    "revision": 25
 }

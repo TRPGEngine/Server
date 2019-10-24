@@ -1,7 +1,8 @@
-import Router from 'koa-router';
-const router = new Router();
 import _ from 'lodash';
 import { NotifyUPush } from 'packages/Notify/lib/models/upush';
+import { TRPGRouter } from 'trpg/core';
+
+const router = new TRPGRouter();
 
 router.post('/send', async (ctx, next) => {
   const data = _.get(ctx, 'request.body');

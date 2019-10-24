@@ -14,6 +14,7 @@ const mail = require('../packages/Mail');
 const notify = require('../packages/Notify');
 const deploy = require('../packages/Deploy');
 const info = require('../packages/Info');
+const oauth = require('../packages/OAuth');
 
 module.exports = function loadModules(app) {
   app.load(player);
@@ -31,6 +32,7 @@ module.exports = function loadModules(app) {
   app.load(notify);
   app.load(deploy);
   app.load(info);
+  app.load(oauth);
 
   app.load(dashboard); // 尚未测试
 

@@ -14,6 +14,7 @@ import PlayerSettingsDefinition from './models/settings';
 import {
   login,
   loginWithToken,
+  getWebToken,
   register,
   getInfo,
   updateInfo,
@@ -36,6 +37,7 @@ import {
 } from './managers/player-manager';
 import { Socket } from 'trpg/core';
 import { AxiosResponse } from 'axios';
+import SSORouter from './routers/sso';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -211,6 +213,7 @@ export default class Player extends BasePackage {
   private initSocket() {
     this.regSocketEvent('player::login', login);
     this.regSocketEvent('player::loginWithToken', loginWithToken);
+    this.regSocketEvent('player::getWebToken', getWebToken);
     this.regSocketEvent('player::register', register);
     this.regSocketEvent('player::getInfo', getInfo);
     this.regSocketEvent('player::updateInfo', updateInfo);
@@ -245,10 +248,12 @@ export default class Player extends BasePackage {
 
     const register = require('./routers/register');
     router.use((ctx, next) => {
-      ctx.geetest = this.geetest; // 中间件声明全局实例
+      (ctx as any).geetest = this.geetest; // 中间件声明全局实例
       return next();
     });
     router.use('/player/register', register.routes());
+    this.regRoute(SSORouter);
+
     webservice.use(router.routes());
   }
 

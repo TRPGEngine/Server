@@ -7,6 +7,10 @@ import { sleep } from 'lib/helper/utils';
 
 export type CacheValue = string | number | {};
 interface CacheOptions {
+  /**
+   * 过期时间
+   * 单位为毫秒
+   */
   expires: number;
 }
 interface RedisOpts {

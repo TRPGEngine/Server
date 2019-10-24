@@ -1,13 +1,12 @@
 require('marko/node-require');
 import http from 'http';
-import Koa, { Middleware } from 'koa';
+import Koa from 'koa';
 import logger from 'koa-logger';
 import helmet from 'koa-helmet';
 import cors from '@koa/cors';
 import bodyParser from 'koa-bodyparser';
 import serve from 'koa-static';
 import session from 'koa-session';
-import Router from 'koa-router';
 import fs from 'fs-extra';
 import path from 'path';
 import jwt from 'jsonwebtoken';
@@ -22,9 +21,16 @@ import _ from 'lodash';
 import { TRPGApplication } from '../types/app';
 import { CacheValue } from './cache';
 import Application from './application';
+import { TRPGRouter, TRPGMiddleware } from '../types/webservice';
 
 const publicDir = path.resolve(process.cwd(), './public');
 const jwtIssuer = 'trpg';
+
+declare module 'koa' {
+  interface Context {
+    trpgapp: TRPGApplication;
+  }
+}
 
 class SessionStore {
   trpgapp: TRPGApplication;
@@ -226,7 +232,7 @@ export default class WebService {
    * 初始化路由
    */
   initRoute() {
-    const router = new Router();
+    const router = new TRPGRouter();
     // homepage
     if (!!this.homepage) {
       router.get('/', (ctx) => {
@@ -282,7 +288,7 @@ export default class WebService {
    * 插入中间件
    * @param middleware 中间件
    */
-  use(middleware: Middleware<any, any>) {
+  use(middleware: TRPGMiddleware) {
     this._app.use(middleware);
     return this;
   }

@@ -29,7 +29,7 @@ router.post(
       url: has_thumbnail
         ? '/avatar/thumbnail/' + filename
         : '/avatar/' + filename,
-      avatar: ctx.avatar,
+      avatar: _.get(ctx, 'avatar'),
       size,
     };
   }

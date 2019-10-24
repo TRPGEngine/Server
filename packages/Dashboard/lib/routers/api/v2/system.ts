@@ -1,6 +1,6 @@
-import Router from 'koa-router';
-const router = new Router();
 import _ from 'lodash';
+import { TRPGRouter } from 'trpg/core';
+const router = new TRPGRouter();
 
 interface AccountType {
   [username: string]: string;

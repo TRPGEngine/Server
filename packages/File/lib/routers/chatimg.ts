@@ -1,4 +1,3 @@
-import Router from 'koa-router';
 import upload from '../middleware/upload';
 import sha265 from '../middleware/sha256';
 import config from '../config';
@@ -7,9 +6,9 @@ import auth from '../middleware/auth';
 import uuid from 'uuid/v1';
 import _ from 'lodash';
 import request from 'request';
-import { TRPGApplication } from 'trpg/core';
+import { TRPGApplication, TRPGRouter } from 'trpg/core';
 
-let router = new Router();
+let router = new TRPGRouter();
 
 router.post(
   '/upload',
