@@ -2,7 +2,6 @@
 db/
 .DS_Store
 public
-package-lock.json
 
 # Logs
 logs
