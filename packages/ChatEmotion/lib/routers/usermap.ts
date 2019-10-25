@@ -1,9 +1,9 @@
-import Router from 'koa-router';
 import _ from 'lodash';
 import auth from 'packages/File/lib/middleware/auth';
 import { ChatEmotionCatalog } from '../models/catalog';
+import { TRPGRouter } from 'trpg/core';
 
-const router = new Router();
+const router = new TRPGRouter();
 
 /**
  * 用户添加表情包

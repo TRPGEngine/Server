@@ -4,8 +4,8 @@ import {
   Model,
   EventFunc,
   ScheduleJobFn,
+  TRPGRouter,
 } from 'trpg/core';
-import Router from 'koa-router';
 import Debug, { Debugger } from 'debug';
 
 export interface PackageMethodsType {
@@ -19,7 +19,7 @@ export default abstract class BasePackage {
   private _debug: Debugger;
   private _app: TRPGApplication;
   private _models: (typeof Model)[] = []; // 该包注册的数据库模型列表
-  private _router: Router; // 该包独有的Router
+  private _router: TRPGRouter; // 该包独有的Router
 
   constructor(app: TRPGApplication) {
     this._app = app;
@@ -53,7 +53,7 @@ export default abstract class BasePackage {
 
   get router() {
     if (!this._router) {
-      this._router = new Router();
+      this._router = new TRPGRouter();
     }
     return this._router;
   }
@@ -95,7 +95,7 @@ export default abstract class BasePackage {
     app.registerEvent(name, event);
   }
 
-  protected regRoute(route: Router) {
+  protected regRoute(route: TRPGRouter) {
     const scope = this.getPackageName().toLowerCase();
     this.router.use(`/${scope}`, route.routes());
   }
