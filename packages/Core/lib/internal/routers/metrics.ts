@@ -1,9 +1,9 @@
-import Router from 'koa-router';
-const router = new Router();
 import moment from 'moment';
 import { CoreMetrics } from '../models/metrics';
 import _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import { TRPGRouter } from 'trpg/core';
+const router = new TRPGRouter();
 
 // 获取统计信息的方法
 const getStatisInfo = memoizeOne((startDate, endDate) => {

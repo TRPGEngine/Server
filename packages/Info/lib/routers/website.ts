@@ -1,8 +1,8 @@
-import Router from 'koa-router';
 import _ from 'lodash';
 import { InfoWebsite } from '../models/Website';
+import { TRPGRouter } from 'trpg/core';
 
-const router = new Router();
+const router = new TRPGRouter();
 
 /**
  * 用户添加表情包

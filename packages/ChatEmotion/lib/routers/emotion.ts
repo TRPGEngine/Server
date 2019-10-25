@@ -1,5 +1,4 @@
-import Router from 'koa-router';
-import { TRPGApplication, Op } from 'trpg/core';
+import { TRPGApplication, Op, TRPGRouter } from 'trpg/core';
 import _ from 'lodash';
 import auth from 'packages/File/lib/middleware/auth';
 import upload from 'packages/File/lib/middleware/upload';
@@ -13,7 +12,7 @@ import { ChatEmotionCatalog } from '../models/catalog';
 import { ChatEmotionItem } from '../models/item';
 import { ChatEmotionSecretSignal } from '../models/secret-signal';
 
-const router = new Router();
+const router = new TRPGRouter();
 
 router.get('/getEmotionList', async (ctx) => {
   const list = await ChatEmotionItem.findAll();

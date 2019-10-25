@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.2.11",
+  "version": "1.2.12",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -53,7 +53,6 @@
     "fs-extra": "^8.0.1",
     "get-port": "^5.0.0",
     "ioredis": "^4.14.1",
-    "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
     "memoize-one": "^5.0.4",
     "moment": "^2.24.0",
@@ -72,8 +71,6 @@
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^7.0.0",
     "@types/jest": "^24.0.18",
-    "@types/koa-bodyparser": "^4.3.0",
-    "@types/koa-router": "^7.0.42",
     "@types/lodash": "^4.14.126",
     "@types/memoize-one": "^4.1.1",
     "@types/node-schedule": "^1.2.3",

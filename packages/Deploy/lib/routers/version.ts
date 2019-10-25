@@ -1,8 +1,8 @@
-import Router from 'koa-router';
 import _ from 'lodash';
 import { DeployVersion } from '../models/version';
+import { TRPGRouter } from 'trpg/core';
 
-const router = new Router();
+const router = new TRPGRouter();
 
 /**
  * 获取最新版本
