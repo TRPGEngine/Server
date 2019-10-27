@@ -1,4 +1,6 @@
-module.exports = function Group(Sequelize, db) {
+import { Orm } from 'trpg/core';
+
+module.exports = function Group(Sequelize: Orm, db) {
   let Group = db.define(
     'group_group',
     {
@@ -8,6 +10,12 @@ module.exports = function Group(Sequelize, db) {
       sub_name: { type: Sequelize.STRING },
       desc: { type: Sequelize.STRING },
       avatar: { type: Sequelize.STRING, defaultValue: '' },
+      max_member: { type: Sequelize.INTEGER, defaultValue: 50 }, // 最大人数 默认50
+      allow_search: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+        comment: '是否允许被搜索',
+      },
       creator_uuid: { type: Sequelize.STRING, required: true },
       owner_uuid: { type: Sequelize.STRING, required: true },
       managers_uuid: { type: Sequelize.JSON, defaultValue: [] },

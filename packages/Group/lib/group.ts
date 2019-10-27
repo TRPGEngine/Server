@@ -2,6 +2,7 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:group');
 import * as event from './event';
 import BasePackage from 'lib/package';
+import GroupDetailDefinition from './models/detail';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -12,6 +13,7 @@ export default class Group extends BasePackage {
     this.regModel(require('./models/invite'));
     this.regModel(require('./models/actor'));
     this.regModel(require('./models/request'));
+    this.regModel(GroupDetailDefinition);
 
     const app = this.app;
     const db = this.db;
