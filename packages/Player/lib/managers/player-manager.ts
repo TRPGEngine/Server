@@ -1,5 +1,4 @@
 /**
- * NOTE: 未实装
  * 这是一个用于管理用户状态的管理类
  */
 import _ from 'lodash';
