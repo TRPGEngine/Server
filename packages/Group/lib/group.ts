@@ -2,6 +2,10 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:group');
 import * as event from './event';
 import BasePackage from 'lib/package';
+import GroupGroupDefinition from './models/group';
+import GroupInviteDefinition from './models/invite';
+import GroupActorDefinition from './models/actor';
+import GroupRequestDefinition from './models/request';
 import GroupDetailDefinition from './models/detail';
 
 export default class Group extends BasePackage {
@@ -9,10 +13,10 @@ export default class Group extends BasePackage {
   public require: string[] = ['Player', 'File', 'Chat'];
   public desc: string = '团模块';
   onInit(): void {
-    this.regModel(require('./models/group'));
-    this.regModel(require('./models/invite'));
-    this.regModel(require('./models/actor'));
-    this.regModel(require('./models/request'));
+    this.regModel(GroupGroupDefinition);
+    this.regModel(GroupInviteDefinition);
+    this.regModel(GroupActorDefinition);
+    this.regModel(GroupRequestDefinition);
     this.regModel(GroupDetailDefinition);
 
     const app = this.app;

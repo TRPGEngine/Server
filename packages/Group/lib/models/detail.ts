@@ -1,5 +1,6 @@
 import { Orm, DBInstance, Model } from 'trpg/core';
 import { ChatMessagePayload } from 'packages/Chat/types/message';
+import { GroupGroup } from './group';
 
 export class GroupDetail extends Model {
   master_name: string; // 主持人称呼: 守密人， 地下城主, ...
@@ -30,7 +31,7 @@ export default function GroupDetailDefinition(Sequelize: Orm, db: DBInstance) {
     }
   );
 
-  GroupDetail.belongsTo(db.models.group_group, { as: 'group' });
+  GroupDetail.belongsTo(GroupGroup, { as: 'group' });
 
   return GroupDetail;
 }

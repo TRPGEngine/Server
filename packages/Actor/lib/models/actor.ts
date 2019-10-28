@@ -1,6 +1,6 @@
 import { Model, Orm, DBInstance, Op } from 'trpg/core';
 
-export class Actor extends Model {
+export class ActorActor extends Model {
   uuid: string;
   name: string;
   desc: string;
@@ -21,7 +21,7 @@ export class Actor extends Model {
 }
 
 export default function ActorDefinition(Sequelize: Orm, db: DBInstance) {
-  Actor.init(
+  ActorActor.init(
     {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       name: { type: Sequelize.STRING, required: true },
@@ -35,16 +35,16 @@ export default function ActorDefinition(Sequelize: Orm, db: DBInstance) {
 
   const User = db.models.player_user as any;
   if (!!User) {
-    // Actor.hasOne('owner', User, {reverse: 'actors'});
-    Actor.belongsTo(User, {
+    // ActorActor.hasOne('owner', User, {reverse: 'actors'});
+    ActorActor.belongsTo(User, {
       foreignKey: 'ownerId',
       as: 'owner',
     });
-    User.hasMany(Actor, {
+    User.hasMany(ActorActor, {
       foreignKey: 'ownerId',
       as: 'actors',
     });
   }
 
-  return Actor;
+  return ActorActor;
 }

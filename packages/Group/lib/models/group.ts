@@ -1,8 +1,48 @@
-import { Orm } from 'trpg/core';
+import { Orm, DBInstance, Model } from 'trpg/core';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
-module.exports = function Group(Sequelize: Orm, db) {
-  let Group = db.define(
-    'group_group',
+type GroupType = 'group' | 'channel' | 'test';
+
+export class GroupGroup extends Model {
+  uuid: string;
+  type: GroupType;
+  name: string;
+  sub_name: string;
+  desc: string;
+  avatar: string;
+  max_member: number;
+  allow_search: boolean;
+  creator_uuid: string;
+  owner_uuid: string;
+  managers_uuid: string[];
+  maps_uuid: {};
+
+  /**
+   * 判断用户是否是该团的管理人员
+   * @param uuid 用户UUID
+   */
+  isManagerOrOwner(uuid: string): boolean {
+    if (
+      this.creator_uuid === uuid ||
+      this.owner_uuid === uuid ||
+      this.managers_uuid.indexOf(uuid) >= 0
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * 获取管理人员列表
+   */
+  getManagerUUIDs(): string[] {
+    return Array.from(new Set([this.owner_uuid].concat(this.managers_uuid)));
+  }
+}
+
+export default function GroupGroupDefinition(Sequelize: Orm, db: DBInstance) {
+  GroupGroup.init(
     {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       type: { type: Sequelize.ENUM('group', 'channel', 'test') },
@@ -22,9 +62,11 @@ module.exports = function Group(Sequelize: Orm, db) {
       maps_uuid: { type: Sequelize.JSON, defaultValue: [] },
     },
     {
+      tableName: '',
+      sequelize: db,
       paranoid: true,
       hooks: {
-        beforeCreate: function(group) {
+        beforeCreate(group) {
           if (!Array.isArray(group.managers_uuid)) {
             group.managers_uuid = [];
           }
@@ -33,46 +75,25 @@ module.exports = function Group(Sequelize: Orm, db) {
           }
         },
       },
-      methods: {
-        isManagerOrOwner: function(uuid) {
-          if (
-            this.creator_uuid === uuid ||
-            this.owner_uuid === uuid ||
-            this.managers_uuid.indexOf(uuid) >= 0
-          ) {
-            return true;
-          } else {
-            return false;
-          }
-        },
-        getManagerUUIDs: function() {
-          return Array.from(
-            new Set([this.owner_uuid].concat(this.managers_uuid))
-          );
-        },
-      },
     }
   );
 
-  let User = db.models.player_user;
-  if (!!User) {
-    Group.belongsTo(User, {
-      as: 'owner',
-    });
+  GroupGroup.belongsTo(PlayerUser, {
+    as: 'owner',
+  });
 
-    // 定义group members的中间模型
-    let GroupMembers = db.define('group_group_members', {
-      selected_group_actor_uuid: { type: Sequelize.STRING },
-    });
-    User.belongsToMany(Group, {
-      through: GroupMembers,
-      as: 'groups',
-    });
-    Group.belongsToMany(User, {
-      through: GroupMembers,
-      as: 'members',
-    });
-  }
+  // 定义group members的中间模型
+  let GroupMembers = db.define('group_group_members', {
+    selected_group_actor_uuid: { type: Sequelize.STRING },
+  });
+  PlayerUser.belongsToMany(GroupGroup, {
+    through: GroupMembers,
+    as: 'groups',
+  });
+  GroupGroup.belongsToMany(PlayerUser, {
+    through: GroupMembers,
+    as: 'members',
+  });
 
-  return Group;
-};
+  return GroupGroup;
+}

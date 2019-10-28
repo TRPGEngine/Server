@@ -1,6 +1,9 @@
-module.exports = function Invite(Sequelize, db) {
-  let Invite = db.define(
-    'group_invite',
+import { Orm, DBInstance, Model } from 'trpg/core';
+
+export class GroupInvite extends Model {}
+
+export default function GroupInviteDefinition(Sequelize: Orm, db: DBInstance) {
+  GroupInvite.init(
     {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       group_uuid: { type: Sequelize.UUID, required: true },
@@ -10,9 +13,10 @@ module.exports = function Invite(Sequelize, db) {
       is_refuse: { type: Sequelize.BOOLEAN, defaultValue: false },
     },
     {
-      methods: {},
+      tableName: 'group_invite',
+      sequelize: db,
     }
   );
 
-  return Invite;
-};
+  return GroupInvite;
+}
