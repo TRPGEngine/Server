@@ -16,10 +16,11 @@ const TICK_PLAYER_EVENTNAME = 'player::tick';
 const getRoomKey = (uuid: string) => `player:manager:room#${uuid}`;
 
 // 消息类型: 单播 房间广播 全体广播
-type PlayerMsgPayloadType = 'unicast' | 'roomcase' | 'broadcast';
+type PlayerMsgPayloadType = 'unicast' | 'listcast' | 'roomcast' | 'broadcast';
 export interface PlayerMsgPayload {
   type: PlayerMsgPayloadType;
   target?: string; // UUID 如果为单播则为用户UUID或UUIDKey， 如果为房间广播则为房间UUID 如果为广播则不填
+  targets?: string[]; // 专门用于列播 存储多个目标的UUID或UUIDKey
   eventName: string;
   data: {};
 }
@@ -103,24 +104,34 @@ class PlayerManager extends EventEmitter {
   };
 
   private async handleMessage(payload: PlayerMsgPayload) {
-    const { type, target, eventName, data } = payload;
+    const { type, target, targets, eventName, data } = payload;
     let waitToSendPlayers: PlayerManagerPlayerMapItem[] = []; // 本地涉及到的Player列表
 
-    if (type === 'unicast') {
-      // 单播
-      if (this.isUUIDKey(target)) {
+    const unicastHandler = (_target: string) => {
+      // 加载单个目标到待推送列表
+      if (this.isUUIDKey(_target)) {
         // 是UUIDkey. 则精确检测
-        const playerUUID = this.getUUIDFromKey(target);
-        const platform = this.getPlatformFromKey(target);
+        const playerUUID = this.getUUIDFromKey(_target);
+        const platform = this.getPlatformFromKey(_target);
         const player = this.findPlayerWithUUIDPlatform(playerUUID, platform);
         if (!_.isUndefined(player)) {
           waitToSendPlayers.push(player);
         }
       } else {
-        const playerUUID = target;
+        const playerUUID = _target;
         waitToSendPlayers.push(...this.findPlayerWithUUID(playerUUID));
       }
-    } else if (type === 'roomcase') {
+    };
+
+    if (type === 'unicast') {
+      // 单播
+      unicastHandler(target);
+    } else if (type === 'listcast') {
+      // 列播
+      for (const t of targets) {
+        unicastHandler(t);
+      }
+    } else if (type === 'roomcast') {
       // 房间广播
       const roomUUID = target;
       const allSocketIds = await this.getRoomAllSocketIds(roomUUID);
@@ -247,6 +258,23 @@ class PlayerManager extends EventEmitter {
   }
 
   /**
+   * 向一批用户发送列播事件
+   * @param uuids 用户uuid列表
+   * @param eventName 事件名
+   * @param data 数据
+   */
+  async listcastSocketEvent(uuids: string[], eventName: string, data: {}) {
+    const payload: PlayerMsgPayload = {
+      type: 'listcast',
+      targets: uuids,
+      eventName,
+      data,
+    };
+
+    await this.emitPlayerMsg(payload);
+  }
+
+  /**
    * 向房间中所有的用户发送socket事件
    * @param roomUUID 房间UUID
    * @param eventName 事件名
@@ -254,7 +282,7 @@ class PlayerManager extends EventEmitter {
    */
   async roomcastSocketEvent(roomUUID: string, eventName: string, data: {}) {
     const payload: PlayerMsgPayload = {
-      type: 'roomcase',
+      type: 'roomcast',
       target: roomUUID,
       eventName,
       data,
