@@ -89,6 +89,7 @@ export default class Group extends BasePackage {
     this.regSocketEvent('agreeGroupRequest', event.agreeGroupRequest);
     this.regSocketEvent('refuseGroupRequest', event.refuseGroupRequest);
     this.regSocketEvent('sendGroupInvite', event.sendGroupInvite);
+    this.regSocketEvent('sendGroupInviteBatch', event.sendGroupInviteBatch);
     this.regSocketEvent('refuseGroupInvite', event.refuseGroupInvite);
     this.regSocketEvent('agreeGroupInvite', event.agreeGroupInvite);
     this.regSocketEvent('getGroupInvite', event.getGroupInvite);

@@ -15,7 +15,7 @@ export class GroupGroup extends Model {
   creator_uuid: string;
   owner_uuid: string;
   managers_uuid: string[];
-  maps_uuid: {};
+  maps_uuid: string[];
 
   /**
    * 判断用户是否是该团的管理人员

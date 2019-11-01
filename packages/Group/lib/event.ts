@@ -4,6 +4,8 @@ import uuid from 'uuid/v4';
 import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import { GroupInvite } from './models/invite';
+import { GroupGroup } from './models/group';
 
 export const create: EventFunc<{
   name: string;
@@ -375,6 +377,7 @@ export const sendGroupInvite: EventFunc<{
     throw '你不能邀请自己';
   }
 
+  // TODO: 待迁移成GroupInvite.createInvites方法
   let group = await db.models.group_group.findOne({
     where: { uuid: group_uuid },
   });
@@ -423,6 +426,52 @@ export const sendGroupInvite: EventFunc<{
   }
 
   return { invite };
+};
+
+/**
+ * 批量发送团邀请
+ */
+export const sendGroupInviteBatch: EventFunc<{
+  group_uuid: string;
+  target_uuids: string[];
+}> = async function(data) {
+  const { app, socket } = this;
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户状态异常';
+  }
+
+  const { group_uuid, target_uuids } = data;
+  const from_uuid = player.uuid;
+
+  // 批量创建团邀请
+  const invites = await GroupInvite.createInvites(
+    group_uuid,
+    from_uuid,
+    target_uuids
+  );
+
+  // 发送通知
+  for (const invite of invites) {
+    const group = await GroupGroup.findOne({ where: { uuid: group_uuid } });
+    if (app.chat && app.chat.sendMsg) {
+      // 发送系统信息
+      const user = await PlayerUser.findByUUID(player.uuid);
+      let msg = `${user.getName()} 想邀请您加入团 ${group.name}`;
+      app.chat.sendMsg('trpgsystem', invite.to_uuid, {
+        message: msg,
+        type: 'card',
+        data: {
+          title: '入团邀请',
+          type: 'groupInvite',
+          content: msg,
+          invite,
+        },
+      });
+    }
+  }
+
+  return { invites };
 };
 
 export const refuseGroupInvite: EventFunc<{
