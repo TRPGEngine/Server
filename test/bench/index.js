@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+// NOTE: 弃用websocket-bench 使用别的测试组件来测试。因为该组件过久没有维护导致危险组件很多
 const Benchmark = require('websocket-bench/lib/benchmark');
 const DefaultReporter = require('websocket-bench/lib/defaultreporter.js');
 const config = require('./config');

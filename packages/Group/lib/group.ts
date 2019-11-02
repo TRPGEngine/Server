@@ -2,16 +2,22 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:group');
 import * as event from './event';
 import BasePackage from 'lib/package';
+import GroupGroupDefinition from './models/group';
+import GroupInviteDefinition from './models/invite';
+import GroupActorDefinition from './models/actor';
+import GroupRequestDefinition from './models/request';
+import GroupDetailDefinition from './models/detail';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
   public require: string[] = ['Player', 'File', 'Chat'];
   public desc: string = '团模块';
   onInit(): void {
-    this.regModel(require('./models/group'));
-    this.regModel(require('./models/invite'));
-    this.regModel(require('./models/actor'));
-    this.regModel(require('./models/request'));
+    this.regModel(GroupGroupDefinition);
+    this.regModel(GroupInviteDefinition);
+    this.regModel(GroupActorDefinition);
+    this.regModel(GroupRequestDefinition);
+    this.regModel(GroupDetailDefinition);
 
     const app = this.app;
     const db = this.db;
@@ -83,6 +89,7 @@ export default class Group extends BasePackage {
     this.regSocketEvent('agreeGroupRequest', event.agreeGroupRequest);
     this.regSocketEvent('refuseGroupRequest', event.refuseGroupRequest);
     this.regSocketEvent('sendGroupInvite', event.sendGroupInvite);
+    this.regSocketEvent('sendGroupInviteBatch', event.sendGroupInviteBatch);
     this.regSocketEvent('refuseGroupInvite', event.refuseGroupInvite);
     this.regSocketEvent('agreeGroupInvite', event.agreeGroupInvite);
     this.regSocketEvent('getGroupInvite', event.getGroupInvite);

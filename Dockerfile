@@ -5,6 +5,9 @@ FROM node:8.11
 LABEL maintainer=moonrailgun
 LABEL description="TRPG Engine Docker Image"
 
+# 更新到最新版本的npm
+RUN npm install -g npm@latest
+
 # RUN echo "https://mirror.tuna.tsinghua.edu.cn/alpine/v3.4/main/" > /etc/apk/repositories
 
 # 安装Bash

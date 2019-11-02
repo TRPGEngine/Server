@@ -1547,6 +1547,21 @@
                     "field": "avatar",
                     "seqType": "Sequelize.STRING"
                 },
+                "max_member": {
+                    "defaultValue": {
+                        "value": 50
+                    },
+                    "field": "max_member",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "allow_search": {
+                    "defaultValue": {
+                        "value": true
+                    },
+                    "comment": "是否允许被搜索",
+                    "field": "allow_search",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
                 "creator_uuid": {
                     "required": true,
                     "allowNull": false,
@@ -1859,6 +1874,56 @@
                     "allowNull": false,
                     "field": "updatedAt",
                     "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "group_detail": {
+            "tableName": "group_detail",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "master_name": {
+                    "field": "master_name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "background_image_url": {
+                    "field": "background_image_url",
+                    "seqType": "Sequelize.STRING"
+                },
+                "welcome_msg_payload": {
+                    "field": "welcome_msg_payload",
+                    "seqType": "Sequelize.JSON"
+                },
+                "allow_quick_dice": {
+                    "field": "allow_quick_dice",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "groupId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "group_group",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "groupId",
+                    "seqType": "Sequelize.INTEGER"
                 }
             },
             "indexes": []
@@ -2820,5 +2885,5 @@
             "indexes": []
         }
     },
-    "revision": 25
+    "revision": 26
 }

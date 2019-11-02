@@ -1,6 +1,44 @@
-module.exports = function GroupActor(Sequelize, db) {
-  let GroupActor = db.define(
-    'group_actor',
+import { Orm, DBInstance, Model } from 'trpg/core';
+import { PlayerUser } from 'packages/Player/lib/models/user';
+import { ActorActor } from 'packages/Actor/lib/models/actor';
+import { GroupGroup } from './group';
+
+export class GroupActor extends Model {
+  uuid: string;
+  actor_uuid: string;
+  actor_info: {};
+  name: string;
+  desc: string;
+  avatar: string;
+  passed: boolean;
+  enabled: boolean;
+  createAt: string;
+  updateAt: string;
+
+  getActor() {
+    throw new Error('get actor error, because not bind actor model');
+  }
+
+  async getObjectAsync() {
+    let actor = await this.getActor();
+    return {
+      uuid: this.uuid,
+      name: this.name,
+      desc: this.desc,
+      actor_uuid: this.actor_uuid,
+      actor_info: this.actor_info,
+      avatar: this.avatar,
+      passed: this.passed,
+      enabled: this.enabled,
+      createAt: this.createAt,
+      updateAt: this.updateAt,
+      actor: actor,
+    };
+  }
+}
+
+export default function GroupActorDefinition(Sequelize: Orm, db: DBInstance) {
+  GroupActor.init(
     {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       actor_uuid: { type: Sequelize.UUID }, // 对应actor_actor的UUID
@@ -12,54 +50,27 @@ module.exports = function GroupActor(Sequelize, db) {
       enabled: { type: Sequelize.BOOLEAN, defaultValue: true },
     },
     {
-      methods: {
-        /**
-         * 获取团人物卡信息
-         */
-        getObjectAsync: async function() {
-          let actor = await this.getActor();
-          return {
-            uuid: this.uuid,
-            name: this.name,
-            desc: this.desc,
-            actor_uuid: this.actor_uuid,
-            actor_info: this.actor_info,
-            avatar: this.avatar,
-            passed: this.passed,
-            enabled: this.enabled,
-            createAt: this.createAt,
-            updateAt: this.updateAt,
-            actor: actor,
-          };
-        },
-      },
+      tableName: 'group_actor',
+      sequelize: db,
     }
   );
 
-  let User = db.models.player_user;
-  if (!!User) {
-    // GroupActor.hasOne('owner', User, { reverse: "groupActors" });
-    GroupActor.belongsTo(User, {
-      as: 'owner',
-    });
-  }
-  let Actor = db.models.actor_actor;
-  if (!!Actor) {
-    // GroupActor.hasOne('actor', Actor, { reverse: "groupActors" });
-    GroupActor.belongsTo(Actor, {
-      as: 'actor',
-    });
-  }
-  let Group = db.models.group_group;
-  // GroupActor.hasOne('group', Group, { reverse: "groupActors" });
-  GroupActor.belongsTo(Group, {
+  GroupActor.belongsTo(PlayerUser, {
+    as: 'owner',
+  });
+
+  GroupActor.belongsTo(ActorActor, {
+    as: 'actor',
+  });
+
+  GroupActor.belongsTo(GroupGroup, {
     foreignKey: 'groupId',
     as: 'group',
   });
-  Group.hasMany(GroupActor, {
+  GroupGroup.hasMany(GroupActor, {
     foreignKey: 'groupId',
     as: 'groupActors',
   });
 
   return GroupActor;
-};
+}

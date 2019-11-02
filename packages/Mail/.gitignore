@@ -1,6 +1,5 @@
 .DS_Store
 
-package-lock.json
 config/config.json
 config/aeskey
 *.marko.js

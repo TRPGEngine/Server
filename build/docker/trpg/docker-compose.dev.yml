@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  trpg-server:
+    image: trpg-server:dev
+    environment:
+      NODE_ENV: development
+      DEBUG: trpg:*
+    ports:
+      - 23256:23256
+    volumes:
+      - ./config/local.dev.js:/usr/src/app/config/local.js:ro
+    depends_on:
+      - mysql
+      - redis
+    links:
+      - mysql
+      - redis
+  mysql:
+    environment:
+      - MYSQL_DATABASE=trpg
+      - MYSQL_ROOT_PASSWORD=devpass
+      - TZ=Asia/Shanghai
+    image: "mysql:5.7.21"
+  redis:
+    image: redis
+    restart: always

@@ -3,7 +3,6 @@
 
 # Marko
 *.marko.js
-package-lock.json
 
 # Logs
 logs
