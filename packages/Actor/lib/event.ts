@@ -5,7 +5,9 @@ import { ActorTemplate } from './models/template';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 const debug = Debug('trpg:component:actor:event');
 
-export const getTemplate: EventFunc = async function(data, cb, db) {
+export const getTemplate: EventFunc<{
+  uuid: string;
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -38,17 +40,20 @@ export const getTemplate: EventFunc = async function(data, cb, db) {
 /**
  * 获取推荐角色模板
  */
-export const getSuggestTemplate: EventFunc = async function(data, cb, db) {
+export const getSuggestTemplate: EventFunc<{}> = async function(data, cb, db) {
   const templates = await ActorTemplate.findAll({
     where: {
       built_in: true,
+      is_public: true,
     },
   });
 
   return { templates };
 };
 
-export const findTemplate: EventFunc = async function(data, cb, db) {
+export const findTemplate: EventFunc<{
+  name: string;
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -74,7 +79,12 @@ export const findTemplate: EventFunc = async function(data, cb, db) {
   return { templates };
 };
 
-export const createTemplate: EventFunc = async function(data, cb, db) {
+export const createTemplate: EventFunc<{
+  name: string;
+  desc?: string;
+  avatar?: string;
+  info: string;
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -114,20 +124,26 @@ export const createTemplate: EventFunc = async function(data, cb, db) {
   return { template };
 };
 
-export const updateTemplate: EventFunc = async function(data, cb, db) {
-  let app = this.app;
-  let socket = this.socket;
+export const updateTemplate: EventFunc<{
+  uuid: string;
+  name: string;
+  desc: string;
+  avatar: string;
+  info: string;
+}> = async function(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let uuid = data.uuid;
-  let name = data.name;
-  let desc = data.desc;
-  let avatar = data.avatar;
-  let info = data.info;
+  const uuid = data.uuid;
+  const name = data.name;
+  const desc = data.desc;
+  const avatar = data.avatar;
+  const info = data.info;
 
   if (!uuid || typeof uuid !== 'string') {
     throw '缺少必要参数';
@@ -157,18 +173,20 @@ export const updateTemplate: EventFunc = async function(data, cb, db) {
   return { template };
 };
 
-export const removeTemplate: EventFunc = async function(data, cb, db) {
+export const removeTemplate: EventFunc<{
+  uuid: string;
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let uuid = data.uuid;
+  const uuid = data.uuid;
   const user = await PlayerUser.findByUUID(player.uuid);
-  let template = await db.models.actor_template.findOne({
+  const template = await db.models.actor_template.findOne({
     where: {
       uuid,
       creatorId: user.id,
@@ -181,20 +199,26 @@ export const removeTemplate: EventFunc = async function(data, cb, db) {
   return true;
 };
 
-export const createActor: EventFunc = async function(data, cb, db) {
-  let app = this.app;
-  let socket = this.socket;
+export const createActor: EventFunc<{
+  name: string;
+  avatar: string;
+  desc: string;
+  info: {};
+  template_uuid: string;
+}> = async function(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let name = data.name;
-  let avatar = data.avatar;
-  let desc = data.desc;
-  let info = data.info || {};
-  let template_uuid = data.template_uuid;
+  const name = data.name;
+  const avatar = data.avatar;
+  const desc = data.desc;
+  const info = data.info || {};
+  const template_uuid = data.template_uuid;
   if (!name) {
     throw '人物名不能为空';
   }
@@ -231,16 +255,18 @@ export const createActor: EventFunc = async function(data, cb, db) {
   }
 };
 
-export const getActor: EventFunc = async function(data, cb, db) {
-  let app = this.app;
-  let socket = this.socket;
+export const getActor: EventFunc<{
+  uuid: string;
+}> = async function(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let uuid = data.uuid;
+  const uuid = data.uuid;
   if (uuid) {
     // 返回指定的actor
     let actor = await db.models.actor_actor.findOne({ where: { uuid } });
@@ -255,7 +281,9 @@ export const getActor: EventFunc = async function(data, cb, db) {
   }
 };
 
-export const removeActor: EventFunc = async function(data, cb, db) {
+export const removeActor: EventFunc<{
+  uuid: string;
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -292,22 +320,28 @@ export const removeActor: EventFunc = async function(data, cb, db) {
   return true;
 };
 
-export const updateActor: EventFunc = async function(data, cb, db) {
-  let app = this.app;
-  let socket = this.socket;
+export const updateActor: EventFunc<{
+  uuid: string;
+  name: string;
+  avatar: string;
+  desc: string;
+  info: {};
+}> = async function(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
   const user = await PlayerUser.findByUUID(player.uuid);
   const userId = user.id;
 
-  let uuid = data.uuid;
-  let name = data.name;
-  let avatar = data.avatar;
-  let desc = data.desc;
-  let info = data.info || {};
+  const uuid = data.uuid;
+  const name = data.name;
+  const avatar = data.avatar;
+  const desc = data.desc;
+  const info = data.info || {};
   if (!uuid) {
     throw '缺少必要参数';
   }

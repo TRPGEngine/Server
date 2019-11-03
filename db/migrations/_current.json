@@ -966,6 +966,13 @@
                     "field": "built_in",
                     "seqType": "Sequelize.BOOLEAN"
                 },
+                "is_public": {
+                    "defaultValue": {
+                        "value": true
+                    },
+                    "field": "is_public",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -2885,5 +2892,5 @@
             "indexes": []
         }
     },
-    "revision": 26
+    "revision": 27
 }
