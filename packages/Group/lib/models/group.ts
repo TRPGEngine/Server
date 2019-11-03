@@ -62,7 +62,7 @@ export default function GroupGroupDefinition(Sequelize: Orm, db: DBInstance) {
       maps_uuid: { type: Sequelize.JSON, defaultValue: [] },
     },
     {
-      tableName: '',
+      tableName: 'group_group',
       sequelize: db,
       paranoid: true,
       hooks: {
