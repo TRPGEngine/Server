@@ -3,7 +3,7 @@ import InfoWebsiteDefinition from './models/Website';
 import WebsiteRouter from './routers/website';
 
 export default class Info extends BasePackage {
-  public name: string = 'info';
+  public name: string = 'Info';
   public require: string[] = [];
   public desc: string = '网站信息获取与短链接生成跳转';
 
