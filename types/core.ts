@@ -9,3 +9,8 @@ export {
 export { SocketEventFn, EventFunc, Socket } from 'packages/Core/types/socket';
 export { CacheValue } from 'packages/Core/types/cache';
 export { TRPGRouter } from 'packages/Core/types/webservice';
+
+export {
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+} from 'sequelize';
