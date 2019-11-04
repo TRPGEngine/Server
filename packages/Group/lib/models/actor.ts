@@ -1,4 +1,9 @@
-import { Orm, DBInstance, Model } from 'trpg/core';
+import {
+  Orm,
+  DBInstance,
+  Model,
+  BelongsToGetAssociationMixin,
+} from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupGroup } from './group';
@@ -15,9 +20,9 @@ export class GroupActor extends Model {
   createAt: string;
   updateAt: string;
 
-  getActor() {
-    throw new Error('get actor error, because not bind actor model');
-  }
+  getActor: BelongsToGetAssociationMixin<ActorActor>;
+  getOwner: BelongsToGetAssociationMixin<PlayerUser>;
+  getGroup: BelongsToGetAssociationMixin<GroupGroup>;
 
   async getObjectAsync() {
     let actor = await this.getActor();

@@ -6,7 +6,7 @@ export class ActorActor extends Model {
   desc: string;
   avatar: string;
   template_uuid: string;
-  info: string;
+  info: {};
 
   getObject() {
     return {

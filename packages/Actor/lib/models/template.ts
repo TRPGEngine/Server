@@ -10,6 +10,7 @@ export class ActorTemplate extends Model {
   info: string;
   layout: string;
   built_in: boolean;
+  is_public: boolean;
 
   getObject() {
     let info = {};
@@ -47,6 +48,7 @@ export default function ActorTemplateDefinition(
       info: { type: Sequelize.TEXT },
       layout: { type: Sequelize.TEXT },
       built_in: { type: Sequelize.BOOLEAN },
+      is_public: { type: Sequelize.BOOLEAN, defaultValue: true },
     },
     { tableName: 'actor_template', sequelize: db, paranoid: true }
   );
