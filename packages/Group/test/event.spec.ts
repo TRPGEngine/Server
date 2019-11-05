@@ -10,7 +10,7 @@ let userInfoInstance;
 
 beforeAll(async () => {
   const loginInfo = await emitEvent('player::login', {
-    username: 'admin1',
+    username: 'admin10',
     password: '21232f297a57a5a743894a0e4a801fc3',
   });
   expect(loginInfo.result).toBe(true);
@@ -122,7 +122,26 @@ describe('group action', () => {
 
   test.todo('refuseGroupInvite should be ok');
 
-  test.todo('agreeGroupInvite should be ok');
+  test.only('agreeGroupInvite should be ok', async () => {
+    const GroupInvite = db.models.group_invite;
+    const invite = await GroupInvite.create({
+      group_uuid: testGroup.uuid,
+      from_uuid: 'test_uuid',
+      to_uuid: userInfo.uuid,
+    });
+
+    const ret = await emitEvent('group::agreeGroupInvite', {
+      uuid: invite.uuid,
+    });
+    expect(ret.result).toBe(true);
+    expect(ret.res).toMatchObject({
+      uuid: invite.uuid,
+      is_agree: true,
+      is_refuse: false,
+    });
+
+    await invite.destroy();
+  });
 
   test('getGroupInviteDetail should be ok', async () => {
     const GroupInvite = db.models.group_invite;
