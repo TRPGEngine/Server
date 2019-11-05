@@ -119,6 +119,31 @@ describe('group action', () => {
 
   test.todo('agreeGroupInvite should be ok');
 
+  test('getGroupInviteDetail should be ok', async () => {
+    const GroupInvite = db.models.group_invite;
+    const invite = await GroupInvite.create({
+      group_uuid: 'test',
+      from_uuid: 'test_uuid',
+      to_uuid: 'test_uuid',
+    });
+
+    const ret = await emitEvent('group::getGroupInviteDetail', {
+      uuid: invite.uuid,
+    });
+    expect(ret).toBeTruthy();
+    expect(ret.result).toBe(true);
+    expect(ret.invite).toMatchObject({
+      uuid: invite.uuid,
+      group_uuid: invite.group_uuid,
+      from_uuid: invite.from_uuid,
+      to_uuid: invite.to_uuid,
+      is_agree: false,
+      is_refuse: false,
+    });
+
+    await invite.destroy();
+  });
+
   test('getGroupInvite should be ok', async () => {
     let ret = await emitEvent('group::getGroupInvite');
     expect(ret.result).toBe(true);

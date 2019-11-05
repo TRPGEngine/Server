@@ -551,6 +551,30 @@ export const agreeGroupInvite: EventFunc<{
 };
 
 /**
+ * 获取团邀请详情内容
+ */
+export const getGroupInviteDetail: EventFunc<{
+  // 团邀请的UUID
+  uuid: string;
+}> = async function getGroupInviteDetail(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户状态异常';
+  }
+
+  const { uuid } = data;
+  const invite = await GroupInvite.findOne({
+    where: {
+      uuid,
+    },
+  });
+
+  return { invite };
+};
+
+/**
  * 获取所有未处理的团邀请列表
  * 未处理的定义: 未同意且未拒绝
  */
