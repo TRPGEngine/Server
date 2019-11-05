@@ -543,8 +543,8 @@ export const agreeGroupInvite: EventFunc<{
 
   await db.transactionAsync(async () => {
     await app.group.addGroupMemberAsync(groupUUID, playerUUID);
-    invite = await invite.save();
-    invite.group = group;
+    await invite.save();
+    _.set(invite, 'dataValues.group', group);
   });
 
   return { res: invite };

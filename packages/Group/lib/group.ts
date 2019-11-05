@@ -22,7 +22,7 @@ export default class Group extends BasePackage {
     const app = this.app;
     const db = this.db;
     this.regMethods({
-      addGroupMemberAsync: async function(groupUUID, userUUID) {
+      addGroupMemberAsync: async function(groupUUID: string, userUUID: string) {
         if (!groupUUID || !userUUID) {
           debug('add group need 2 uuid: receive %o', { groupUUID, userUUID });
           return;

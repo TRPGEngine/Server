@@ -122,7 +122,7 @@ describe('group action', () => {
 
   test.todo('refuseGroupInvite should be ok');
 
-  test.only('agreeGroupInvite should be ok', async () => {
+  test('agreeGroupInvite should be ok', async () => {
     const GroupInvite = db.models.group_invite;
     const invite = await GroupInvite.create({
       group_uuid: testGroup.uuid,
@@ -139,8 +139,19 @@ describe('group action', () => {
       is_agree: true,
       is_refuse: false,
     });
+    expect(ret.res.group).toBeTruthy();
+    expect(ret.res.group).toMatchObject({
+      uuid: testGroup.uuid,
+    });
 
-    await invite.destroy();
+    // 校验一下数据库
+    const savedInvite = await GroupInvite.findOne({
+      where: { uuid: invite.uuid },
+    });
+    expect(savedInvite.is_agree).toBe(true);
+    expect(savedInvite.is_refuse).toBe(false);
+
+    await invite.destroy(); // 销毁
   });
 
   test('getGroupInviteDetail should be ok', async () => {
