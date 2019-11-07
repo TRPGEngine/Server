@@ -474,6 +474,10 @@ export const sendFriendInvite: EventFunc<{
   const from_uuid = player.uuid;
   const to_uuid = data.to;
 
+  if (from_uuid === to_uuid) {
+    throw '不能请求成为自己的好友';
+  }
+
   const Invite = db.models.player_invite;
   const inviteIsExist = await Invite.findOne({
     where: {
