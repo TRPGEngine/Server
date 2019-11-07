@@ -206,6 +206,7 @@ export default class Player extends BasePackage {
 
     // 断开连接时记录登出时间
     app.on('disconnect', (socket) => {
+      debug('socket disconnect', socket.id);
       app.player.recordUserOfflineDate(socket);
     });
   }
@@ -294,9 +295,7 @@ export default class Player extends BasePackage {
           if (info.code === 0) {
             // 请求成功
             const data = info.data;
-            const ip_address = `[${data.isp}]${data.country} ${data.region} ${
-              data.city
-            } ${data.county}`;
+            const ip_address = `[${data.isp}]${data.country} ${data.region} ${data.city} ${data.county}`;
             log.ip_address = ip_address;
             debug('请求ip信息结果:', ip_address);
             cacheMap[ip] = ip_address;

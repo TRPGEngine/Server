@@ -5,11 +5,7 @@ const lodash = require('lodash');
 const randomString = require('crypto-random-string');
 const config = require('config');
 const axios = require('axios').default;
-let trpgapp = null;
 const port = lodash.get(config, 'port', 23256);
-const socket = io(`ws://127.0.0.1:${port}`, {
-  autoConnect: false,
-});
 
 function generateTRPGInstance() {
   const app = require('../../standard');
@@ -19,6 +15,11 @@ function generateTRPGInstance() {
 class TRPGEnvironment extends NodeEnvironment {
   constructor(config) {
     super(config);
+
+    this.trpgapp = null;
+    this.socket = io(`ws://127.0.0.1:${port}`, {
+      autoConnect: false,
+    });
   }
 
   async setup() {
@@ -26,23 +27,23 @@ class TRPGEnvironment extends NodeEnvironment {
 
     // 创建trpg实例
     if (!lodash.get(process, 'env.npm_config_noserver', false)) {
-      trpgapp = generateTRPGInstance();
+      this.trpgapp = generateTRPGInstance();
     } else {
       console.log('run test with noserver mode');
     }
 
-    const db = lodash.get(trpgapp, 'storage.db');
+    const db = lodash.get(this.trpgapp, 'storage.db');
 
-    socket.open();
-    socket.on('error', (err) => {
+    this.socket.open();
+    this.socket.on('error', (err) => {
       console.error('[TRPG-Test]', 'socket-client:', err);
     });
 
     // 声明沙盒内可用的全局变量
     this.global._ = lodash;
-    this.global.trpgapp = trpgapp;
+    this.global.trpgapp = this.trpgapp;
     this.global.db = db;
-    this.global.socket = socket;
+    this.global.socket = this.socket;
     this.global.port = port;
     this.global.testEvent = (eventFn, data) => {
       // 测试直接处理信息
@@ -51,7 +52,7 @@ class TRPGEnvironment extends NodeEnvironment {
           let cbres = { result: false }; // 默认返回信息
           let ret = await eventFn.call(
             {
-              app: trpgapp,
+              app: this.trpgapp,
               socket: null,
             },
             data,
@@ -84,7 +85,7 @@ class TRPGEnvironment extends NodeEnvironment {
     this.global.emitEvent = (eventName, data) => {
       // 发送信息测试
       return new Promise((resolve) => {
-        socket.emit(eventName, data, function(_res) {
+        this.socket.emit(eventName, data, function(_res) {
           resolve(_res);
         });
       });
@@ -99,11 +100,11 @@ class TRPGEnvironment extends NodeEnvironment {
     debug('Teardown TRPG Test Environment');
 
     try {
-      socket.close();
-      if (trpgapp) {
+      this.socket.close();
+      if (this.trpgapp) {
         // TODO: trpg还是没有关闭所有的连接, 可以考虑将其放到下一级(测试文件级)
-        await trpgapp.close();
-        trpgapp = null;
+        await this.trpgapp.close();
+        this.trpgapp = null;
       }
     } catch (err) {
       debug('Teardown error:', err);
