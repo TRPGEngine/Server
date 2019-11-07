@@ -1,7 +1,9 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 const db = global.db;
 const emitEvent = global.emitEvent;
 const _ = global._;
+
+export {};
 
 function md5(str) {
   if (typeof str != 'string') {
@@ -36,7 +38,7 @@ describe('account', () => {
 });
 
 describe('user action', () => {
-  let userInfo = {};
+  let userInfo;
   let userInfoDbInstance = null;
 
   beforeAll(async () => {
