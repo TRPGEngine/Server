@@ -195,7 +195,7 @@ describe('user action', () => {
       expect(instance.is_refuse).toBe(true);
     });
 
-    test('get invite should be ok', async () => {
+    test('getFriendsInvite should be ok', async () => {
       let ret = await emitEvent('player::getFriendsInvite');
       expect(ret.result).toBe(true);
 
@@ -204,6 +204,19 @@ describe('user action', () => {
         uuid: inviteUUID,
       });
       expect(index).toBeGreaterThanOrEqual(0);
+    });
+
+    test('getFriendInviteDetail', async () => {
+      const ret = await emitEvent('player::getFriendInviteDetail', {
+        uuid: inviteUUID,
+      });
+
+      expect(ret.result).toBe(true);
+      expect(ret.invite).toBeTruthy();
+      expect(ret.invite).toMatchObject({
+        uuid: inviteUUID,
+        to_uuid: userInfo.uuid,
+      });
     });
   });
 
