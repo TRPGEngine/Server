@@ -535,12 +535,12 @@ export const refuseFriendInvite: EventFunc<{
 
   if (app.chat) {
     // 如果 chat 模块已注册
+    const user = await PlayerUser.findByUUID(player.uuid);
     app.chat.sendSystemMsg(
       invite.from_uuid,
       '',
       '',
-      `${_.get(player, 'user.username', '') ||
-        _.get(player, 'user.nickname', '')} 已拒绝你的好友申请`
+      `${user.getName()} 已拒绝你的好友申请`
     );
   }
 
@@ -583,12 +583,12 @@ export const agreeFriendInvite: EventFunc<{
     });
     if (app.chat) {
       // 如果 chat 模块已注册
+      const user = await PlayerUser.findByUUID(player.uuid);
       app.chat.sendSystemMsg(
         uuid1,
         '',
         '',
-        `${_.get(player, 'user.username', '') ||
-          _.get(player, 'user.nickname', '')} 已同意你的好友申请`
+        `${user.getName()} 已同意你的好友申请`
       );
     }
   });
