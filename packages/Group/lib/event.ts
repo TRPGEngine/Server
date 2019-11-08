@@ -565,9 +565,12 @@ export const getGroupInviteDetail: EventFunc<{
   }
 
   const { uuid } = data;
+  const to_uuid = player.uuid;
+
   const invite = await GroupInvite.findOne({
     where: {
       uuid,
+      to_uuid,
     },
   });
 
