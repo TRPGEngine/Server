@@ -543,11 +543,38 @@ export const agreeGroupInvite: EventFunc<{
 
   await db.transactionAsync(async () => {
     await app.group.addGroupMemberAsync(groupUUID, playerUUID);
-    invite = await invite.save();
-    invite.group = group;
+    await invite.save();
+    _.set(invite, 'dataValues.group', group);
   });
 
   return { res: invite };
+};
+
+/**
+ * 获取团邀请详情内容
+ */
+export const getGroupInviteDetail: EventFunc<{
+  // 团邀请的UUID
+  uuid: string;
+}> = async function getGroupInviteDetail(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户状态异常';
+  }
+
+  const { uuid } = data;
+  const to_uuid = player.uuid;
+
+  const invite = await GroupInvite.findOne({
+    where: {
+      uuid,
+      to_uuid,
+    },
+  });
+
+  return { invite };
 };
 
 /**

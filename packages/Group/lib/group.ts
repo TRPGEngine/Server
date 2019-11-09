@@ -22,7 +22,7 @@ export default class Group extends BasePackage {
     const app = this.app;
     const db = this.db;
     this.regMethods({
-      addGroupMemberAsync: async function(groupUUID, userUUID) {
+      addGroupMemberAsync: async function(groupUUID: string, userUUID: string) {
         if (!groupUUID || !userUUID) {
           debug('add group need 2 uuid: receive %o', { groupUUID, userUUID });
           return;
@@ -93,6 +93,7 @@ export default class Group extends BasePackage {
     this.regSocketEvent('refuseGroupInvite', event.refuseGroupInvite);
     this.regSocketEvent('agreeGroupInvite', event.agreeGroupInvite);
     this.regSocketEvent('getGroupInvite', event.getGroupInvite);
+    this.regSocketEvent('getGroupInviteDetail', event.getGroupInviteDetail);
     this.regSocketEvent('getGroupList', event.getGroupList);
     this.regSocketEvent('getGroupMembers', event.getGroupMembers);
     this.regSocketEvent('getGroupActors', event.getGroupActors);

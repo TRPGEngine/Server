@@ -11,25 +11,7 @@ import PlayerUserDefinition, { PlayerUser } from './models/user';
 import PlayerInviteDefinition from './models/invite';
 import PlayerLoginLogDefinition, { PlayerLoginLog } from './models/login-log';
 import PlayerSettingsDefinition from './models/settings';
-import {
-  login,
-  loginWithToken,
-  getWebToken,
-  register,
-  getInfo,
-  updateInfo,
-  changePassword,
-  logout,
-  findUser,
-  getFriends,
-  sendFriendInvite,
-  refuseFriendInvite,
-  agreeFriendInvite,
-  getFriendsInvite,
-  checkUserOnline,
-  getSettings,
-  saveSettings,
-} from './event';
+import * as event from './event';
 import {
   getPlayerManager,
   PlayerManagerCls,
@@ -206,28 +188,33 @@ export default class Player extends BasePackage {
 
     // 断开连接时记录登出时间
     app.on('disconnect', (socket) => {
+      debug('socket disconnect', socket.id);
       app.player.recordUserOfflineDate(socket);
     });
   }
 
   private initSocket() {
-    this.regSocketEvent('player::login', login);
-    this.regSocketEvent('player::loginWithToken', loginWithToken);
-    this.regSocketEvent('player::getWebToken', getWebToken);
-    this.regSocketEvent('player::register', register);
-    this.regSocketEvent('player::getInfo', getInfo);
-    this.regSocketEvent('player::updateInfo', updateInfo);
-    this.regSocketEvent('player::changePassword', changePassword);
-    this.regSocketEvent('player::logout', logout);
-    this.regSocketEvent('player::findUser', findUser);
-    this.regSocketEvent('player::getFriends', getFriends);
-    this.regSocketEvent('player::sendFriendInvite', sendFriendInvite);
-    this.regSocketEvent('player::refuseFriendInvite', refuseFriendInvite);
-    this.regSocketEvent('player::agreeFriendInvite', agreeFriendInvite);
-    this.regSocketEvent('player::getFriendsInvite', getFriendsInvite);
-    this.regSocketEvent('player::checkUserOnline', checkUserOnline);
-    this.regSocketEvent('player::getSettings', getSettings);
-    this.regSocketEvent('player::saveSettings', saveSettings);
+    this.regSocketEvent('player::login', event.login);
+    this.regSocketEvent('player::loginWithToken', event.loginWithToken);
+    this.regSocketEvent('player::getWebToken', event.getWebToken);
+    this.regSocketEvent('player::register', event.register);
+    this.regSocketEvent('player::getInfo', event.getInfo);
+    this.regSocketEvent('player::updateInfo', event.updateInfo);
+    this.regSocketEvent('player::changePassword', event.changePassword);
+    this.regSocketEvent('player::logout', event.logout);
+    this.regSocketEvent('player::findUser', event.findUser);
+    this.regSocketEvent('player::getFriends', event.getFriends);
+    this.regSocketEvent('player::sendFriendInvite', event.sendFriendInvite);
+    this.regSocketEvent('player::refuseFriendInvite', event.refuseFriendInvite);
+    this.regSocketEvent('player::agreeFriendInvite', event.agreeFriendInvite);
+    this.regSocketEvent('player::getFriendsInvite', event.getFriendsInvite);
+    this.regSocketEvent(
+      'player::getFriendInviteDetail',
+      event.getFriendInviteDetail
+    );
+    this.regSocketEvent('player::checkUserOnline', event.checkUserOnline);
+    this.regSocketEvent('player::getSettings', event.getSettings);
+    this.regSocketEvent('player::saveSettings', event.saveSettings);
 
     // TODO:需要考虑到断线重连的问题
     const app = this.app;
@@ -294,9 +281,7 @@ export default class Player extends BasePackage {
           if (info.code === 0) {
             // 请求成功
             const data = info.data;
-            const ip_address = `[${data.isp}]${data.country} ${data.region} ${
-              data.city
-            } ${data.county}`;
+            const ip_address = `[${data.isp}]${data.country} ${data.region} ${data.city} ${data.county}`;
             log.ip_address = ip_address;
             debug('请求ip信息结果:', ip_address);
             cacheMap[ip] = ip_address;

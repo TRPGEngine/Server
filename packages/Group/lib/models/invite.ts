@@ -30,7 +30,7 @@ export class GroupInvite extends Model {
       throw '你不能邀请你自己';
     }
 
-    const group: GroupGroup = GroupGroup.findOne({
+    const group: GroupGroup = await GroupGroup.findOne({
       where: {
         uuid: groupUUID,
       },

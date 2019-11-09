@@ -8,6 +8,7 @@ import { EventFunc } from 'trpg/core';
 import { PlayerUser } from './models/user';
 import { TRPGApplication, Socket } from 'trpg/core';
 import { Platform } from '../types/player';
+import { PlayerInvite } from './models/invite';
 
 /**
  * 自动加入房间
@@ -474,6 +475,10 @@ export const sendFriendInvite: EventFunc<{
   const from_uuid = player.uuid;
   const to_uuid = data.to;
 
+  if (from_uuid === to_uuid) {
+    throw '不能请求成为自己的好友';
+  }
+
   const Invite = db.models.player_invite;
   const inviteIsExist = await Invite.findOne({
     where: {
@@ -530,12 +535,12 @@ export const refuseFriendInvite: EventFunc<{
 
   if (app.chat) {
     // 如果 chat 模块已注册
+    const user = await PlayerUser.findByUUID(player.uuid);
     app.chat.sendSystemMsg(
       invite.from_uuid,
       '',
       '',
-      `${_.get(player, 'user.username', '') ||
-        _.get(player, 'user.nickname', '')} 已拒绝你的好友申请`
+      `${user.getName()} 已拒绝你的好友申请`
     );
   }
 
@@ -578,12 +583,12 @@ export const agreeFriendInvite: EventFunc<{
     });
     if (app.chat) {
       // 如果 chat 模块已注册
+      const user = await PlayerUser.findByUUID(player.uuid);
       app.chat.sendSystemMsg(
         uuid1,
         '',
         '',
-        `${_.get(player, 'user.username', '') ||
-          _.get(player, 'user.nickname', '')} 已同意你的好友申请`
+        `${user.getName()} 已同意你的好友申请`
       );
     }
   });
@@ -614,6 +619,32 @@ export const getFriendsInvite: EventFunc = async function getFriendsInvite(
   });
 
   return { res };
+};
+
+/**
+ * 获取好友请求详情信息
+ */
+export const getFriendInviteDetail: EventFunc<{
+  uuid: string;
+}> = async function(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户状态异常';
+  }
+
+  const uuid = data.uuid;
+  const to_uuid = player.uuid;
+
+  const invite = await PlayerInvite.findOne({
+    where: {
+      uuid,
+      to_uuid,
+    },
+  });
+
+  return { invite };
 };
 
 // 检查用户是否在线
