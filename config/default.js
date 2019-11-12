@@ -29,6 +29,9 @@ module.exports = {
   },
   jwt: {
     // json web token 相关设定
+    // 注意: 因为这里每次启动都不一样。因此重复重启可能会出现校验不通过的问题
+    // 解决方法是在local配置中设置一个默认的secret
+    // 该问题不能用close task来清除redis来解决, 因为会出现多实例反复关闭的问题
     secret: randomString(10),
   },
   dashboard: {

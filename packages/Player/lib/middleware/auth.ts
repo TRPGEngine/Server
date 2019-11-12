@@ -5,10 +5,14 @@ import { PlayerJWTPayload } from 'packages/Player/types/player';
 export const ssoAuth = (): TRPGMiddleware<{
   player: PlayerJWTPayload;
 }> => async (ctx, next) => {
-  const token: string = ctx.headers['X-Token'] || '';
+  const token: string = ctx.headers['x-token'] || '';
   try {
+    if (_.isEmpty(token)) {
+      throw 'Token 不存在';
+    }
+
     const ret = await ctx.trpgapp.jwtVerify(token);
-    if (_.isObject(ret)) {
+    if (!_.isNil(ret) && _.isObject(ret)) {
       const { uuid, name, avatar } = ret as PlayerJWTPayload;
 
       ctx.state.player = { uuid, name, avatar };
