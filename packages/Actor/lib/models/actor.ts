@@ -1,4 +1,10 @@
-import { Model, Orm, DBInstance, Op } from 'trpg/core';
+import {
+  Model,
+  Orm,
+  DBInstance,
+  BelongsToSetAssociationMixin,
+} from 'trpg/core';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
 export class ActorActor extends Model {
   uuid: string;
@@ -7,6 +13,8 @@ export class ActorActor extends Model {
   avatar: string;
   template_uuid: string;
   info: {};
+
+  setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
 
   getObject() {
     return {
