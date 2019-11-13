@@ -5,6 +5,7 @@ import * as event from './event';
 import ActorTemplateDefinition from './models/template';
 import ActorDefinition from './models/actor';
 import BasePackage from 'lib/package';
+import actorRouter from './routers/actor';
 
 export default class Actor extends BasePackage {
   public name: string = 'Actor';
@@ -28,6 +29,8 @@ export default class Actor extends BasePackage {
     this.regSocketEvent('getActor', event.getActor);
     this.regSocketEvent('removeActor', event.removeActor);
     this.regSocketEvent('updateActor', event.updateActor);
+
+    this.regRoute(actorRouter);
   }
 }
 
