@@ -1,6 +1,7 @@
 import Router from 'koa-router';
 import { PlayerUser } from '../models/user';
 import _ from 'lodash';
+import { ssoAuth } from '../middleware/auth';
 const SSORouter = new Router();
 
 SSORouter.post('/sso/login', async (ctx) => {
@@ -16,6 +17,12 @@ SSORouter.post('/sso/login', async (ctx) => {
 
   ctx.body = {
     jwt,
+  };
+});
+
+SSORouter.post('/sso/check', ssoAuth(), (ctx) => {
+  ctx.body = {
+    result: true,
   };
 });
 
