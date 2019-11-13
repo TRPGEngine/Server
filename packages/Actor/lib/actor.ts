@@ -6,6 +6,7 @@ import ActorTemplateDefinition from './models/template';
 import ActorDefinition from './models/actor';
 import BasePackage from 'lib/package';
 import actorRouter from './routers/actor';
+import templateRouter from './routers/template';
 
 export default class Actor extends BasePackage {
   public name: string = 'Actor';
@@ -31,6 +32,7 @@ export default class Actor extends BasePackage {
     this.regSocketEvent('updateActor', event.updateActor);
 
     this.regRoute(actorRouter);
+    this.regRoute(templateRouter);
   }
 }
 

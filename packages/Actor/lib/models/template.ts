@@ -7,7 +7,7 @@ export class ActorTemplate extends Model {
   name: string;
   desc: string;
   avatar: string;
-  info: string;
+  info: string; // 这个字段目前没用。看情况是否要删除
   layout: string;
   built_in: boolean;
   is_public: boolean;
@@ -23,6 +23,18 @@ export class ActorTemplate extends Model {
     }
   }
 
+  /**
+   * 获取模板列表
+   * @param page 页数
+   * @param size 每页显示条数
+   */
+  static getList(page = 1, size = 10): Promise<ActorTemplate[]> {
+    return ActorTemplate.findAll({
+      limit: size,
+      offset: (page - 1) * size,
+    });
+  }
+
   static findTemplateAsync(nameFragment: string): Promise<ActorTemplate[]> {
     return ActorTemplate.findAll({
       where: {
@@ -31,6 +43,12 @@ export class ActorTemplate extends Model {
         },
       },
       limit: 10,
+    });
+  }
+
+  static findByUUID(uuid: string): Promise<ActorTemplate | null> {
+    return ActorTemplate.findOne({
+      where: { uuid },
     });
   }
 }
