@@ -1,8 +1,7 @@
-import Router from 'koa-router';
-const router = new Router();
 import _ from 'lodash';
 import { PlayerUser } from 'packages/Player/lib/models/user';
-import { Op } from 'trpg/core';
+import { Op, TRPGRouter } from 'trpg/core';
+const router = new TRPGRouter();
 
 router.get('/search/fuzzy', async (ctx, next) => {
   const word = _.get(ctx, 'params.word', '');

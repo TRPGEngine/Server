@@ -1,8 +1,8 @@
-import Router from 'koa-router';
 import { PlayerUser } from '../models/user';
 import _ from 'lodash';
 import { ssoAuth } from '../middleware/auth';
-const SSORouter = new Router();
+import { TRPGRouter } from 'trpg/core';
+const SSORouter = new TRPGRouter();
 
 SSORouter.post('/sso/login', async (ctx) => {
   const username = _.get(ctx.request, 'body.username');

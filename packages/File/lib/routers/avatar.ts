@@ -1,4 +1,3 @@
-import Router from 'koa-router';
 import upload from '../middleware/upload';
 import sha256 from '../middleware/sha256';
 import thumbnail from '../middleware/thumbnail';
@@ -8,8 +7,9 @@ import { encodeStr2Int } from '../utils';
 import config from '../config';
 const avatarStorage = require('../middleware/storage/avatar');
 import auth from '../middleware/auth';
+import { TRPGRouter } from 'trpg/core';
 
-let router = new Router();
+let router = new TRPGRouter();
 
 router.post(
   '/',

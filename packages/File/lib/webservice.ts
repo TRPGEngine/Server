@@ -1,9 +1,9 @@
-import Router from 'koa-router';
 import documentRouter from './routers/document';
+import { TRPGRouter } from 'trpg/core';
 
 export function initFileService(app) {
   const webservice = app.webservice;
-  const router = new Router();
+  const router = new TRPGRouter();
 
   const file = require('./routers/file');
   const avatar = require('./routers/avatar');

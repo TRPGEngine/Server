@@ -1,10 +1,10 @@
 import Debug from 'debug';
+import { TRPGRouter } from 'trpg/core';
 const debug = Debug('trpg:component:player:router:register');
-const Router = require('koa-router');
-const router = new Router();
+const registerRouter = new TRPGRouter();
 const geetestWrapper = require('../utils/geetest-wrapper');
 
-router.get('/gt-register', async function(ctx, next) {
+registerRouter.get('/register/gt-register', async function(ctx, next) {
   const geetest = ctx.geetest;
   if (!geetest) {
     throw '极验未加载';
@@ -23,7 +23,7 @@ router.get('/gt-register', async function(ctx, next) {
   }
 });
 
-router.post('/gt-validate', async function(ctx) {
+registerRouter.post('/register/gt-validate', async function(ctx) {
   const geetest = ctx.geetest;
   if (!geetest) {
     throw '极验未加载';
@@ -48,4 +48,4 @@ router.post('/gt-validate', async function(ctx) {
   ctx.body = isSuccess ? '极验成功' : '极验失败';
 });
 
-module.exports = router;
+export default registerRouter;
