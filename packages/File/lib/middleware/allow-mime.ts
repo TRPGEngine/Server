@@ -1,11 +1,18 @@
 import fs from 'fs-extra';
+import { TRPGMiddleware } from 'trpg/core';
+import _ from 'lodash';
 
 /**
  * 限定文件MIME类型的中间件, 应放在upload中间件后
  */
-export default function allowMIME(types: MIMEType[]) {
-  return async (ctx: any, next: any) => {
-    const { mimetype, path } = ctx.req.file;
+export default function allowMIME(types: MIMEType[]): TRPGMiddleware {
+  return async (ctx, next) => {
+    const file = _.get(ctx, 'req.file');
+    if (_.isNil(file)) {
+      throw new Error('文件不存在');
+    }
+
+    const { mimetype, path } = file;
     if (!types.includes(mimetype)) {
       await fs.remove(path);
 
