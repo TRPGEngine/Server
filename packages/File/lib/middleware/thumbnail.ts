@@ -1,7 +1,8 @@
-import images from 'images';
 import _ from 'lodash';
 import path from 'path';
 import Debug from 'debug';
+import { TRPGMiddleware } from 'trpg/core';
+import { genThumbnail } from '../utils/jimp';
 const debug = Debug('trpg:component:file:thumbnail');
 
 /**
@@ -10,26 +11,29 @@ const debug = Debug('trpg:component:file:thumbnail');
  * @param maxWidth 最大宽度
  * @param maxHeight 最大高度
  */
-export default function thumbnail(maxWidth: number, maxHeight: number) {
-  return async (ctx: any, next: any) => {
+export default function thumbnail(
+  maxWidth: number,
+  maxHeight: number
+): TRPGMiddleware {
+  return async (ctx, next) => {
     const filePath = _.get(ctx, 'req.file.path');
+    if (!_.isString(filePath)) {
+      throw new Error('生成缩略图失败: 文件不存在 ' + filePath);
+    }
 
-    const image = images(filePath);
-    const { width, height } = image.size();
+    const targetName = path.basename(filePath); // 处理文件名
+    const targetDir = path.dirname(filePath); // 处理文件夹
+    const targetPath = path.resolve(targetDir, 'thumbnail', targetName);
 
-    if (width > maxWidth || height > maxHeight) {
-      // 生成缩略图
-      const widthRadio = maxWidth / width;
-      const heightRadio = maxHeight / height;
-
-      const targetRadio = Math.min(widthRadio, heightRadio); // 为实现等比压缩。取较小值
-      const targetWidth = width * targetRadio; // 目标大小的宽度
-      const targetName = path.basename(filePath); // 处理文件名
-      const targetDir = path.dirname(filePath); // 处理文件夹
-      const targetPath = path.resolve(targetDir, 'thumbnail', targetName);
-
-      debug('generate thumbnail with size:', targetWidth, height * targetRadio);
-      image.resize(targetWidth).save(targetPath); // 修改大小并原地保存
+    const { isThumbnail } = await genThumbnail(
+      filePath,
+      targetPath,
+      maxWidth,
+      maxHeight,
+      true
+    );
+    if (isThumbnail) {
+      // 如果成功生成了缩略图
       _.set(ctx, 'req.file.has_thumbnail', true);
       debug('generate completed!', targetPath);
     }
