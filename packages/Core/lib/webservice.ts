@@ -185,6 +185,8 @@ export default class WebService {
             msg = 'System Error';
           } else if (ctx.status === 403) {
             msg = 'Forbidden';
+          } else if (ctx.status === 401) {
+            msg = 'Unauthorized';
           } else {
             msg = 'Unknown Error';
           }
@@ -331,8 +333,9 @@ export default class WebService {
   /**
    * 校验jwt
    * 返回校验后的结果
+   * 如果校验不通过则返回null
    */
-  jwtVerify = (token: string): Promise<string | object> => {
+  jwtVerify = (token: string): Promise<string | object | null> => {
     return new Promise((resolve, reject) => {
       jwt.verify(
         token,
@@ -342,7 +345,8 @@ export default class WebService {
         },
         (err, decoded) => {
           if (err) {
-            reject(err);
+            console.error(err);
+            resolve(null);
           } else {
             resolve(decoded);
           }

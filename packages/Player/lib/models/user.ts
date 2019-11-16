@@ -5,6 +5,7 @@ import { Model, DBInstance, Orm } from 'trpg/core';
 import config from 'config';
 import _ from 'lodash';
 import { fn, col } from 'sequelize';
+import { PlayerJWTPayload } from 'packages/Player/types/player';
 
 // 阵营九宫格
 export type Alignment =
@@ -63,6 +64,7 @@ export class PlayerUser extends Model {
     const app = PlayerUser.getApplication();
     const cacheKey = `player:jwt:${uuid}`;
 
+    // 如果缓存中已经有签证了，则直接返回缓存中的签证
     const cachedJWT = await app.cache.get(cacheKey);
     if (_.isString(cachedJWT) && cachedJWT !== '') {
       return cachedJWT;
@@ -74,7 +76,7 @@ export class PlayerUser extends Model {
       uuid: user.uuid,
       name: user.getName(),
       avatar: user.getAvatarUrl(),
-    });
+    } as PlayerJWTPayload);
 
     await app.cache.set(cacheKey, jwt, { expires: 1000 * 60 * 60 * 12 });
 

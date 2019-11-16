@@ -9,8 +9,15 @@ export interface TRPGRouterContext extends DefaultContext {
   trpgapp: TRPGApplication;
 }
 
-export class TRPGRouter extends KoaRouter<TRPGRouterState, TRPGRouterContext> {}
-export type TRPGMiddleware = Middleware<
-  DefaultState & TRPGRouterState,
-  TRPGRouterContext & IRouterParamContext<DefaultState, TRPGRouterContext>
+export class TRPGRouter<
+  S extends TRPGRouterState = TRPGRouterState,
+  C extends TRPGRouterContext = TRPGRouterContext
+> extends KoaRouter<S, C> {}
+
+export type TRPGMiddleware<
+  S extends TRPGRouterState = TRPGRouterState,
+  C extends TRPGRouterContext = TRPGRouterContext
+> = Middleware<
+  DefaultState & S,
+  TRPGRouterContext & IRouterParamContext<DefaultState, C>
 >;

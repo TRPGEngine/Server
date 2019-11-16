@@ -9,14 +9,15 @@ exports.command = 'run-seeder';
 exports.desc = 'run all db seeder or specify seeder file';
 exports.builder = function(args) {
   return args
-    .usage('$0 run-seed [--file anyseed.js]')
+    .usage('$0 run-seed [--file anyseed.js] [--index 1]')
     .alias('f', 'file')
+    .alias('i', 'index')
     .describe('file', 'Optional, specify seed file').argv;
 };
 exports.handler = async function(argv) {
   process.env['TRPG_PORT'] = 23666; // 配置环境变量.
 
-  const { file } = argv;
+  const { file, index } = argv;
 
   const { sequelize, Sequelize, app } = require('../../../db/models');
   const queryInterface = sequelize.getQueryInterface();
@@ -36,6 +37,17 @@ exports.handler = async function(argv) {
   if (file) {
     // Handle Specify Seed
     await execSeederFile(file);
+  } else if (index) {
+    console.log('选择指定seeder索引:', index);
+    const files = glob(`${index}-seeder-*.js`, {
+      cwd: seederDir,
+      sync: true,
+    });
+
+    console.log('执行文件列表:', files);
+    for (const f of files) {
+      await execSeederFile(f);
+    }
   } else {
     // Handle All Seed
     const seederFiles = glob(pattern, {
