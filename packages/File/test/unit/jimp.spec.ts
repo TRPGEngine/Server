@@ -33,4 +33,25 @@ describe('jimp functions', () => {
       height: 144,
     });
   });
+
+  test('genThumbnail if onlyNecessary === false(default) should be ok', async () => {
+    const targetPath = targetFile('genThumbnail-large.jpg');
+
+    const thumbnail = await genThumbnail(logoImage, targetPath, 256, 256);
+
+    expect(await getImageInfo(targetPath)).toMatchObject({
+      width: 256,
+      height: 256,
+    });
+    expect(thumbnail.isThumbnail).toBe(true);
+  });
+
+  test('genThumbnail if onlyNecessary === true should be ok', async () => {
+    const targetPath = targetFile('genThumbnail-onlyNecessary.jpg');
+
+    const thumbnail = await genThumbnail(logoImage, targetPath, 256, 256, true);
+
+    expect(await fs.pathExists(targetPath)).toBe(false); // 因为目标大小大于原图所以没有生成对应文件
+    expect(thumbnail.isThumbnail).toBe(false);
+  });
 });
