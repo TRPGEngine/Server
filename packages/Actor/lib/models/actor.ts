@@ -16,6 +16,14 @@ export class ActorActor extends Model {
 
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
 
+  static findByUUID(uuid: string): Promise<ActorActor> {
+    return ActorActor.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
+
   getObject() {
     return {
       name: this.name,

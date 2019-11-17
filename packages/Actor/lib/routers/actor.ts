@@ -44,4 +44,12 @@ actorRouter.post('/create', ssoAuth(), async (ctx) => {
   ctx.body = { actor };
 });
 
+actorRouter.get('/detail/:actorUUID', async (ctx) => {
+  const actorUUID = ctx.params.actorUUID;
+
+  const actor = await ActorActor.findByUUID(actorUUID);
+
+  ctx.body = { actor };
+});
+
 export default actorRouter;
