@@ -7,8 +7,11 @@ class UnauthorizedError extends Error {
   name: 'Unauthorized';
 }
 
+/**
+ * 单点登录校验
+ */
 export const ssoAuth = (): TRPGMiddleware<{
-  player: PlayerJWTPayload;
+  player?: PlayerJWTPayload;
 }> => async (ctx, next) => {
   const token: string = ctx.headers['x-token'] || '';
   try {
@@ -36,5 +39,20 @@ export const ssoAuth = (): TRPGMiddleware<{
     } else {
       throw e;
     }
+  }
+};
+
+/**
+ * 获取单点校验信息
+ * 如果不通过则没有player状态。不会抛出异常
+ */
+export const ssoInfo = (): TRPGMiddleware<{
+  player?: PlayerJWTPayload;
+}> => async (ctx, next) => {
+  try {
+    await ssoAuth()(ctx, next);
+  } catch (e) {
+    ctx.status = 404; // 恢复到默认状态码
+    await next();
   }
 };

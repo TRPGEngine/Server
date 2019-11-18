@@ -1,5 +1,5 @@
-import { TRPGRouter } from 'trpg/core';
-import { ssoAuth } from 'packages/Player/lib/middleware/auth';
+import { TRPGRouter, ModelAccess } from 'trpg/core';
+import { ssoAuth, ssoInfo } from 'packages/Player/lib/middleware/auth';
 import { PlayerJWTPayload } from 'packages/Player/types/player';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
@@ -44,12 +44,46 @@ actorRouter.post('/create', ssoAuth(), async (ctx) => {
   ctx.body = { actor };
 });
 
-actorRouter.get('/detail/:actorUUID', async (ctx) => {
+actorRouter.get('/:actorUUID/detail', async (ctx) => {
   const actorUUID = ctx.params.actorUUID;
 
   const actor = await ActorActor.findByUUID(actorUUID);
 
   ctx.body = { actor };
+});
+
+actorRouter.get('/:actorUUID/access', ssoInfo(), async (ctx) => {
+  const actorUUID = ctx.params.actorUUID;
+
+  if (_.isNil(ctx.state.player)) {
+    ctx.body = {
+      access: {
+        editable: false,
+        removeable: false,
+      } as ModelAccess,
+    };
+
+    return;
+  }
+
+  const actor = await ActorActor.findByUUID(actorUUID);
+  const owner: PlayerUser = await actor.getOwner();
+
+  if (owner.uuid === _.get(ctx.state, 'player.uuid')) {
+    ctx.body = {
+      access: {
+        editable: true,
+        removeable: true,
+      } as ModelAccess,
+    };
+  } else {
+    ctx.body = {
+      access: {
+        editable: false,
+        removeable: false,
+      } as ModelAccess,
+    };
+  }
 });
 
 export default actorRouter;
