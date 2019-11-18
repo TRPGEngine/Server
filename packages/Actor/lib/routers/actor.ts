@@ -52,6 +52,44 @@ actorRouter.get('/:actorUUID/detail', async (ctx) => {
   ctx.body = { actor };
 });
 
+actorRouter.post('/:actorUUID/edit', ssoAuth(), async (ctx) => {
+  const actorUUID = ctx.params.actorUUID;
+  const { name, desc, avatar, info } = ctx.request.body;
+  const { uuid: userUUID } = ctx.state.player;
+
+  // 仅自己可以修改
+  const user = await PlayerUser.findByUUID(userUUID);
+  const actor: ActorActor = await ActorActor.findOne({
+    where: {
+      uuid: actorUUID,
+      ownerId: user.id,
+    },
+  });
+
+  if (_.isNil(actor)) {
+    throw new Error('角色不存在');
+  }
+
+  if (_.isString(name) && name !== '') {
+    actor.name = name;
+  }
+  if (_.isString(desc)) {
+    actor.desc = desc;
+  }
+  if (_.isString(avatar)) {
+    actor.avatar = avatar;
+  }
+  if (_.isEmpty(info)) {
+    _.merge(actor.info, info);
+  }
+
+  await actor.save();
+
+  ctx.body = {
+    actor,
+  };
+});
+
 actorRouter.get('/:actorUUID/access', ssoInfo(), async (ctx) => {
   const actorUUID = ctx.params.actorUUID;
 
