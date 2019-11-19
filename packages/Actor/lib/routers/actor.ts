@@ -79,8 +79,8 @@ actorRouter.post('/:actorUUID/edit', ssoAuth(), async (ctx) => {
   if (_.isString(avatar)) {
     actor.avatar = avatar;
   }
-  if (_.isEmpty(info)) {
-    _.merge(actor.info, info);
+  if (!_.isEmpty(info)) {
+    actor.info = _.merge(_.cloneDeep(actor.info), info);
   }
 
   await actor.save();
