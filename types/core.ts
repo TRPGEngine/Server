@@ -13,6 +13,8 @@ export { TRPGRouter, TRPGMiddleware } from 'packages/Core/types/webservice';
 export {
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
+  HasManyGetAssociationsMixin,
+  HasManySetAssociationsMixin,
 } from 'sequelize';
 
 // 模型权限信息

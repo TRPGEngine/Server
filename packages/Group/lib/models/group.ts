@@ -1,9 +1,12 @@
 import { Orm, DBInstance, Model } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import { GroupActor } from './actor';
+import _ from 'lodash';
 
 type GroupType = 'group' | 'channel' | 'test';
 
 export class GroupGroup extends Model {
+  id: number;
   uuid: string;
   type: GroupType;
   name: string;
@@ -16,6 +19,17 @@ export class GroupGroup extends Model {
   owner_uuid: string;
   managers_uuid: string[];
   maps_uuid: string[];
+
+  static async findGroupActorsByUUID(groupUUID: string): Promise<GroupActor> {
+    const group: GroupActor = await GroupGroup.findOne({
+      where: {
+        uuid: groupUUID,
+      },
+      include: ['groupActors'],
+    });
+
+    return _.get(group, 'groupActors', []);
+  }
 
   /**
    * 判断用户是否是该团的管理人员

@@ -9,6 +9,7 @@ import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupGroup } from './group';
 
 export class GroupActor extends Model {
+  id: number;
   uuid: string;
   actor_uuid: string;
   actor_info: {};
@@ -20,12 +21,13 @@ export class GroupActor extends Model {
   createAt: string;
   updateAt: string;
 
-  getActor: BelongsToGetAssociationMixin<ActorActor>;
-  getOwner: BelongsToGetAssociationMixin<PlayerUser>;
-  getGroup: BelongsToGetAssociationMixin<GroupGroup>;
+  getActor?: BelongsToGetAssociationMixin<ActorActor>;
+  getOwner?: BelongsToGetAssociationMixin<PlayerUser>;
+  getGroup?: BelongsToGetAssociationMixin<GroupGroup>;
 
   async getObjectAsync() {
-    let actor = await this.getActor();
+    const actor = await this.getActor();
+
     return {
       uuid: this.uuid,
       name: this.name,

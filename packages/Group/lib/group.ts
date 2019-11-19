@@ -7,6 +7,7 @@ import GroupInviteDefinition from './models/invite';
 import GroupActorDefinition from './models/actor';
 import GroupRequestDefinition from './models/request';
 import GroupDetailDefinition from './models/detail';
+import actorRouter from './routers/actor';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -117,6 +118,8 @@ export default class Group extends BasePackage {
     this.regSocketEvent('setMemberToManager', event.setMemberToManager);
     this.regSocketEvent('getGroupStatus', event.getGroupStatus);
     this.regSocketEvent('setGroupStatus', event.setGroupStatus);
+
+    this.regRoute(actorRouter);
 
     this.regStatJob('groupCount', async () => {
       let res = await db.models.group_group.count();
