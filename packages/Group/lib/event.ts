@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupInvite } from './models/invite';
 import { GroupGroup } from './models/group';
+import { GroupActor } from './models/actor';
 
 export const create: EventFunc<{
   name: string;
@@ -747,49 +748,9 @@ export const addGroupActor: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let groupUUID = data.groupUUID;
-  let actorUUID = data.actorUUID;
-  if (!groupUUID || !actorUUID) {
-    throw '缺少必要参数';
-  }
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  let actor = await db.models.actor_actor.findOne({
-    where: { uuid: actorUUID },
-  });
-  if (!actor) {
-    throw '找不到该角色';
-  }
-  let isGroupActorExist = await db.models.group_actor.findOne({
-    where: { actor_uuid: actor.uuid, groupId: group.id },
-  });
-  if (isGroupActorExist) {
-    throw '该角色已存在';
-  }
-
-  const user = await PlayerUser.findByUUID(player.uuid);
-
-  let groupActor;
-  await db.transactionAsync(async () => {
-    groupActor = await db.models.group_actor.create({
-      name: actor.name,
-      desc: actor.desc,
-      actor_uuid: actorUUID,
-      actor_info: {},
-      avatar: actor.avatar,
-      passed: false,
-      ownerId: user.id,
-    });
-    groupActor = await groupActor.setActor(actor);
-    groupActor = await groupActor.setGroup(group);
-
-    _.set(groupActor, 'dataValues.actor', actor);
-    _.set(groupActor, 'dataValues.group', group);
-  });
+  const groupUUID = data.groupUUID;
+  const actorUUID = data.actorUUID;
+  const groupActor = await GroupActor.addApprovalGroupActor(groupUUID, actorUUID, player.uuid)
 
   return { groupActor };
 };
