@@ -733,7 +733,7 @@ export const getGroupActorMapping: EventFunc<{
 };
 
 /**
- * 添加团人物
+ * 添加一个待审核团人物
  */
 export const addGroupActor: EventFunc<{
   groupUUID: string;

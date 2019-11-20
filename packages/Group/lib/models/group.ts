@@ -20,6 +20,22 @@ export class GroupGroup extends Model {
   managers_uuid: string[];
   maps_uuid: string[];
 
+  /**
+   * 根据UUID查找团
+   * @param groupUUID 团UUID
+   */
+  static findByUUID(groupUUID: string): Promise<GroupGroup> {
+    return GroupGroup.findOne({
+      where: {
+        uuid: groupUUID
+      }
+    })
+  }
+
+  /**
+   * 根据团UUID获取团UUID列表
+   * @param groupUUID 团UUID
+   */
   static async findGroupActorsByUUID(groupUUID: string): Promise<GroupActor> {
     const group: GroupActor = await GroupGroup.findOne({
       where: {

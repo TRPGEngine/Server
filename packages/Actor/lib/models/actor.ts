@@ -8,6 +8,7 @@ import {
 import { PlayerUser } from 'packages/Player/lib/models/user';
 
 export class ActorActor extends Model {
+  id: string;
   uuid: string;
   name: string;
   desc: string;
