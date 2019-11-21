@@ -380,18 +380,37 @@ export class Application extends events.EventEmitter {
 
   async close() {
     debug('closing....');
-    // 清理timer
-    await this.socketservice
-      .close()
-      .then(() => debug('closed socketservice service'));
+
+    if (!_.isNil(this.socketservice)) {
+      await this.socketservice
+        .close()
+        .then(() => debug('closed socketservice success'));
+    }
+
+    if (!_.isNil(this.webservice)) {
+      // NOTE: 这里是一个冗余操作
+      // 如果socketservice共用webservice的话。在socketservice关闭时同时会关闭webservice
+      await this.webservice
+        .close()
+        .then(() => debug('closed webservice success'));
+    }
+
     for (let timer of this.timers) {
+      // 清理timer
       clearInterval(timer);
     }
     this.timers = [];
-    this.job.cancel();
+
+    if (!_.isNil(this.job) && _.isFunction(this.job.cancel)) {
+      this.job.cancel();
+    }
     this.scheduleJob.forEach(({ job }) => job.cancel()); // 关闭计划任务列表
     debug('closed all scheduleJob');
-    this.cache.close(); // 关闭redis连接
+
+    if (!_.isNil(this.cache)) {
+      // 关闭redis连接
+      this.cache.close();
+    }
     // 执行关闭事件
     await Promise.all(
       Object.entries(this.closeTasks).map(([packageName, fn]) =>
@@ -401,7 +420,11 @@ export class Application extends events.EventEmitter {
       )
     ).then(() => debug('completed all close task'));
     this.emit('close');
-    await this.storage.close().then(() => debug('closed storage service'));
+
+    if (!_.isNil(this.storage)) {
+      // 关闭存储服务
+      await this.storage.close().then(() => debug('closed storage service'));
+    }
 
     debug('close completed!');
   }

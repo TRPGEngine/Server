@@ -303,6 +303,24 @@ export default class WebService {
     });
   }
 
+  close(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const server = this.getHttpServer();
+      if (!server.listening) {
+        // 如果没有启动监听则直接返回成功
+        resolve();
+      } else {
+        server.close((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      }
+    });
+  }
+
   getHttpServer() {
     return this._server;
   }
