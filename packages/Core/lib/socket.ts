@@ -1,5 +1,4 @@
 import IO, { Server, Socket } from 'socket.io';
-import SocketIORedis from 'socket.io-redis';
 import Debug from 'debug';
 const debug = Debug('trpg:socket');
 import { getLogger } from './logger';
@@ -82,7 +81,6 @@ export default class SocketService {
         this._io = IO(port, ioOpts);
       }
       applog('create io(%d) process success!', port);
-      this.initRedisAdapter();
     } catch (err) {
       applog('create io process error: %O', err);
       throw err;
@@ -120,22 +118,6 @@ export default class SocketService {
       app.emit('connection', socket);
       this.injectCustomEvents(socket);
     });
-  }
-
-  /**
-   * 使用redis分发socketio事件
-   */
-  initRedisAdapter() {
-    const redisUrl = this._app.get('redisUrl');
-    if (redisUrl) {
-      // TODO: 该适配器仅用于群发消息，一对一需自己实现
-      const adapter = SocketIORedis(redisUrl, {
-        key: 'trpg:socket.io',
-      });
-      this._io.adapter(adapter);
-
-      applog('Apply redis adapter in socketio instance success!');
-    }
   }
 
   registerIOEvent(eventName: string, eventFn: EventFunc) {
