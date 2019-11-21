@@ -13,3 +13,20 @@ test('context should contains port', () => {
   expect(context).toHaveProperty('port');
   expect(typeof context.port).toBe('number');
 });
+
+test('context should contains socket and emitEvent', () => {
+  expect(context).toHaveProperty('socket');
+  expect(typeof context.socket).toBe('object');
+  expect(context.socket.connected).toBe(true);
+  expect(context).toHaveProperty('emitEvent');
+  expect(typeof context.emitEvent).toBe('function');
+});
+
+test('context.emitEvent should be ok', async () => {
+  const ret = await context.emitEvent('hello');
+  expect(ret).toMatchObject({
+    data: null,
+  });
+  expect(ret).toHaveProperty('version');
+  expect(typeof ret.version).toBe('string');
+});

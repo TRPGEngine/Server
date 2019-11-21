@@ -75,6 +75,7 @@
     "@types/memoize-one": "^4.1.1",
     "@types/node-schedule": "^1.2.3",
     "@types/request": "^2.48.3",
+    "@types/socket.io-client": "^1.4.32",
     "@types/uuid": "^3.4.4",
     "cross-env": "^5.2.0",
     "glob": "^7.1.4",
