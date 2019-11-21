@@ -27,9 +27,9 @@ export class GroupGroup extends Model {
   static findByUUID(groupUUID: string): Promise<GroupGroup> {
     return GroupGroup.findOne({
       where: {
-        uuid: groupUUID
-      }
-    })
+        uuid: groupUUID,
+      },
+    });
   }
 
   /**

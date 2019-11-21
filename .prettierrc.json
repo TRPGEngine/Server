@@ -7,7 +7,7 @@
   "trailingComma": "es5",
   "bracketSpacing": true,
   "arrowParens": "always",
-  "parser": "babylon",
+  "parser": "babel",
   "jsxBracketSameLine": false,
   "overrides": [
     {
@@ -20,6 +20,12 @@
       "files": "*.{tsx,ts}",
       "options": {
         "parser": "typescript"
+      }
+    },
+    {
+      "files": "*.xml",
+      "options": {
+        "parser": "xml"
       }
     }
   ]
