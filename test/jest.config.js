@@ -118,7 +118,7 @@ module.exports = {
   rootDir: '../',
 
   // A list of paths to directories that Jest should use to search for files in
-  roots: ['<rootDir>/packages/'],
+  roots: ['<rootDir>/packages/', '<rootDir>/test/'],
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
@@ -135,8 +135,8 @@ module.exports = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  // testEnvironment: "node",
-  testEnvironment: require.resolve('./lib/TRPGEnvironment.js'),
+  testEnvironment: 'node',
+  // testEnvironment: require.resolve('./lib/TRPGEnvironment.js'),
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -183,7 +183,7 @@ module.exports = {
   // unmockedModulePathPatterns: undefined,
 
   // Indicates whether each individual test should be reported during the run
-  // verbose: null,
+  verbose: true,
 
   // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
   // watchPathIgnorePatterns: [],
