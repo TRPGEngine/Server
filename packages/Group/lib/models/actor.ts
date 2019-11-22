@@ -52,7 +52,7 @@ export class GroupActor extends Model {
       where: { actor_uuid: actor.uuid, groupId: group.id },
     });
     if (!_.isNil(isGroupActorExist)) {
-      throw new Error('该角色已存在');
+      throw new Error('该角色已存在, 请勿重复申请');
     }
 
     const user = await PlayerUser.findByUUID(playerUUID);
@@ -71,6 +71,44 @@ export class GroupActor extends Model {
     _.set(groupActor, 'dataValues.actor', actor);
     _.set(groupActor, 'dataValues.group', group);
 
+    return groupActor;
+  }
+
+  /**
+   * 同意团人物卡的审批
+   * @param groupActorUUID 团角色UUID
+   * @param playerUUID 操作人UUID
+   */
+  static async agreeApprovalGroupActor(
+    groupActorUUID: string,
+    playerUUID: string
+  ) {
+    if (!_.isString(groupActorUUID) || !_.isString(playerUUID)) {
+      throw new Error('缺少必要参数');
+    }
+
+    const groupActor: GroupActor = await GroupActor.findOne({
+      where: {
+        uuid: groupActorUUID,
+      },
+    });
+
+    if (_.isNil(groupActor)) {
+      throw new Error('找不到该团人物');
+    }
+
+    const group: GroupGroup = await groupActor.getGroup();
+
+    if (_.isNil(group)) {
+      throw new Error('找不到该人物所在团');
+    }
+
+    if (!group.isManagerOrOwner(playerUUID)) {
+      throw new Error('没有操作权限');
+    }
+
+    groupActor.passed = true;
+    await groupActor.save();
     return groupActor;
   }
 

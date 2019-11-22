@@ -821,7 +821,6 @@ export const removeGroupActor: EventFunc<{
 };
 
 export const agreeGroupActor: EventFunc<{
-  groupUUID: string;
   groupActorUUID: string;
 }> = async function agreeGroupActor(data, cb, db) {
   const app = this.app;
@@ -832,35 +831,20 @@ export const agreeGroupActor: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let groupUUID = data.groupUUID;
-  let groupActorUUID = data.groupActorUUID;
-  if (!groupUUID || !groupActorUUID) {
-    throw '缺少必要参数';
-  }
+  const groupActorUUID = data.groupActorUUID;
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  if (!group.isManagerOrOwner(player.uuid)) {
-    throw '没有操作权限';
-  }
-  let groupActor = await db.models.group_actor.findOne({
-    where: {
-      uuid: groupActorUUID,
-      passed: false,
-    },
-  });
-  if (!groupActor) {
-    throw '找不到该角色';
-  }
-  groupActor.passed = true;
-  await groupActor.save();
+  const groupActor = await GroupActor.agreeApprovalGroupActor(
+    groupActorUUID,
+    player.uuid
+  );
+
   return { groupActor };
 };
 
+/**
+ * 拒绝团角色申请
+ * 逻辑就是直接删除该角色
+ */
 export const refuseGroupActor: EventFunc<{
   groupUUID: string;
   groupActorUUID: string;
