@@ -6,7 +6,11 @@ import _ from 'lodash';
 import { TRPGApplication } from 'trpg/core';
 import io from 'socket.io-client';
 import supertest from 'supertest';
-import { Response } from 'superagent';
+import { Response as OriResponse } from 'superagent';
+
+interface Response<T> extends OriResponse {
+  body: T;
+}
 
 require('iconv-lite').encodingExists('foo'); // https://stackoverflow.com/questions/46227783/encoding-not-recognized-in-jest-js
 const loadModules = require('../../loader/standard');
@@ -18,8 +22,12 @@ interface TRPGAppInstanceContext {
   socket: SocketIOClient.Socket;
   emitEvent: (eventName: string, data?: {}) => Promise<any>;
   request: {
-    get: (url: string) => Promise<Response>;
-    post: (url: string, data: {}) => Promise<any>;
+    get: <T extends object = any>(url: string) => Promise<Response<T>>;
+    post: <T extends object = any>(
+      url: string,
+      data: {},
+      headers?: {}
+    ) => Promise<Response<T>>;
   };
 }
 
@@ -81,17 +89,23 @@ export const buildAppContext = (): TRPGAppInstanceContext => {
           });
         });
       },
-      post(url, data) {
+      post(url, data, headers?) {
         return new Promise((resolve, reject) => {
-          st.post(url)
-            .send(data)
-            .end((err, res) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(res);
-              }
+          const ins = st.post(url).send(data);
+
+          if (!_.isEmpty(headers)) {
+            _.toPairs(headers).map(([key, val]) => {
+              ins.set(key, String(val));
             });
+          }
+
+          ins.end((err, res) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(res);
+            }
+          });
         });
       },
     };
