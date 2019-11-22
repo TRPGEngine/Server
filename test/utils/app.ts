@@ -5,6 +5,8 @@ import Debug from 'debug';
 import _ from 'lodash';
 import { TRPGApplication } from 'trpg/core';
 import io from 'socket.io-client';
+import supertest from 'supertest';
+import { Response } from 'superagent';
 
 require('iconv-lite').encodingExists('foo'); // https://stackoverflow.com/questions/46227783/encoding-not-recognized-in-jest-js
 const loadModules = require('../../loader/standard');
@@ -15,6 +17,10 @@ interface TRPGAppInstanceContext {
   port: number;
   socket: SocketIOClient.Socket;
   emitEvent: (eventName: string, data?: {}) => Promise<any>;
+  request: {
+    get: (url: string) => Promise<Response>;
+    post: (url: string, data: {}) => Promise<any>;
+  };
 }
 
 /**
@@ -29,13 +35,14 @@ export const buildAppContext = (): TRPGAppInstanceContext => {
     port: config.get<number>('port'),
     socket: null,
     emitEvent: null,
+    request: null,
   };
   beforeAll(async () => {
     debug('beforeAll');
 
     // 创建应用
     const port = await getPort({ port: Number(context.port) });
-    const app = require('../../packages/Core/')({
+    const app: TRPGApplication = require('../../packages/Core/')({
       ...config,
       port, // 分配一个端口以保证不会重复
     });
@@ -59,6 +66,35 @@ export const buildAppContext = (): TRPGAppInstanceContext => {
     };
     context.socket = socket;
     context.emitEvent = emitEvent;
+
+    // 创建http服务测试框架
+    const st = supertest(app.webservice.getHttpServer());
+    context.request = {
+      get(url) {
+        return new Promise((resolve, reject) => {
+          st.get(url).end((err, res) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(res);
+            }
+          });
+        });
+      },
+      post(url, data) {
+        return new Promise((resolve, reject) => {
+          st.post(url)
+            .send(data)
+            .end((err, res) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(res);
+              }
+            });
+        });
+      },
+    };
 
     // TODO: 要想办法弄掉
     await sleep(1000); // 强行sleep以保证app能正常加载完毕
