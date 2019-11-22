@@ -35,7 +35,7 @@ interface TRPGAppInstanceContext {
  * 创建一个APP测试上下文
  * Usage: const context = buildAppContext();
  * context.xxx
- * NOTICE: 不要结构他。因为他初始值是么有数据的，是通过beforeAll的方式加载进来的
+ * NOTICE: 不要结构这个对象。因为他初始值是没有数据的，是通过beforeAll的方式加载进来的
  */
 export const buildAppContext = (): TRPGAppInstanceContext => {
   let context: TRPGAppInstanceContext = {

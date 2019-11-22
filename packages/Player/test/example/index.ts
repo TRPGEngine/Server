@@ -3,7 +3,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
 import memoizeOne from 'memoize-one';
 
-const testPlayerInfo = {
+const testUserInfo = {
   username: 'admin10',
   password: md5Encrypt('admin'),
 };
@@ -11,10 +11,10 @@ const testPlayerInfo = {
 /**
  * 获取测试用户
  */
-export const getTestPlayer = memoizeOne(async () => {
+export const getTestUser = memoizeOne(async () => {
   return await PlayerUser.findByUsernameAndPassword(
-    testPlayerInfo.username,
-    testPlayerInfo.password
+    testUserInfo.username,
+    testUserInfo.password
   );
 });
 
@@ -22,7 +22,7 @@ export const getTestPlayer = memoizeOne(async () => {
  * 生成测试用户的JWT
  */
 export const genTestPlayerJWT = async (): Promise<string> => {
-  const player = await getTestPlayer();
+  const player = await getTestUser();
   const playerUUID = player.uuid;
   const jwt = await PlayerUser.signJWT(playerUUID);
 

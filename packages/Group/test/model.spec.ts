@@ -1,44 +1,25 @@
-import { ActorActor as ActorActorCls } from 'packages/Actor/lib/models/actor';
-import { ActorTemplate as ActorTemplateCls } from 'packages/Actor/lib/models/template';
-import { GroupGroup as GroupGroupCls } from '../lib/models/group';
-import { GroupActor as GroupActorCls } from '../lib/models/actor';
 import _ from 'lodash';
+import { buildAppContext } from 'test/utils/app';
+import { ActorActor } from 'packages/Actor/lib/models/actor';
+import { GroupGroup } from 'packages/Group/lib/models/group';
+import { GroupActor } from 'packages/Group/lib/models/actor';
+import { createTestActor } from 'packages/Actor/test/example';
+import { createTestGroup, createTestGroupActor } from './example';
+import { getTestUser } from 'packages/Player/test/example';
 
-const db = global.db;
-const ActorActor: typeof ActorActorCls = db.models.actor_actor;
-const ActorTemplate: typeof ActorTemplateCls = db.models.actor_template;
-const GroupGroup: typeof GroupGroupCls = db.models.group_group;
-const GroupActor: typeof GroupActorCls = db.models.group_actor;
+const context = buildAppContext();
 
-export {};
-
-describe('model function', () => {
-  let testActor: ActorActorCls;
-  let testGroup: GroupGroupCls;
-  let testGroupActor: GroupActorCls;
+describe('group model function', () => {
+  let testActor: ActorActor;
+  let testGroup: GroupGroup;
+  let testGroupActor: GroupActor;
 
   beforeAll(async () => {
-    const firstTemplate = await ActorTemplate.findOne();
-    testActor = await ActorActor.create({
-      name: 'test actor name',
-      desc: '',
-      avatar: '',
-      template_uuid: firstTemplate.uuid,
-    });
+    testActor = await createTestActor();
 
-    testGroup = await GroupGroup.create({
-      type: 'test',
-      name: 'test_group',
-      creator_uuid: 'test_uuid',
-      owner_uuid: 'test_uuid',
-    });
+    testGroup = await createTestGroup();
 
-    testGroupActor = await GroupActor.create({
-      actor_uuid: 'test_actor',
-      actor_info: {},
-      name: 'test',
-      groupId: testGroup.id,
-    });
+    testGroupActor = await createTestGroupActor(testGroup.id);
   });
 
   afterAll(async () => {
@@ -62,11 +43,11 @@ describe('model function', () => {
 
   describe('GroupActor', () => {
     test('GroupActor.addApprovalGroupActor should be ok', async () => {
-      const firstUser = await db.models.player_user.findOne();
+      const testUser = await getTestUser();
       const groupActor = await GroupActor.addApprovalGroupActor(
         testGroup.uuid,
         testActor.uuid,
-        firstUser.uuid
+        testUser.uuid
       );
 
       expect(groupActor.toJSON()).toHaveProperty('actor');
@@ -78,6 +59,19 @@ describe('model function', () => {
       expect(groupActor.avatar).toBe(testActor.avatar);
 
       await groupActor.destroy();
+    });
+
+    test('GroupActor.agreeApprovalGroupActor should be ok', async () => {
+      const testUser = await getTestUser();
+      const groupActor = await GroupActor.agreeApprovalGroupActor(
+        testGroupActor.uuid,
+        testUser.uuid
+      );
+
+      expect(groupActor).toMatchObject({
+        uuid: testGroupActor.uuid,
+        passed: true,
+      });
     });
   });
 });
