@@ -1,10 +1,8 @@
-import { ChatLog as ChatLogCls } from '../lib/models/log';
-import { TRPGApplication } from 'trpg/core';
+import { ChatLog } from '../lib/models/log';
 import { ChatMessagePartial } from '../types/message';
+import { buildAppContext } from 'test/utils/app';
 
-const app: TRPGApplication = global.trpgapp;
-const db = global.db;
-const ChatLog: typeof ChatLogCls = db.models.chat_log;
+const context = buildAppContext();
 
 describe('chat log func', () => {
   const logCacheKey = 'chat:log-cache';
@@ -18,24 +16,24 @@ describe('chat log func', () => {
   it('ChatLog.appendCachedChatLog should be ok', async () => {
     await ChatLog.appendCachedChatLog(testChatLogPayload);
 
-    const logList = await app.cache.lget(logCacheKey);
+    const logList = await context.app.cache.lget(logCacheKey);
     expect(logList).toHaveProperty('length');
     expect(logList.length).toBeGreaterThan(0);
 
-    await app.cache.lclear(logCacheKey, logList.length - 1, 1); // 清除最后一条
+    await context.app.cache.lclear(logCacheKey, logList.length - 1, 1); // 清除最后一条
   });
 
   it('ChatLog.getCachedChatLog should be ok', async () => {
-    await app.cache.rpush('chat:log-cache', testChatLogPayload);
+    await context.app.cache.rpush('chat:log-cache', testChatLogPayload);
 
     const logList = await ChatLog.getCachedChatLog();
     expect(logList).toMatchObject([testChatLogPayload]);
 
-    await app.cache.lclear(logCacheKey, logList.length - 1, 1); // 清除最后一条
+    await context.app.cache.lclear(logCacheKey, logList.length - 1, 1); // 清除最后一条
   });
 
   it('ChatLog.dumpCachedChatLog should be ok', async () => {
-    await app.cache.rpush('chat:log-cache', testChatLogPayload);
+    await context.app.cache.rpush('chat:log-cache', testChatLogPayload);
     const mockBulkCreate = jest.fn();
     ChatLog.bulkCreate = mockBulkCreate;
 
@@ -44,6 +42,6 @@ describe('chat log func', () => {
     expect(mockBulkCreate).toBeCalledTimes(1);
     expect(mockBulkCreate.mock.calls[0][0]).toMatchObject([testChatLogPayload]);
 
-    expect(await app.cache.lget(ChatLog.CACHE_KEY)).toMatchObject([]);
+    expect(await context.app.cache.lget(ChatLog.CACHE_KEY)).toMatchObject([]);
   });
 });
