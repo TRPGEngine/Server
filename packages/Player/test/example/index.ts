@@ -20,9 +20,9 @@ export const handleLogin = async (
   const ret = await context.emitEvent('player::login', testUserInfo);
   await sleep(500); // 保证登录的token能写到数据库中
 
-  const playerInfo = await getTestUser();
+  const testUser = await getTestUser();
 
-  return playerInfo;
+  return testUser;
 };
 
 /**

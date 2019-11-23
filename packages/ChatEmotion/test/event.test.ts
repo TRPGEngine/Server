@@ -1,32 +1,21 @@
-const db = global.db;
-const emitEvent = global.emitEvent;
-const _ = global._;
+import { buildAppContext } from 'test/utils/app';
+import { handleLogin, handleLogout } from 'packages/Player/test/example';
 
-export {};
+const context = buildAppContext();
 
-let userInfo;
-let userInfoInstance;
+let testUser;
 
 beforeAll(async () => {
-  const loginInfo = await emitEvent('player::login', {
-    username: 'admin10',
-    password: '21232f297a57a5a743894a0e4a801fc3',
-  });
-  expect(loginInfo.result).toBe(true);
-  userInfo = loginInfo.info;
-  userInfoInstance = await db.models.player_user.findOne({
-    where: { uuid: userInfo.uuid },
-  });
+  testUser = await handleLogin(context);
 });
 
 afterAll(async () => {
-  let { uuid, token } = userInfo;
-  await emitEvent('player::logout', { uuid, token });
+  await handleLogout(context, testUser);
 });
 
 describe('chat emotion event', () => {
   test('getUserEmotionCatalog should be ok', async () => {
-    const ret = await emitEvent('chatemotion::getUserEmotionCatalog');
+    const ret = await context.emitEvent('chatemotion::getUserEmotionCatalog');
 
     expect(ret.result).toBe(true);
     expect(ret.catalogs).toBeTruthy();
