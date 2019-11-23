@@ -372,21 +372,23 @@ export const logout: EventFunc<{
     throw '参数不全';
   }
 
-  let where = { uuid };
+  const where = { uuid };
   if (isApp) {
     where['app_token'] = token;
   } else {
     where['token'] = token;
   }
 
-  let user = await db.models.player_user.findOne({ where });
+  const user = await PlayerUser.findOne({ where });
   if (!user) {
-    debug('logout fail, try to login %s', uuid);
+    debug('logout fail, try to logout %s', uuid);
     throw 'TOKEN错误或过期';
   } else {
     debug('logout success!user %s has been logout', user.uuid);
     user.token = '';
     await user.save();
+
+    cb({ result: true });
 
     // 记录用户离线时间
     app.player.recordUserOfflineDate(socket);
@@ -395,8 +397,6 @@ export const logout: EventFunc<{
     if (!!app.player) {
       await app.player.manager.removePlayer(user.uuid, isApp ? 'app' : 'web');
     }
-
-    return true;
   }
 };
 

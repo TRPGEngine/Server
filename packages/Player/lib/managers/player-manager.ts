@@ -439,7 +439,7 @@ class PlayerManager extends EventEmitter {
     const socket = player.socket;
     delete this.players[socket.id]; // 从本地的会话管理列表中移除
 
-    if (!socket.connected) {
+    if (socket.connected) {
       socket.disconnect();
     }
 
