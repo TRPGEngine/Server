@@ -18,7 +18,9 @@ export const handleLogin = async (
   context: TRPGAppInstanceContext
 ): Promise<PlayerUser> => {
   const ret = await context.emitEvent('player::login', testUserInfo);
-  const playerInfo = ret.info;
+  await sleep(500); // 保证登录的token能写到数据库中
+
+  const playerInfo = await getTestUser();
 
   return playerInfo;
 };
@@ -31,7 +33,6 @@ export const handleLogout = async (
   context: TRPGAppInstanceContext,
   testUser?: PlayerUser
 ) => {
-  await sleep(100); // 保证登录的token能写到数据库中
   if (_.isNil(testUser)) {
     testUser = await getTestUser();
   }
