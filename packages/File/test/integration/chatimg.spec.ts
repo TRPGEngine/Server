@@ -1,13 +1,15 @@
-import request from 'test/utils/request';
+import { buildAppContext } from 'test/utils/app';
+
+const context = buildAppContext();
 
 describe('chatimg router', () => {
   it('/file/chatimg/upload/info', async () => {
-    const { data } = await request.get('/file/chatimg/upload/info');
+    const { body } = await context.request.get('/file/chatimg/upload/info');
 
-    expect(data).toHaveProperty('result');
-    expect(data.result).toBe(true);
-    expect(data).toHaveProperty('url');
-    expect(data).toHaveProperty('imageField');
-    expect(data).toHaveProperty('otherData');
+    expect(body).toHaveProperty('result');
+    expect(body.result).toBe(true);
+    expect(body).toHaveProperty('url');
+    expect(body).toHaveProperty('imageField');
+    expect(body).toHaveProperty('otherData');
   });
 });
