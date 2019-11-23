@@ -3,7 +3,7 @@ import getPort from 'get-port';
 import { sleep } from './utils';
 import Debug from 'debug';
 import _ from 'lodash';
-import { TRPGApplication } from 'trpg/core';
+import { TRPGApplication, DBInstance } from 'trpg/core';
 import io from 'socket.io-client';
 import supertest from 'supertest';
 import { Response as OriResponse } from 'superagent';
@@ -16,8 +16,9 @@ require('iconv-lite').encodingExists('foo'); // https://stackoverflow.com/questi
 const loadModules = require('../../loader/standard');
 const debug = Debug('trpg:test:app');
 
-interface TRPGAppInstanceContext {
+export interface TRPGAppInstanceContext {
   app: TRPGApplication;
+  db: DBInstance;
   port: number;
   socket: SocketIOClient.Socket;
   emitEvent: (eventName: string, data?: {}) => Promise<any>;
@@ -40,6 +41,7 @@ interface TRPGAppInstanceContext {
 export const buildAppContext = (): TRPGAppInstanceContext => {
   let context: TRPGAppInstanceContext = {
     app: null,
+    db: null,
     port: config.get<number>('port'),
     socket: null,
     emitEvent: null,
@@ -60,6 +62,7 @@ export const buildAppContext = (): TRPGAppInstanceContext => {
     app.run();
     debug('app start in %d', port);
     context.app = app;
+    context.db = app.storage.db;
 
     // 创建socket客户端连接
     const socket = io(`ws://127.0.0.1:${port}`, { autoConnect: false });

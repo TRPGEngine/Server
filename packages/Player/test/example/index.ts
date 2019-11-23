@@ -2,21 +2,56 @@ import md5Encrypt from 'packages/Player/lib/utils/md5';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import { TRPGAppInstanceContext } from 'test/utils/app';
+import { sleep } from 'lib/helper/utils';
 
-const testUserInfo = {
+export const testUserInfo = {
   username: 'admin10',
   password: md5Encrypt('admin'),
 };
 
 /**
+ * 用户登录
+ * @param context 测试应用上下文
+ */
+export const handleLogin = async (
+  context: TRPGAppInstanceContext
+): Promise<PlayerUser> => {
+  const ret = await context.emitEvent('player::login', testUserInfo);
+  const playerInfo = ret.info;
+
+  return playerInfo;
+};
+
+/**
+ * 用户登出
+ * @param context 测试应用上下文
+ */
+export const handleLogout = async (
+  context: TRPGAppInstanceContext,
+  testUser?: PlayerUser
+) => {
+  await sleep(100); // 保证登录的token能写到数据库中
+  if (_.isNil(testUser)) {
+    testUser = await getTestUser();
+  }
+  await context.emitEvent('player::logout', {
+    uuid: testUser.uuid,
+    token: testUser.token,
+  });
+};
+
+/**
  * 获取测试用户
  */
-export const getTestUser = memoizeOne(async () => {
-  return await PlayerUser.findByUsernameAndPassword(
-    testUserInfo.username,
-    testUserInfo.password
-  );
-});
+export const getTestUser = memoizeOne(
+  async (): Promise<PlayerUser> => {
+    return await PlayerUser.findByUsernameAndPassword(
+      testUserInfo.username,
+      testUserInfo.password
+    );
+  }
+);
 
 /**
  * 生成测试用户的JWT

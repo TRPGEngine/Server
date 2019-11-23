@@ -9,18 +9,9 @@ import { RedisCache } from 'packages/Core/lib/cache';
 import { sleep } from 'test/utils/utils';
 import _ from 'lodash';
 import { Socket } from 'trpg/core';
+import { createFakeSocket } from 'test/utils/socket';
 
 const redisUrl = Config.get<string>('redisUrl');
-const getFakeSocket = (): Socket => {
-  const emit = jest.fn() as any;
-  const disconnect = jest.fn() as any;
-  return {
-    id: _.uniqueId('socket_'),
-    emit,
-    connected: true,
-    disconnect,
-  } as Socket;
-};
 
 describe('player-manager class test', () => {
   let cache: RedisCache;
@@ -67,7 +58,7 @@ describe('player-manager class test', () => {
   }, 10000);
 
   it('addPlayer should be ok', async () => {
-    const socket = getFakeSocket();
+    const socket = createFakeSocket();
     const isSuccess = await playerManager.addPlayer('testUUID', socket, 'web');
 
     expect(isSuccess).toBe(true);
@@ -82,7 +73,7 @@ describe('player-manager class test', () => {
   });
 
   it('removePlayer should be ok', async () => {
-    const socket = getFakeSocket();
+    const socket = createFakeSocket();
     playerManager.players = {
       [socket.id]: {
         uuid: 'testUUID',
@@ -97,8 +88,8 @@ describe('player-manager class test', () => {
   });
 
   it('findPlayerWithUUID', async () => {
-    const socket = getFakeSocket();
-    const socket2 = getFakeSocket();
+    const socket = createFakeSocket();
+    const socket2 = createFakeSocket();
     const players: PlayerManagerPlayerMap = {
       [socket.id]: {
         uuid: 'testUUID',
@@ -122,8 +113,8 @@ describe('player-manager class test', () => {
   });
 
   it('findPlayerWithUUIDPlatform', async () => {
-    const socket = getFakeSocket();
-    const socket2 = getFakeSocket();
+    const socket = createFakeSocket();
+    const socket2 = createFakeSocket();
     const players: PlayerManagerPlayerMap = {
       [socket.id]: {
         uuid: 'testUUID',
@@ -150,17 +141,17 @@ describe('player-manager class test', () => {
 
   it('getOnlinePlayerCount should be ok', async () => {
     expect(await playerManager.getOnlinePlayerCount()).toBe(0);
-    const socket = getFakeSocket();
+    const socket = createFakeSocket();
     await playerManager.addPlayer('test1', socket, 'web');
     expect(await playerManager.getOnlinePlayerCount()).toBe(1);
-    const socket2 = getFakeSocket();
+    const socket2 = createFakeSocket();
     await playerManager.addPlayer('test1', socket2, 'app');
     expect(await playerManager.getOnlinePlayerCount(true)).toBe(1);
     expect(await playerManager.getOnlinePlayerCount()).toBe(2);
   });
 
   it('tickPlayer should be ok', async () => {
-    const socket = getFakeSocket();
+    const socket = createFakeSocket();
     await playerManager.addPlayer('test1', socket, 'web');
     await playerManager.tickPlayer('test1', 'web');
 
@@ -182,8 +173,8 @@ describe('player-manager class test', () => {
 
   describe('single instance', () => {
     it('unicastSocketEvent should be ok', async () => {
-      const socket1 = getFakeSocket();
-      const socket2 = getFakeSocket();
+      const socket1 = createFakeSocket();
+      const socket2 = createFakeSocket();
       await playerManager.addPlayer('test1', socket1, 'web');
       await playerManager.addPlayer('test1', socket2, 'app');
       await playerManager.unicastSocketEvent('test1', 'testEvent', { test: 1 });
@@ -203,8 +194,8 @@ describe('player-manager class test', () => {
     });
 
     it('roomcastSocketEvent should be ok', async () => {
-      const socket1 = getFakeSocket();
-      const socket2 = getFakeSocket();
+      const socket1 = createFakeSocket();
+      const socket2 = createFakeSocket();
       const roomUUID = 'roomUUID';
       await playerManager.addPlayer('test1', socket1, 'web');
       await playerManager.addPlayer('test2', socket2, 'web');
@@ -229,8 +220,8 @@ describe('player-manager class test', () => {
     });
 
     it('broadcastSocketEvent should be ok', async () => {
-      const socket1 = getFakeSocket();
-      const socket2 = getFakeSocket();
+      const socket1 = createFakeSocket();
+      const socket2 = createFakeSocket();
       await playerManager.addPlayer('test1', socket1, 'web');
       await playerManager.addPlayer('test2', socket2, 'web');
       await playerManager.broadcastSocketEvent('testEvent', {

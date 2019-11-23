@@ -1,31 +1,32 @@
-import crypto from 'crypto';
-const db = global.db;
-const emitEvent = global.emitEvent;
-const _ = global._;
+import { buildAppContext } from 'test/utils/app';
+import { testUserInfo, handleLogin, handleLogout } from './example';
+import { PlayerUser } from '../lib/models/user';
+import _ from 'lodash';
+import { PlayerInvite } from '../lib/models/invite';
+import { sleep } from 'test/utils/utils';
 
-export {};
-
-function md5(str) {
-  if (typeof str != 'string') {
-    str = String(str);
-  }
-
-  var md5sum = crypto.createHash('md5');
-  md5sum.update(str);
-  str = md5sum.digest('hex');
-  return str;
-}
+const context = buildAppContext();
 
 describe('account', () => {
-  test('login should be ok', async () => {
-    let ret = await emitEvent('player::login', {
-      username: 'admin1',
-      password: md5('admin'),
+  test('login and logout should be ok', async () => {
+    const ret = await context.emitEvent('player::login', {
+      username: 'admin9',
+      password: testUserInfo.password,
     });
 
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('info');
-    expect(ret.info.username).toBe('admin1');
+    expect(typeof ret.info.uuid).toBe('string');
+    expect(ret.info.username).toBe('admin9');
+
+    // 登录完毕后退出登录
+    await sleep(500); // 因为刚登录时数据还没有写入数据库，因此等待100毫秒让token写入数据库
+    const logoutRet = await context.emitEvent('player::logout', {
+      uuid: ret.info.uuid,
+      token: ret.info.token,
+    });
+
+    expect(logoutRet.result).toBe(true);
   });
 
   test.todo('login should be error if username and password is error');
@@ -38,30 +39,15 @@ describe('account', () => {
 });
 
 describe('user action', () => {
-  let userInfo;
-  let userInfoDbInstance = null;
+  let testUser: PlayerUser;
 
   beforeAll(async () => {
-    const loginInfo = await emitEvent('player::login', {
-      username: 'admin1',
-      password: md5('admin'),
-    });
-    expect(loginInfo.result).toBe(true);
-    userInfo = loginInfo.info;
-
-    userInfoDbInstance = await db.models.player_user.findOne({
-      where: { uuid: userInfo.uuid },
-    });
+    testUser = await handleLogin(context);
   });
 
   afterAll(async () => {
-    await emitEvent('player::logout', {
-      uuid: userInfo.uuid,
-      token: userInfo.token,
-    });
-
-    userInfo = {};
-    userInfoDbInstance = null;
+    await handleLogout(context, testUser);
+    testUser = null;
   });
 
   test.todo('getInfo should be ok');
@@ -73,7 +59,7 @@ describe('user action', () => {
   test.todo('findUser should be ok');
 
   // test('addFriend should be ok', async () => {
-  //   let testUser = await db.models.player_user.findOne({
+  //   let testUser = await context.db.models.player_user.findOne({
   //     where: {
   //       username: 'admin5',
   //     },
@@ -81,7 +67,7 @@ describe('user action', () => {
   //   expect(testUser).toBeTruthy();
   //   let targetUUID = testUser.uuid;
 
-  //   let ret = await emitEvent('player::addFriend', {
+  //   let ret = await context.emitEvent('player::addFriend', {
   //     uuid: targetUUID,
   //   });
   //   expect(ret.result).toBe(true);
@@ -95,7 +81,7 @@ describe('user action', () => {
   // });
 
   test('getFriends should be ok', async () => {
-    let ret = await emitEvent('player::getFriends');
+    let ret = await context.emitEvent('player::getFriends');
 
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('list');
@@ -107,25 +93,25 @@ describe('user action', () => {
   });
 
   test('sendFriendInvite should be ok', async () => {
-    let testUser = await db.models.player_user.findOne({
+    const testUser = await context.db.models.player_user.findOne({
       where: {
         username: 'admin6',
       },
     });
     expect(testUser).toBeTruthy();
 
-    let ret = await emitEvent('player::sendFriendInvite', {
+    const ret = await context.emitEvent('player::sendFriendInvite', {
       to: testUser.uuid,
     });
     expect(ret.result).toBe(true);
     const invite = ret.invite;
 
-    let retDup = await emitEvent('player::sendFriendInvite', {
+    const retDup = await context.emitEvent('player::sendFriendInvite', {
       to: testUser.uuid,
     });
     expect(retDup.result).toBe(false); // 应当不允许重复请求
 
-    let inviteInstance = await db.models.player_invite.findOne({
+    const inviteInstance: PlayerInvite = await PlayerInvite.findOne({
       where: {
         uuid: invite.uuid,
       },
@@ -139,14 +125,14 @@ describe('user action', () => {
 
     beforeEach(async () => {
       // 创建一个好友邀请
-      let testUser = await db.models.player_user.findOne({
+      let testUser2 = await context.db.models.player_user.findOne({
         where: {
           username: 'admin6',
         },
       });
-      let invite = await db.models.player_invite.create({
-        from_uuid: testUser.uuid,
-        to_uuid: userInfo.uuid,
+      let invite = await context.db.models.player_invite.create({
+        from_uuid: testUser2.uuid,
+        to_uuid: testUser.uuid,
       });
 
       inviteUUID = invite.uuid;
@@ -155,7 +141,7 @@ describe('user action', () => {
 
     afterEach(async () => {
       // 移除新建的邀请
-      await db.models.player_invite.destroy({
+      await context.db.models.player_invite.destroy({
         where: {
           uuid: inviteUUID,
         },
@@ -164,12 +150,12 @@ describe('user action', () => {
     });
 
     test('agree should be ok', async () => {
-      let ret = await emitEvent('player::agreeFriendInvite', {
+      let ret = await context.emitEvent('player::agreeFriendInvite', {
         uuid: inviteUUID,
       });
       expect(ret.result).toBe(true);
 
-      let instance = await db.models.player_invite.findOne({
+      let instance = await context.db.models.player_invite.findOne({
         where: {
           uuid: inviteUUID,
         },
@@ -180,12 +166,12 @@ describe('user action', () => {
     });
 
     test('refuse should be ok', async () => {
-      let ret = await emitEvent('player::refuseFriendInvite', {
+      let ret = await context.emitEvent('player::refuseFriendInvite', {
         uuid: inviteUUID,
       });
       expect(ret.result).toBe(true);
 
-      let instance = await db.models.player_invite.findOne({
+      let instance = await context.db.models.player_invite.findOne({
         where: {
           uuid: inviteUUID,
         },
@@ -196,7 +182,7 @@ describe('user action', () => {
     });
 
     test('getFriendsInvite should be ok', async () => {
-      let ret = await emitEvent('player::getFriendsInvite');
+      let ret = await context.emitEvent('player::getFriendsInvite');
       expect(ret.result).toBe(true);
 
       expect(ret.res).toHaveProperty('length');
@@ -207,7 +193,7 @@ describe('user action', () => {
     });
 
     test('getFriendInviteDetail', async () => {
-      const ret = await emitEvent('player::getFriendInviteDetail', {
+      const ret = await context.emitEvent('player::getFriendInviteDetail', {
         uuid: inviteUUID,
       });
 
@@ -215,20 +201,20 @@ describe('user action', () => {
       expect(ret.invite).toBeTruthy();
       expect(ret.invite).toMatchObject({
         uuid: inviteUUID,
-        to_uuid: userInfo.uuid,
+        to_uuid: testUser.uuid,
       });
     });
   });
 
   test('check user online should be ok', async () => {
-    let selfRet = await emitEvent('player::checkUserOnline', {
-      uuid: userInfo.uuid,
+    let selfRet = await context.emitEvent('player::checkUserOnline', {
+      uuid: testUser.uuid,
     });
 
     expect(selfRet.result).toBe(true);
     expect(selfRet.isOnline).toBe(true);
 
-    let errRet = await emitEvent('player::checkUserOnline', {
+    let errRet = await context.emitEvent('player::checkUserOnline', {
       uuid: Math.random(),
     });
 
@@ -237,7 +223,7 @@ describe('user action', () => {
   });
 
   test('get settings should be ok', async () => {
-    let ret = await emitEvent('player::getSettings');
+    let ret = await context.emitEvent('player::getSettings');
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('userSettings');
     expect(ret).toHaveProperty('systemSettings');
