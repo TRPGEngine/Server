@@ -41,9 +41,11 @@ jobs:
       # - run: npm run packages:install
       - run: bash packages/foreach.sh 'npm install'
 
+      - run: export NODE_ENV=ci
+
       # 更新数据库
       - run: npm run db:migrate:run
       - run: npm run db:seeder:run
 
       # run tests!
-      - run: NODE_ENV=ci npm run test
+      - run: npm run test
