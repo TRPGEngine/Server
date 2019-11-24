@@ -16,5 +16,6 @@ module.exports = [
   'all',
   'misc',
   'test',
+  'ci',
   ...packages,
 ];
