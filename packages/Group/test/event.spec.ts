@@ -1,41 +1,36 @@
-const db = global.db;
-const emitEvent = global.emitEvent;
-const _ = global._;
-const generateRandomStr = global.generateRandomStr;
+import { buildAppContext } from 'test/utils/app';
+import { handleLogin, handleLogout } from 'packages/Player/test/example';
+import { PlayerUser } from 'packages/Player/lib/models/user';
+import { generateRandomStr } from 'test/utils/utils';
+import { GroupGroup } from '../lib/models/group';
+import { GroupRequest } from '../lib/models/request';
+import { GroupInvite } from '../lib/models/invite';
+import { ActorActor } from 'packages/Actor/lib/models/actor';
+import { GroupActor } from '../lib/models/actor';
 
-export {};
+const context = buildAppContext();
 
-let userInfo;
-let userInfoInstance;
+let testUser: PlayerUser;
 
 beforeAll(async () => {
-  const loginInfo = await emitEvent('player::login', {
-    username: 'admin10',
-    password: '21232f297a57a5a743894a0e4a801fc3',
-  });
-  expect(loginInfo.result).toBe(true);
-  userInfo = loginInfo.info;
-  userInfoInstance = await db.models.player_user.findOne({
-    where: { uuid: userInfo.uuid },
-  });
+  testUser = await handleLogin(context);
 });
 
 afterAll(async () => {
-  let { uuid, token } = userInfo;
-  await emitEvent('player::logout', { uuid, token });
+  await handleLogout(context, testUser);
 });
 
 describe('group action', () => {
-  let testGroup;
+  let testGroup: GroupGroup;
 
   beforeAll(async () => {
-    testGroup = await db.models.group_group.create({
+    testGroup = await GroupGroup.create({
       name: 'test name' + generateRandomStr(),
       sub_name: 'test sub_name' + generateRandomStr(),
-      creator_uuid: userInfo.uuid,
-      owner_uuid: userInfo.uuid,
+      creator_uuid: testUser.uuid,
+      owner_uuid: testUser.uuid,
     });
-    await testGroup.addMember(userInfoInstance, {
+    await testGroup.addMember(testUser, {
       through: {
         selected_group_actor_uuid: 'test selected_group_actor_uuid',
       },
@@ -47,7 +42,7 @@ describe('group action', () => {
   });
 
   test('create should be ok', async () => {
-    let ret = await emitEvent('group::create', {
+    let ret = await context.emitEvent('group::create', {
       name: 'test group name',
       sub_name: 'test group sub_name',
     });
@@ -58,7 +53,7 @@ describe('group action', () => {
     expect(ret).toHaveProperty('group.uuid');
 
     let groupUUID = ret.group.uuid;
-    await db.models.group_group.destroy({
+    await GroupGroup.destroy({
       where: {
         uuid: groupUUID,
       },
@@ -67,7 +62,7 @@ describe('group action', () => {
   });
 
   test('getInfo should be ok', async () => {
-    let ret = await emitEvent('group::getInfo', {
+    let ret = await context.emitEvent('group::getInfo', {
       uuid: testGroup.uuid,
     });
 
@@ -78,7 +73,7 @@ describe('group action', () => {
 
   test('updateInfo should be ok', async () => {
     const desc = generateRandomStr(30);
-    let ret = await emitEvent('group::updateInfo', {
+    let ret = await context.emitEvent('group::updateInfo', {
       groupUUID: testGroup.uuid,
       groupInfo: {
         desc,
@@ -94,7 +89,7 @@ describe('group action', () => {
   test.todo('findGroup should be ok');
 
   test('requestJoinGroup should be ok', async () => {
-    const ret = await emitEvent('group::requestJoinGroup', {
+    const ret = await context.emitEvent('group::requestJoinGroup', {
       group_uuid: testGroup.uuid,
     });
     expect(ret.result).toBe(true);
@@ -102,10 +97,10 @@ describe('group action', () => {
     expect(ret.request.is_agree).toBe(false);
     expect(ret.request.is_refuse).toBe(false);
     expect(ret.request.group_uuid).toBe(testGroup.uuid);
-    expect(ret.request.from_uuid).toBe(userInfo.uuid);
+    expect(ret.request.from_uuid).toBe(testUser.uuid);
 
     const groupRequestUUID = ret.request.uuid;
-    const requestIns = await db.models.group_request.findOne({
+    const requestIns = await GroupRequest.findOne({
       where: {
         uuid: groupRequestUUID,
       },
@@ -123,14 +118,13 @@ describe('group action', () => {
   test.todo('refuseGroupInvite should be ok');
 
   test('agreeGroupInvite should be ok', async () => {
-    const GroupInvite = db.models.group_invite;
     const invite = await GroupInvite.create({
       group_uuid: testGroup.uuid,
       from_uuid: 'test_uuid',
-      to_uuid: userInfo.uuid,
+      to_uuid: testUser.uuid,
     });
 
-    const ret = await emitEvent('group::agreeGroupInvite', {
+    const ret = await context.emitEvent('group::agreeGroupInvite', {
       uuid: invite.uuid,
     });
     expect(ret.result).toBe(true);
@@ -154,17 +148,17 @@ describe('group action', () => {
     await invite.destroy(); // 销毁
   });
 
-  test('getGroupInviteDetail should be ok', async () => {
-    const GroupInvite = db.models.group_invite;
+  test.only('getGroupInviteDetail should be ok', async () => {
     const invite = await GroupInvite.create({
       group_uuid: 'test',
       from_uuid: 'test_uuid',
-      to_uuid: 'test_uuid',
+      to_uuid: testUser.uuid,
     });
 
-    const ret = await emitEvent('group::getGroupInviteDetail', {
+    const ret = await context.emitEvent('group::getGroupInviteDetail', {
       uuid: invite.uuid,
     });
+
     expect(ret).toBeTruthy();
     expect(ret.result).toBe(true);
     expect(ret.invite).toMatchObject({
@@ -180,22 +174,22 @@ describe('group action', () => {
   });
 
   test('getGroupInvite should be ok', async () => {
-    let ret = await emitEvent('group::getGroupInvite');
+    let ret = await context.emitEvent('group::getGroupInvite');
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('res');
     expect(Array.isArray(ret.res)).toBe(true);
   });
 
   test('getGroupList should be ok', async () => {
-    let ret = await emitEvent('group::getGroupList');
+    let ret = await context.emitEvent('group::getGroupList');
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('groups');
     expect(Array.isArray(ret.groups)).toBe(true);
   });
 
   test('getGroupMembers should be ok', async () => {
-    let group = await db.models.group_group.findOne();
-    let ret = await emitEvent('group::getGroupMembers', {
+    let group = await GroupGroup.findOne();
+    let ret = await context.emitEvent('group::getGroupMembers', {
       groupUUID: group.uuid,
     });
 
@@ -208,8 +202,8 @@ describe('group action', () => {
   });
 
   test('getGroupActors should be ok', async () => {
-    let group = await db.models.group_group.findOne();
-    let ret = await emitEvent('group::getGroupActors', {
+    let group = await GroupGroup.findOne();
+    let ret = await context.emitEvent('group::getGroupActors', {
       groupUUID: group.uuid,
     });
 
@@ -222,8 +216,8 @@ describe('group action', () => {
   });
 
   test('addGroupActor should be ok', async () => {
-    let testActor = await db.models.actor_actor.findOne();
-    let ret = await emitEvent('group::addGroupActor', {
+    let testActor = await ActorActor.findOne();
+    let ret = await context.emitEvent('group::addGroupActor', {
       groupUUID: testGroup.uuid,
       actorUUID: testActor.uuid,
     });
@@ -233,7 +227,7 @@ describe('group action', () => {
     expect(ret).toHaveProperty('groupActor.actorId');
     expect(ret).toHaveProperty('groupActor.groupId');
 
-    await db.models.group_actor.destroy({
+    await GroupActor.destroy({
       where: {
         uuid: ret.groupActor.uuid,
       },
@@ -251,10 +245,10 @@ describe('group action', () => {
   describe('group actor action', () => {
     let testGroupActor;
     beforeAll(async () => {
-      const actor = await db.models.actor_actor.findOne();
-      testGroupActor = await db.models.group_actor.create({
+      const actor = await ActorActor.findOne();
+      testGroupActor = await GroupActor.create({
         actor_uuid: actor.uuid,
-        ownerId: userInfo.id,
+        ownerId: testUser.id,
         actorId: actor.id,
         groupId: testGroup.id,
       });
@@ -265,7 +259,7 @@ describe('group action', () => {
     });
 
     test('setPlayerSelectedGroupActor should be ok', async () => {
-      let ret = await emitEvent('group::setPlayerSelectedGroupActor', {
+      let ret = await context.emitEvent('group::setPlayerSelectedGroupActor', {
         groupUUID: testGroup.uuid,
         groupActorUUID: testGroupActor.uuid,
       });
@@ -277,16 +271,16 @@ describe('group action', () => {
     });
 
     test('getPlayerSelectedGroupActor should be ok', async () => {
-      let ret = await emitEvent('group::getPlayerSelectedGroupActor', {
+      let ret = await context.emitEvent('group::getPlayerSelectedGroupActor', {
         groupUUID: testGroup.uuid,
-        groupMemberUUID: userInfo.uuid,
+        groupMemberUUID: testUser.uuid,
       });
 
       expect(ret.result).toBe(true);
       expect(ret).toHaveProperty('playerSelectedGroupActor');
       expect(ret).toHaveProperty(
         'playerSelectedGroupActor.groupMemberUUID',
-        userInfo.uuid
+        testUser.uuid
       );
     });
   });
@@ -300,7 +294,7 @@ describe('group action', () => {
   test.todo('setMemberToManager should be ok');
 
   test('getGroupStatus should be ok', async () => {
-    let ret = await emitEvent('group::getGroupStatus', {
+    let ret = await context.emitEvent('group::getGroupStatus', {
       groupUUID: testGroup.uuid,
     });
 
@@ -309,7 +303,7 @@ describe('group action', () => {
   });
 
   test('setGroupStatus should be ok', async () => {
-    let ret = await emitEvent('group::setGroupStatus', {
+    let ret = await context.emitEvent('group::setGroupStatus', {
       groupUUID: testGroup.uuid,
       groupStatus: true,
     });

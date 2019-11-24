@@ -1,4 +1,9 @@
-import { Orm, DBInstance, Model } from 'trpg/core';
+import {
+  Orm,
+  DBInstance,
+  Model,
+  BelongsToManyAddAssociationMixin,
+} from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
 import _ from 'lodash';
@@ -19,6 +24,8 @@ export class GroupGroup extends Model {
   owner_uuid: string;
   managers_uuid: string[];
   maps_uuid: string[];
+
+  addMember: BelongsToManyAddAssociationMixin<PlayerUser, number>;
 
   /**
    * 根据UUID查找团

@@ -5,6 +5,7 @@ import { GroupGroup } from '../lib/models/group';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupActor } from '../lib/models/actor';
 import { genTestPlayerJWT } from 'packages/Player/test/example';
+import _ from 'lodash';
 
 describe('Group router', () => {
   const context = buildAppContext();
