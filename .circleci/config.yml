@@ -13,9 +13,11 @@ jobs:
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/mongo:3.4.4
-      - image: circleci/mysql:5.7.17
+      - image: circleci/mysql:5.7.21
         environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_DATABASE: trpg_ci
+          TZ: Asia/Shanghai
       - image: circleci/redis:5.0.5
 
     working_directory: ~/repo
@@ -41,7 +43,7 @@ jobs:
       # - run: npm run packages:install
       - run: bash packages/foreach.sh 'npm install'
 
-      - run: export NODE_ENV=ci
+      - run: echo 'export NODE_ENV=ci' >> $BASH_ENV
 
       # 更新数据库
       - run: npm run db:migrate:run
