@@ -1,8 +1,9 @@
-import { InfoWebsite as InfoWebsiteCls } from '../lib/models/Website';
+import { buildAppContext } from 'test/utils/app';
+import { InfoWebsite } from '../lib/models/Website';
+
+const context = buildAppContext();
 
 describe('Info website', () => {
-  const InfoWebsite: typeof InfoWebsiteCls = global.db.models.info_website;
-
   it('getWebsiteInfo with og should be ok', async () => {
     const url = 'https://www.npmjs.com/package/react';
     const info = await InfoWebsite.getWebsiteInfo(url);
@@ -33,7 +34,9 @@ describe('Info website', () => {
     expect(info.content).toBe(
       '输入法手写拼音关闭百度首页设置登录新闻hao123地图视频贴吧学术登录设置更多产品网页资讯贴吧知道音乐图片视频地图文库更多»'
     );
-    expect(info.icon).toBe('https://www.baidu.com/img/baidu_resultlogo@2.png');
+    expect(typeof info.icon).toBe('string');
+    expect(info.icon.startsWith('https://www.baidu.com/img/')).toBe(true);
+    expect(info.icon.endsWith('.png')).toBe(true);
 
     // 数据库里应当有数据
     expect(await InfoWebsite.findOne({ where: { url } })).not.toBeNull();

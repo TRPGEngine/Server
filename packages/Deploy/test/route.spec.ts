@@ -1,12 +1,13 @@
+import { buildAppContext } from 'test/utils/app';
 import _ from 'lodash';
 import { mockVersionFindAll } from './dataset';
-import { buildAppContext } from 'test/utils/app';
+import { DeployVersion } from '../lib/models/version';
 
 const context = buildAppContext();
 
 describe('route', () => {
   beforeAll(() => {
-    _.set(global.db, 'models.deploy_version.findAll', mockVersionFindAll);
+    DeployVersion.findAll = mockVersionFindAll;
   });
 
   it('/deploy/version/latest', async () => {

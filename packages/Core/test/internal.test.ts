@@ -1,8 +1,11 @@
 import moment from 'moment';
+import { buildAppContext } from 'test/utils/app';
+import { CoreMetrics } from '../lib/internal/models/metrics';
+const context = buildAppContext();
 
 describe('internal module', () => {
   test('getGlobalConfig should be ok', async () => {
-    const ret = await emitEvent('core::getGlobalConfig');
+    const ret = await context.emitEvent('core::getGlobalConfig');
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('config');
     expect(Array.isArray(ret.config)).toBe(true);
@@ -14,10 +17,7 @@ describe('internal module', () => {
         .subtract(7, 'day')
         .format('YYYY-MM-DD');
       const endDate = moment().format('YYYY-MM-DD');
-      const statis = await db.models.core_metrics.getStatisInfo(
-        startDate,
-        endDate
-      );
+      const statis = await CoreMetrics.getStatisInfo(startDate, endDate);
 
       expect(statis.startDate).toBe(startDate);
       expect(statis.endDate).toBe(endDate);
