@@ -36,7 +36,8 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: npm run packages:install
+      # - run: npm run packages:install
+      - run: bash packages/foreach.sh 'npm install'
 
       # run tests!
       - run: npm run test
