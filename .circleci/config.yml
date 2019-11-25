@@ -35,6 +35,9 @@ jobs:
 
       - run: npm install
 
+      # 在ci中额外安装jest-junit用于生成Test Summary
+      - run: npm install -D jest-junit
+
       - save_cache:
           paths:
             - node_modules
@@ -50,4 +53,4 @@ jobs:
       - run: npm run db:seeder:run
 
       # run tests!
-      - run: npm run test
+      - run: npm run test:ci
