@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { ActorActor } from '../lib/models/actor';
 import { ActorTemplate } from '../lib/models/template';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import { createTestActor } from './example';
 
 const context = buildAppContext();
 
@@ -58,7 +59,7 @@ describe('template event', () => {
   });
 
   test('findTemplate should be ok', async () => {
-    let ret = await context.emitEvent('actor::findTemplate', { name: '刀' });
+    let ret = await context.emitEvent('actor::findTemplate', { name: '空白' });
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('templates');
     expect(ret).toHaveProperty('templates.0.creator_name');
@@ -140,12 +141,16 @@ describe('template event', () => {
 });
 
 describe('actor event', () => {
-  let testTemplate;
-  let testActor;
+  let testActor: ActorActor;
+  let testTemplate: ActorTemplate;
 
   beforeAll(async () => {
+    testActor = await createTestActor();
     testTemplate = await ActorTemplate.findOne();
-    testActor = await ActorActor.findOne();
+  });
+
+  afterAll(async () => {
+    await testActor.destroy();
   });
 
   test('createActor should be ok', async () => {

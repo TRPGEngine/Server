@@ -67,13 +67,17 @@ export const findTemplate: EventFunc<{
     throw '缺少必要参数';
   }
 
-  let templates = await (db.models.actor_template as any).findTemplateAsync(
-    nameFragment
-  );
+  const templates = await ActorTemplate.findTemplateAsync(nameFragment);
   for (let template of templates) {
     let creator = await template.getCreator();
     if (creator) {
-      template.dataValues.creator_name = creator.getName();
+      template.setDataValue('creator_name' as any, creator.getName());
+    } else {
+      // 处理当没有指定creator的情况
+      template.setDataValue(
+        'creator_name' as any,
+        template.built_in ? '系统' : '未知'
+      );
     }
   }
   return { templates };

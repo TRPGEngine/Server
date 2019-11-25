@@ -1,4 +1,11 @@
-import { Model, Orm, DBInstance, Op } from 'trpg/core';
+import {
+  Model,
+  Orm,
+  DBInstance,
+  Op,
+  BelongsToGetAssociationMixin,
+} from 'trpg/core';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
 const at = require('trpg-actor-template');
 
@@ -11,6 +18,8 @@ export class ActorTemplate extends Model {
   layout: string;
   built_in: boolean;
   is_public: boolean;
+
+  getCreator?: BelongsToGetAssociationMixin<PlayerUser>;
 
   getObject() {
     let info = {};

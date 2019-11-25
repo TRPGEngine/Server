@@ -7,6 +7,7 @@ import { GroupRequest } from '../lib/models/request';
 import { GroupInvite } from '../lib/models/invite';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupActor } from '../lib/models/actor';
+import { createTestActor } from 'packages/Actor/test/example';
 
 const context = buildAppContext();
 
@@ -243,18 +244,20 @@ describe('group action', () => {
   test.todo('updateGroupActorInfo should be ok');
 
   describe('group actor action', () => {
-    let testGroupActor;
+    let testActor: ActorActor;
+    let testGroupActor: GroupActor;
     beforeAll(async () => {
-      const actor = await ActorActor.findOne();
+      testActor = await createTestActor();
       testGroupActor = await GroupActor.create({
-        actor_uuid: actor.uuid,
+        actor_uuid: testActor.uuid,
         ownerId: testUser.id,
-        actorId: actor.id,
+        actorId: testActor.id,
         groupId: testGroup.id,
       });
     });
 
     afterAll(async () => {
+      await testActor.destroy();
       await testGroupActor.destroy();
     });
 
