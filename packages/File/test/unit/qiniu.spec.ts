@@ -9,6 +9,11 @@ import {
 } from 'packages/File/lib/utils/qiniu';
 
 describe('qiniu oss unit test', () => {
+  if (process.env.NODE_ENV === 'ci') {
+    // ci 环境不测试qiniu相关API
+    return;
+  }
+
   const demoKey = 'test/demo.txt';
   const demoImageKey = 'test/demo-image.png';
 

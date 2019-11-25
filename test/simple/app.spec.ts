@@ -43,12 +43,13 @@ describe('app context', () => {
     const { status, body } = await context.request.get('/core/health');
     expect(status).toBe(200);
     expect(body).toMatchObject({
-      env: 'test',
       result: true,
     });
     expect(body).toHaveProperty('version');
     expect(typeof body.version).toBe('string');
     expect(body).toHaveProperty('hash');
     expect(typeof body.hash).toBe('string');
+    expect(body).toHaveProperty('env');
+    expect(typeof body.env).toBe('string');
   });
 });
