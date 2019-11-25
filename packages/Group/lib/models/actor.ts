@@ -82,7 +82,7 @@ export class GroupActor extends Model {
   static async agreeApprovalGroupActor(
     groupActorUUID: string,
     playerUUID: string
-  ) {
+  ): Promise<GroupActor> {
     if (!_.isString(groupActorUUID) || !_.isString(playerUUID)) {
       throw new Error('缺少必要参数');
     }
@@ -110,6 +110,40 @@ export class GroupActor extends Model {
     groupActor.passed = true;
     await groupActor.save();
     return groupActor;
+  }
+
+  /**
+   * 拒绝团角色
+   * 本质上是删除团角色
+   * @param groupActorUUID 团角色UUID
+   * @param playerUUID 操作人UUID
+   */
+  static async refuseApprovalGroupActor(
+    groupActorUUID: string,
+    playerUUID: string
+  ): Promise<void> {
+    if (!_.isString(groupActorUUID) || !_.isString(playerUUID)) {
+      throw new Error('缺少必要参数');
+    }
+
+    const groupActor: GroupActor = await GroupActor.findOne({
+      where: {
+        uuid: groupActorUUID,
+        passed: false,
+      },
+    });
+    if (_.isNil(groupActor)) {
+      throw new Error('找不到该团人物或该人物已通过审批');
+    }
+    const group: GroupGroup = await groupActor.getGroup();
+    if (_.isNil(group)) {
+      throw new Error('找不到该人物所在团');
+    }
+    if (!group.isManagerOrOwner(playerUUID)) {
+      throw '没有操作权限';
+    }
+
+    await groupActor.destroy();
   }
 
   async getObjectAsync() {

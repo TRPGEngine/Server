@@ -73,5 +73,22 @@ describe('group model function', () => {
         passed: true,
       });
     });
+
+    test('GroupActor.refuseApprovalGroupActor should be ok', async () => {
+      const testUser = await getTestUser();
+      const testGroupActor = await createTestGroupActor(testGroup.id);
+      const testGroupActorUUID = testGroupActor.uuid;
+      await GroupActor.refuseApprovalGroupActor(
+        testGroupActorUUID,
+        testUser.uuid
+      );
+
+      const groupActor = await GroupActor.findOne({
+        where: {
+          uuid: testGroupActorUUID,
+        },
+      });
+      expect(groupActor).toBe(null);
+    });
   });
 });
