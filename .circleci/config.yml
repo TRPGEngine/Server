@@ -56,5 +56,7 @@ jobs:
       # run tests!
       - run: npm run test:ci
 
+      - run: npx codecov
+
       - store_test_results:
-          path: junit.xml
+          path: test/reports

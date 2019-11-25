@@ -10,4 +10,4 @@ test/bench/out.log
 !packages/Dashboard/app/public
 dist/
 test/coverage
-junit.xml
+test/reports
