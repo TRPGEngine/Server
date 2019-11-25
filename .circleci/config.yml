@@ -33,10 +33,11 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: npm install
-
       # 在ci中额外安装jest-junit用于生成Test Summary
       - run: npm install -D jest-junit
+
+      # 安装完整依赖。放在后面防止低版本npm把git下载的包覆盖
+      - run: npm install
 
       - save_cache:
           paths:
