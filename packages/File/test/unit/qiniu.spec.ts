@@ -11,6 +11,10 @@ import {
 describe('qiniu oss unit test', () => {
   if (process.env.NODE_ENV === 'ci') {
     // ci 环境不测试qiniu相关API
+    it('1 + 1 = 2', () => {
+      // 这里强行弄一个it来防止jest报空test的问题
+      expect(1 + 1).toBe(2);
+    });
     return;
   }
 
