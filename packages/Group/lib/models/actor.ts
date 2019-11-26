@@ -30,6 +30,32 @@ export class GroupActor extends Model {
   setActor?: BelongsToSetAssociationMixin<ActorActor, number>;
 
   /**
+   * 获取团人物详情
+   * @param uuid 团人物UUID
+   */
+  static async getDetailByUUID(uuid: string): Promise<GroupActor> {
+    const groupActor = await GroupActor.findOne({
+      where: {
+        uuid,
+      },
+      attributes: [
+        'uuid',
+        'actor_uuid',
+        'actor_info',
+        'actor_template_uuid',
+        'name',
+        'desc',
+        'avatar',
+        'passed',
+        'enabled',
+        'updatedAt',
+      ],
+    });
+
+    return groupActor;
+  }
+
+  /**
    * 添加一个待审核的团人物
    * TODO: 需要增加一个用户是否在该团内的判断
    */

@@ -83,8 +83,8 @@ describe('group model function', () => {
 
     test('GroupActor.refuseApprovalGroupActor should be ok', async () => {
       const testUser = await getTestUser();
-      const testGroupActor = await createTestGroupActor(testGroup.id);
-      const testGroupActorUUID = testGroupActor.uuid;
+      const testGroupActorTmp = await createTestGroupActor(testGroup.id);
+      const testGroupActorUUID = testGroupActorTmp.uuid;
       await GroupActor.refuseApprovalGroupActor(
         testGroupActorUUID,
         testUser.uuid
@@ -96,6 +96,28 @@ describe('group model function', () => {
         },
       });
       expect(groupActor).toBe(null);
+    });
+
+    test('GroupActor.getDetailByUUID should be ok', async () => {
+      const groupActor = await GroupActor.getDetailByUUID(testGroupActor.uuid);
+
+      expect(groupActor).toBeTruthy();
+      expect(groupActor).toHaveProperty('uuid');
+      expect(groupActor).toHaveProperty('actor_uuid');
+      expect(groupActor).toHaveProperty('actor_info');
+      expect(groupActor).toHaveProperty('actor_template_uuid');
+      expect(groupActor).toHaveProperty('name');
+      expect(groupActor).toHaveProperty('desc');
+      expect(groupActor).toHaveProperty('avatar');
+      expect(groupActor).toHaveProperty('passed');
+      expect(groupActor).toHaveProperty('enabled');
+      expect(groupActor).toHaveProperty('updatedAt');
+      expect(groupActor).toMatchObject({
+        uuid: testGroupActor.uuid,
+        actor_uuid: testGroupActor.actor_uuid,
+        actor_info: testGroupActor.actor_info,
+        name: testGroupActor.name,
+      });
     });
   });
 });

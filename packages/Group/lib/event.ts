@@ -680,6 +680,7 @@ export const getGroupActors: EventFunc<{
   let groupActors = await group.getGroupActors();
   let res = [];
   for (let ga of groupActors) {
+    // TODO: 这个是个N+1问题。需要优化
     res.push(await ga.getObjectAsync());
   }
   return { actors: res };

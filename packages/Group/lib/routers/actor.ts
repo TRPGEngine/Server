@@ -21,6 +21,17 @@ actorRouter.get('/:groupUUID/actor/list', async (ctx) => {
 });
 
 /**
+ * 获取团角色详情
+ */
+actorRouter.get('/actor/detail/:groupActorUUID', async (ctx) => {
+  const groupActorUUID = ctx.params.groupActorUUID;
+
+  const groupActor = await GroupActor.getDetailByUUID(groupActorUUID);
+
+  ctx.body = { groupActor };
+});
+
+/**
  * 申请团角色
  */
 actorRouter.post('/:groupUUID/actor/apply', ssoAuth(), async (ctx) => {
