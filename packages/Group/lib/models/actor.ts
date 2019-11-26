@@ -3,6 +3,7 @@ import {
   DBInstance,
   Model,
   BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
@@ -25,9 +26,11 @@ export class GroupActor extends Model {
   getActor?: BelongsToGetAssociationMixin<ActorActor>;
   getOwner?: BelongsToGetAssociationMixin<PlayerUser>;
   getGroup?: BelongsToGetAssociationMixin<GroupGroup>;
+  setActor?: BelongsToSetAssociationMixin<ActorActor, number>;
 
   /**
    * 添加一个待审核的团人物
+   * TODO: 需要增加一个用户是否在该团内的判断
    */
   static async addApprovalGroupActor(
     groupUUID: string,
@@ -76,6 +79,7 @@ export class GroupActor extends Model {
 
   /**
    * 同意团人物卡的审批
+   * 并将Actor的数据写入的GroupActor中
    * @param groupActorUUID 团角色UUID
    * @param playerUUID 操作人UUID
    */
@@ -108,6 +112,10 @@ export class GroupActor extends Model {
     }
 
     groupActor.passed = true;
+    const actor: ActorActor = await groupActor.getActor();
+    if (!_.isNil(actor)) {
+      groupActor.actor_info = actor.info;
+    }
     await groupActor.save();
     return groupActor;
   }

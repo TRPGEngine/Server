@@ -8,6 +8,9 @@ export const createTestActor = async (): Promise<ActorActor> => {
     desc: '',
     avatar: '',
     template_uuid: firstTemplate.uuid,
+    info: {
+      data: '测试属性',
+    },
   });
 
   return group;

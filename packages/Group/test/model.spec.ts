@@ -63,14 +63,18 @@ describe('group model function', () => {
 
     test('GroupActor.agreeApprovalGroupActor should be ok', async () => {
       const testUser = await getTestUser();
+      const testGroupActorTmp = await createTestGroupActor(testGroup.id);
+      await testGroupActorTmp.setActor(testActor);
+
       const groupActor = await GroupActor.agreeApprovalGroupActor(
-        testGroupActor.uuid,
+        testGroupActorTmp.uuid,
         testUser.uuid
       );
 
       expect(groupActor).toMatchObject({
-        uuid: testGroupActor.uuid,
+        uuid: testGroupActorTmp.uuid,
         passed: true,
+        actor_info: testActor.info, // 同意申请后角色的属性应当写入团角色信息
       });
     });
 
