@@ -75,7 +75,10 @@ describe('group model function', () => {
         uuid: testGroupActorTmp.uuid,
         passed: true,
         actor_info: testActor.info, // 同意申请后角色的属性应当写入团角色信息
+        actor_template_uuid: testActor.template_uuid, // 同意申请后角色的属性应当写入团角色模板UUID
       });
+
+      await testGroupActorTmp.destroy();
     });
 
     test('GroupActor.refuseApprovalGroupActor should be ok', async () => {

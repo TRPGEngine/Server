@@ -1756,6 +1756,10 @@
                     "field": "actor_info",
                     "seqType": "Sequelize.JSON"
                 },
+                "actor_template_uuid": {
+                    "field": "actor_template_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
                 "name": {
                     "field": "name",
                     "seqType": "Sequelize.STRING"
@@ -2892,5 +2896,5 @@
             "indexes": []
         }
     },
-    "revision": 27
+    "revision": 28
 }

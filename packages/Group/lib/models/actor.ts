@@ -15,6 +15,7 @@ export class GroupActor extends Model {
   uuid: string;
   actor_uuid: string;
   actor_info: {};
+  actor_template_uuid: string;
   name: string;
   desc: string;
   avatar: string;
@@ -115,6 +116,7 @@ export class GroupActor extends Model {
     const actor: ActorActor = await groupActor.getActor();
     if (!_.isNil(actor)) {
       groupActor.actor_info = actor.info;
+      groupActor.actor_template_uuid = actor.template_uuid;
     }
     await groupActor.save();
     return groupActor;
@@ -179,6 +181,7 @@ export default function GroupActorDefinition(Sequelize: Orm, db: DBInstance) {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       actor_uuid: { type: Sequelize.UUID }, // 对应actor_actor的UUID
       actor_info: { type: Sequelize.JSON }, // 团人物信息
+      actor_template_uuid: { type: Sequelize.UUID }, // 团人物模板的UUID
       name: { type: Sequelize.STRING },
       desc: { type: Sequelize.TEXT },
       avatar: { type: Sequelize.STRING },
