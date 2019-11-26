@@ -20,6 +20,9 @@ actorRouter.get('/:groupUUID/actor/list', async (ctx) => {
   ctx.body = { list: actors };
 });
 
+/**
+ * 申请团角色
+ */
 actorRouter.post('/:groupUUID/actor/apply', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
   const { actorUUID } = ctx.request.body;
@@ -41,6 +44,55 @@ actorRouter.post('/:groupUUID/actor/apply', ssoAuth(), async (ctx) => {
   );
 
   ctx.body = { actor };
+});
+
+/**
+ * 同意团角色的申请
+ */
+actorRouter.post('/:groupUUID/actor/agree', ssoAuth(), async (ctx) => {
+  const groupUUID = ctx.params.groupUUID;
+  const { groupActorUUID } = ctx.request.body;
+  const player = ctx.state.player;
+  const playerUUID = player.uuid;
+
+  if (_.isNil(groupUUID) || _.isNil(groupActorUUID) || _.isNil(playerUUID)) {
+    throw new Error('缺少必要字段');
+  }
+
+  if (!_.isString(groupActorUUID)) {
+    throw new Error('groupActorUUID 必须为字符串');
+  }
+
+  const groupActor = await GroupActor.agreeApprovalGroupActor(
+    groupActorUUID,
+    playerUUID
+  );
+
+  ctx.body = { groupActor };
+});
+
+/**
+ * 拒绝团角色申请
+ */
+actorRouter.post('/:groupUUID/actor/refuse', ssoAuth(), async (ctx) => {
+  const groupUUID = ctx.params.groupUUID; // 这个参数暂时没有用
+  const { groupActorUUID } = ctx.request.body;
+  const player = ctx.state.player;
+  const playerUUID = player.uuid;
+
+  if (_.isNil(groupUUID) || _.isNil(groupActorUUID) || _.isNil(playerUUID)) {
+    throw new Error('缺少必要字段');
+  }
+
+  if (!_.isString(groupActorUUID)) {
+    throw new Error('groupActorUUID 必须为字符串');
+  }
+
+  await GroupActor.refuseApprovalGroupActor(groupActorUUID, playerUUID);
+
+  ctx.body = {
+    result: true,
+  };
 });
 
 export default actorRouter;

@@ -1,5 +1,5 @@
 import { buildAppContext } from 'test/utils/app';
-import { createTestGroup } from './example';
+import { createTestGroup, createTestGroupActor } from './example';
 import { createTestActor } from 'packages/Actor/test/example';
 import { GroupGroup } from '../lib/models/group';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
@@ -12,15 +12,18 @@ describe('Group router', () => {
 
   let testGroup: GroupGroup;
   let testActor: ActorActor;
+  let testGroupActor: GroupActor;
 
   beforeAll(async () => {
     testGroup = await createTestGroup();
     testActor = await createTestActor();
+    testGroupActor = await createTestGroupActor(testGroup.id);
   });
 
   afterAll(async () => {
     await _.invoke(testGroup, 'destroy');
     await _.invoke(testActor, 'destroy');
+    await _.invoke(testGroupActor, 'destroy');
   });
 
   describe('POST /group/:groupUUID/actor/apply should be ok', () => {
@@ -70,5 +73,57 @@ describe('Group router', () => {
         },
       });
     });
+  });
+
+  test('POST /group/:groupUUID/actor/agree', async () => {
+    const testGroupActorTmp = await createTestGroupActor(testGroup.id);
+    const { body } = await context.request.post(
+      `/group/${testGroup.uuid}/actor/agree`,
+      {
+        groupActorUUID: testGroupActorTmp.uuid,
+      },
+      {
+        'X-Token': await genTestPlayerJWT(),
+      }
+    );
+
+    expect(body).toBeSuccess();
+    expect(body).toHaveProperty('groupActor');
+    expect(_.get(body, 'groupActor.passed')).toBe(true);
+
+    const groupActor = await GroupActor.findOne({
+      where: {
+        uuid: testGroupActorTmp.uuid,
+      },
+    });
+
+    expect(groupActor.passed).toBe(true);
+
+    await testGroupActorTmp.destroy();
+  });
+
+  test('POST /group/:groupUUID/actor/refuse', async () => {
+    const testGroupActorTmp = await createTestGroupActor(testGroup.id);
+    const { body } = await context.request.post(
+      `/group/${testGroup.uuid}/actor/refuse`,
+      {
+        groupActorUUID: testGroupActorTmp.uuid,
+      },
+      {
+        'X-Token': await genTestPlayerJWT(),
+      }
+    );
+
+    expect(body).toBeSuccess();
+
+    const groupActor = await GroupActor.findOne({
+      where: {
+        uuid: testGroupActorTmp.uuid,
+      },
+    });
+
+    expect(groupActor).toBeNull();
+
+    await testGroupActorTmp.destroy(); // 此处是一个冗余删除
   });
 });
