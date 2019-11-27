@@ -515,6 +515,10 @@
                     "field": "attach_uuid",
                     "seqType": "Sequelize.STRING"
                 },
+                "owner_uuid": {
+                    "field": "owner_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -2896,5 +2900,5 @@
             "indexes": []
         }
     },
-    "revision": 29
+    "revision": 30
 }

@@ -10,6 +10,7 @@ export class FileAvatar extends Model {
   type: 'actor' | 'user' | 'group';
   has_thumbnail: boolean;
   attach_uuid: string;
+  owner_uuid: string;
   createdAt: Date;
   updatedAt: Date;
 
@@ -18,8 +19,9 @@ export class FileAvatar extends Model {
       uuid: this.uuid,
       name: this.name,
       type: this.type,
-      createdAt: this.createdAt,
       attach_uuid: this.attach_uuid,
+      owner_uuid: this.owner_uuid,
+      createdAt: this.createdAt,
     };
   }
 }
@@ -35,6 +37,7 @@ export default function FileAvatarDefinition(Sequelize: Orm, db: DBInstance) {
       type: { type: Sequelize.ENUM('actor', 'user', 'group') },
       has_thumbnail: { type: Sequelize.BOOLEAN, defaultValue: false },
       attach_uuid: { type: Sequelize.STRING },
+      owner_uuid: { type: Sequelize.STRING },
     },
     {
       tableName: 'file_avatar',
