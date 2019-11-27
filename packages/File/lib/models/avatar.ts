@@ -8,7 +8,7 @@ export class FileAvatar extends Model {
   size: number;
   width: number;
   height: number;
-  type: 'actor' | 'user' | 'group';
+  type: 'actor' | 'user' | 'group' | 'groupActor';
   has_thumbnail: boolean;
   attach_uuid: string;
   owner_uuid: string;
@@ -80,7 +80,7 @@ export default function FileAvatarDefinition(Sequelize: Orm, db: DBInstance) {
       size: { type: Sequelize.INTEGER, allowNull: false },
       width: { type: Sequelize.INTEGER },
       height: { type: Sequelize.INTEGER },
-      type: { type: Sequelize.ENUM('actor', 'user', 'group') },
+      type: { type: Sequelize.ENUM('actor', 'user', 'group', 'groupActor') },
       has_thumbnail: { type: Sequelize.BOOLEAN, defaultValue: false },
       attach_uuid: { type: Sequelize.STRING },
       owner_uuid: { type: Sequelize.STRING },

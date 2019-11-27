@@ -502,7 +502,7 @@
                 },
                 "type": {
                     "field": "type",
-                    "seqType": "Sequelize.ENUM('actor', 'user', 'group')"
+                    "seqType": "Sequelize.ENUM('actor', 'user', 'group', 'groupActor')"
                 },
                 "has_thumbnail": {
                     "defaultValue": {
@@ -2900,5 +2900,5 @@
             "indexes": []
         }
     },
-    "revision": 30
+    "revision": 31
 }
