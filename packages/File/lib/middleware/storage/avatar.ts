@@ -32,7 +32,7 @@ export default function avatarStorage(): TRPGMiddleware {
           await oldAvatar.save();
         }
       }
-      const avatar = await FileAvatar.create({
+      const avatar: FileAvatar = await FileAvatar.create({
         name: filename,
         size,
         type,
