@@ -1,5 +1,6 @@
-import { Model, Orm, DBInstance } from 'trpg/core';
+import { Model, Orm, DBInstance, Op } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import _ from 'lodash';
 
 export class FileAvatar extends Model {
   uuid: string;
@@ -13,6 +14,51 @@ export class FileAvatar extends Model {
   owner_uuid: string;
   createdAt: Date;
   updatedAt: Date;
+
+  /**
+   * 绑定关联UUID
+   * @param avatarUUID 头像UUID
+   * @param attachUUID 关联UUID
+   * @param playerUUID 操作人UUID
+   */
+  static async bindAttachUUID(
+    avatarUUID: string,
+    attachUUID: string,
+    playerUUID: string
+  ): Promise<FileAvatar> {
+    const avatar: FileAvatar = await FileAvatar.findOne({
+      where: {
+        uuid: avatarUUID,
+        owner_uuid: playerUUID,
+      },
+    });
+
+    if (_.isNil(avatar)) {
+      throw new Error('该头像数据不存在');
+    }
+    avatar.attach_uuid = attachUUID;
+    await avatar.save();
+
+    // 移除旧的关联关系
+    await FileAvatar.update(
+      {
+        attach_uuid: null,
+      },
+      {
+        where: {
+          uuid: {
+            [Op.not]: avatar.uuid,
+          },
+          attach_uuid: {
+            [Op.not]: null,
+          },
+          type: avatar.type,
+        },
+      }
+    );
+
+    return avatar;
+  }
 
   getObject() {
     return {

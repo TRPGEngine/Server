@@ -1,4 +1,5 @@
 import { EventFunc } from 'trpg/core';
+import { FileAvatar } from './models/avatar';
 
 export const bindAttachUUID: EventFunc = async function(data, cb, db) {
   const app = this.app;
@@ -9,14 +10,15 @@ export const bindAttachUUID: EventFunc = async function(data, cb, db) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let avatar_uuid = data.avatar_uuid;
-  let attach_uuid = data.attach_uuid;
+  const avatar_uuid = data.avatar_uuid;
+  const attach_uuid = data.attach_uuid;
 
-  let avatar = await db.models.file_avatar.findOne({
-    where: { uuid: avatar_uuid },
-  });
-  avatar.attach_uuid = attach_uuid;
-  await avatar.save();
+  const avatar = await FileAvatar.bindAttachUUID(
+    avatar_uuid,
+    attach_uuid,
+    player.uuid
+  );
+
   return {
     avatar: avatar.getObject(),
   };
