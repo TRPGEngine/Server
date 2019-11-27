@@ -5,9 +5,9 @@ import allowMIME from '../middleware/allow-mime';
 import _ from 'lodash';
 import { encodeStr2Int } from '../utils';
 import config from '../config';
-const avatarStorage = require('../middleware/storage/avatar');
 import auth from '../middleware/auth';
 import { TRPGRouter } from 'trpg/core';
+import avatarStorage from '../middleware/storage/avatar';
 
 let router = new TRPGRouter();
 

@@ -3,7 +3,7 @@ import upload from '../middleware/upload';
 import sha256 from '../middleware/sha256';
 import auth from '../middleware/auth';
 import { TRPGRouter } from 'trpg/core';
-const fileStorage = require('../middleware/storage/file');
+import fileStorage from '../middleware/storage/file';
 
 const router = new TRPGRouter();
 
