@@ -1,10 +1,35 @@
-export default function FileAvatarDefinition(Sequelize, db) {
-  let Avatar = db.define(
-    'file_avatar',
+import { Model, Orm, DBInstance } from 'trpg/core';
+import { PlayerUser } from 'packages/Player/lib/models/user';
+
+export class FileAvatar extends Model {
+  uuid: string;
+  name: string;
+  size: number;
+  width: number;
+  height: number;
+  type: 'actor' | 'user' | 'group';
+  has_thumbnail: boolean;
+  attach_uuid: string;
+  createdAt: Date;
+  updatedAt: Date;
+
+  getObject() {
+    return {
+      uuid: this.uuid,
+      name: this.name,
+      type: this.type,
+      createdAt: this.createdAt,
+      attach_uuid: this.attach_uuid,
+    };
+  }
+}
+
+export default function FileAvatarDefinition(Sequelize: Orm, db: DBInstance) {
+  FileAvatar.init(
     {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
-      name: { type: Sequelize.STRING, require: true },
-      size: { type: Sequelize.INTEGER, require: true },
+      name: { type: Sequelize.STRING, allowNull: false },
+      size: { type: Sequelize.INTEGER, allowNull: false },
       width: { type: Sequelize.INTEGER },
       height: { type: Sequelize.INTEGER },
       type: { type: Sequelize.ENUM('actor', 'user', 'group') },
@@ -12,25 +37,12 @@ export default function FileAvatarDefinition(Sequelize, db) {
       attach_uuid: { type: Sequelize.STRING },
     },
     {
-      methods: {
-        getObject: function() {
-          return {
-            uuid: this.uuid,
-            name: this.name,
-            type: this.type,
-            createAt: this.createAt,
-            attach_uuid: this.attach_uuid,
-          };
-        },
-      },
+      tableName: 'file_avatar',
+      sequelize: db,
     }
   );
 
-  let User = db.models.player_user;
-  if (!!User) {
-    // Avatar.hasOne('owner', User, {reverse: 'avatar_file'});
-    Avatar.belongsTo(User, { as: 'owner' });
-  }
+  FileAvatar.belongsTo(PlayerUser, { as: 'owner' });
 
-  return Avatar;
+  return FileAvatar;
 }

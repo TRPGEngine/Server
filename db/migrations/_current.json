@@ -483,12 +483,12 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "name": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "name",
                     "seqType": "Sequelize.STRING"
                 },
                 "size": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "size",
                     "seqType": "Sequelize.INTEGER"
                 },
@@ -558,7 +558,7 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "name": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "name",
                     "seqType": "Sequelize.STRING"
                 },
@@ -567,7 +567,7 @@
                     "seqType": "Sequelize.STRING"
                 },
                 "size": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "size",
                     "seqType": "Sequelize.INTEGER"
                 },
@@ -645,17 +645,17 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "name": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "name",
                     "seqType": "Sequelize.STRING"
                 },
                 "originalname": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "originalname",
                     "seqType": "Sequelize.STRING"
                 },
                 "size": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "size",
                     "seqType": "Sequelize.INTEGER"
                 },
@@ -2896,5 +2896,5 @@
             "indexes": []
         }
     },
-    "revision": 28
+    "revision": 29
 }
