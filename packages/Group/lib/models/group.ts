@@ -71,6 +71,13 @@ export class GroupGroup extends Model {
   }
 
   /**
+   * 判断是否为团所有者
+   */
+  isOwner(uuid: string): boolean {
+    return this.owner_uuid === uuid;
+  }
+
+  /**
    * 获取管理人员列表
    */
   getManagerUUIDs(): string[] {

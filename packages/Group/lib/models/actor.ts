@@ -4,6 +4,7 @@ import {
   Model,
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
+  ModelAccess,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
@@ -28,6 +29,27 @@ export class GroupActor extends Model {
   getOwner?: BelongsToGetAssociationMixin<PlayerUser>;
   getGroup?: BelongsToGetAssociationMixin<GroupGroup>;
   setActor?: BelongsToSetAssociationMixin<ActorActor, number>;
+
+  static async getAccess(
+    groupUUID: string,
+    groupActorUUID: string,
+    playerUUID: string
+  ): Promise<ModelAccess> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+
+    const isManager = group.isManagerOrOwner(playerUUID);
+    if (isManager) {
+      return {
+        editable: true,
+        removeable: group.isOwner(playerUUID),
+      };
+    } else {
+      return {
+        editable: false,
+        removeable: false,
+      };
+    }
+  }
 
   /**
    * 获取团人物详情

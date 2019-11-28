@@ -32,6 +32,37 @@ actorRouter.get('/actor/detail/:groupActorUUID', async (ctx) => {
 });
 
 /**
+ * 获取团角色权限
+ */
+actorRouter.get(
+  '/:groupUUID/actor/:groupActorUUID/access',
+  ssoInfo(),
+  async (ctx) => {
+    const groupUUID = ctx.params.groupUUID;
+    const groupActorUUID = ctx.params.groupActorUUID;
+    const playerUUID = _.get(ctx, 'state.player.uuid');
+
+    if (_.isEmpty(playerUUID)) {
+      ctx.body = {
+        access: {
+          editable: false,
+          removeable: false,
+        } as ModelAccess,
+      };
+      return;
+    }
+
+    const access = await GroupActor.getAccess(
+      groupUUID,
+      groupActorUUID,
+      playerUUID
+    );
+
+    ctx.body = { access };
+  }
+);
+
+/**
  * 申请团角色
  */
 actorRouter.post('/:groupUUID/actor/apply', ssoAuth(), async (ctx) => {
