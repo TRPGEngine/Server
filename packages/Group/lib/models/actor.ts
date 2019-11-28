@@ -52,6 +52,57 @@ export class GroupActor extends Model {
   }
 
   /**
+   * 编辑团成员信息
+   * @param playerUUID 操作人UUID
+   */
+  static async editActorInfo(
+    groupActorUUID: string,
+    groupActorInfo: {},
+    playerUUID: string
+  ) {
+    const groupActor: GroupActor = await GroupActor.findOne({
+      where: {
+        uuid: groupActorUUID,
+      },
+    });
+
+    if (_.isNil(groupActor)) {
+      throw new Error('该角色不存在');
+    }
+
+    const group: GroupGroup = await groupActor.getGroup();
+
+    const allowEdit = await group.isManagerOrOwner(playerUUID);
+    if (!allowEdit) {
+      throw new Error('没有编辑权限');
+    }
+
+    const name = _.get(groupActorInfo, '_name');
+    const desc = _.get(groupActorInfo, '_desc');
+    const avatar = _.get(groupActorInfo, '_avatar');
+
+    if (_.isString(name) && name !== '') {
+      groupActor.name = name;
+    }
+    if (_.isString(desc)) {
+      groupActor.desc = desc;
+    }
+    if (_.isString(avatar)) {
+      groupActor.avatar = avatar;
+    }
+    if (!_.isEmpty(groupActorInfo)) {
+      groupActor.actor_info = _.merge(
+        _.cloneDeep(groupActor.actor_info),
+        groupActorInfo
+      );
+    }
+
+    await groupActor.save();
+
+    return groupActor;
+  }
+
+  /**
    * 获取团人物详情
    * @param uuid 团人物UUID
    */

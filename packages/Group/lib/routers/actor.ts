@@ -1,7 +1,7 @@
-import { TRPGRouter } from 'trpg/core';
+import { TRPGRouter, ModelAccess } from 'trpg/core';
 import { GroupGroup } from '../models/group';
 import { GroupActor } from '../models/actor';
-import { ssoAuth } from 'packages/Player/lib/middleware/auth';
+import { ssoAuth, ssoInfo } from 'packages/Player/lib/middleware/auth';
 import { PlayerJWTPayload } from 'packages/Player/types/player';
 import _ from 'lodash';
 
@@ -63,13 +63,37 @@ actorRouter.get(
 );
 
 /**
+ * 编辑团角色
+ */
+actorRouter.post(
+  '/:groupUUID/actor/:groupActorUUID/edit',
+  ssoAuth(),
+  async (ctx) => {
+    const groupActorUUID = ctx.params.groupActorUUID;
+    const playerUUID = _.get(ctx.state, 'player.uuid');
+    const { info } = ctx.request.body;
+
+    if (_.isNil(groupActorUUID) || _.isNil(playerUUID)) {
+      throw new Error('缺少必要字段');
+    }
+
+    const groupActor = await GroupActor.editActorInfo(
+      groupActorUUID,
+      info,
+      playerUUID
+    );
+
+    ctx.body = { groupActor };
+  }
+);
+
+/**
  * 申请团角色
  */
 actorRouter.post('/:groupUUID/actor/apply', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
   const { actorUUID } = ctx.request.body;
-  const player = ctx.state.player;
-  const playerUUID = player.uuid;
+  const playerUUID = _.get(ctx.state, 'player.uuid');
 
   if (_.isNil(groupUUID) || _.isNil(actorUUID) || _.isNil(playerUUID)) {
     throw new Error('缺少必要字段');

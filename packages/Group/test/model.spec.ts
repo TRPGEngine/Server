@@ -5,7 +5,7 @@ import { GroupGroup } from 'packages/Group/lib/models/group';
 import { GroupActor } from 'packages/Group/lib/models/actor';
 import { createTestActor } from 'packages/Actor/test/example';
 import { createTestGroup, createTestGroupActor } from './example';
-import { getTestUser } from 'packages/Player/test/example';
+import { getTestUser, testUserInfo } from 'packages/Player/test/example';
 
 const context = buildAppContext();
 
@@ -16,16 +16,21 @@ describe('group model function', () => {
 
   beforeAll(async () => {
     testActor = await createTestActor();
-
     testGroup = await createTestGroup();
-
-    testGroupActor = await createTestGroupActor(testGroup.id);
   });
 
   afterAll(async () => {
     await _.invoke(testActor, 'destroy');
     await _.invoke(testGroup, 'destroy');
+  });
+
+  beforeEach(async () => {
+    testGroupActor = await createTestGroupActor(testGroup.id);
+  });
+
+  afterEach(async () => {
     await _.invoke(testGroupActor, 'destroy');
+    testGroupActor = null;
   });
 
   describe('GroupGroup', () => {
@@ -42,6 +47,32 @@ describe('group model function', () => {
   });
 
   describe('GroupActor', () => {
+    test('GroupActor.editActorInfo should be ok', async () => {
+      const testUser = await getTestUser();
+      const targetInfo = {
+        _name: 'target_name',
+        _desc: 'target_desc',
+        _avatar: 'target_avatar',
+        data: 'sda',
+      };
+
+      await GroupActor.editActorInfo(
+        testGroupActor.uuid,
+        targetInfo,
+        testUser.uuid
+      );
+
+      const ga: GroupActor = await GroupActor.findOne({
+        where: {
+          uuid: testGroupActor.uuid,
+        },
+      });
+      expect(ga.name).toBe(targetInfo._name);
+      expect(ga.desc).toBe(targetInfo._desc);
+      expect(ga.avatar).toBe(targetInfo._avatar);
+      expect(ga.actor_info).toMatchObject(targetInfo);
+    });
+
     test('GroupActor.addApprovalGroupActor should be ok', async () => {
       const testUser = await getTestUser();
       const groupActor = await GroupActor.addApprovalGroupActor(
@@ -63,28 +94,24 @@ describe('group model function', () => {
 
     test('GroupActor.agreeApprovalGroupActor should be ok', async () => {
       const testUser = await getTestUser();
-      const testGroupActorTmp = await createTestGroupActor(testGroup.id);
-      await testGroupActorTmp.setActor(testActor);
+      await testGroupActor.setActor(testActor);
 
       const groupActor = await GroupActor.agreeApprovalGroupActor(
-        testGroupActorTmp.uuid,
+        testGroupActor.uuid,
         testUser.uuid
       );
 
       expect(groupActor).toMatchObject({
-        uuid: testGroupActorTmp.uuid,
+        uuid: testGroupActor.uuid,
         passed: true,
         actor_info: testActor.info, // 同意申请后角色的属性应当写入团角色信息
         actor_template_uuid: testActor.template_uuid, // 同意申请后角色的属性应当写入团角色模板UUID
       });
-
-      await testGroupActorTmp.destroy();
     });
 
     test('GroupActor.refuseApprovalGroupActor should be ok', async () => {
       const testUser = await getTestUser();
-      const testGroupActorTmp = await createTestGroupActor(testGroup.id);
-      const testGroupActorUUID = testGroupActorTmp.uuid;
+      const testGroupActorUUID = testGroupActor.uuid;
       await GroupActor.refuseApprovalGroupActor(
         testGroupActorUUID,
         testUser.uuid
