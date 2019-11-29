@@ -1,9 +1,9 @@
-import { TRPGApplication } from 'trpg/core';
+import { TRPGMiddleware } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 
-export default function auth() {
+export default function auth(): TRPGMiddleware {
   return async (ctx, next) => {
-    const trpgapp: TRPGApplication = ctx.trpgapp;
+    const trpgapp = ctx.trpgapp;
 
     // TODO: 目前先基于header的user-uuid 之后改成jwt校验防止伪造
     let user_uuid = ctx.request.header['user-uuid'];

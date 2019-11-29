@@ -10,3 +10,9 @@ declare namespace NodeJS {
     generateRandomStr(length?: number): string;
   }
 }
+
+declare namespace jest {
+  interface Matchers<R> {
+    toBeSuccess(): R;
+  }
+}

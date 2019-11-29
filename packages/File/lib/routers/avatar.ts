@@ -1,4 +1,3 @@
-import Router from 'koa-router';
 import upload from '../middleware/upload';
 import sha256 from '../middleware/sha256';
 import thumbnail from '../middleware/thumbnail';
@@ -6,12 +5,18 @@ import allowMIME from '../middleware/allow-mime';
 import _ from 'lodash';
 import { encodeStr2Int } from '../utils';
 import config from '../config';
-const avatarStorage = require('../middleware/storage/avatar');
 import auth from '../middleware/auth';
+import { TRPGRouter } from 'trpg/core';
+import avatarStorage from '../middleware/storage/avatar';
+import { ssoAuth } from 'packages/Player/lib/middleware/auth';
+import { PlayerJWTPayload } from 'packages/Player/types/player';
+import { FileAvatar } from '../models/avatar';
 
-let router = new Router();
+const avatarRouter = new TRPGRouter<{
+  player?: PlayerJWTPayload;
+}>();
 
-router.post(
+avatarRouter.post(
   '/',
   auth(),
   upload('public/avatar/').single('avatar') as any,
@@ -30,12 +35,30 @@ router.post(
         ? '/avatar/thumbnail/' + filename
         : '/avatar/' + filename,
       avatar: _.get(ctx, 'avatar'),
+      uuid: _.get(ctx, 'avatar.uuid'),
       size,
     };
   }
 );
 
-router.get('/svg', async (ctx, next) => {
+avatarRouter.post('/bindAttachUUID', ssoAuth(), async (ctx) => {
+  const player = ctx.state.player;
+  const { avatarUUID, attachUUID } = ctx.request.body;
+
+  if (!avatarUUID || !attachUUID) {
+    throw new Error('缺少必要参数');
+  }
+
+  const avatar = await FileAvatar.bindAttachUUID(
+    avatarUUID,
+    attachUUID,
+    player.uuid
+  );
+
+  ctx.body = { avatar };
+});
+
+avatarRouter.get('/svg', async (ctx, next) => {
   let name = ctx.query.name;
   if (!name) {
     ctx.body = 'need name';
@@ -56,4 +79,4 @@ router.get('/svg', async (ctx, next) => {
   </svg>`;
 });
 
-module.exports = router;
+module.exports = avatarRouter;

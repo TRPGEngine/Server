@@ -1,4 +1,4 @@
-import KoaRouter, { IMiddleware, IRouterParamContext } from 'koa-router';
+import KoaRouter, { IRouterParamContext } from 'koa-router';
 import { TRPGApplication } from './app';
 import { DefaultContext, Middleware, DefaultState } from 'koa';
 
@@ -12,7 +12,7 @@ export interface TRPGRouterContext extends DefaultContext {
 export class TRPGRouter<
   S extends TRPGRouterState = TRPGRouterState,
   C extends TRPGRouterContext = TRPGRouterContext
-> extends KoaRouter<S, C> {}
+> extends KoaRouter<Partial<S>, C> {}
 
 export type TRPGMiddleware<
   S extends TRPGRouterState = TRPGRouterState,

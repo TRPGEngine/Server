@@ -1,12 +1,12 @@
 import upload from '../middleware/upload';
 import sha265 from '../middleware/sha256';
 import config from '../config';
-const chatimgStorage = require('../middleware/storage/chatimg');
 import auth from '../middleware/auth';
 import uuid from 'uuid/v1';
 import _ from 'lodash';
 import request from 'request';
 import { TRPGApplication, TRPGRouter } from 'trpg/core';
+import chatimgStorage from '../middleware/storage/chatimg';
 
 let router = new TRPGRouter();
 

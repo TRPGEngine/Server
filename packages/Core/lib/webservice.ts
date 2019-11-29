@@ -299,7 +299,28 @@ export default class WebService {
     debug('start to listen(%d)', this.port);
     appLogger.info('start to listen(%d)', this.port);
     return this.getHttpServer().listen(this.port, () => {
-      console.log('listening on *:' + this.port);
+      if (this.trpgapp.get('env') !== 'test') {
+        // 测试环境不打印日志
+        console.log('listening on *:' + this.port);
+      }
+    });
+  }
+
+  close(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const server = this.getHttpServer();
+      if (!server.listening) {
+        // 如果没有启动监听则直接返回成功
+        resolve();
+      } else {
+        server.close((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      }
     });
   }
 

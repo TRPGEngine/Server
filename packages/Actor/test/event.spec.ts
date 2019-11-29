@@ -1,69 +1,72 @@
-const db = global.db;
-const emitEvent = global.emitEvent;
-const _ = global._;
+import { buildAppContext } from 'test/utils/app';
+import { handleLogin, handleLogout } from 'packages/Player/test/example';
+import _ from 'lodash';
+import { ActorActor } from '../lib/models/actor';
+import { ActorTemplate } from '../lib/models/template';
+import { PlayerUser } from 'packages/Player/lib/models/user';
+import { createTestActor } from './example';
+
+const context = buildAppContext();
+
+let testUser: PlayerUser = null;
 
 beforeAll(async () => {
-  const loginInfo = await emitEvent('player::login', {
-    username: 'admin1',
-    password: '21232f297a57a5a743894a0e4a801fc3',
-  });
-  expect(loginInfo.result).toBe(true);
-  this.userInfo = loginInfo.info;
+  testUser = await handleLogin(context);
 });
 
 afterAll(async () => {
-  let { uuid, token } = this.userInfo;
-  await emitEvent('player::logout', { uuid, token });
+  await handleLogout(context, testUser);
 });
 
 describe('template event', () => {
+  let testTemplate;
+
   beforeAll(async () => {
-    expect(db.models).toHaveProperty('actor_template');
-    this.testTemplate = await db.models.actor_template.create({
+    testTemplate = await ActorTemplate.create({
       name: 'test template ' + Math.random(),
       info: 'test info',
-      creatorId: this.userInfo.id,
+      creatorId: testUser.id,
     });
   });
 
   afterAll(async () => {
-    await this.testTemplate.destroy({
+    await testTemplate.destroy({
       force: true,
     });
   });
 
   test('getTemplate all should be ok', async () => {
-    let ret = await emitEvent('actor::getTemplate');
+    let ret = await context.emitEvent('actor::getTemplate');
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('templates');
     expect(Array.isArray(ret.templates)).toBe(true);
   });
 
   test('getTemplate specify should be ok', async () => {
-    let ret = await emitEvent('actor::getTemplate', {
-      uuid: this.testTemplate.uuid,
+    let ret = await context.emitEvent('actor::getTemplate', {
+      uuid: testTemplate.uuid,
     });
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('template');
-    expect(ret.template.uuid).toBe(this.testTemplate.uuid);
+    expect(ret.template.uuid).toBe(testTemplate.uuid);
   });
 
   test('getSuggestTemplate should be ok', async () => {
-    const ret = await emitEvent('actor::getSuggestTemplate', {});
+    const ret = await context.emitEvent('actor::getSuggestTemplate', {});
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('templates');
     expect(Array.isArray(ret.templates)).toBe(true);
   });
 
   test('findTemplate should be ok', async () => {
-    let ret = await emitEvent('actor::findTemplate', { name: '刀' });
+    let ret = await context.emitEvent('actor::findTemplate', { name: '空白' });
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('templates');
     expect(ret).toHaveProperty('templates.0.creator_name');
   });
 
   test('createTemplate should be ok', async () => {
-    let ret = await emitEvent('actor::createTemplate', {
+    let ret = await context.emitEvent('actor::createTemplate', {
       name: 'test template ' + Math.random(),
       info: JSON.stringify({
         test: 'abc',
@@ -76,7 +79,7 @@ describe('template event', () => {
     expect(ret).toHaveProperty('template.creatorId');
 
     let uuid = _.get(ret, 'template.uuid');
-    let dnum = await db.models.actor_template.destroy({
+    let dnum = await ActorTemplate.destroy({
       where: { uuid },
       force: true, // 硬删除，默认是软删除
     });
@@ -85,8 +88,8 @@ describe('template event', () => {
 
   test('updateTemplate should be ok', async () => {
     let randomText = 'modified ' + Math.random();
-    let ret = await emitEvent('actor::updateTemplate', {
-      uuid: this.testTemplate.uuid,
+    let ret = await context.emitEvent('actor::updateTemplate', {
+      uuid: testTemplate.uuid,
       name: randomText + 'name',
       desc: randomText + 'desc',
       avatar: randomText + 'avatar',
@@ -100,9 +103,9 @@ describe('template event', () => {
     expect(ret).toHaveProperty('template.avatar', randomText + 'avatar');
     expect(ret).toHaveProperty('template.info', randomText + 'info');
 
-    let dbInstance = await db.models.actor_template.findOne({
+    let dbInstance = await ActorTemplate.findOne({
       where: {
-        uuid: this.testTemplate.uuid,
+        uuid: testTemplate.uuid,
       },
     });
     expect(dbInstance).toHaveProperty('name', randomText + 'name');
@@ -112,18 +115,18 @@ describe('template event', () => {
   });
 
   test('removeTemplate should be ok', async () => {
-    let oldTemplate = await db.models.actor_template.create({
+    let oldTemplate = await ActorTemplate.create({
       name: 'test ' + Math.random(),
       info: 'info',
-      creatorId: this.userInfo.id,
+      creatorId: testUser.id,
     });
 
-    let ret = await emitEvent('actor::removeTemplate', {
+    let ret = await context.emitEvent('actor::removeTemplate', {
       uuid: oldTemplate.uuid,
     });
     expect(ret.result).toBe(true);
 
-    let newTemplate = await db.models.actor_template.findOne({
+    let newTemplate = await ActorTemplate.findOne({
       where: {
         uuid: oldTemplate.uuid,
       },
@@ -138,13 +141,20 @@ describe('template event', () => {
 });
 
 describe('actor event', () => {
+  let testActor: ActorActor;
+  let testTemplate: ActorTemplate;
+
   beforeAll(async () => {
-    this.testTemplate = await db.models.actor_template.findOne();
-    this.testActor = await db.models.actor_actor.findOne();
+    testActor = await createTestActor();
+    testTemplate = await ActorTemplate.findOne();
+  });
+
+  afterAll(async () => {
+    await testActor.destroy();
   });
 
   test('createActor should be ok', async () => {
-    let ret = await emitEvent('actor::createActor', {
+    let ret = await context.emitEvent('actor::createActor', {
       name: 'test actor',
       avatar: 'test avatar',
       desc: 'test desc',
@@ -153,13 +163,13 @@ describe('actor event', () => {
         number: 1,
         array: ['a', 'b', 'c'],
       },
-      template_uuid: this.testTemplate.uuid,
+      template_uuid: testTemplate.uuid,
     });
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('actor');
     // TODO: 需要增加avatar绑定检测
 
-    await db.models.actor_actor.destroy({
+    await ActorActor.destroy({
       where: {
         uuid: ret.actor.uuid,
       },
@@ -168,35 +178,35 @@ describe('actor event', () => {
   });
 
   test('getActor all should be ok', async () => {
-    let ret = await emitEvent('actor::getActor');
+    let ret = await context.emitEvent('actor::getActor');
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('actors');
     expect(Array.isArray(ret.actors)).toBe(true);
   });
 
   test('getActor specify should be ok', async () => {
-    let ret = await emitEvent('actor::getActor', {
-      uuid: this.testActor.uuid,
+    let ret = await context.emitEvent('actor::getActor', {
+      uuid: testActor.uuid,
     });
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('actor');
-    expect(ret).toHaveProperty('actor.uuid', this.testActor.uuid);
+    expect(ret).toHaveProperty('actor.uuid', testActor.uuid);
   });
 
   test('removeActor should be ok', async () => {
-    let newTestActor = await db.models.actor_actor.create({
+    const newTestActor = await ActorActor.create({
       name: 'test name',
-      template_uuid: this.testTemplate.uuid,
-      ownerId: this.userInfo.id,
+      template_uuid: testTemplate.uuid,
+      ownerId: testUser.id,
     });
 
-    let ret = await emitEvent('actor::removeActor', {
+    let ret = await context.emitEvent('actor::removeActor', {
       uuid: newTestActor.uuid,
     });
 
     expect(ret.result).toBe(true);
 
-    newTestActor.destroy({ force: true });
+    await newTestActor.destroy({ force: true });
   });
 
   test.todo('updateActor should be ok');

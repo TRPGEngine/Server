@@ -3,7 +3,7 @@
  * 2-seeder-upgrade_password_encrypt.js
  * 为没有salt的用户增加salt并增加sha1加密
  */
-const sha1 = require('../../packages/Player/sha1').default;
+const sha1 = require('../../packages/Player/lib/utils/sha1').default;
 
 module.exports = {
   up: async (queryInterface, Sequelize, { app }) => {

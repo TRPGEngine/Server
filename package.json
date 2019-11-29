@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.2.17",
+  "version": "1.2.18",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "run:standard": "node standard.js",
     "run:nodemon": "nodemon standard.js",
     "packages:install": "bash packages/foreach.sh 'npm ci'",
-    "prettier:all": "prettier --write \"./packages/**/*.{js,ts}\"",
+    "prettier:all": "prettier --write \"./packages/**/*.{js,ts}\" && prettier --write \"./db/**/*.xml\"",
     "db:migrate:generate": "node ./cli.js generate-migrate",
     "db:migrate:run": "node ./cli.js run-migrate",
     "db:seeder:generate": "node ./cli.js generate-seeder",
@@ -21,8 +21,10 @@
     "playground": "cross-env TRPG_PORT=23275 node ./playground/playground.js --experimental-repl-await",
     "bench": "node ./test/bench/index.js && cat ./test/bench/out.log",
     "test": "jest --config=./test/jest.config.js --runInBand",
+    "test:coverage": "jest --config=./test/jest.config.js --runInBand --coverage",
     "test:noserver": "npm run test --noserver",
-    "test:watch": "jest --config=./test/jest.config.js --runInBand --watch"
+    "test:watch": "jest --config=./test/jest.config.js --runInBand --watch",
+    "test:ci": "cross-env JEST_JUNIT_OUTPUT_DIR=test/reports/jest/results.xml NODE_ENV=ci npm run test:coverage -- --ci --reporters=default --reporters=jest-junit"
   },
   "husky": {
     "hooks": {
@@ -67,6 +69,7 @@
     "yargs": "^13.2.2"
   },
   "devDependencies": {
+    "@prettier/plugin-xml": "^0.3.0",
     "@types/config": "0.0.34",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^7.0.0",
@@ -75,7 +78,10 @@
     "@types/memoize-one": "^4.1.1",
     "@types/node-schedule": "^1.2.3",
     "@types/request": "^2.48.3",
+    "@types/socket.io-client": "^1.4.32",
+    "@types/supertest": "^2.0.8",
     "@types/uuid": "^3.4.4",
+    "codecov": "^3.6.1",
     "cross-env": "^5.2.0",
     "glob": "^7.1.4",
     "husky": "^2.4.1",
@@ -83,6 +89,7 @@
     "prettier": "^1.16.4",
     "sequelize-auto-migrations": "github:TRPGEngine/sequelize-auto-migrations",
     "socket.io-client": "^2.2.0",
+    "supertest": "^4.0.2",
     "ts-jest": "^24.0.2"
   }
 }

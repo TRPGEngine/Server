@@ -1,5 +1,5 @@
-import { TRPGRouter } from 'trpg/core';
-import { ssoAuth } from 'packages/Player/lib/middleware/auth';
+import { TRPGRouter, ModelAccess } from 'trpg/core';
+import { ssoAuth, ssoInfo } from 'packages/Player/lib/middleware/auth';
 import { PlayerJWTPayload } from 'packages/Player/types/player';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
@@ -42,6 +42,86 @@ actorRouter.post('/create', ssoAuth(), async (ctx) => {
   await actor.setOwner(user);
 
   ctx.body = { actor };
+});
+
+actorRouter.get('/:actorUUID/detail', async (ctx) => {
+  const actorUUID = ctx.params.actorUUID;
+
+  const actor = await ActorActor.findByUUID(actorUUID);
+
+  ctx.body = { actor };
+});
+
+actorRouter.post('/:actorUUID/edit', ssoAuth(), async (ctx) => {
+  const actorUUID = ctx.params.actorUUID;
+  const { name, desc, avatar, info } = ctx.request.body;
+  const { uuid: userUUID } = ctx.state.player;
+
+  // 仅自己可以修改
+  const user = await PlayerUser.findByUUID(userUUID);
+  const actor: ActorActor = await ActorActor.findOne({
+    where: {
+      uuid: actorUUID,
+      ownerId: user.id,
+    },
+  });
+
+  if (_.isNil(actor)) {
+    throw new Error('角色不存在');
+  }
+
+  if (_.isString(name) && name !== '') {
+    actor.name = name;
+  }
+  if (_.isString(desc)) {
+    actor.desc = desc;
+  }
+  if (_.isString(avatar)) {
+    actor.avatar = avatar;
+  }
+  if (!_.isEmpty(info)) {
+    actor.info = _.merge(_.cloneDeep(actor.info), info);
+  }
+
+  await actor.save();
+
+  ctx.body = {
+    actor,
+  };
+});
+
+actorRouter.get('/:actorUUID/access', ssoInfo(), async (ctx) => {
+  const actorUUID = ctx.params.actorUUID;
+
+  if (_.isNil(ctx.state.player)) {
+    ctx.body = {
+      access: {
+        editable: false,
+        removeable: false,
+      } as ModelAccess,
+    };
+
+    return;
+  }
+
+  const actor = await ActorActor.findByUUID(actorUUID);
+  const owner: PlayerUser = await actor.getOwner();
+
+  if (owner.uuid === _.get(ctx.state, 'player.uuid')) {
+    ctx.body = {
+      access: {
+        editable: true,
+        removeable: true,
+      } as ModelAccess,
+    };
+  } else {
+    ctx.body = {
+      access: {
+        editable: false,
+        removeable: false,
+      } as ModelAccess,
+    };
+  }
 });
 
 export default actorRouter;

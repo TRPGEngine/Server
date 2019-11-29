@@ -1,4 +1,10 @@
-import { Model, DBInstance, Orm } from 'trpg/core';
+import {
+  Model,
+  DBInstance,
+  Orm,
+  BelongsToSetAssociationMixin,
+} from 'trpg/core';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
 export type ChatConverseType = 'user' | 'channel' | 'group' | 'system';
 
@@ -7,6 +13,8 @@ export class ChatConverse extends Model {
   type: ChatConverseType;
   name: string;
   icon: string;
+
+  setOwner: BelongsToSetAssociationMixin<PlayerUser, number>;
 }
 
 export default function ChatConverseDefinition(Sequelize: Orm, db: DBInstance) {

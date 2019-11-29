@@ -1,8 +1,9 @@
-const db = global.db;
-const emitEvent = global.emitEvent;
-const socket = global.socket;
+import { buildAppContext } from 'test/utils/app';
+import { PlayerUser } from 'packages/Player/lib/models/user';
+import { ChatConverse } from '../lib/models/converse';
+import { ChatLog } from '../lib/models/log';
 
-export {};
+const context = buildAppContext();
 
 let listenedEvent = {};
 
@@ -12,7 +13,7 @@ function registerSocketListener(eventName, cb) {
     listenedEvent[eventName].push(cb);
   } else {
     listenedEvent[eventName] = [cb];
-    socket.on(eventName, (data) => {
+    context.socket.on(eventName, (data) => {
       // 循环调用所有注册的事件回调
       if (listenedEvent[eventName]) {
         // 如果有该事件存在
@@ -43,20 +44,20 @@ describe('chat event action', () => {
   let userInfoDbInstance = null;
 
   beforeAll(async () => {
-    const loginInfo = await emitEvent('player::login', {
+    const loginInfo = await context.emitEvent('player::login', {
       username: 'admin1',
       password: '21232f297a57a5a743894a0e4a801fc3',
     });
     expect(loginInfo.result).toBe(true);
     userInfo = loginInfo.info;
 
-    userInfoDbInstance = await db.models.player_user.findOne({
+    userInfoDbInstance = await PlayerUser.findOne({
       where: { uuid: userInfo.uuid },
     });
   });
 
   afterAll(async () => {
-    await emitEvent('player::logout', {
+    await context.emitEvent('player::logout', {
       uuid: userInfo.uuid,
       token: userInfo.token,
     });
@@ -66,48 +67,50 @@ describe('chat event action', () => {
   });
 
   describe('converse action', () => {
+    let testConverse: ChatConverse = null;
     beforeEach(async () => {
-      this.converse = await db.models.chat_converse.create({
+      testConverse = await ChatConverse.create({
         name: 'test_converse',
       });
-      await this.converse.setOwner(userInfoDbInstance);
+      await testConverse.setOwner(userInfoDbInstance);
     });
 
     afterEach(async () => {
-      if (this.converse) {
-        await this.converse.destroy();
+      if (testConverse) {
+        await testConverse.destroy();
+        testConverse = null;
       }
     });
 
     test('getConverses should be ok', async () => {
-      let ret = await emitEvent('chat::getConverses');
+      let ret = await context.emitEvent('chat::getConverses');
       expect(ret.result).toBe(true);
       expect(Array.isArray(ret.list)).toBe(true);
     });
 
     test('removeConverse should be ok', async () => {
-      let ret = await emitEvent('chat::removeConverse', {
-        converseUUID: this.converse.uuid,
+      let ret = await context.emitEvent('chat::removeConverse', {
+        converseUUID: testConverse.uuid,
       });
       expect(ret.result).toBe(true);
-
-      this.converse = null; // 手动清空
     });
   });
 
   describe('message action', () => {
     const targetConverse = 'test-trpg-converse-' + Math.random();
     const targetUUID = 'test-trpg-uuid-' + Math.random();
+    let testChatLog: ChatLog = null;
+    let testChatConverseLog: ChatLog = null;
 
     beforeEach(async () => {
-      this.testChatLog = await db.models.chat_log.create({
+      testChatLog = await ChatLog.create({
         sender_uuid: userInfo.uuid,
         to_uuid: targetUUID,
         message: 'test message',
         type: 'normal',
         date: new Date(),
       });
-      this.testChatConverseLog = await db.models.chat_log.create({
+      testChatConverseLog = await ChatLog.create({
         sender_uuid: userInfo.uuid,
         converse_uuid: targetConverse,
         message: 'test converse message',
@@ -117,12 +120,12 @@ describe('chat event action', () => {
     });
 
     afterEach(async () => {
-      await this.testChatLog.destroy();
-      await this.testChatConverseLog.destroy();
+      await testChatLog.destroy();
+      await testChatConverseLog.destroy();
     });
 
     test('getUserChatLog should be ok', async () => {
-      let ret = await emitEvent('chat::getUserChatLog', {
+      let ret = await context.emitEvent('chat::getUserChatLog', {
         user_uuid: targetUUID,
       });
 
@@ -130,7 +133,7 @@ describe('chat event action', () => {
       expect(Array.isArray(ret.list)).toBe(true);
       expect(ret.list).toMatchObject([
         {
-          uuid: this.testChatLog.uuid,
+          uuid: testChatLog.uuid,
           sender_uuid: userInfo.uuid,
           to_uuid: targetUUID,
         },
@@ -138,7 +141,7 @@ describe('chat event action', () => {
     });
 
     test('getConverseChatLog should be ok', async () => {
-      let ret = await emitEvent('chat::getConverseChatLog', {
+      let ret = await context.emitEvent('chat::getConverseChatLog', {
         converse_uuid: targetConverse,
       });
 
@@ -147,7 +150,7 @@ describe('chat event action', () => {
       expect(Array.isArray(ret.list)).toBe(true);
       expect(ret.list).toMatchObject([
         {
-          uuid: this.testChatConverseLog.uuid,
+          uuid: testChatConverseLog.uuid,
           sender_uuid: userInfo.uuid,
           converse_uuid: targetConverse,
         },
@@ -155,7 +158,7 @@ describe('chat event action', () => {
     });
 
     test('getAllUserConverse should be ok', async () => {
-      let ret = await emitEvent('chat::getAllUserConverse');
+      let ret = await context.emitEvent('chat::getAllUserConverse');
       expect(ret.result).toBe(true);
       expect(ret).toHaveProperty('senders');
       expect(Array.isArray(ret.senders)).toBe(true);
@@ -166,7 +169,7 @@ describe('chat event action', () => {
       const now = new Date();
       const lastLoginDate = new Date(now.setDate(now.getDate() - 10));
       // 获取一天前到现在的所有会话
-      let ret = await emitEvent('chat::getOfflineUserConverse', {
+      let ret = await context.emitEvent('chat::getOfflineUserConverse', {
         lastLoginDate,
       });
       expect(ret.result).toBe(true);
@@ -177,7 +180,7 @@ describe('chat event action', () => {
   });
 
   test('updateCardChatData should be ok', async () => {
-    const testChat = await db.models.chat_log.create({
+    const testChat = await ChatLog.create({
       type: 'card',
       sender_uuid: userInfo.uuid,
       to_uuid: 'any user',
@@ -186,7 +189,7 @@ describe('chat event action', () => {
     expect(testChat).toBeTruthy();
     expect(testChat.data).toMatchObject({ number: 1, string: '2' });
 
-    let ret = await emitEvent('chat::updateCardChatData', {
+    let ret = await context.emitEvent('chat::updateCardChatData', {
       chatUUID: testChat.uuid,
       newData: { number: 3, array: ['1', '2'] },
     });

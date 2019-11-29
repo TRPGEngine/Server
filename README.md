@@ -1,5 +1,8 @@
 # Server
 
+[![CircleCI](https://circleci.com/gh/TRPGEngine/Server.svg?style=svg)](https://circleci.com/gh/TRPGEngine/Server)
+[![codecov](https://codecov.io/gh/TRPGEngine/Server/branch/master/graph/badge.svg)](https://codecov.io/gh/TRPGEngine/Server)
+
 ## 安装环境
 
 本项目基于`NodeJS`，因此服务器上必须配备`NodeJS`才能正常运行本服务器。  

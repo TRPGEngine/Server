@@ -3,10 +3,12 @@ import {
   Orm,
   DBInstance,
   BelongsToSetAssociationMixin,
+  BelongsToGetAssociationMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 
 export class ActorActor extends Model {
+  id: string;
   uuid: string;
   name: string;
   desc: string;
@@ -15,6 +17,15 @@ export class ActorActor extends Model {
   info: {};
 
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
+  getOwner?: BelongsToGetAssociationMixin<PlayerUser>;
+
+  static findByUUID(uuid: string): Promise<ActorActor> {
+    return ActorActor.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
 
   getObject() {
     return {

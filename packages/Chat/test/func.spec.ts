@@ -1,18 +1,20 @@
-const app = global.trpgapp;
-const db = global.db;
+import { buildAppContext } from 'test/utils/app';
+import { ChatLog } from '../lib/models/log';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
-export {};
+const context = buildAppContext();
 
 describe('register', () => {
-  test('app.player should be exist', () => {
-    expect(app.player).toBeTruthy();
+  test('context.app.player should be exist', () => {
+    expect(context.app.player).toBeTruthy();
   });
 
-  test('app.chat should be exist', () => {
-    expect(app.chat).toBeTruthy();
+  test('context.app.chat should be exist', () => {
+    expect(context.app.chat).toBeTruthy();
   });
 
   test('chat models should be exist', () => {
+    const db = context.db;
     expect(db.models.chat_log).toBeTruthy();
     expect(db.models.chat_converse).toBeTruthy();
   });
@@ -22,7 +24,7 @@ describe('actions', () => {
   let senderUser = null;
 
   beforeAll(async () => {
-    senderUser = await db.models.player_user.findOne({
+    senderUser = await PlayerUser.findOne({
       where: {
         username: 'admin1',
       },
@@ -37,8 +39,9 @@ describe('actions', () => {
   test.todo('addConverse should be ok');
 
   describe('msg action', () => {
+    let testMsg: ChatLog = null;
     beforeEach(async () => {
-      this.testMsg = await db.models.chat_log.create({
+      testMsg = await ChatLog.create({
         sender_uuid: senderUser.uuid,
         message: 'test message',
         date: new Date(),
@@ -46,13 +49,13 @@ describe('actions', () => {
     });
 
     afterEach(async () => {
-      await this.testMsg.destroy();
+      await testMsg.destroy();
     });
 
     test('findMsgAsync should be ok', async () => {
-      let msg = this.testMsg;
+      const msg = testMsg;
 
-      let found = await app.chat.findMsgAsync(msg.uuid);
+      const found = await context.app.chat.findMsgAsync(msg.uuid);
       expect(found).toBeTruthy();
       expect(found.uuid).toBe(msg.uuid);
       expect(found.message).toBe(msg.message);
@@ -70,12 +73,12 @@ describe('actions', () => {
   test.todo('saveChatLogAsync should be ok');
 
   test('getChatLogSumAsync should be ok', async () => {
-    let count = await app.chat.getChatLogSumAsync();
+    let count = await context.app.chat.getChatLogSumAsync();
     expect(count).toEqual(expect.any(Number));
   });
 
   test('getChatLogAsync should be ok', async () => {
-    let logList = await app.chat.getChatLogAsync();
+    let logList = await context.app.chat.getChatLogAsync();
     expect(logList).toBeTruthy();
     expect(logList.length).toBeGreaterThanOrEqual(0);
   });

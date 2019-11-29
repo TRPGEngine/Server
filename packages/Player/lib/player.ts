@@ -1,25 +1,20 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:player');
 import BasePackage from 'lib/package';
-import Router from 'koa-router';
 const Geetest = require('gt3-sdk');
 import md5 from './utils/md5';
 import sha1 from './utils/sha1';
-import PlayerList from './list';
 import memoizeOne from 'memoize-one';
 import PlayerUserDefinition, { PlayerUser } from './models/user';
 import PlayerInviteDefinition from './models/invite';
 import PlayerLoginLogDefinition, { PlayerLoginLog } from './models/login-log';
 import PlayerSettingsDefinition from './models/settings';
 import * as event from './event';
-import {
-  getPlayerManager,
-  PlayerManagerCls,
-  PlayerManagerPlayerMapItem,
-} from './managers/player-manager';
+import { getPlayerManager, PlayerManagerCls } from './managers/player-manager';
 import { Socket } from 'trpg/core';
 import { AxiosResponse } from 'axios';
 import SSORouter from './routers/sso';
+import registerRouter from './routers/register';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -229,19 +224,16 @@ export default class Player extends BasePackage {
   }
 
   private initRouters() {
-    const app = this.app;
-    const webservice = app.webservice;
-    const router = new Router();
+    // const register = require('./routers/register');
+    // TODO: 等待处理
+    // router.use((ctx, next) => {
+    //   (ctx as any).geetest = this.geetest; // 中间件声明全局实例
+    //   return next();
+    // });
+    // router.use('/player/register', register.routes());
 
-    const register = require('./routers/register');
-    router.use((ctx, next) => {
-      (ctx as any).geetest = this.geetest; // 中间件声明全局实例
-      return next();
-    });
-    router.use('/player/register', register.routes());
+    this.regRoute(registerRouter);
     this.regRoute(SSORouter);
-
-    webservice.use(router.routes());
   }
 
   private initTimer() {

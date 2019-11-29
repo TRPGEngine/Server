@@ -483,12 +483,12 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "name": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "name",
                     "seqType": "Sequelize.STRING"
                 },
                 "size": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "size",
                     "seqType": "Sequelize.INTEGER"
                 },
@@ -502,7 +502,7 @@
                 },
                 "type": {
                     "field": "type",
-                    "seqType": "Sequelize.ENUM('actor', 'user', 'group')"
+                    "seqType": "Sequelize.ENUM('actor', 'user', 'group', 'groupActor')"
                 },
                 "has_thumbnail": {
                     "defaultValue": {
@@ -513,6 +513,10 @@
                 },
                 "attach_uuid": {
                     "field": "attach_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "owner_uuid": {
+                    "field": "owner_uuid",
                     "seqType": "Sequelize.STRING"
                 },
                 "createdAt": {
@@ -558,7 +562,7 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "name": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "name",
                     "seqType": "Sequelize.STRING"
                 },
@@ -567,7 +571,7 @@
                     "seqType": "Sequelize.STRING"
                 },
                 "size": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "size",
                     "seqType": "Sequelize.INTEGER"
                 },
@@ -645,17 +649,17 @@
                     "seqType": "Sequelize.UUID"
                 },
                 "name": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "name",
                     "seqType": "Sequelize.STRING"
                 },
                 "originalname": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "originalname",
                     "seqType": "Sequelize.STRING"
                 },
                 "size": {
-                    "require": true,
+                    "allowNull": false,
                     "field": "size",
                     "seqType": "Sequelize.INTEGER"
                 },
@@ -1755,6 +1759,10 @@
                 "actor_info": {
                     "field": "actor_info",
                     "seqType": "Sequelize.JSON"
+                },
+                "actor_template_uuid": {
+                    "field": "actor_template_uuid",
+                    "seqType": "Sequelize.UUID"
                 },
                 "name": {
                     "field": "name",
@@ -2892,5 +2900,5 @@
             "indexes": []
         }
     },
-    "revision": 27
+    "revision": 31
 }

@@ -62,14 +62,19 @@ exports.handler = async function(argv) {
 
     for (const sf of seederFiles) {
       if (!alreadyExecuted.includes(sf)) {
-        await execSeederFile(sf);
+        try {
+          await execSeederFile(sf);
 
-        // 执行完毕后记录插入数据库
-        await queryInterface.bulkInsert('SequelizeMeta', [
-          {
-            name: sf,
-          },
-        ]);
+          // 执行完毕后记录插入数据库
+          await queryInterface.bulkInsert('SequelizeMeta', [
+            {
+              name: sf,
+            },
+          ]);
+        } catch (err) {
+          // 对于seeder全部执行。会忽略错误并仅返回提示
+          console.error(err);
+        }
       }
     }
   }

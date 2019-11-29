@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupInvite } from './models/invite';
 import { GroupGroup } from './models/group';
+import { GroupActor } from './models/actor';
 
 export const create: EventFunc<{
   name: string;
@@ -679,6 +680,7 @@ export const getGroupActors: EventFunc<{
   let groupActors = await group.getGroupActors();
   let res = [];
   for (let ga of groupActors) {
+    // TODO: 这个是个N+1问题。需要优化
     res.push(await ga.getObjectAsync());
   }
   return { actors: res };
@@ -733,7 +735,7 @@ export const getGroupActorMapping: EventFunc<{
 };
 
 /**
- * 添加团人物
+ * 添加一个待审核团人物
  */
 export const addGroupActor: EventFunc<{
   groupUUID: string;
@@ -747,49 +749,13 @@ export const addGroupActor: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let groupUUID = data.groupUUID;
-  let actorUUID = data.actorUUID;
-  if (!groupUUID || !actorUUID) {
-    throw '缺少必要参数';
-  }
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  let actor = await db.models.actor_actor.findOne({
-    where: { uuid: actorUUID },
-  });
-  if (!actor) {
-    throw '找不到该角色';
-  }
-  let isGroupActorExist = await db.models.group_actor.findOne({
-    where: { actor_uuid: actor.uuid, groupId: group.id },
-  });
-  if (isGroupActorExist) {
-    throw '该角色已存在';
-  }
-
-  const user = await PlayerUser.findByUUID(player.uuid);
-
-  let groupActor;
-  await db.transactionAsync(async () => {
-    groupActor = await db.models.group_actor.create({
-      name: actor.name,
-      desc: actor.desc,
-      actor_uuid: actorUUID,
-      actor_info: {},
-      avatar: actor.avatar,
-      passed: false,
-      ownerId: user.id,
-    });
-    groupActor = await groupActor.setActor(actor);
-    groupActor = await groupActor.setGroup(group);
-
-    _.set(groupActor, 'dataValues.actor', actor);
-    _.set(groupActor, 'dataValues.group', group);
-  });
+  const groupUUID = data.groupUUID;
+  const actorUUID = data.actorUUID;
+  const groupActor = await GroupActor.addApprovalGroupActor(
+    groupUUID,
+    actorUUID,
+    player.uuid
+  );
 
   return { groupActor };
 };
@@ -856,7 +822,6 @@ export const removeGroupActor: EventFunc<{
 };
 
 export const agreeGroupActor: EventFunc<{
-  groupUUID: string;
   groupActorUUID: string;
 }> = async function agreeGroupActor(data, cb, db) {
   const app = this.app;
@@ -867,37 +832,21 @@ export const agreeGroupActor: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let groupUUID = data.groupUUID;
-  let groupActorUUID = data.groupActorUUID;
-  if (!groupUUID || !groupActorUUID) {
-    throw '缺少必要参数';
-  }
+  const groupActorUUID = data.groupActorUUID;
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  if (!group.isManagerOrOwner(player.uuid)) {
-    throw '没有操作权限';
-  }
-  let groupActor = await db.models.group_actor.findOne({
-    where: {
-      uuid: groupActorUUID,
-      passed: false,
-    },
-  });
-  if (!groupActor) {
-    throw '找不到该角色';
-  }
-  groupActor.passed = true;
-  await groupActor.save();
+  const groupActor = await GroupActor.agreeApprovalGroupActor(
+    groupActorUUID,
+    player.uuid
+  );
+
   return { groupActor };
 };
 
+/**
+ * 拒绝团角色申请
+ * 逻辑就是直接删除该角色
+ */
 export const refuseGroupActor: EventFunc<{
-  groupUUID: string;
   groupActorUUID: string;
 }> = async function refuseGroupActor(data, cb, db) {
   const app = this.app;
@@ -908,30 +857,10 @@ export const refuseGroupActor: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let groupUUID = data.groupUUID;
-  let groupActorUUID = data.groupActorUUID;
-  if (!groupUUID || !groupActorUUID) {
-    throw '缺少必要参数';
-  }
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  if (!group.isManagerOrOwner(player.uuid)) {
-    throw '没有操作权限';
-  }
-  let groupActor = await db.models.group_actor.findOne({
-    where: {
-      uuid: groupActorUUID,
-      passed: false,
-    },
-  });
-  if (!groupActor) {
-    throw '找不到该角色';
-  }
-  await groupActor.destroy();
+  const groupActorUUID = data.groupActorUUID;
+
+  await GroupActor.refuseApprovalGroupActor(groupActorUUID, player.uuid);
+
   return true;
 };
 

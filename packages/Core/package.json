@@ -44,7 +44,6 @@
     "pinyin": "^2.9.0",
     "raven": "^2.6.4",
     "socket.io": "^2.0.2",
-    "socket.io-redis": "^5.2.0",
     "xss": "^1.0.6"
   },
   "devDependencies": {
@@ -60,7 +59,6 @@
     "@types/minimatch": "^3.0.3",
     "@types/pinyin": "^2.8.1",
     "@types/socket.io": "^2.1.2",
-    "@types/socket.io-redis": "^1.0.25",
     "chai": "^4.1.1",
     "gulp": "^3.9.1",
     "gulp-live-server": "0.0.31",

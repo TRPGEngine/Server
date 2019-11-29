@@ -1,9 +1,15 @@
-const uuid = require('uuid/v1');
-const path = require('path');
+import path from 'path';
+import uuid from 'uuid/v1';
+import { TRPGMiddleware } from 'trpg/core';
+import _ from 'lodash';
+import { FileFile } from '../../models/file';
 
-module.exports = function fileStorage(isPersistence = false, type = 'file') {
+export default function fileStorage(
+  isPersistence = false,
+  type = 'file'
+): TRPGMiddleware {
   return async (ctx, next) => {
-    let trpgapp = ctx.trpgapp;
+    const trpgapp = ctx.trpgapp;
     if (!ctx.player) {
       ctx.response.status = 403;
       throw '用户未找到，请检查登录状态';
@@ -16,15 +22,15 @@ module.exports = function fileStorage(isPersistence = false, type = 'file') {
       encoding,
       mimetype,
       path: filepath,
-    } = ctx.req.file;
-    let db = await trpgapp.storage.db;
+    } = _.get(ctx, 'req.file');
+    const db = await trpgapp.storage.db;
 
     if (path.isAbsolute(filepath)) {
       // 如果filepath是绝对路径，则转化为相对路径
       filepath = path.relative(process.cwd(), filepath);
     }
 
-    let fileinfo = await db.models.file_file.create({
+    const fileinfo = await FileFile.create({
       uuid: uuid(),
       name: filename,
       originalname,
@@ -41,4 +47,4 @@ module.exports = function fileStorage(isPersistence = false, type = 'file') {
 
     await next();
   };
-};
+}

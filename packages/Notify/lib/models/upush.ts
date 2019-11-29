@@ -3,6 +3,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import md5Encrypt from 'packages/Player/lib/utils/md5';
 import _ from 'lodash';
 import { NotifyHistory } from './history';
+import moment from 'moment';
 
 // 友盟push
 
@@ -84,6 +85,13 @@ export class NotifyUPush extends Model {
           ...extraBody,
         },
       },
+      policy: {
+        // 过期时间: 10分钟，超过十分钟就不要发送了
+        // NOTICE: 可能会有时区的问题。需要注意一下
+        expire_time: moment()
+          .add(10, 'minutes')
+          .format('YYYY-MM-DD HH:mm:ss'),
+      },
     };
 
     if (mipush) {
@@ -115,6 +123,7 @@ export class NotifyUPush extends Model {
         title,
         message: text,
         data: {
+          upushRequest: body,
           upushResponse: res,
         },
       });

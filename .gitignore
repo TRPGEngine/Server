@@ -9,3 +9,5 @@ test/bench/out.log
 !packages/Dashboard/lib/public
 !packages/Dashboard/app/public
 dist/
+test/coverage
+test/reports

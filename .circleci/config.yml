@@ -1,0 +1,62 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8.11
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+      - image: circleci/mysql:5.7.21
+        environment:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_DATABASE: trpg_ci
+          TZ: Asia/Shanghai
+      - image: circleci/redis:5.0.5
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      # TODO: 待处理包缓存
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      # 在ci中额外安装jest-junit用于生成Test Summary
+      - run: npm install -D jest-junit
+
+      # 安装完整依赖。放在后面防止低版本npm把git下载的包覆盖
+      - run: npm install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      # - run: npm run packages:install
+      - run: bash packages/foreach.sh 'npm install'
+
+      - run: echo 'export NODE_ENV=ci' >> $BASH_ENV
+
+      # 更新数据库
+      - run: npm run db:migrate:run
+      - run: npm run db:seeder:run
+
+      # run tests!
+      - run: npm run test:ci
+
+      - run: npx codecov
+
+      - store_test_results:
+          path: test/reports
