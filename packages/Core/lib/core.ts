@@ -21,6 +21,7 @@ export default function createApplication(conf: Config): Application {
   exitHook(async (cb) => {
     console.log('正在关闭应用...');
     await app.close();
+    console.log('应用关闭成功!');
     cb();
   });
 

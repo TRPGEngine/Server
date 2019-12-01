@@ -89,7 +89,7 @@
     "glob": "^7.1.4",
     "husky": "^2.4.1",
     "jest": "^24.7.1",
-    "prettier": "^1.16.4",
+    "prettier": "^1.19.1",
     "sequelize-auto-migrations": "github:TRPGEngine/sequelize-auto-migrations",
     "socket.io-client": "^2.2.0",
     "standard-version": "^7.0.1",
