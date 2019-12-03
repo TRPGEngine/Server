@@ -1,7 +1,11 @@
 import { EventFunc } from 'trpg/core';
 import { FileAvatar } from './models/avatar';
+import _ from 'lodash';
 
-export const bindAttachUUID: EventFunc = async function(data, cb, db) {
+export const bindAttachUUID: EventFunc<{
+  avatar_uuid: string;
+  attach_uuid: string;
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -12,6 +16,10 @@ export const bindAttachUUID: EventFunc = async function(data, cb, db) {
 
   const avatar_uuid = data.avatar_uuid;
   const attach_uuid = data.attach_uuid;
+
+  if (_.isNil(avatar_uuid) || _.isNil(attach_uuid)) {
+    throw '缺少必要参数';
+  }
 
   const avatar = await FileAvatar.bindAttachUUID(
     avatar_uuid,
