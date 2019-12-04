@@ -218,8 +218,8 @@ describe('group action', () => {
   });
 
   test('addGroupActor should be ok', async () => {
-    let testActor = await ActorActor.findOne();
-    let ret = await context.emitEvent('group::addGroupActor', {
+    const testActor = await createTestActor();
+    const ret = await context.emitEvent('group::addGroupActor', {
       groupUUID: testGroup.uuid,
       actorUUID: testActor.uuid,
     });
@@ -234,6 +234,8 @@ describe('group action', () => {
         uuid: ret.groupActor.uuid,
       },
     });
+
+    await testActor.destroy();
   });
 
   test.todo('removeGroupActor should be ok');
