@@ -864,8 +864,10 @@ export const refuseGroupActor: EventFunc<{
   return true;
 };
 
+/**
+ * 更新团成员信息
+ */
 export const updateGroupActorInfo: EventFunc<{
-  groupUUID: string;
   groupActorUUID: string;
   groupActorInfo: string;
 }> = async function updateGroupActorInfo(data, cb, db) {
@@ -877,34 +879,20 @@ export const updateGroupActorInfo: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let groupUUID = data.groupUUID;
-  let groupActorUUID = data.groupActorUUID;
-  let groupActorInfo = data.groupActorInfo;
-  if (!groupUUID || !groupActorUUID || !groupActorInfo) {
+  const groupActorUUID = data.groupActorUUID;
+  const groupActorInfo = data.groupActorInfo;
+
+  if (!groupActorUUID || !groupActorInfo) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  if (!group.isManagerOrOwner(player.uuid)) {
-    throw '没有修改权限, 只有管理员才能修改团人物卡信息';
-  }
-  let groupActor = await db.models.group_actor.findOne({
-    where: {
-      groupId: group.id,
-      uuid: groupActorUUID,
-    },
-  });
-  if (!groupActor) {
-    throw '找不到团角色';
-  }
-  groupActor.actor_info = groupActorInfo;
-  await groupActor.save();
-  return true;
+  const groupActor = await GroupActor.editActorInfo(
+    groupActorUUID,
+    groupActorInfo,
+    player.uuid
+  );
+
+  return { groupActor };
 };
 
 export const setPlayerSelectedGroupActor: EventFunc<{

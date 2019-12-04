@@ -20,7 +20,8 @@ export const createTestGroup = async (): Promise<GroupGroup> => {
  * @param groupId 团ID
  */
 export const createTestGroupActor = async (
-  groupId?: number
+  groupId?: number,
+  actorId?: number
 ): Promise<GroupActor> => {
   if (!_.isNumber(groupId)) {
     const group = await createTestGroup();
@@ -31,7 +32,8 @@ export const createTestGroupActor = async (
     actor_uuid: 'test_actor',
     actor_info: {},
     name: 'test',
-    groupId: groupId,
+    groupId,
+    actorId,
   });
 
   return groupActor;
