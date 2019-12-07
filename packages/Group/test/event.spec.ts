@@ -8,6 +8,7 @@ import { GroupInvite } from '../lib/models/invite';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupActor } from '../lib/models/actor';
 import { createTestActor } from 'packages/Actor/test/example';
+import { createTestGroupActor } from './example';
 
 const context = buildAppContext();
 
@@ -149,7 +150,7 @@ describe('group action', () => {
     await invite.destroy(); // 销毁
   });
 
-  test.only('getGroupInviteDetail should be ok', async () => {
+  test('getGroupInviteDetail should be ok', async () => {
     const invite = await GroupInvite.create({
       group_uuid: 'test',
       from_uuid: 'test_uuid',
@@ -217,8 +218,8 @@ describe('group action', () => {
   });
 
   test('addGroupActor should be ok', async () => {
-    let testActor = await ActorActor.findOne();
-    let ret = await context.emitEvent('group::addGroupActor', {
+    const testActor = await createTestActor();
+    const ret = await context.emitEvent('group::addGroupActor', {
       groupUUID: testGroup.uuid,
       actorUUID: testActor.uuid,
     });
@@ -233,15 +234,11 @@ describe('group action', () => {
         uuid: ret.groupActor.uuid,
       },
     });
+
+    await testActor.destroy();
   });
 
   test.todo('removeGroupActor should be ok');
-
-  test.todo('agreeGroupActor should be ok');
-
-  test.todo('refuseGroupActor should be ok');
-
-  test.todo('updateGroupActorInfo should be ok');
 
   describe('group actor action', () => {
     let testActor: ActorActor;
@@ -254,6 +251,36 @@ describe('group action', () => {
         actorId: testActor.id,
         groupId: testGroup.id,
       });
+    });
+
+    test.todo('agreeGroupActor should be ok');
+
+    test.todo('refuseGroupActor should be ok');
+
+    test('updateGroupActorInfo should be ok', async () => {
+      const testGroupActor = await createTestGroupActor(
+        testGroup.id,
+        testActor.id
+      );
+      const targetActorInfo = { testInfo: 'aa' };
+
+      const ret = await context.emitEvent('group::updateGroupActorInfo', {
+        groupActorUUID: testGroupActor.uuid,
+        groupActorInfo: targetActorInfo,
+      });
+      expect(ret).toBeSuccess();
+      expect(ret.groupActor).toHaveProperty('actor_info');
+      expect(ret.groupActor.actorId).toBe(testActor.id);
+      expect(ret.groupActor.actor_info).toMatchObject(targetActorInfo);
+
+      // 再检查数据库中是否确实写入了
+      expect(
+        await GroupActor.findOne({ where: { uuid: testGroupActor.uuid } })
+      ).toMatchObject({
+        actor_info: targetActorInfo,
+      });
+
+      await testGroupActor.destroy();
     });
 
     afterAll(async () => {

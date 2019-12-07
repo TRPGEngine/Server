@@ -3,12 +3,19 @@ import {
   DBInstance,
   Model,
   BelongsToManyAddAssociationMixin,
+  BelongsToManyGetAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
 import _ from 'lodash';
 
 type GroupType = 'group' | 'channel' | 'test';
+
+declare module 'packages/Player/lib/models/user' {
+  interface PlayerUser {
+    getGroups?: BelongsToManyGetAssociationsMixin<GroupGroup>;
+  }
+}
 
 export class GroupGroup extends Model {
   id: number;
@@ -25,7 +32,7 @@ export class GroupGroup extends Model {
   managers_uuid: string[];
   maps_uuid: string[];
 
-  addMember: BelongsToManyAddAssociationMixin<PlayerUser, number>;
+  addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
 
   /**
    * 根据UUID查找团

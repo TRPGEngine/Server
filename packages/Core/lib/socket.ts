@@ -7,6 +7,7 @@ import { DBInstance } from './storage';
 const logger = getLogger();
 const appLogger = getLogger('application');
 const packageInfo = require('../../../package.json');
+import _ from 'lodash';
 
 export type MiddlewareFn = (socket: IO.Socket, fn: (err?: any) => void) => void;
 
@@ -141,7 +142,7 @@ export default class SocketService {
         const app = wrap.app;
         const db = app.storage.db;
         try {
-          let ret = await eventFn.call(this, data, cb, db);
+          const ret = await eventFn.call(this, data, cb, db);
           if (ret !== undefined) {
             // return 方法返回结果信息
             if (typeof ret === 'object') {
@@ -158,7 +159,7 @@ export default class SocketService {
           }
         } catch (err) {
           // 若event.fn内没有进行异常处理，进行统一的异常处理
-          if (cb && typeof cb === 'function') {
+          if (_.isFunction(cb)) {
             let errorMsg: string;
             if (err instanceof Error) {
               errorMsg = err.message;
@@ -198,6 +199,10 @@ export default class SocketService {
       let eventName = event.name;
       socket.on(eventName, (data, cb) => {
         // 为原生socket事件进行一层封装
+        if (_.isNil(data)) {
+          // 如果data为null的话JSON.parse(JSON.stringify(data))无法正常处理
+          data = {};
+        }
         const socketId = wrap.socket.id;
         const verbose = app.get('verbose');
         data = JSON.parse(JSON.stringify(data));

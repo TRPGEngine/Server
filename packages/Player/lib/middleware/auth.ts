@@ -26,7 +26,7 @@ export const ssoAuth = (): TRPGMiddleware<{
       ctx.state.player = { uuid, name, avatar };
       await next();
     } else {
-      throw new UnauthorizedError('Token解析失败');
+      throw new UnauthorizedError(`Token解析失败: ${token}`);
     }
   } catch (e) {
     if (e instanceof UnauthorizedError) {

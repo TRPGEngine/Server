@@ -22,6 +22,7 @@ export const getUserEmotionCatalog: EventFunc = async function getUserEmotionCat
   const catalogs = await (user as any).getEmotionCatalogs();
 
   for (let catalog of catalogs) {
+    // TODO: N+1问题需要优化
     const items = await catalog.getItems();
     _.set(catalog, 'dataValues.items', items);
   }

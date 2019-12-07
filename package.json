@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.2.18",
+  "version": "1.2.19",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -24,11 +24,12 @@
     "test:coverage": "jest --config=./test/jest.config.js --runInBand --coverage",
     "test:noserver": "npm run test --noserver",
     "test:watch": "jest --config=./test/jest.config.js --runInBand --watch",
-    "test:ci": "cross-env JEST_JUNIT_OUTPUT_DIR=test/reports/jest/results.xml NODE_ENV=ci npm run test:coverage -- --ci --reporters=default --reporters=jest-junit"
+    "test:ci": "cross-env JEST_JUNIT_OUTPUT_DIR=test/reports/jest/results.xml NODE_ENV=ci npm run test:coverage -- --ci --reporters=default --reporters=jest-junit",
+    "release": "standard-version -a"
   },
   "husky": {
     "hooks": {
-      "commit-msg": "node ./build/husky/commit-msg.js"
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
   "repository": {
@@ -69,6 +70,8 @@
     "yargs": "^13.2.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
     "@prettier/plugin-xml": "^0.3.0",
     "@types/config": "0.0.34",
     "@types/debug": "^4.1.4",
@@ -86,9 +89,10 @@
     "glob": "^7.1.4",
     "husky": "^2.4.1",
     "jest": "^24.7.1",
-    "prettier": "^1.16.4",
+    "prettier": "^1.19.1",
     "sequelize-auto-migrations": "github:TRPGEngine/sequelize-auto-migrations",
     "socket.io-client": "^2.2.0",
+    "standard-version": "^7.0.1",
     "supertest": "^4.0.2",
     "ts-jest": "^24.0.2"
   }

@@ -72,7 +72,7 @@ export class GroupActor extends Model {
 
     const group: GroupGroup = await groupActor.getGroup();
 
-    const allowEdit = await group.isManagerOrOwner(playerUUID);
+    const allowEdit = group.isManagerOrOwner(playerUUID);
     if (!allowEdit) {
       throw new Error('没有编辑权限');
     }

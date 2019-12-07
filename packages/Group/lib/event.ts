@@ -56,26 +56,27 @@ export const create: EventFunc<{
   return { group };
 };
 
+/**
+ * 获取团信息
+ */
 export const getInfo: EventFunc<{
   uuid: string;
 }> = async function getInfo(data, cb, db) {
-  const app = this.app;
-  const socket = this.socket;
-
-  let uuid = data.uuid;
+  const uuid = data.uuid;
   if (!uuid) {
     throw '缺少参数';
   }
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid },
-  });
+  const group = await GroupGroup.findByUUID(uuid);
   if (!group) {
     throw '没有找到该团';
   }
   return { group };
 };
 
+/**
+ * 更新团信息
+ */
 export const updateInfo: EventFunc<{
   groupUUID: string;
   groupInfo: {
@@ -85,7 +86,7 @@ export const updateInfo: EventFunc<{
     desc: string;
   };
 }> = async function updateInfo(data, cb, db) {
-  let { app, socket } = this;
+  const { app, socket } = this;
 
   if (!app.player) {
     debug('[GroupComponent] need [PlayerComponent]');
@@ -96,12 +97,12 @@ export const updateInfo: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let { groupUUID, groupInfo } = data;
+  const { groupUUID, groupInfo } = data;
   if (!groupUUID || !groupInfo) {
     throw '缺少参数';
   }
 
-  let group = await db.models.group_group.findOne({
+  const group = await db.models.group_group.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
@@ -112,7 +113,7 @@ export const updateInfo: EventFunc<{
   }
 
   // IDEA: 为防止意外暂时只允许修改下列属性
-  let info = {
+  const info = {
     avatar: groupInfo.avatar,
     name: groupInfo.name,
     sub_name: groupInfo.sub_name,
@@ -620,10 +621,8 @@ export const getGroupList: EventFunc<{}> = async function getGroupList(
     throw '用户不存在，请检查登录状态';
   }
 
-  let user = await db.models.player_user.findOne({
-    where: { uuid: player.uuid },
-  });
-  let groups = await user.getGroups();
+  const user = await PlayerUser.findByUUID(player.uuid);
+  const groups = await user.getGroups();
   return { groups };
 };
 
@@ -864,8 +863,10 @@ export const refuseGroupActor: EventFunc<{
   return true;
 };
 
+/**
+ * 更新团成员信息
+ */
 export const updateGroupActorInfo: EventFunc<{
-  groupUUID: string;
   groupActorUUID: string;
   groupActorInfo: string;
 }> = async function updateGroupActorInfo(data, cb, db) {
@@ -877,34 +878,20 @@ export const updateGroupActorInfo: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let groupUUID = data.groupUUID;
-  let groupActorUUID = data.groupActorUUID;
-  let groupActorInfo = data.groupActorInfo;
-  if (!groupUUID || !groupActorUUID || !groupActorInfo) {
+  const groupActorUUID = data.groupActorUUID;
+  const groupActorInfo = data.groupActorInfo;
+
+  if (!groupActorUUID || !groupActorInfo) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  if (!group.isManagerOrOwner(player.uuid)) {
-    throw '没有修改权限, 只有管理员才能修改团人物卡信息';
-  }
-  let groupActor = await db.models.group_actor.findOne({
-    where: {
-      groupId: group.id,
-      uuid: groupActorUUID,
-    },
-  });
-  if (!groupActor) {
-    throw '找不到团角色';
-  }
-  groupActor.actor_info = groupActorInfo;
-  await groupActor.save();
-  return true;
+  const groupActor = await GroupActor.editActorInfo(
+    groupActorUUID,
+    groupActorInfo,
+    player.uuid
+  );
+
+  return { groupActor };
 };
 
 export const setPlayerSelectedGroupActor: EventFunc<{
