@@ -24,6 +24,7 @@ export default class Group extends BasePackage {
     const db = this.db;
     this.regMethods({
       addGroupMemberAsync: async function(groupUUID: string, userUUID: string) {
+        // TODO: 应使用GroupGroup.addGroupMember
         if (!groupUUID || !userUUID) {
           debug('add group need 2 uuid: receive %o', { groupUUID, userUUID });
           return;

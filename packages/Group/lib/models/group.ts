@@ -4,6 +4,7 @@ import {
   Model,
   BelongsToManyAddAssociationMixin,
   BelongsToManyGetAssociationsMixin,
+  BelongsToManyHasAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
@@ -33,6 +34,8 @@ export class GroupGroup extends Model {
   maps_uuid: string[];
 
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
+  getMembers?: BelongsToManyGetAssociationsMixin<PlayerUser>;
+  hasMembers?: BelongsToManyHasAssociationsMixin<PlayerUser, number>;
 
   /**
    * 根据UUID查找团
@@ -59,6 +62,43 @@ export class GroupGroup extends Model {
     });
 
     return _.get(group, 'groupActors', []);
+  }
+
+  /**
+   * 添加团成员
+   * @param groupUUID 团UUID
+   * @param userUUID 要加入的用户的UUID
+   * @param operatorUserUUID 操作者的UUID，有权限校验
+   */
+  static async addGroupMember(
+    groupUUID: string,
+    userUUID: string,
+    operatorUserUUID: string
+  ): Promise<void> {
+    if (_.isNil(groupUUID) || _.isNil(userUUID) || _.isNil(operatorUserUUID)) {
+      throw new Error('缺少必要字段');
+    }
+
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(group)) {
+      throw new Error('找不到该团');
+    }
+
+    if (!group.isManagerOrOwner(operatorUserUUID)) {
+      throw new Error('没有添加成员权限');
+    }
+
+    const user = await PlayerUser.findByUUID(userUUID);
+    if (_.isNil(user)) {
+      throw new Error('该用户不存在');
+    }
+
+    const exist = await group.hasMembers([user]);
+    if (exist) {
+      throw new Error('该用户已经在团中');
+    }
+
+    await group.addMember(user);
   }
 
   /**
