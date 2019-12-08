@@ -53,6 +53,18 @@ export class GroupInvite extends Model {
     const invites: GroupInvite[] = await GroupInvite.bulkCreate(records);
     return invites;
   }
+
+  async agreeAsync() {
+    this.is_agree = true;
+    this.is_refuse = false;
+    return await this.save();
+  }
+
+  async refuseAsync() {
+    this.is_agree = false;
+    this.is_refuse = true;
+    return await this.save();
+  }
 }
 
 export default function GroupInviteDefinition(Sequelize: Orm, db: DBInstance) {

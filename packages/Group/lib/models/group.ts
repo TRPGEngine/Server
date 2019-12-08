@@ -5,6 +5,7 @@ import {
   BelongsToManyAddAssociationMixin,
   BelongsToManyGetAssociationsMixin,
   BelongsToManyHasAssociationsMixin,
+  BelongsToSetAssociationMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
@@ -33,6 +34,7 @@ export class GroupGroup extends Model {
   managers_uuid: string[];
   maps_uuid: string[];
 
+  setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
   getMembers?: BelongsToManyGetAssociationsMixin<PlayerUser>;
   hasMembers?: BelongsToManyHasAssociationsMixin<PlayerUser, number>;
@@ -68,14 +70,14 @@ export class GroupGroup extends Model {
    * 添加团成员
    * @param groupUUID 团UUID
    * @param userUUID 要加入的用户的UUID
-   * @param operatorUserUUID 操作者的UUID，有权限校验
+   * @param operatorUserUUID 操作者的UUID, 如果有输入则进行权限校验
    */
   static async addGroupMember(
     groupUUID: string,
     userUUID: string,
-    operatorUserUUID: string
+    operatorUserUUID?: string
   ): Promise<void> {
-    if (_.isNil(groupUUID) || _.isNil(userUUID) || _.isNil(operatorUserUUID)) {
+    if (_.isNil(groupUUID) || _.isNil(userUUID)) {
       throw new Error('缺少必要字段');
     }
 
@@ -84,7 +86,10 @@ export class GroupGroup extends Model {
       throw new Error('找不到该团');
     }
 
-    if (!group.isManagerOrOwner(operatorUserUUID)) {
+    if (
+      _.isString(operatorUserUUID) &&
+      !group.isManagerOrOwner(operatorUserUUID)
+    ) {
       throw new Error('没有添加成员权限');
     }
 
@@ -99,6 +104,20 @@ export class GroupGroup extends Model {
     }
 
     await group.addMember(user);
+
+    const app = GroupGroup.getApplication();
+
+    if (app.player) {
+      if (await app.player.manager.checkPlayerOnline(user.uuid)) {
+        // 检查是否加入团的成员在线, 如果在线则发送一条更新通知
+        app.player.manager.unicastSocketEvent(
+          user.uuid,
+          'group::addGroupSuccess',
+          { group }
+        );
+        app.player.manager.joinRoomWithUUID(group.uuid, user.uuid);
+      }
+    }
   }
 
   /**

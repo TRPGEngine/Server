@@ -7,6 +7,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupInvite } from './models/invite';
 import { GroupGroup } from './models/group';
 import { GroupActor } from './models/actor';
+import { GroupRequest } from './models/request';
 
 export const create: EventFunc<{
   name: string;
@@ -28,7 +29,7 @@ export const create: EventFunc<{
     throw '缺少团名';
   }
 
-  let isExist = await db.models.group_group.findOne({
+  const isExist = await GroupGroup.findOne({
     where: { name },
   });
   if (!!isExist) {
@@ -36,7 +37,7 @@ export const create: EventFunc<{
   }
 
   const user = await PlayerUser.findByUUID(userUUID);
-  const group = await db.models.group_group.create({
+  const group: GroupGroup = await GroupGroup.create({
     type: 'group',
     name,
     sub_name,
@@ -49,7 +50,7 @@ export const create: EventFunc<{
   });
 
   await group.setOwner(user);
-  await app.group.addGroupMemberAsync(group.uuid, userUUID);
+  await GroupGroup.addGroupMember(group.uuid, userUUID);
 
   await app.player.manager.joinRoom(group.uuid, socket); // 加入房间
 
@@ -250,6 +251,9 @@ export const requestJoinGroup: EventFunc<{
   return { request: groupRequest };
 };
 
+/**
+ * 同意入团申请
+ */
 export const agreeGroupRequest: EventFunc<{
   request_uuid: string;
 }> = async function agreeGroupRequest(data, cb, db) {
@@ -266,7 +270,7 @@ export const agreeGroupRequest: EventFunc<{
     throw '缺少必要参数';
   }
 
-  let request = await db.models.group_request.findOne({
+  let request = await GroupRequest.findOne({
     where: { uuid: request_uuid },
   });
   if (!request) {
@@ -276,37 +280,42 @@ export const agreeGroupRequest: EventFunc<{
     throw '已同意该请求';
   }
 
-  let group_uuid = request.group_uuid;
-  let group = await db.models.group_group.findOne({
-    where: { uuid: group_uuid },
-  });
+  const groupUUID = request.group_uuid;
+  const fromUUID = request.from_uuid; // 请求入团的人的UUID
+  const group = await GroupGroup.findByUUID(groupUUID);
   if (!group) {
     throw '找不到该团';
   }
 
-  await request.agreeAsync();
-
   // 发送入团成功消息
   const user = await PlayerUser.findByUUID(player.uuid);
-  let systemMsg = `管理员 ${user.getName()} 已同意您加入团 [${
+  if (_.isNil(user)) {
+    throw new Error('用户状态异常');
+  }
+
+  await db.transactionAsync(async () => {
+    await GroupGroup.addGroupMember(groupUUID, fromUUID, player.uuid);
+    await request.agreeAsync();
+  });
+
+  const systemMsg = `管理员 ${user.getName()} 已同意您加入团 [${
     group.name
   }] ,和大家打个招呼吧!`;
   app.chat.sendSystemMsg(
-    request.from_uuid,
+    fromUUID,
     'groupRequestSuccess',
     '入团成功',
     systemMsg,
     {
-      groupUUID: group_uuid,
+      groupUUID: groupUUID,
     }
   );
-  await app.group.addGroupMemberAsync(group_uuid, request.from_uuid);
 
-  let members = await group.getMembers();
-  let members_uuid = members.map((i) => i.uuid);
+  const members = await group.getMembers();
+  const membersUUID = members.map((i) => i.uuid);
   return {
     groupUUID: group.uuid,
-    members: members_uuid,
+    members: membersUUID,
   };
 };
 
@@ -510,6 +519,9 @@ export const refuseGroupInvite: EventFunc<{
   return { res: invite };
 };
 
+/**
+ * 同意团邀请
+ */
 export const agreeGroupInvite: EventFunc<{
   uuid: string;
 }> = async function agreeGroupInvite(data, cb, db) {
@@ -521,31 +533,31 @@ export const agreeGroupInvite: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let playerUUID = player.uuid;
-  let inviteUUID = data.uuid;
+  const playerUUID = player.uuid;
+  const inviteUUID = data.uuid;
 
   if (!inviteUUID) {
     throw '缺少必要参数';
   }
 
-  let invite = await db.models.group_invite.findOne({
+  const invite: GroupInvite = await GroupInvite.findOne({
     where: {
       uuid: inviteUUID,
       to_uuid: playerUUID,
     },
   });
-  invite.is_agree = true;
-  let groupUUID = invite.group_uuid;
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
+  if (_.isNil(invite)) {
+    throw new Error('该邀请不存在');
+  }
+  const groupUUID = invite.group_uuid;
+  const group = await GroupGroup.findByUUID(groupUUID);
   if (!group) {
     throw '该团不存在';
   }
 
   await db.transactionAsync(async () => {
-    await app.group.addGroupMemberAsync(groupUUID, playerUUID);
-    await invite.save();
+    await GroupGroup.addGroupMember(groupUUID, playerUUID);
+    await invite.agreeAsync();
     _.set(invite, 'dataValues.group', group);
   });
 
