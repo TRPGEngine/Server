@@ -87,7 +87,9 @@ export class ChatLog extends Model implements ChatMessagePayload {
   /**
    * 发送消息
    */
-  public static async sendMsg(payload: ChatMessagePayload) {
+  public static async sendMsg(
+    payload: ChatMessagePayload
+  ): Promise<ChatMessagePartial> {
     const app = ChatLog.getApplication();
     debug('发送消息: [to %s] %o', payload.to_uuid, payload);
     const log = ChatLog.appendCachedChatLog(payload);
@@ -116,6 +118,46 @@ export class ChatLog extends Model implements ChatMessagePayload {
     }
 
     return log;
+  }
+
+  /**
+   * 发送个人系统消息
+   */
+  public static async sendSystemMsg(
+    payload: Pick<ChatMessagePayload, 'to_uuid' | 'message' | 'type' | 'data'>
+  ): Promise<ChatMessagePartial> {
+    const { to_uuid, message, type, data } = payload;
+    const full: ChatMessagePayload = {
+      uuid: generateUUID(),
+      sender_uuid: 'trpgsystem',
+      to_uuid,
+      message,
+      converse_uuid: null,
+      is_public: false,
+      is_group: false,
+      type,
+      data,
+      date: new Date().toISOString(),
+    };
+
+    return await ChatLog.sendMsg(full);
+  }
+
+  /**
+   * 发送简单个人系统消息
+   * @param to_uuid 发送系统消息的对象
+   * @param message 发送系统消息的内容
+   */
+  public static sendSimpleSystemMsg(
+    to_uuid: string,
+    message: string
+  ): Promise<ChatMessagePartial> {
+    return ChatLog.sendSystemMsg({
+      to_uuid,
+      message,
+      type: 'normal',
+      data: null,
+    });
   }
 }
 
