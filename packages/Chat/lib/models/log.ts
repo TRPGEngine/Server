@@ -1,10 +1,11 @@
-import { Model, Orm, DBInstance, CacheValue } from 'trpg/core';
+import { Model, Orm, DBInstance } from 'trpg/core';
 import {
   ChatMessageType,
   ChatMessagePayload,
   ChatMessagePartial,
 } from 'packages/Chat/types/message';
 import _ from 'lodash';
+import generateUUID from 'uuid/v4';
 
 export class ChatLog extends Model implements ChatMessagePayload {
   static CACHE_KEY = 'chat:log-cache';
@@ -36,6 +37,14 @@ export class ChatLog extends Model implements ChatMessagePayload {
     payload: ChatMessagePartial
   ): Promise<void> {
     const trpgapp = ChatLog.getApplication();
+
+    // 预处理数据
+    if (_.isEmpty(payload.uuid)) {
+      payload.uuid = generateUUID();
+    }
+    const date = _.isEmpty(payload.date) ? new Date() : new Date(payload.date);
+    payload.date = date.toISOString();
+
     await trpgapp.cache.rpush(ChatLog.CACHE_KEY, payload);
   }
 

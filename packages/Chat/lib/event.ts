@@ -8,30 +8,17 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 
 /**
  * 增加聊天消息
- * @param messagePkg 消息内容
+ * @todo 待将所有addChatLog转到ChatLog.appendCachedChatLog
+ * @param payload 消息内容
  */
 export const addChatLog: EventFunc = function addChatLog(
-  messagePkg: ChatMessagePartial
+  payload: ChatMessagePartial
 ): ChatMessagePartial | false {
   const app = this.app;
-  if (!!messagePkg) {
-    const date = messagePkg.date ? new Date(messagePkg.date) : new Date();
-    const pkg: ChatMessagePartial = {
-      uuid: messagePkg.uuid || generateUUID(),
-      sender_uuid: messagePkg.sender_uuid,
-      to_uuid: messagePkg.to_uuid,
-      converse_uuid: messagePkg.converse_uuid,
-      message: messagePkg.message,
-      type: messagePkg.type,
-      is_group: messagePkg.is_group,
-      is_public: messagePkg.is_public,
-      date: date.toISOString(),
-      data: messagePkg.data,
-    };
+  if (!!payload) {
+    ChatLog.appendCachedChatLog(payload);
 
-    ChatLog.appendCachedChatLog(pkg);
-
-    return pkg;
+    return payload;
   } else {
     return false;
   }
