@@ -42,6 +42,8 @@ const autoJoinSocketRoom = async function autoJoinSocketRoom(
   }
 
   const groups = await (user as any).getGroups();
+
+  // 团UUID就是房间号
   await Promise.all(
     groups
       .map((group) => group.uuid)

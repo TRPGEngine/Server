@@ -6,6 +6,8 @@ import {
 } from 'packages/Chat/types/message';
 import _ from 'lodash';
 import generateUUID from 'uuid/v4';
+import Debug from 'debug';
+const debug = Debug('trpg:component:chat:model:log');
 
 export class ChatLog extends Model implements ChatMessagePayload {
   static CACHE_KEY = 'chat:log-cache';
@@ -80,6 +82,40 @@ export class ChatLog extends Model implements ChatMessagePayload {
       await trpgapp.cache.lclear(ChatLog.CACHE_KEY, 0, size);
       await ChatLog.bulkCreate(logs);
     }
+  }
+
+  /**
+   * 发送消息
+   */
+  public static async sendMsg(payload: ChatMessagePayload) {
+    const app = ChatLog.getApplication();
+    debug('发送消息: [to %s] %o', payload.to_uuid, payload);
+    const log = ChatLog.appendCachedChatLog(payload);
+
+    if (payload.is_public) {
+      // 是私密消息
+      app.player.manager.unicastSocketEvent(
+        payload.to_uuid,
+        'chat::message',
+        log
+      );
+    } else {
+      // 是公开消息
+      if (!payload.is_group) {
+        // TODO: 这里好像有问题, 需要检查一下
+        // 疑问: 什么情况下会出现公开的用户信息？
+        app.player.manager.broadcastSocketEvent('chat::message', log);
+      } else {
+        // TODO: 需要校验
+        app.player.manager.roomcastSocketEvent(
+          payload.converse_uuid,
+          'chat::message',
+          log
+        );
+      }
+    }
+
+    return log;
   }
 }
 

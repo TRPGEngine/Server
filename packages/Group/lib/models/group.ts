@@ -109,7 +109,7 @@ export class GroupGroup extends Model {
 
     if (app.player) {
       if (await app.player.manager.checkPlayerOnline(user.uuid)) {
-        // 检查是否加入团的成员在线, 如果在线则发送一条更新通知
+        // 检查加入团的成员是否在线, 如果在线则发送一条更新通知要求其更新团信息
         app.player.manager.unicastSocketEvent(
           user.uuid,
           'group::addGroupSuccess',
