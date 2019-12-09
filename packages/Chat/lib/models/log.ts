@@ -33,10 +33,10 @@ export class ChatLog extends Model implements ChatMessagePayload {
   /**
    * 往缓存的聊天记录里塞数据
    */
-  public static async appendCachedChatLog(
+  public static appendCachedChatLog(
     payload: ChatMessagePartial
-  ): Promise<void> {
-    const trpgapp = ChatLog.getApplication();
+  ): ChatMessagePartial {
+    const app = ChatLog.getApplication();
 
     // 预处理数据
     if (_.isEmpty(payload.uuid)) {
@@ -45,7 +45,15 @@ export class ChatLog extends Model implements ChatMessagePayload {
     const date = _.isEmpty(payload.date) ? new Date() : new Date(payload.date);
     payload.date = date.toISOString();
 
-    await trpgapp.cache.rpush(ChatLog.CACHE_KEY, payload);
+    // 这里直接向redis发送消息。不等待返回
+    // 这样可以同步向
+    app.cache.rpush(ChatLog.CACHE_KEY, payload).catch((err) => {
+      // 缓存记录失败。直接写入数据库
+      app.error('向Redis添加聊天记录失败。直接写入数据库: ' + payload.uuid);
+      ChatLog.create(payload);
+    });
+
+    return payload;
   }
 
   /**

@@ -14,11 +14,8 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 export const addChatLog: EventFunc = function addChatLog(
   payload: ChatMessagePartial
 ): ChatMessagePartial | false {
-  const app = this.app;
   if (!!payload) {
-    ChatLog.appendCachedChatLog(payload);
-
-    return payload;
+    return ChatLog.appendCachedChatLog(payload);
   } else {
     return false;
   }
