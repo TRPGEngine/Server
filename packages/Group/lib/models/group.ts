@@ -10,6 +10,7 @@ import {
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
 import _ from 'lodash';
+import { ChatLog } from 'packages/Chat/lib/models/log';
 
 type GroupType = 'group' | 'channel' | 'test';
 
@@ -117,7 +118,19 @@ export class GroupGroup extends Model {
         );
         app.player.manager.joinRoomWithUUID(group.uuid, user.uuid);
       }
+
+      // TODO: 通知团其他所有人更新团成员信息
     }
+  }
+
+  /**
+   * 发送加入成员的系统通知
+   */
+  async sendAddMemberNotify(memberUUID: string) {
+    const user = await PlayerUser.findByUUID(memberUUID);
+    const name = user.getName();
+
+    await ChatLog.sendSimpleSystemMsg(null, this.uuid, `${name} 加入本团`);
   }
 
   /**

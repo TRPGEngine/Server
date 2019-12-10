@@ -161,7 +161,8 @@ export class ChatLog extends Model implements ChatMessagePayload {
       to_uuid,
       converse_uuid,
       message,
-      type: 'normal',
+      // 如果是私人会话，则类型为normal
+      type: _.isNil(converse_uuid) ? 'normal' : 'tip',
       data: null,
     });
   }

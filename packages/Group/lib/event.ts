@@ -1,6 +1,5 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:group:event');
-import uuid from 'uuid/v4';
 import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
 import { PlayerUser } from 'packages/Player/lib/models/user';
@@ -310,6 +309,7 @@ export const agreeGroupRequest: EventFunc<{
       groupUUID: groupUUID,
     }
   );
+  group.sendAddMemberNotify(fromUUID); // 发送系统广播
 
   const members = await group.getMembers();
   const membersUUID = members.map((i) => i.uuid);
@@ -560,6 +560,8 @@ export const agreeGroupInvite: EventFunc<{
     await invite.agreeAsync();
     _.set(invite, 'dataValues.group', group);
   });
+
+  group.sendAddMemberNotify(playerUUID); // 发送系统广播
 
   return { res: invite };
 };
