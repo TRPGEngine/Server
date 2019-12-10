@@ -124,16 +124,20 @@ export class ChatLog extends Model implements ChatMessagePayload {
    * 发送个人系统消息
    */
   public static async sendSystemMsg(
-    payload: Pick<ChatMessagePayload, 'to_uuid' | 'message' | 'type' | 'data'>
+    payload: Pick<
+      ChatMessagePayload,
+      'to_uuid' | 'converse_uuid' | 'message' | 'type' | 'data'
+    >
   ): Promise<ChatMessagePartial> {
-    const { to_uuid, message, type, data } = payload;
+    const { to_uuid, converse_uuid, message, type, data } = payload;
     const full: ChatMessagePayload = {
       uuid: generateUUID(),
       sender_uuid: 'trpgsystem',
       to_uuid,
       message,
-      converse_uuid: null,
-      is_public: false,
+      converse_uuid,
+      // 如果有具体的发送对象，则为私有消息，否则则为公共消息
+      is_public: _.isNil(to_uuid) ? false : true,
       is_group: false,
       type,
       data,
@@ -149,11 +153,13 @@ export class ChatLog extends Model implements ChatMessagePayload {
    * @param message 发送系统消息的内容
    */
   public static sendSimpleSystemMsg(
-    to_uuid: string,
+    to_uuid: string | null,
+    converse_uuid: string | null,
     message: string
   ): Promise<ChatMessagePartial> {
     return ChatLog.sendSystemMsg({
       to_uuid,
+      converse_uuid,
       message,
       type: 'normal',
       data: null,
