@@ -41,12 +41,7 @@ export const getTemplate: EventFunc<{
  * 获取推荐角色模板
  */
 export const getSuggestTemplate: EventFunc<{}> = async function(data, cb, db) {
-  const templates = await ActorTemplate.findAll({
-    where: {
-      built_in: true,
-      is_public: true,
-    },
-  });
+  const templates = await ActorTemplate.getRecommendList();
 
   return { templates };
 };
