@@ -1,5 +1,6 @@
 import { ActorTemplate } from 'packages/Actor/lib/models/template';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
+import testExampleStack from 'test/utils/example';
 
 export const createTestActor = async (): Promise<ActorActor> => {
   const firstTemplate = await ActorTemplate.findOne(); // 获取一个模板UUID
@@ -12,6 +13,8 @@ export const createTestActor = async (): Promise<ActorActor> => {
       data: '测试属性',
     },
   });
+
+  testExampleStack.append(group);
 
   return group;
 };
