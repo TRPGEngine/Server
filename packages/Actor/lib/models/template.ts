@@ -64,7 +64,7 @@ export class ActorTemplate extends Model {
   /**
    * 获取推荐模块列表
    */
-  static async getRecommendList(): Promise<ActorTemplate> {
+  static async getRecommendList(): Promise<ActorTemplate[]> {
     const templates = await ActorTemplate.findAll({
       where: {
         built_in: true,
