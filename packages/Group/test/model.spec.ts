@@ -89,6 +89,8 @@ describe('group model function', () => {
       expect(ga.actor_info).toMatchObject(targetInfo);
     });
 
+    test.todo('GroupActor.remove should be ok');
+
     test('GroupActor.addApprovalGroupActor should be ok', async () => {
       const testUser = await getTestUser();
       const groupActor = await GroupActor.addApprovalGroupActor(
