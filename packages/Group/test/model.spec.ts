@@ -7,8 +7,11 @@ import { createTestActor } from 'packages/Actor/test/example';
 import { createTestGroup, createTestGroupActor } from './example';
 import { getTestUser, testUserInfo } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import testExampleStack from 'test/utils/example';
 
 const context = buildAppContext();
+
+testExampleStack.afterAll();
 
 describe('group model function', () => {
   let testActor: ActorActor;
@@ -89,7 +92,19 @@ describe('group model function', () => {
       expect(ga.actor_info).toMatchObject(targetInfo);
     });
 
-    test.todo('GroupActor.remove should be ok');
+    test('GroupActor.remove should be ok', async () => {
+      const testGroupActor = await createTestGroupActor(testGroup.id);
+      const testUser = await getTestUser();
+      await GroupActor.remove(testGroupActor.uuid, testUser.uuid);
+
+      expect(
+        await GroupActor.findOne({
+          where: {
+            uuid: testGroupActor.uuid,
+          },
+        })
+      ).toBeNull();
+    });
 
     test('GroupActor.addApprovalGroupActor should be ok', async () => {
       const testUser = await getTestUser();

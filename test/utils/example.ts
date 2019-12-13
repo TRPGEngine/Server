@@ -18,6 +18,15 @@ class TestExampleStack {
       this.stack.map((model) => model.destroy({ force: true }))
     ).catch((e) => console.error('测试数据回收失败: ' + e));
   }
+
+  /**
+   * 供外部直接注册一个配好的afterAll 生命周期
+   */
+  afterAll() {
+    afterAll(async () => {
+      await this.gc();
+    });
+  }
 }
 
 const testExampleStack = new TestExampleStack();
