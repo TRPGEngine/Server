@@ -22,7 +22,7 @@ class TestExampleStack {
   /**
    * 供外部直接注册一个配好的afterAll 生命周期
    */
-  afterAll() {
+  regAfterAll() {
     afterAll(async () => {
       await this.gc();
     });

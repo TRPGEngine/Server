@@ -1,7 +1,13 @@
 import { buildAppContext } from 'test/utils/app';
 import { ActorTemplate } from '../lib/models/template';
+import { createTestActor } from './example';
+import { getTestUser } from 'packages/Player/test/example';
+import testExampleStack from 'test/utils/example';
+import { ActorActor } from '../lib/models/actor';
 
 buildAppContext();
+
+testExampleStack.regAfterAll();
 
 describe('ActorTemplate', () => {
   test('ActorTemplate.getList should be ok', async () => {
@@ -24,5 +30,21 @@ describe('ActorTemplate', () => {
       expect(t.is_public).toBe(true);
       expect(t.built_in).toBe(true);
     }
+  });
+});
+
+describe('ActorActor', () => {
+  test('ActorActor.remove should be ok', async () => {
+    const testActor = await createTestActor();
+    const testUser = await getTestUser();
+    await ActorActor.remove(testActor.uuid, testUser.uuid);
+
+    expect(
+      await ActorActor.findOne({
+        where: {
+          uuid: testActor.uuid,
+        },
+      })
+    ).toBeNull();
   });
 });

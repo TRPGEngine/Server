@@ -5,13 +5,13 @@ import { GroupGroup } from 'packages/Group/lib/models/group';
 import { GroupActor } from 'packages/Group/lib/models/actor';
 import { createTestActor } from 'packages/Actor/test/example';
 import { createTestGroup, createTestGroupActor } from './example';
-import { getTestUser, testUserInfo } from 'packages/Player/test/example';
+import { getTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import testExampleStack from 'test/utils/example';
 
 const context = buildAppContext();
 
-testExampleStack.afterAll();
+testExampleStack.regAfterAll();
 
 describe('group model function', () => {
   let testActor: ActorActor;
