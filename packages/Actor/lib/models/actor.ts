@@ -6,6 +6,7 @@ import {
   BelongsToGetAssociationMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import _ from 'lodash';
 
 export class ActorActor extends Model {
   id: number;
@@ -25,6 +26,30 @@ export class ActorActor extends Model {
         uuid,
       },
     });
+  }
+
+  /**
+   * 删除人物卡
+   * @param groupActorUUID 团人物UUID
+   * @param playerUUID 操作人员的UUID
+   */
+  static async remove(actorUUID: string, playerUUID: string) {
+    const actor = await ActorActor.findByUUID(actorUUID);
+
+    if (_.isNil(actor)) {
+      throw new Error('该人物卡不存在');
+    }
+
+    const owner: PlayerUser = await actor.getOwner();
+    if (_.isNil(owner)) {
+      throw new Error('该人物卡所有权不明');
+    }
+
+    if (owner.uuid !== playerUUID) {
+      throw new Error('没有操作权限， 您不是该人物卡的所有者');
+    }
+
+    await actor.destroy();
   }
 
   getObject() {

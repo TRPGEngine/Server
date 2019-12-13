@@ -12,6 +12,12 @@ templateRouter.get('/template/list', async (ctx) => {
   ctx.body = { list: templates };
 });
 
+templateRouter.get('/template/list/recommend', async (ctx) => {
+  const templates = await ActorTemplate.getRecommendList();
+
+  ctx.body = { list: templates };
+});
+
 templateRouter.get('/template/info/:templateUUID', async (ctx) => {
   const templateUUID = ctx.params.templateUUID;
 

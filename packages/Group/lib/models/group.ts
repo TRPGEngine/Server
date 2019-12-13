@@ -4,10 +4,13 @@ import {
   Model,
   BelongsToManyAddAssociationMixin,
   BelongsToManyGetAssociationsMixin,
+  BelongsToManyHasAssociationsMixin,
+  BelongsToSetAssociationMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
 import _ from 'lodash';
+import { ChatLog } from 'packages/Chat/lib/models/log';
 
 type GroupType = 'group' | 'channel' | 'test';
 
@@ -32,7 +35,10 @@ export class GroupGroup extends Model {
   managers_uuid: string[];
   maps_uuid: string[];
 
+  setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
+  getMembers?: BelongsToManyGetAssociationsMixin<PlayerUser>;
+  hasMembers?: BelongsToManyHasAssociationsMixin<PlayerUser, number>;
 
   /**
    * 根据UUID查找团
@@ -59,6 +65,72 @@ export class GroupGroup extends Model {
     });
 
     return _.get(group, 'groupActors', []);
+  }
+
+  /**
+   * 添加团成员
+   * @param groupUUID 团UUID
+   * @param userUUID 要加入的用户的UUID
+   * @param operatorUserUUID 操作者的UUID, 如果有输入则进行权限校验
+   */
+  static async addGroupMember(
+    groupUUID: string,
+    userUUID: string,
+    operatorUserUUID?: string
+  ): Promise<void> {
+    if (_.isNil(groupUUID) || _.isNil(userUUID)) {
+      throw new Error('缺少必要字段');
+    }
+
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(group)) {
+      throw new Error('找不到该团');
+    }
+
+    if (
+      _.isString(operatorUserUUID) &&
+      !group.isManagerOrOwner(operatorUserUUID)
+    ) {
+      throw new Error('没有添加成员权限');
+    }
+
+    const user = await PlayerUser.findByUUID(userUUID);
+    if (_.isNil(user)) {
+      throw new Error('该用户不存在');
+    }
+
+    const exist = await group.hasMembers([user]);
+    if (exist) {
+      throw new Error('该用户已经在团中');
+    }
+
+    await group.addMember(user);
+
+    const app = GroupGroup.getApplication();
+
+    if (app.player) {
+      if (await app.player.manager.checkPlayerOnline(user.uuid)) {
+        // 检查加入团的成员是否在线, 如果在线则发送一条更新通知要求其更新团信息
+        app.player.manager.unicastSocketEvent(
+          user.uuid,
+          'group::addGroupSuccess',
+          { group }
+        );
+        app.player.manager.joinRoomWithUUID(group.uuid, user.uuid);
+      }
+
+      // TODO: 通知团其他所有人更新团成员信息
+    }
+  }
+
+  /**
+   * 发送加入成员的系统通知
+   */
+  async sendAddMemberNotify(memberUUID: string) {
+    const user = await PlayerUser.findByUUID(memberUUID);
+    const name = user.getName();
+
+    await ChatLog.sendSimpleSystemMsg(null, this.uuid, `${name} 加入本团`);
   }
 
   /**

@@ -5,9 +5,13 @@ import { GroupGroup } from 'packages/Group/lib/models/group';
 import { GroupActor } from 'packages/Group/lib/models/actor';
 import { createTestActor } from 'packages/Actor/test/example';
 import { createTestGroup, createTestGroupActor } from './example';
-import { getTestUser, testUserInfo } from 'packages/Player/test/example';
+import { getTestUser } from 'packages/Player/test/example';
+import { PlayerUser } from 'packages/Player/lib/models/user';
+import testExampleStack from 'test/utils/example';
 
 const context = buildAppContext();
+
+testExampleStack.regAfterAll();
 
 describe('group model function', () => {
   let testActor: ActorActor;
@@ -44,6 +48,21 @@ describe('group model function', () => {
         uuid: testGroupActor.uuid,
       });
     });
+
+    test('GroupGroup.addGroupMember should be ok', async () => {
+      const testUser = await getTestUser();
+      await GroupGroup.addGroupMember(
+        testGroup.uuid,
+        testUser.uuid,
+        testUser.uuid
+      );
+
+      const group = await GroupGroup.findByUUID(testGroup.uuid);
+      const members: PlayerUser[] = await group.getMembers();
+      expect(
+        members.findIndex((m) => m.uuid === testUser.uuid)
+      ).toBeGreaterThanOrEqual(0);
+    });
   });
 
   describe('GroupActor', () => {
@@ -71,6 +90,20 @@ describe('group model function', () => {
       expect(ga.desc).toBe(targetInfo._desc);
       expect(ga.avatar).toBe(targetInfo._avatar);
       expect(ga.actor_info).toMatchObject(targetInfo);
+    });
+
+    test('GroupActor.remove should be ok', async () => {
+      const testGroupActor = await createTestGroupActor(testGroup.id);
+      const testUser = await getTestUser();
+      await GroupActor.remove(testGroupActor.uuid, testUser.uuid);
+
+      expect(
+        await GroupActor.findOne({
+          where: {
+            uuid: testGroupActor.uuid,
+          },
+        })
+      ).toBeNull();
     });
 
     test('GroupActor.addApprovalGroupActor should be ok', async () => {

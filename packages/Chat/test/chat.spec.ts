@@ -13,7 +13,7 @@ describe('chat log func', () => {
     message: 'test',
   };
 
-  it('ChatLog.appendCachedChatLog should be ok', async () => {
+  test('ChatLog.appendCachedChatLog should be ok', async () => {
     await ChatLog.appendCachedChatLog(testChatLogPayload);
 
     const logList = await context.app.cache.lget(logCacheKey);
@@ -23,7 +23,7 @@ describe('chat log func', () => {
     await context.app.cache.lclear(logCacheKey, logList.length - 1, 1); // 清除最后一条
   });
 
-  it('ChatLog.getCachedChatLog should be ok', async () => {
+  test('ChatLog.getCachedChatLog should be ok', async () => {
     await context.app.cache.rpush('chat:log-cache', testChatLogPayload);
 
     const logList = await ChatLog.getCachedChatLog();
@@ -32,7 +32,7 @@ describe('chat log func', () => {
     await context.app.cache.lclear(logCacheKey, logList.length - 1, 1); // 清除最后一条
   });
 
-  it('ChatLog.dumpCachedChatLog should be ok', async () => {
+  test('ChatLog.dumpCachedChatLog should be ok', async () => {
     await context.app.cache.rpush('chat:log-cache', testChatLogPayload);
     const mockBulkCreate = jest.fn();
     ChatLog.bulkCreate = mockBulkCreate;
@@ -44,4 +44,10 @@ describe('chat log func', () => {
 
     expect(await context.app.cache.lget(ChatLog.CACHE_KEY)).toMatchObject([]);
   });
+
+  test.todo('ChatLog.sendMsg should be ok');
+
+  test.todo('ChatLog.sendSystemMsg should be ok');
+
+  test.todo('ChatLog.sendSimpleSystemMsg should be ok');
 });

@@ -8,7 +8,7 @@ import { GroupInvite } from '../lib/models/invite';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupActor } from '../lib/models/actor';
 import { createTestActor } from 'packages/Actor/test/example';
-import { createTestGroupActor } from './example';
+import { createTestGroupActor, createTestGroup } from './example';
 
 const context = buildAppContext();
 
@@ -26,17 +26,12 @@ describe('group action', () => {
   let testGroup: GroupGroup;
 
   beforeAll(async () => {
-    testGroup = await GroupGroup.create({
-      name: 'test name' + generateRandomStr(),
-      sub_name: 'test sub_name' + generateRandomStr(),
-      creator_uuid: testUser.uuid,
-      owner_uuid: testUser.uuid,
-    });
-    await testGroup.addMember(testUser, {
-      through: {
-        selected_group_actor_uuid: 'test selected_group_actor_uuid',
-      },
-    });
+    testGroup = await createTestGroup();
+    // await testGroup.addMember(testUser, {
+    //   through: {
+    //     selected_group_actor_uuid: 'test selected_group_actor_uuid',
+    //   },
+    // });
   });
 
   afterAll(async () => {
@@ -129,6 +124,7 @@ describe('group action', () => {
     const ret = await context.emitEvent('group::agreeGroupInvite', {
       uuid: invite.uuid,
     });
+    expect(ret).toBeSuccess();
     expect(ret.result).toBe(true);
     expect(ret.res).toMatchObject({
       uuid: invite.uuid,

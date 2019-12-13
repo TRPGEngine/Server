@@ -94,6 +94,9 @@ export default class Chat extends BasePackage {
 
         return res;
       },
+      /**
+       * @deprecated 使用ChatLog.sendMsg
+       */
       sendMsg: function(from_uuid: string, to_uuid: string, info: any) {
         // 不检测发送者uuid, 用于系统发送消息
         const {
@@ -139,6 +142,9 @@ export default class Chat extends BasePackage {
 
         return log;
       },
+      /**
+       * @deprecated 使用ChatLog.sendSystemMsg
+       */
       sendSystemMsg: function(
         to_uuid: string,
         type: string, // 卡片信息的类型 , 如果为空字符串则为普通信息
@@ -169,6 +175,9 @@ export default class Chat extends BasePackage {
         debug('发送系统消息:');
         app.chat.sendMsg('trpgsystem', to_uuid, pkg);
       },
+      /**
+       * @deprecated 使用ChatLog.sendSimpleSystemMsg
+       */
       sendSystemSimpleMsg: function(to_uuid, msg) {
         app.chat.sendSystemMsg(to_uuid, '', '', msg, null);
       },

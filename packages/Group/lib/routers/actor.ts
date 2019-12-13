@@ -88,6 +88,26 @@ actorRouter.post(
 );
 
 /**
+ * 删除团角色
+ */
+actorRouter.post(
+  '/:groupUUID/actor/:groupActorUUID/remove',
+  ssoAuth(),
+  async (ctx) => {
+    const groupActorUUID = ctx.params.groupActorUUID;
+    const playerUUID = _.get(ctx.state, 'player.uuid');
+
+    if (_.isNil(groupActorUUID) || _.isNil(playerUUID)) {
+      throw new Error('缺少必要字段');
+    }
+
+    await GroupActor.remove(groupActorUUID, playerUUID);
+
+    ctx.body = { result: true };
+  }
+);
+
+/**
  * 申请团角色
  */
 actorRouter.post('/:groupUUID/actor/apply', ssoAuth(), async (ctx) => {

@@ -8,30 +8,14 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 
 /**
  * 增加聊天消息
- * @param messagePkg 消息内容
+ * @todo 待将所有addChatLog转到ChatLog.appendCachedChatLog
+ * @param payload 消息内容
  */
-export const addChatLog: EventFunc = function addChatLog(
-  messagePkg: ChatMessagePartial
+export const addChatLog = function addChatLog(
+  payload: ChatMessagePartial
 ): ChatMessagePartial | false {
-  const app = this.app;
-  if (!!messagePkg) {
-    const date = messagePkg.date ? new Date(messagePkg.date) : new Date();
-    const pkg: ChatMessagePartial = {
-      uuid: messagePkg.uuid || generateUUID(),
-      sender_uuid: messagePkg.sender_uuid,
-      to_uuid: messagePkg.to_uuid,
-      converse_uuid: messagePkg.converse_uuid,
-      message: messagePkg.message,
-      type: messagePkg.type,
-      is_group: messagePkg.is_group,
-      is_public: messagePkg.is_public,
-      date: date.toISOString(),
-      data: messagePkg.data,
-    };
-
-    ChatLog.appendCachedChatLog(pkg);
-
-    return pkg;
+  if (!!payload) {
+    return ChatLog.appendCachedChatLog(payload);
   } else {
     return false;
   }
@@ -329,74 +313,66 @@ export const getOfflineUserConverse: EventFunc = async function getOfflineUserCo
 };
 
 export const message: EventFunc = async function message(data, cb) {
-  let app = this.app;
-  let socket = this.socket;
-  if (!!app.player) {
-    let player = app.player;
-    let message = data.message;
-    message = (app.xss as any)(message); // 将传输的信息进行xss处理 // TODO: 可能需要处理单独的发送< 与 > 的情况
-    let sender_uuid = data.sender_uuid;
-    let to_uuid = data.to_uuid;
-    let converse_uuid = data.converse_uuid;
-    let type = data.type || 'normal';
-    let is_public = data.is_public || false;
-    let is_group = data.is_group || false;
-    let date = data.date;
-    let _uuid = generateUUID();
-    let _data = data.data || null;
-    let _pkg = {
-      message,
-      sender_uuid,
-      to_uuid,
-      converse_uuid,
-      type,
-      is_public,
-      is_group,
-      date,
-      uuid: _uuid,
-      data: _data,
-    };
+  const app = this.app;
 
-    debug('[用户#%s]: %s', sender_uuid, message);
-    if (!!message) {
-      let pkg = addChatLog.call(app, _pkg);
-      if (!pkg) {
-        cb({ result: false, msg: '信息服务出现异常' });
-        return;
-      }
+  const player = app.player;
+  let message = data.message;
+  message = app.xss.filterXSS(message); // 将传输的信息进行xss处理 // TODO: 可能需要处理单独的发送< 与 > 的情况
+  const sender_uuid = data.sender_uuid;
+  const to_uuid = data.to_uuid;
+  const converse_uuid = data.converse_uuid;
+  const type = data.type || 'normal';
+  const is_public = data.is_public || false;
+  const is_group = data.is_group || false;
+  const date = data.date;
+  const _uuid = generateUUID();
+  const _data = data.data || null;
+  const _pkg = {
+    message,
+    sender_uuid,
+    to_uuid,
+    converse_uuid,
+    type,
+    is_public,
+    is_group,
+    date,
+    uuid: _uuid,
+    data: _data,
+  };
 
-      if (!is_public) {
-        // 仅个人可见
-        if (sender_uuid !== to_uuid) {
-          // 私聊
-          const isOnline = await player.manager.checkPlayerOnline(to_uuid);
-          if (isOnline) {
-            player.manager.unicastSocketEvent(to_uuid, 'chat::message', pkg);
-          } else {
-            debug('[用户:%s]: 接收方%s不在线', sender_uuid, to_uuid);
-            app.chat.tryNotify(pkg);
-          }
-        }
-      } else {
-        // 所有人可见
-        if (!is_group) {
-          // 公聊
-          player.manager.broadcastSocketEvent('chat::message', pkg);
-        } else {
-          // 群聊
-          player.manager.roomcastSocketEvent(
-            converse_uuid,
-            'chat::message',
-            pkg
-          );
-        }
-      }
-      cb({ result: true, pkg });
-    } else {
-      cb({ result: false, msg: '聊天内容不能为空' });
+  debug('[用户#%s]: %s', sender_uuid, message);
+  if (!!message) {
+    const pkg = addChatLog.call(app, _pkg);
+    if (!pkg) {
+      cb({ result: false, msg: '信息服务出现异常' });
+      return;
     }
+
+    if (!is_public) {
+      // 仅个人可见
+      if (sender_uuid !== to_uuid) {
+        // 私聊
+        const isOnline = await player.manager.checkPlayerOnline(to_uuid);
+        if (isOnline) {
+          player.manager.unicastSocketEvent(to_uuid, 'chat::message', pkg);
+        } else {
+          debug('[用户:%s]: 接收方%s不在线', sender_uuid, to_uuid);
+          app.chat.tryNotify(pkg);
+        }
+      }
+    } else {
+      // 所有人可见
+      if (!is_group) {
+        // 公聊
+        player.manager.broadcastSocketEvent('chat::message', pkg);
+      } else {
+        // 群聊
+        player.manager.roomcastSocketEvent(converse_uuid, 'chat::message', pkg);
+      }
+    }
+    cb({ result: true, pkg });
   } else {
-    throw new Error('[ChatComponent] require component [PlayerComponent]');
+    cb({ result: false, msg: '聊天内容不能为空' });
   }
 };
 

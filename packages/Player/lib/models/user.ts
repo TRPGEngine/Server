@@ -19,6 +19,13 @@ export type Alignment =
   | 'NE'
   | 'CE';
 
+/**
+ * 生成用户的缓存key
+ * @param uuid 用户UUID
+ */
+export const getPlayerUserCacheKey = (uuid: string): string =>
+  `player:user:info:${uuid}`;
+
 export class PlayerUser extends Model {
   id: number;
   uuid: string;
@@ -33,7 +40,7 @@ export class PlayerUser extends Model {
   token: string;
   app_token: string;
   sex: '男' | '女' | '其他' | '保密';
-  sign: string;
+  sign: string; // 个人签名
   alignment: Alignment;
   createdAt: Date;
   updatedAt: Date;
@@ -87,12 +94,25 @@ export class PlayerUser extends Model {
    * 根据用户UUID查找用户
    * @param userUUID 用户UUID
    */
-  static findByUUID(userUUID: string): Promise<PlayerUser> {
-    return PlayerUser.findOne({
-      where: {
-        uuid: userUUID,
-      },
-    });
+  static async findByUUID(userUUID: string): Promise<PlayerUser> {
+    const cacheKey = getPlayerUserCacheKey(userUUID);
+    const app = PlayerUser.getApplication();
+    const cacheVal = await app.cache.get(cacheKey);
+
+    if (_.isObject(cacheVal) && !_.isEmpty(cacheVal)) {
+      // 应用缓存
+      return new PlayerUser(cacheVal, {
+        isNewRecord: false,
+      });
+    } else {
+      const user = await PlayerUser.findOne({
+        where: {
+          uuid: userUUID,
+        },
+      });
+      await app.cache.set(cacheKey, user);
+      return user;
+    }
   }
 
   /**
@@ -240,6 +260,11 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
           if (typeof user.last_login === 'string') {
             user.last_login = new Date(user.last_login);
           }
+        },
+        async afterUpdate(user, options) {
+          // 在用户的任意修改操作后清空缓存
+          const app = PlayerUser.getApplication();
+          await app.cache.remove(getPlayerUserCacheKey(user.uuid));
         },
       },
     }

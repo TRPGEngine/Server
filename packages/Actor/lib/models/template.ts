@@ -60,6 +60,20 @@ export class ActorTemplate extends Model {
       where: { uuid },
     });
   }
+
+  /**
+   * 获取推荐模块列表
+   */
+  static async getRecommendList(): Promise<ActorTemplate[]> {
+    const templates = await ActorTemplate.findAll({
+      where: {
+        built_in: true,
+        is_public: true,
+      },
+    });
+
+    return templates;
+  }
 }
 
 export default function ActorTemplateDefinition(

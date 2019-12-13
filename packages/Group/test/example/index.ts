@@ -2,6 +2,7 @@ import { GroupGroup } from 'packages/Group/lib/models/group';
 import { GroupActor } from 'packages/Group/lib/models/actor';
 import _ from 'lodash';
 import { getTestUser } from 'packages/Player/test/example';
+import testExampleStack from 'test/utils/example';
 
 export const createTestGroup = async (): Promise<GroupGroup> => {
   const testUser = await getTestUser();
@@ -11,6 +12,8 @@ export const createTestGroup = async (): Promise<GroupGroup> => {
     creator_uuid: testUser.uuid,
     owner_uuid: testUser.uuid,
   });
+
+  testExampleStack.append(group);
 
   return group;
 };
@@ -35,6 +38,8 @@ export const createTestGroupActor = async (
     groupId,
     actorId,
   });
+
+  testExampleStack.append(groupActor);
 
   return groupActor;
 };

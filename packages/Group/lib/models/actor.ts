@@ -103,6 +103,37 @@ export class GroupActor extends Model {
   }
 
   /**
+   * 移除团角色
+   * @param groupActorUUID 团人物UUID
+   * @param playerUUID 操作人员的UUID
+   */
+  static async remove(
+    groupActorUUID: string,
+    playerUUID: string
+  ): Promise<void> {
+    const groupActor: GroupActor = await GroupActor.findOne({
+      where: {
+        uuid: groupActorUUID,
+      },
+    });
+
+    if (_.isNil(groupActor)) {
+      throw new Error('该团人物不存在');
+    }
+
+    const group: GroupGroup = await groupActor.getGroup();
+    if (_.isNil(group)) {
+      throw new Error('找不到相关联的团');
+    }
+
+    if (!group.isManagerOrOwner(playerUUID)) {
+      throw new Error('没有操作权限');
+    }
+
+    await groupActor.destroy();
+  }
+
+  /**
    * 获取团人物详情
    * @param uuid 团人物UUID
    */

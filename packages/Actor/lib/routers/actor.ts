@@ -90,6 +90,19 @@ actorRouter.post('/:actorUUID/edit', ssoAuth(), async (ctx) => {
   };
 });
 
+actorRouter.post('/:actorUUID/remove', ssoAuth(), async (ctx) => {
+  const actorUUID = ctx.params.actorUUID;
+  const playerUUID = _.get(ctx.state, 'player.uuid');
+
+  if (_.isNil(actorUUID) || _.isNil(playerUUID)) {
+    throw new Error('缺少必要字段');
+  }
+
+  await ActorActor.remove(actorUUID, playerUUID);
+
+  ctx.body = { result: true };
+});
+
 actorRouter.get('/:actorUUID/access', ssoInfo(), async (ctx) => {
   const actorUUID = ctx.params.actorUUID;
 
