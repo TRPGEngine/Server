@@ -6,6 +6,7 @@ import {
   BelongsToManyGetAssociationsMixin,
   BelongsToManyHasAssociationsMixin,
   BelongsToSetAssociationMixin,
+  Op,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
@@ -65,6 +66,55 @@ export class GroupGroup extends Model {
     });
 
     return _.get(group, 'groupActors', []);
+  }
+
+  /**
+   * 搜索团
+   * @param text 搜索文本
+   * @param type 搜索方式
+   */
+  static async searchGroup(
+    text: string,
+    type: 'uuid' | 'groupname' | 'groupdesc'
+  ): Promise<GroupGroup[]> {
+    if (_.isNil(text) || _.isNil(type)) {
+      throw new Error('缺少必要参数');
+    }
+
+    const limit = 10;
+
+    if (type === 'uuid') {
+      return await GroupGroup.findAll({
+        where: { allow_search: true, uuid: text },
+        limit,
+      });
+    }
+
+    if (type === 'groupname') {
+      return await GroupGroup.findAll({
+        where: {
+          allow_search: true,
+          name: {
+            [Op.like]: `%${text}%`,
+          },
+        },
+        limit,
+      });
+    }
+
+    if (type === 'groupdesc') {
+      return await GroupGroup.findAll({
+        where: {
+          allow_search: true,
+          desc: {
+            [Op.like]: `%${text}%`,
+          },
+        },
+        limit,
+      });
+    }
+
+    return [];
   }
 
   /**

@@ -135,7 +135,6 @@ export const findGroup: EventFunc<{
 }> = async function findGroup(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
-  const Op = app.storage.Op;
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
@@ -147,33 +146,9 @@ export const findGroup: EventFunc<{
     throw '缺少参数';
   }
 
-  let results = [];
-  if (type === 'uuid') {
-    results = await db.models.group_group.findAll({
-      where: { uuid: text },
-      limit: 10,
-    });
-  } else if (type === 'groupname') {
-    results = await db.models.group_group.findAll({
-      where: {
-        name: {
-          [Op.like]: `%${text}%`,
-        },
-      },
-      limit: 10,
-    });
-  } else if (type === 'groupdesc') {
-    results = await db.models.group_group.findAll({
-      where: {
-        desc: {
-          [Op.like]: `%${text}%`,
-        },
-      },
-      limit: 10,
-    });
-  }
-
-  return { results };
+  return {
+    results: await GroupGroup.searchGroup(text, type),
+  };
 };
 
 export const requestJoinGroup: EventFunc<{
