@@ -23,17 +23,11 @@ describe('group model function', () => {
     testGroup = await createTestGroup();
   });
 
-  afterAll(async () => {
-    await _.invoke(testActor, 'destroy');
-    await _.invoke(testGroup, 'destroy');
-  });
-
   beforeEach(async () => {
     testGroupActor = await createTestGroupActor(testGroup.id);
   });
 
   afterEach(async () => {
-    await _.invoke(testGroupActor, 'destroy');
     testGroupActor = null;
   });
 
@@ -46,6 +40,65 @@ describe('group model function', () => {
       expect(actors[0].toJSON()).toMatchObject({
         id: testGroupActor.id,
         uuid: testGroupActor.uuid,
+      });
+    });
+
+    describe('GroupGroup.searchGroup should be ok', () => {
+      /**
+       * 检测一个团UUID是否应该在搜索结果中
+       * @param uuid 团UUID
+       * @param results 搜索结果
+       */
+      const checkGroupExistInSearchResult = (
+        uuid: string,
+        results: GroupGroup[]
+      ): boolean => {
+        return results.map((x) => x.uuid).includes(uuid);
+      };
+
+      /**
+       *
+       * @param testGroup 测试的团
+       * @param shouldExist 是否应该在测试结果中
+       */
+      const checkAllSearchType = async (
+        testGroup: GroupGroup,
+        shouldExist: boolean
+      ) => {
+        const testGroupUUID = testGroup.uuid;
+
+        expect(
+          checkGroupExistInSearchResult(
+            testGroupUUID,
+            await GroupGroup.searchGroup(testGroupUUID, 'uuid')
+          )
+        ).toBe(shouldExist);
+        expect(
+          checkGroupExistInSearchResult(
+            testGroupUUID,
+            await GroupGroup.searchGroup(testGroup.name, 'groupname')
+          )
+        ).toBe(shouldExist);
+        expect(
+          checkGroupExistInSearchResult(
+            testGroupUUID,
+            await GroupGroup.searchGroup(testGroup.desc, 'groupdesc')
+          )
+        ).toBe(shouldExist);
+      };
+
+      test('normal search', async () => {
+        const testGroupTmp = await createTestGroup();
+
+        await checkAllSearchType(testGroupTmp, true);
+      });
+
+      test('cannot search if not allow search', async () => {
+        const testGroupTmp = await createTestGroup();
+        testGroupTmp.allow_search = false;
+        await testGroupTmp.save();
+
+        await checkAllSearchType(testGroupTmp, false);
       });
     });
 

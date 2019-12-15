@@ -3,12 +3,14 @@ import { GroupActor } from 'packages/Group/lib/models/actor';
 import _ from 'lodash';
 import { getTestUser } from 'packages/Player/test/example';
 import testExampleStack from 'test/utils/example';
+import { generateRandomStr } from 'test/utils/utils';
 
 export const createTestGroup = async (): Promise<GroupGroup> => {
   const testUser = await getTestUser();
   const group: GroupGroup = await GroupGroup.create({
     type: 'test',
     name: 'test_group',
+    desc: generateRandomStr(),
     creator_uuid: testUser.uuid,
     owner_uuid: testUser.uuid,
   });
