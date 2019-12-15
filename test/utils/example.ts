@@ -1,4 +1,6 @@
 import { TRPGModel } from 'packages/Core/lib/storage';
+import Debug from 'debug';
+const debug = Debug('trpg:test:example');
 
 /**
  * 用于同一管理测试数据
@@ -14,6 +16,7 @@ class TestExampleStack {
   }
 
   async gc(): Promise<void> {
+    debug('回收 %d 条测试数据...', this.stack.length);
     Promise.all(
       this.stack.map((model) => model.destroy({ force: true }))
     ).catch((e) => console.error('测试数据回收失败: ' + e));

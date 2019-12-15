@@ -9,6 +9,7 @@ import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupActor } from '../lib/models/actor';
 import { createTestActor } from 'packages/Actor/test/example';
 import { createTestGroupActor, createTestGroup } from './example';
+import testExampleStack from 'test/utils/example';
 
 const context = buildAppContext();
 
@@ -23,6 +24,7 @@ afterAll(async () => {
 });
 
 describe('group action', () => {
+  testExampleStack.regAfterAll();
   let testGroup: GroupGroup;
 
   beforeAll(async () => {
@@ -32,10 +34,6 @@ describe('group action', () => {
     //     selected_group_actor_uuid: 'test selected_group_actor_uuid',
     //   },
     // });
-  });
-
-  afterAll(async () => {
-    await testGroup.destroy({ force: true });
   });
 
   test('create should be ok', async () => {

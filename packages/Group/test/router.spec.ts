@@ -6,10 +6,13 @@ import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupActor } from '../lib/models/actor';
 import { genTestPlayerJWT } from 'packages/Player/test/example';
 import _ from 'lodash';
+import testExampleStack from 'test/utils/example';
+
+const context = buildAppContext();
+
+testExampleStack.regAfterAll();
 
 describe('Group router', () => {
-  const context = buildAppContext();
-
   let testGroup: GroupGroup;
   let testActor: ActorActor;
   let testGroupActor: GroupActor;
@@ -18,12 +21,6 @@ describe('Group router', () => {
     testGroup = await createTestGroup();
     testActor = await createTestActor();
     testGroupActor = await createTestGroupActor(testGroup.id);
-  });
-
-  afterAll(async () => {
-    await _.invoke(testGroup, 'destroy');
-    await _.invoke(testActor, 'destroy');
-    await _.invoke(testGroupActor, 'destroy');
   });
 
   describe('POST /group/:groupUUID/actor/apply should be ok', () => {
@@ -98,8 +95,6 @@ describe('Group router', () => {
     });
 
     expect(groupActor.passed).toBe(true);
-
-    await testGroupActorTmp.destroy();
   });
 
   test('POST /group/:groupUUID/actor/refuse', async () => {
@@ -123,7 +118,5 @@ describe('Group router', () => {
     });
 
     expect(groupActor).toBeNull();
-
-    await testGroupActorTmp.destroy(); // 此处是一个冗余删除
   });
 });
