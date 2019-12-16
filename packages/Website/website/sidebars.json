@@ -1,6 +1,6 @@
 {
   "docs": {
-    "开始": ["getstart"],
+    "开始": ["introduce", "getstart"],
     "创建人物": ["doc2"],
     "配置设置": ["doc3"]
   },
