@@ -993,31 +993,9 @@ export const quitGroup: EventFunc<{
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  if (group.owner_uuid === player.uuid) {
-    throw '作为团主持人你无法直接退出群';
-  }
+  await GroupGroup.removeGroupMember(groupUUID, player.uuid);
 
-  const user = await PlayerUser.findByUUID(player.uuid);
-  let removeMember = await group.removeMember(user);
-
-  // 系统通知
-  let managers_uuid = group.getManagerUUIDs();
-  let systemMsg = `用户 ${user.getName()} 退出了团 [${group.name}]`;
-  managers_uuid.forEach((uuid) => {
-    if (uuid !== user.uuid) {
-      app.chat.sendSystemSimpleMsg(uuid, systemMsg);
-    }
-  });
-  cb({ result: true, removeMember });
-
-  // 离开房间
-  app.player.leaveSocketRoom(player.uuid, group.uuid);
+  return true;
 };
 
 // 解散团

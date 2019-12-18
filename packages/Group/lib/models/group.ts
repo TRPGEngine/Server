@@ -7,6 +7,7 @@ import {
   BelongsToManyHasAssociationsMixin,
   BelongsToSetAssociationMixin,
   Op,
+  BelongsToManyRemoveAssociationMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
@@ -40,6 +41,7 @@ export class GroupGroup extends Model {
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
   getMembers?: BelongsToManyGetAssociationsMixin<PlayerUser>;
   hasMembers?: BelongsToManyHasAssociationsMixin<PlayerUser, number>;
+  removeMember?: BelongsToManyRemoveAssociationMixin<PlayerUser, number>;
 
   /**
    * 根据UUID查找团
@@ -171,6 +173,47 @@ export class GroupGroup extends Model {
 
       // TODO: 通知团其他所有人更新团成员信息
     }
+  }
+
+  /**
+   * 移除团成员
+   * @param groupUUID 团UUID
+   * @param userUUID 要移除的用户的UUID
+   * @param operatorUserUUID 操作者的UUID, 如果有输入则进行权限校验
+   */
+  static async removeGroupMember(
+    groupUUID: string,
+    userUUID: string,
+    operatorUserUUID?: string
+  ) {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(group)) {
+      throw '找不到团';
+    }
+
+    if (group.owner_uuid === userUUID) {
+      throw '作为团主持人你无法直接退出群';
+    }
+
+    const user = await PlayerUser.findByUUID(userUUID);
+    if (_.isNil(user)) {
+      throw '找不到用户';
+    }
+
+    await group.removeMember(user);
+
+    // 系统通知所有团管理员
+    const managers_uuid = group.getManagerUUIDs();
+    const systemMsg = `用户 ${user.getName()} 退出了团 [${group.name}]`;
+    managers_uuid.forEach((uuid) => {
+      if (uuid !== user.uuid) {
+        ChatLog.sendSimpleSystemMsg(uuid, null, systemMsg);
+      }
+    });
+
+    // 离开房间
+    const app = GroupGroup.getApplication();
+    await app.player.manager.leaveRoomWithUUID(group.uuid, userUUID);
   }
 
   /**

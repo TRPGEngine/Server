@@ -130,7 +130,7 @@ export default class Player extends BasePackage {
           console.error('加入房间失败:', e);
         }
       },
-      leaveSocketRoom: async function(userUUID, roomUUID) {
+      leaveSocketRoom: async function(userUUID: string, roomUUID: string) {
         await app.player.manager.leaveRoomWithUUID(roomUUID, userUUID);
       },
       // 服务端直接创建用户

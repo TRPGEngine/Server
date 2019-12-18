@@ -19,6 +19,7 @@ export {
   BelongsToManyAddAssociationsMixin,
   BelongsToManyGetAssociationsMixin,
   BelongsToManyHasAssociationsMixin,
+  BelongsToManyRemoveAssociationMixin,
 } from 'sequelize';
 
 // 模型权限信息
