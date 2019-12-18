@@ -4,14 +4,16 @@ const appLogger = getLogger('application');
 const errorLogger = getLogger('error');
 
 interface ReportConfig {
+  enable: boolean;
   logger: boolean;
-  sentry: boolean;
+  sentry: boolean | string;
 }
 
 type ReportErrorType = Error | string;
 
 // 默认设置
 const defaultConfig: ReportConfig = {
+  enable: true,
   logger: true,
   sentry: false, // 如果有则为Sentry DSN http://xxxxxxx@sentry.xxxxx.com/x 格式
 };
@@ -32,6 +34,11 @@ class ReportService {
     console.error(err); // 在终端里输出一遍
 
     const setting = this._setting;
+    if (!this._setting.enable) {
+      // 未开启汇报系统
+      return;
+    }
+
     if (setting.logger) {
       errorLogger.error(err);
     }

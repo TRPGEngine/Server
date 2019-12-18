@@ -62,6 +62,9 @@ module.exports = {
       },
     },
   },
+  report: {
+    enable: true,
+  },
   oauth: {
     enabled: ['qq'],
     // qq互联相关信息 required!
