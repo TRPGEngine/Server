@@ -8,6 +8,7 @@ import {
   BelongsToSetAssociationMixin,
   Op,
   BelongsToManyRemoveAssociationMixin,
+  BelongsToManyHasAssociationMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
@@ -40,6 +41,7 @@ export class GroupGroup extends Model {
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
   getMembers?: BelongsToManyGetAssociationsMixin<PlayerUser>;
+  hasMember?: BelongsToManyHasAssociationMixin<PlayerUser, number>;
   hasMembers?: BelongsToManyHasAssociationsMixin<PlayerUser, number>;
   removeMember?: BelongsToManyRemoveAssociationMixin<PlayerUser, number>;
 
@@ -180,12 +182,16 @@ export class GroupGroup extends Model {
    * @param groupUUID 团UUID
    * @param userUUID 要移除的用户的UUID
    * @param operatorUserUUID 操作者的UUID, 如果有输入则进行权限校验
+   * @returns 返回移除成员团的UUID与移除用户的UUID
    */
   static async removeGroupMember(
     groupUUID: string,
     userUUID: string,
     operatorUserUUID?: string
-  ) {
+  ): Promise<{
+    user: PlayerUser;
+    group: GroupGroup;
+  }> {
     const group = await GroupGroup.findByUUID(groupUUID);
     if (_.isNil(group)) {
       throw '找不到团';
@@ -200,20 +206,35 @@ export class GroupGroup extends Model {
       throw '找不到用户';
     }
 
-    await group.removeMember(user);
-
-    // 系统通知所有团管理员
-    const managers_uuid = group.getManagerUUIDs();
-    const systemMsg = `用户 ${user.getName()} 退出了团 [${group.name}]`;
-    managers_uuid.forEach((uuid) => {
-      if (uuid !== user.uuid) {
-        ChatLog.sendSimpleSystemMsg(uuid, null, systemMsg);
+    if (_.isString(operatorUserUUID)) {
+      // 有操作人, 进行权限校验
+      if (!group.isManagerOrOwner(operatorUserUUID)) {
+        // 操作人不是管理
+        throw '您没有该权限';
+      } else if (
+        group.isManagerOrOwner(userUUID) &&
+        group.owner_uuid !== operatorUserUUID
+      ) {
+        // 被踢人是管理但操作人不是团所有人
+        throw '您没有该权限';
       }
-    });
+    }
+
+    if (!(await group.hasMember(user))) {
+      throw '该团没有该成员';
+    }
+
+    await group.removeMember(user);
 
     // 离开房间
     const app = GroupGroup.getApplication();
     await app.player.manager.leaveRoomWithUUID(group.uuid, userUUID);
+
+    // 返回操作对象用于后续操作。如通知
+    return {
+      user,
+      group,
+    };
   }
 
   /**

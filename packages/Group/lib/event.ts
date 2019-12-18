@@ -7,6 +7,7 @@ import { GroupInvite } from './models/invite';
 import { GroupGroup } from './models/group';
 import { GroupActor } from './models/actor';
 import { GroupRequest } from './models/request';
+import { ChatLog } from 'packages/Chat/lib/models/log';
 
 export const create: EventFunc<{
   name: string;
@@ -993,7 +994,18 @@ export const quitGroup: EventFunc<{
     throw '缺少必要参数';
   }
 
-  await GroupGroup.removeGroupMember(groupUUID, player.uuid);
+  await GroupGroup.removeGroupMember(groupUUID, player.uuid).then(
+    ({ user, group }) => {
+      // 系统通知所有团管理员
+      const managers_uuid = group.getManagerUUIDs();
+      const systemMsg = `用户 ${user.getName()} 退出了团 [${group.name}]`;
+      managers_uuid.forEach((uuid) => {
+        if (uuid !== user.uuid) {
+          ChatLog.sendSimpleSystemMsg(uuid, null, systemMsg);
+        }
+      });
+    }
+  );
 
   return true;
 };
@@ -1009,12 +1021,12 @@ export const dismissGroup: EventFunc<{
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
-  let groupUUID = data.groupUUID;
+  const groupUUID = data.groupUUID;
   if (!groupUUID) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.findOne({
+  const group: GroupGroup = await GroupGroup.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
@@ -1025,8 +1037,8 @@ export const dismissGroup: EventFunc<{
   }
 
   // 系统通知
-  let members = await group.getMembers();
-  let systemMsg = `您的团 ${group.name} 解散了, ${members.length -
+  const members = await group.getMembers();
+  const systemMsg = `您所在的团 ${group.name} 解散了, ${members.length -
     1} 只小鸽子无家可归`;
   members.forEach((member) => {
     let uuid = member.uuid;
@@ -1052,8 +1064,8 @@ export const tickMember: EventFunc<{
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
-  let groupUUID = data.groupUUID;
-  let memberUUID = data.memberUUID;
+  const groupUUID = data.groupUUID;
+  const memberUUID = data.memberUUID;
   if (!groupUUID || !memberUUID) {
     throw '缺少必要参数';
   }
@@ -1061,47 +1073,22 @@ export const tickMember: EventFunc<{
     throw '您不能踢出你自己';
   }
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  let member = await db.models.player_user.findOne({
-    where: { uuid: memberUUID },
-  });
-  if (!member) {
-    throw '找不到该成员';
-  }
-  if (!group.isManagerOrOwner(player.uuid)) {
-    // 操作人不是管理
-    throw '您没有该权限';
-  } else if (
-    group.isManagerOrOwner(memberUUID) &&
-    group.owner_uuid !== player.uuid
-  ) {
-    // 被踢人是管理但操作人不是团所有人
-    throw '您没有该权限';
-  }
-  if (!(await group.hasMember(member))) {
-    throw '该团没有该成员';
-  }
+  await GroupGroup.removeGroupMember(groupUUID, memberUUID, player.uuid).then(
+    ({ group, user }) => {
+      // 发通知
+      app.chat.sendSystemMsg(user.uuid, '', '', `您已被踢出团 [${group.name}]`);
+      group.getManagerUUIDs().forEach((uuid) => {
+        app.chat.sendSystemMsg(
+          uuid,
+          '',
+          '',
+          `团成员 ${user.getName()} 已被踢出团 [${group.name}]`
+        );
+      });
+    }
+  );
 
-  await group.removeMember(member);
-  // 发通知
-  app.chat.sendSystemMsg(memberUUID, '', '', `您已被踢出团 [${group.name}]`);
-  group.getManagerUUIDs().forEach((uuid) => {
-    app.chat.sendSystemMsg(
-      uuid,
-      '',
-      '',
-      `团成员 ${member.getName()} 已被踢出团 [${group.name}]`
-    );
-  });
-  cb({ result: true });
-
-  // 离开房间
-  app.player.leaveSocketRoom(memberUUID, group.uuid);
+  return true;
 };
 
 // 将普通用户提升为管理员

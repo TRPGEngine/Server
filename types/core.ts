@@ -18,6 +18,7 @@ export {
   BelongsToManyAddAssociationMixin,
   BelongsToManyAddAssociationsMixin,
   BelongsToManyGetAssociationsMixin,
+  BelongsToManyHasAssociationMixin,
   BelongsToManyHasAssociationsMixin,
   BelongsToManyRemoveAssociationMixin,
 } from 'sequelize';
