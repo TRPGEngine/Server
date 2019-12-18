@@ -55,6 +55,18 @@ export const getTestUser = memoizeOne(
 );
 
 /**
+ * 获取其他的测试用户
+ */
+export const getOtherTestUser = memoizeOne(
+  async (username: string): Promise<PlayerUser> => {
+    return await PlayerUser.findByUsernameAndPassword(
+      username,
+      testUserInfo.password
+    );
+  }
+);
+
+/**
  * 生成测试用户的JWT
  */
 export const genTestPlayerJWT = async (): Promise<string> => {

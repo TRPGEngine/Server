@@ -9,7 +9,7 @@ export const createTestGroup = async (): Promise<GroupGroup> => {
   const testUser = await getTestUser();
   const group: GroupGroup = await GroupGroup.create({
     type: 'test',
-    name: 'test_group',
+    name: 'test_group' + generateRandomStr(4),
     desc: generateRandomStr(),
     creator_uuid: testUser.uuid,
     owner_uuid: testUser.uuid,

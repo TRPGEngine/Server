@@ -5,7 +5,7 @@ import { GroupGroup } from 'packages/Group/lib/models/group';
 import { GroupActor } from 'packages/Group/lib/models/actor';
 import { createTestActor } from 'packages/Actor/test/example';
 import { createTestGroup, createTestGroupActor } from './example';
-import { getTestUser } from 'packages/Player/test/example';
+import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import testExampleStack from 'test/utils/example';
 
@@ -115,6 +115,21 @@ describe('group model function', () => {
       expect(
         members.findIndex((m) => m.uuid === testUser.uuid)
       ).toBeGreaterThanOrEqual(0);
+    });
+
+    test('GroupGroup.removeGroupMember should be ok', async () => {
+      const testUser9 = await getOtherTestUser('admin9');
+      await testGroup.addMember(testUser9);
+
+      expect((await testGroup.getMembers()).map((x) => x.uuid)).toContain(
+        testUser9.uuid
+      );
+
+      await GroupGroup.removeGroupMember(testGroup.uuid, testUser9.uuid);
+
+      expect(
+        (await testGroup.getMembers()).map<string>((x) => x.uuid)
+      ).not.toContain(testUser9.uuid);
     });
   });
 
