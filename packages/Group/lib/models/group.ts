@@ -173,7 +173,15 @@ export class GroupGroup extends Model {
         app.player.manager.joinRoomWithUUID(group.uuid, user.uuid);
       }
 
-      // TODO: 通知团其他所有人更新团成员信息
+      // 通知团其他所有人更新团成员列表
+      app.player.manager.roomcastSocketEvent(
+        group.uuid,
+        'group::addGroupMember',
+        {
+          groupUUID: group.uuid,
+          memberUUID: user.uuid,
+        }
+      );
     }
   }
 
@@ -229,6 +237,16 @@ export class GroupGroup extends Model {
     // 离开房间
     const app = GroupGroup.getApplication();
     await app.player.manager.leaveRoomWithUUID(group.uuid, userUUID);
+
+    // 通知团其他所有人更新团成员列表
+    app.player.manager.roomcastSocketEvent(
+      group.uuid,
+      'group::removeGroupMember',
+      {
+        groupUUID: group.uuid,
+        memberUUID: user.uuid,
+      }
+    );
 
     // 返回操作对象用于后续操作。如通知
     return {
