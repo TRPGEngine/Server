@@ -11,6 +11,7 @@ const debug = Debug('trpg:component:chat:model:log');
 
 export class ChatLog extends Model implements ChatMessagePayload {
   static CACHE_KEY = 'chat:log-cache';
+  static CACHE_DUMP_LOCK = 'chat:dumpLog';
 
   uuid: string;
   sender_uuid: string;
@@ -76,12 +77,15 @@ export class ChatLog extends Model implements ChatMessagePayload {
    */
   public static async dumpCachedChatLog(): Promise<void> {
     const trpgapp = ChatLog.getApplication();
+
+    await trpgapp.cache.lockScope(ChatLog.CACHE_DUMP_LOCK, async () => {
     const logs: {}[] = await ChatLog.getCachedChatLog();
     const size = logs.length;
     if (size > 0) {
       await trpgapp.cache.lclear(ChatLog.CACHE_KEY, 0, size);
       await ChatLog.bulkCreate(logs);
     }
+    });
   }
 
   /**
