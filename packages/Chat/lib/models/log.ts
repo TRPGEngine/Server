@@ -23,6 +23,15 @@ export class ChatLog extends Model implements ChatMessagePayload {
   is_group: boolean;
   is_public: boolean;
   date: string;
+  revoke: boolean;
+
+  public static async findByUUID(uuid: string): Promise<ChatLog> {
+    return ChatLog.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
 
   /**
    * 获取缓存的聊天记录
@@ -31,6 +40,16 @@ export class ChatLog extends Model implements ChatMessagePayload {
     const trpgapp = ChatLog.getApplication();
     const cachedList = await trpgapp.cache.lget(ChatLog.CACHE_KEY);
     return cachedList.filter<object>((i): i is object => _.isObject(i));
+  }
+
+  /**
+   * 根据消息UUID获取缓存的聊天记录
+   */
+  public static async getCachedChatLogByUUID(
+    msgUUID: string
+  ): Promise<ChatMessagePartial> {
+    const cachedList = await ChatLog.getCachedChatLog();
+    return cachedList.find((msg) => msg.uuid === msgUUID);
   }
 
   /**
@@ -79,12 +98,12 @@ export class ChatLog extends Model implements ChatMessagePayload {
     const trpgapp = ChatLog.getApplication();
 
     await trpgapp.cache.lockScope(ChatLog.CACHE_DUMP_LOCK, async () => {
-    const logs: {}[] = await ChatLog.getCachedChatLog();
-    const size = logs.length;
-    if (size > 0) {
-      await trpgapp.cache.lclear(ChatLog.CACHE_KEY, 0, size);
-      await ChatLog.bulkCreate(logs);
-    }
+      const logs: {}[] = await ChatLog.getCachedChatLog();
+      const size = logs.length;
+      if (size > 0) {
+        await trpgapp.cache.lclear(ChatLog.CACHE_KEY, 0, size);
+        await ChatLog.bulkCreate(logs);
+      }
     });
   }
 
@@ -170,6 +189,125 @@ export class ChatLog extends Model implements ChatMessagePayload {
       data: null,
     });
   }
+
+  /**
+   * 撤回消息
+   * @param msgUUID 消息UUID
+   * @param userUUID 操作者UUID
+   */
+  public static async revokeMsg(msgUUID: string, userUUID: string) {
+    let msg: ChatMessagePartial = await ChatLog.findByUUID(msgUUID);
+    let isCachedMsg = false;
+    let isGroupManagerRevoke = false; // 是否为团管理员的撤回(没有时间限制)
+    if (_.isNil(msg)) {
+      // 在数据库中没有找到，尝试在缓存中查找
+      msg = await ChatLog.getCachedChatLogByUUID(msgUUID);
+      if (_.isNil(msg)) {
+        throw new Error('撤回失败, 找不到此信息');
+      }
+      isCachedMsg = true;
+    }
+
+    const app = ChatLog.getApplication();
+
+    /**
+     * 校验撤回权限
+     */
+    if (userUUID !== msg.sender_uuid) {
+      // 如果不是发送者
+      if (!msg.is_group) {
+        // 不是团消息，直接返回错误
+        throw new Error('撤回失败, 没有撤回权限');
+      }
+
+      const groupUUID = msg.converse_uuid;
+      if (!_.isEmpty(groupUUID)) {
+        throw new Error('撤回失败, 消息内容异常');
+      }
+
+      if (app.hasPackage('Group')) {
+        const { GroupGroup } = await import('packages/Group/lib/models/group');
+        const group = await GroupGroup.findByUUID(msg.converse_uuid);
+        if (!group.isManagerOrOwner(userUUID)) {
+          // 不是管理员
+          throw new Error('撤回失败, 没有撤回权限');
+        }
+
+        isGroupManagerRevoke = true;
+      }
+    }
+
+    /**
+     * 校验撤回时间
+     */
+    const now = new Date().valueOf();
+    const msgDate = new Date(msg.date).valueOf();
+    if (!(isGroupManagerRevoke || now - msgDate <= 2 * 60 * 1000)) {
+      throw new Error('撤回失败, 已超出撤回时间');
+    }
+    // 如果撤回时间在2分钟内，或为管理员撤回则允许撤回
+
+    // 撤回消息
+    let isRevoked = false;
+    if (isCachedMsg) {
+      await app.cache.lockScope(ChatLog.CACHE_DUMP_LOCK, async () => {
+        const list = await ChatLog.getCachedChatLog();
+        const index = list.findIndex((item) => item.uuid === msgUUID);
+        if (index >= 0) {
+          await ChatLog.updateCachedChatLog(index, {
+            ...list[index],
+            revoke: true,
+          });
+          isRevoked = true;
+        }
+      });
+    }
+
+    if (!isRevoked) {
+      // 如果没有成功撤回, 则再在数据库中处理一下
+      await ChatLog.update(
+        {
+          revoke: true,
+        },
+        {
+          where: {
+            uuid: msgUUID,
+          },
+        }
+      );
+    }
+
+    // 通知所有用户可以看得到消息的人已撤回
+    if (!_.isEmpty(msg.to_uuid)) {
+      // 该消息是发送给个人的
+      app.player.manager.unicastSocketEvent(
+        msg.to_uuid,
+        'chat::revokeMessage',
+        {
+          converseUUID: msg.sender_uuid,
+          msgUUID: msgUUID,
+        }
+      );
+      app.player.manager.unicastSocketEvent(
+        msg.sender_uuid,
+        'chat::revokeMessage',
+        {
+          converseUUID: msg.to_uuid,
+          msgUUID: msgUUID,
+        }
+      );
+    } else if (!_.isEmpty(msg.converse_uuid)) {
+      // 该消息为团消息
+      app.player.manager.roomcastSocketEvent(
+        msg.converse_uuid,
+        'chat::revokeMessage',
+        {
+          converseUUID: msg.converse_uuid,
+          msgUUID: msgUUID,
+        }
+      );
+    }
+  }
 }
 
 export default function LogDefinition(Sequelize: Orm, db: DBInstance) {
@@ -201,6 +339,11 @@ export default function LogDefinition(Sequelize: Orm, db: DBInstance) {
       is_group: { type: Sequelize.BOOLEAN, defaultValue: false },
       is_public: { type: Sequelize.BOOLEAN, defaultValue: true },
       date: { type: Sequelize.DATE },
+      revoke: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        comment: '消息撤回',
+      },
     },
     {
       tableName: 'chat_log',
