@@ -1,8 +1,14 @@
 import { ChatLog } from '../lib/models/log';
 import { ChatMessagePartial } from '../types/message';
 import { buildAppContext } from 'test/utils/app';
+import { createTestChatlog, createTestChatlogPayload } from './example';
+import { getTestUser } from 'packages/Player/test/example';
+import testExampleStack from 'test/utils/example';
+import _ from 'lodash';
 
 const context = buildAppContext();
+
+testExampleStack.regAfterAll();
 
 describe('chat log func', () => {
   const logCacheKey = 'chat:log-cache';
@@ -50,4 +56,38 @@ describe('chat log func', () => {
   test.todo('ChatLog.sendSystemMsg should be ok');
 
   test.todo('ChatLog.sendSimpleSystemMsg should be ok');
+
+  describe('ChatLog.revokeMsg should be ok', () => {
+    test('revoke when chatlog in DB', async () => {
+      const testUser = await getTestUser();
+      const testChatlog = await createTestChatlog();
+      await ChatLog.revokeMsg(testChatlog.uuid, testUser.uuid);
+
+      expect(testChatlog.revoke).toBe(false);
+
+      const ret = await ChatLog.findOne({
+        where: {
+          uuid: testChatlog.uuid,
+        },
+      });
+
+      expect(ret.revoke).toBe(true);
+    });
+
+    test('revoke when chatlog in Cache', async () => {
+      const testUser = await getTestUser();
+      const testChatlogPayload = await createTestChatlogPayload();
+      await context.app.cache.rpush(ChatLog.CACHE_KEY, testChatlogPayload);
+
+      await ChatLog.revokeMsg(testChatlogPayload.uuid, testUser.uuid);
+
+      const cacheList = await context.app.cache.lget(ChatLog.CACHE_KEY);
+      const ret = cacheList.find(
+        (item) => _.get(item, 'uuid') === testChatlogPayload.uuid
+      );
+      expect(_.get(ret, 'revoke')).toBe(true);
+
+      context.app.cache.lclear(ChatLog.CACHE_KEY, 0, cacheList.length);
+    });
+  });
 });
