@@ -6,6 +6,9 @@ import {
   BelongsToManyGetAssociationsMixin,
   BelongsToManyHasAssociationsMixin,
   BelongsToSetAssociationMixin,
+  Op,
+  BelongsToManyRemoveAssociationMixin,
+  BelongsToManyHasAssociationMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
@@ -38,7 +41,9 @@ export class GroupGroup extends Model {
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
   getMembers?: BelongsToManyGetAssociationsMixin<PlayerUser>;
+  hasMember?: BelongsToManyHasAssociationMixin<PlayerUser, number>;
   hasMembers?: BelongsToManyHasAssociationsMixin<PlayerUser, number>;
+  removeMember?: BelongsToManyRemoveAssociationMixin<PlayerUser, number>;
 
   /**
    * 根据UUID查找团
@@ -65,6 +70,55 @@ export class GroupGroup extends Model {
     });
 
     return _.get(group, 'groupActors', []);
+  }
+
+  /**
+   * 搜索团
+   * @param text 搜索文本
+   * @param type 搜索方式
+   */
+  static async searchGroup(
+    text: string,
+    type: 'uuid' | 'groupname' | 'groupdesc'
+  ): Promise<GroupGroup[]> {
+    if (_.isNil(text) || _.isNil(type)) {
+      throw new Error('缺少必要参数');
+    }
+
+    const limit = 10;
+
+    if (type === 'uuid') {
+      return await GroupGroup.findAll({
+        where: { allow_search: true, uuid: text },
+        limit,
+      });
+    }
+
+    if (type === 'groupname') {
+      return await GroupGroup.findAll({
+        where: {
+          allow_search: true,
+          name: {
+            [Op.like]: `%${text}%`,
+          },
+        },
+        limit,
+      });
+    }
+
+    if (type === 'groupdesc') {
+      return await GroupGroup.findAll({
+        where: {
+          allow_search: true,
+          desc: {
+            [Op.like]: `%${text}%`,
+          },
+        },
+        limit,
+      });
+    }
+
+    return [];
   }
 
   /**
@@ -119,8 +173,86 @@ export class GroupGroup extends Model {
         app.player.manager.joinRoomWithUUID(group.uuid, user.uuid);
       }
 
-      // TODO: 通知团其他所有人更新团成员信息
+      // 通知团其他所有人更新团成员列表
+      app.player.manager.roomcastSocketEvent(
+        group.uuid,
+        'group::addGroupMember',
+        {
+          groupUUID: group.uuid,
+          memberUUID: user.uuid,
+        }
+      );
     }
+  }
+
+  /**
+   * 移除团成员
+   * @param groupUUID 团UUID
+   * @param userUUID 要移除的用户的UUID
+   * @param operatorUserUUID 操作者的UUID, 如果有输入则进行权限校验
+   * @returns 返回移除成员团的UUID与移除用户的UUID
+   */
+  static async removeGroupMember(
+    groupUUID: string,
+    userUUID: string,
+    operatorUserUUID?: string
+  ): Promise<{
+    user: PlayerUser;
+    group: GroupGroup;
+  }> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(group)) {
+      throw '找不到团';
+    }
+
+    if (group.owner_uuid === userUUID) {
+      throw '作为团主持人你无法直接退出群';
+    }
+
+    const user = await PlayerUser.findByUUID(userUUID);
+    if (_.isNil(user)) {
+      throw '找不到用户';
+    }
+
+    if (_.isString(operatorUserUUID)) {
+      // 有操作人, 进行权限校验
+      if (!group.isManagerOrOwner(operatorUserUUID)) {
+        // 操作人不是管理
+        throw '您没有该权限';
+      } else if (
+        group.isManagerOrOwner(userUUID) &&
+        group.owner_uuid !== operatorUserUUID
+      ) {
+        // 被踢人是管理但操作人不是团所有人
+        throw '您没有该权限';
+      }
+    }
+
+    if (!(await group.hasMember(user))) {
+      throw '该团没有该成员';
+    }
+
+    await group.removeMember(user);
+
+    // 离开房间
+    const app = GroupGroup.getApplication();
+    await app.player.manager.leaveRoomWithUUID(group.uuid, userUUID);
+
+    // 通知团其他所有人更新团成员列表
+    app.player.manager.roomcastSocketEvent(
+      group.uuid,
+      'group::removeGroupMember',
+      {
+        groupUUID: group.uuid,
+        memberUUID: user.uuid,
+      }
+    );
+
+    // 返回操作对象用于后续操作。如通知
+    return {
+      user,
+      group,
+    };
   }
 
   /**

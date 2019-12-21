@@ -76,7 +76,7 @@ export const bindUPushNotifyInfo: EventFunc<{
   const selfUUID = player.uuid;
 
   if (selfUUID !== userUUID) {
-    throw '非法操作, UUID不匹配';
+    throw '非法操作, 用户UUID不匹配';
   }
 
   const { id: userId } = await PlayerUser.findByUUID(selfUUID);
@@ -108,12 +108,17 @@ export const bindUPushNotifyInfo: EventFunc<{
  * 启用推送通知
  */
 export const activeNofifyEvent: EventFunc<{
-  info: {
-    userUUID: string;
-    registrationID: string;
-  };
+  registrationID: string;
 }> = async function(data, cb, db) {
-  const userUUID = _.get(data, 'info.userUUID', '');
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户不存在，请检查登录状态';
+  }
+
+  const userUUID = player.uuid;
   const registrationID = _.get(data, 'info.registrationID');
 
   const setting = await PlayerSettings.getByUserUUID(userUUID);
@@ -137,12 +142,17 @@ export const activeNofifyEvent: EventFunc<{
  * 操作: 在该用户的通知设置上设置不推送。取消该设备的绑定性
  */
 export const deactiveNofifyEvent: EventFunc<{
-  info: {
-    userUUID: string;
-    registrationID: string;
-  };
+  registrationID: string;
 }> = async function(data, cb, db) {
-  const userUUID = _.get(data, 'info.userUUID', '');
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户不存在，请检查登录状态';
+  }
+
+  const userUUID = player.uuid;
   const registrationID = _.get(data, 'info.registrationID');
 
   const setting = await PlayerSettings.getByUserUUID(userUUID);

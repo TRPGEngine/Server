@@ -5,7 +5,7 @@ import { GroupGroup } from 'packages/Group/lib/models/group';
 import { GroupActor } from 'packages/Group/lib/models/actor';
 import { createTestActor } from 'packages/Actor/test/example';
 import { createTestGroup, createTestGroupActor } from './example';
-import { getTestUser } from 'packages/Player/test/example';
+import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import testExampleStack from 'test/utils/example';
 
@@ -23,17 +23,11 @@ describe('group model function', () => {
     testGroup = await createTestGroup();
   });
 
-  afterAll(async () => {
-    await _.invoke(testActor, 'destroy');
-    await _.invoke(testGroup, 'destroy');
-  });
-
   beforeEach(async () => {
     testGroupActor = await createTestGroupActor(testGroup.id);
   });
 
   afterEach(async () => {
-    await _.invoke(testGroupActor, 'destroy');
     testGroupActor = null;
   });
 
@@ -46,6 +40,65 @@ describe('group model function', () => {
       expect(actors[0].toJSON()).toMatchObject({
         id: testGroupActor.id,
         uuid: testGroupActor.uuid,
+      });
+    });
+
+    describe('GroupGroup.searchGroup should be ok', () => {
+      /**
+       * 检测一个团UUID是否应该在搜索结果中
+       * @param uuid 团UUID
+       * @param results 搜索结果
+       */
+      const checkGroupExistInSearchResult = (
+        uuid: string,
+        results: GroupGroup[]
+      ): boolean => {
+        return results.map((x) => x.uuid).includes(uuid);
+      };
+
+      /**
+       *
+       * @param testGroup 测试的团
+       * @param shouldExist 是否应该在测试结果中
+       */
+      const checkAllSearchType = async (
+        testGroup: GroupGroup,
+        shouldExist: boolean
+      ) => {
+        const testGroupUUID = testGroup.uuid;
+
+        expect(
+          checkGroupExistInSearchResult(
+            testGroupUUID,
+            await GroupGroup.searchGroup(testGroupUUID, 'uuid')
+          )
+        ).toBe(shouldExist);
+        expect(
+          checkGroupExistInSearchResult(
+            testGroupUUID,
+            await GroupGroup.searchGroup(testGroup.name, 'groupname')
+          )
+        ).toBe(shouldExist);
+        expect(
+          checkGroupExistInSearchResult(
+            testGroupUUID,
+            await GroupGroup.searchGroup(testGroup.desc, 'groupdesc')
+          )
+        ).toBe(shouldExist);
+      };
+
+      test('normal search', async () => {
+        const testGroupTmp = await createTestGroup();
+
+        await checkAllSearchType(testGroupTmp, true);
+      });
+
+      test('cannot search if not allow search', async () => {
+        const testGroupTmp = await createTestGroup();
+        testGroupTmp.allow_search = false;
+        await testGroupTmp.save();
+
+        await checkAllSearchType(testGroupTmp, false);
       });
     });
 
@@ -62,6 +115,21 @@ describe('group model function', () => {
       expect(
         members.findIndex((m) => m.uuid === testUser.uuid)
       ).toBeGreaterThanOrEqual(0);
+    });
+
+    test('GroupGroup.removeGroupMember should be ok', async () => {
+      const testUser9 = await getOtherTestUser('admin9');
+      await testGroup.addMember(testUser9);
+
+      expect((await testGroup.getMembers()).map((x) => x.uuid)).toContain(
+        testUser9.uuid
+      );
+
+      await GroupGroup.removeGroupMember(testGroup.uuid, testUser9.uuid);
+
+      expect(
+        (await testGroup.getMembers()).map<string>((x) => x.uuid)
+      ).not.toContain(testUser9.uuid);
     });
   });
 

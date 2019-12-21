@@ -1069,6 +1069,14 @@
                     "field": "date",
                     "seqType": "Sequelize.DATE"
                 },
+                "revoke": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "comment": "消息撤回",
+                    "field": "revoke",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -2900,5 +2908,5 @@
             "indexes": []
         }
     },
-    "revision": 31
+    "revision": 32
 }

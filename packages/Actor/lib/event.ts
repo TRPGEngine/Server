@@ -3,6 +3,7 @@ import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
 import { ActorTemplate } from './models/template';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import { ActorActor } from './models/actor';
 const debug = Debug('trpg:component:actor:event');
 
 export const getTemplate: EventFunc<{
@@ -280,42 +281,26 @@ export const getActor: EventFunc<{
   }
 };
 
+/**
+ * 删除角色
+ */
 export const removeActor: EventFunc<{
   uuid: string;
 }> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
-  let uuid = data.uuid;
+  const uuid = data.uuid;
   if (!uuid) {
     throw '缺少必要参数';
   }
 
-  await db.transactionAsync(async () => {
-    const user = await PlayerUser.findByUUID(player.uuid);
-    let actor = await db.models.actor_actor.findOne({
-      where: {
-        uuid,
-        ownerId: user.id,
-      },
-    });
-    if (!actor) {
-      throw '没有找到该角色';
-    }
-    await actor.destroy();
+  await ActorActor.remove(uuid, player.uuid);
 
-    if (db.models.group_actor) {
-      // 如果有group actor模型
-      // 移除所有相关的团角色
-      await db.models.group_actor.destroy({
-        where: { actor_uuid: uuid },
-      });
-    }
-  });
   return true;
 };
 

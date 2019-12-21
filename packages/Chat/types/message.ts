@@ -20,6 +20,7 @@ export interface ChatMessagePayload {
   is_group: boolean;
   date: string;
   data: object;
+  revoke?: boolean;
 }
 
 export type ChatMessagePartial = Partial<ChatMessagePayload>;

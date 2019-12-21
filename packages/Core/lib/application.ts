@@ -51,6 +51,7 @@ export class Application extends events.EventEmitter {
   webservice: WebService = null; // 网页服务
   socketservice: SocketService = null; // websocket服务
   components: BasePackage[] | Function[] = []; // 组件列表
+  installedPackages: string[] = []; // 安装的组件名列表
   events: InternalEvents = {}; // 内部事件列表
   timers = []; // 计时器列表
   webApi = {}; // 网页服务api
@@ -209,6 +210,7 @@ export class Application extends events.EventEmitter {
           applog('initing ...%s', componentName);
           instance.onInit();
           instance.onInitCompleted();
+          this.installedPackages.push(componentName);
           applog('component info:', {
             name: componentName,
             require: instance.require,
@@ -367,6 +369,17 @@ export class Application extends events.EventEmitter {
       });
     },
   };
+
+  /**
+   * 检测是否注册了某个组件
+   * 大小写不限
+   * @param componentName 组件名
+   */
+  hasPackage(componentName: string): boolean {
+    return this.installedPackages
+      .map(_.lowerCase)
+      .includes(_.lowerCase(componentName));
+  }
 
   // 记录错误
   error(err) {

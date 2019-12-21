@@ -102,8 +102,11 @@ export interface ICache {
   remove(key: string): Promise<any>;
   close(): void;
 
-  // 分布式锁
-  // 仅redis有效
+  /**
+   * 分布式锁
+   * 自定过期时间: 10秒
+   * NOTE: 仅redis缓存有效
+   */
   lock(key: string): Promise<boolean>;
   unlock(key: string): Promise<void>;
   /**

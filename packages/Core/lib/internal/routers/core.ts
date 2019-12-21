@@ -39,6 +39,7 @@ router.get('/health', async (ctx) => {
     version: _.get(serverInfo, 'packageConf.version', ''),
     hash: _.get(serverInfo, 'gitVersion', ''),
     env: trpgapp.get('env'),
+    components: trpgapp.installedPackages,
   };
 });
 

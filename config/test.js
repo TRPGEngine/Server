@@ -10,4 +10,7 @@ module.exports = {
       min: 0,
     },
   },
+  report: {
+    enable: false,
+  },
 };
