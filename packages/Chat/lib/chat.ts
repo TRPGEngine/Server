@@ -18,6 +18,7 @@ export default class Chat extends BasePackage {
     this.initMethods();
 
     this.regSocketEvent('message', event.message);
+    this.regSocketEvent('revokeMsg', event.revokeMsg);
     this.regSocketEvent('getConverses', event.getConverses);
     this.regSocketEvent('removeConverse', event.removeConverse);
     this.regSocketEvent('getUserChatLog', event.getUserChatLog);

@@ -1,6 +1,7 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:chat:event');
 import generateUUID from 'uuid/v4';
+import _ from 'lodash';
 import { ChatMessagePartial } from '../types/message';
 import { ChatLog } from './models/log';
 import { EventFunc } from 'trpg/core';
@@ -374,6 +375,30 @@ export const message: EventFunc = async function message(data, cb) {
   } else {
     cb({ result: false, msg: '聊天内容不能为空' });
   }
+};
+
+/**
+ * 撤回消息
+ */
+export const revokeMsg: EventFunc<{
+  messageUUID: string;
+}> = async function revokeMsg(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
+  }
+
+  const messageUUID = data.messageUUID;
+  if (_.isNil(messageUUID)) {
+    throw new Error('缺少必要字段');
+  }
+
+  await ChatLog.revokeMsg(messageUUID, player.uuid);
+
+  return true;
 };
 
 export const removeConverse: EventFunc = async function removeConverse(
