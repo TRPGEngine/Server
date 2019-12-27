@@ -27,6 +27,9 @@ export const getPlayerUserCacheKey = (uuid: string): string =>
   `player:user:info:${uuid}`;
 
 export class PlayerUser extends Model {
+  // 保护字段
+  static protectedField: string[] = ['password', 'salt', 'token', 'app_token'];
+
   id: number;
   uuid: string;
   username: string;
@@ -255,6 +258,11 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
       tableName: 'player_user',
       sequelize: db,
       paranoid: true,
+      defaultScope: {
+        attributes: {
+          exclude: PlayerUser.protectedField,
+        },
+      },
       hooks: {
         beforeSave: function(user, options) {
           if (typeof user.last_login === 'string') {
