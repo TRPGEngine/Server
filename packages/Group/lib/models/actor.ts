@@ -25,6 +25,8 @@ export class GroupActor extends Model {
   createAt: string;
   updateAt: string;
 
+  owner?: PlayerUser;
+  ownerId?: number;
   getActor?: BelongsToGetAssociationMixin<ActorActor>;
   getOwner?: BelongsToGetAssociationMixin<PlayerUser>;
   getGroup?: BelongsToGetAssociationMixin<GroupGroup>;
