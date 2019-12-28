@@ -278,32 +278,36 @@ export class ChatLog extends Model implements ChatMessagePayload {
     }
 
     // 通知所有用户可以看得到消息的人已撤回
+    const updatedMsgPayload = {
+      uuid: msgUUID,
+      revoke: true,
+    };
     if (!_.isEmpty(msg.to_uuid)) {
       // 该消息是发送给个人的
       app.player.manager.unicastSocketEvent(
         msg.to_uuid,
-        'chat::revokeMessage',
+        'chat::updateMessage',
         {
           converseUUID: msg.sender_uuid,
-          msgUUID: msgUUID,
+          payload: updatedMsgPayload,
         }
       );
       app.player.manager.unicastSocketEvent(
         msg.sender_uuid,
-        'chat::revokeMessage',
+        'chat::updateMessage',
         {
           converseUUID: msg.to_uuid,
-          msgUUID: msgUUID,
+          payload: updatedMsgPayload,
         }
       );
     } else if (!_.isEmpty(msg.converse_uuid)) {
       // 该消息为团消息
       app.player.manager.roomcastSocketEvent(
         msg.converse_uuid,
-        'chat::revokeMessage',
+        'chat::updateMessage',
         {
           converseUUID: msg.converse_uuid,
-          msgUUID: msgUUID,
+          payload: updatedMsgPayload,
         }
       );
     }
