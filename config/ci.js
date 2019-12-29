@@ -14,4 +14,7 @@ module.exports = {
   report: {
     enable: false,
   },
+  jwt: {
+    secret: 'circle-ci-jwt-secret',
+  },
 };
