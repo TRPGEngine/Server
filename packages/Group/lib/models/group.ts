@@ -61,12 +61,23 @@ export class GroupGroup extends Model {
    * 根据团UUID获取团UUID列表
    * @param groupUUID 团UUID
    */
-  static async findGroupActorsByUUID(groupUUID: string): Promise<GroupActor> {
-    const group: GroupActor = await GroupGroup.findOne({
+  static async findGroupActorsByUUID(groupUUID: string): Promise<GroupActor[]> {
+    const group: GroupGroup = await GroupGroup.findOne({
       where: {
         uuid: groupUUID,
       },
-      include: ['groupActors'],
+      include: [
+        {
+          model: GroupActor,
+          as: 'groupActors',
+          include: [
+            {
+              model: PlayerUser,
+              as: 'owner',
+            },
+          ],
+        },
+      ],
     });
 
     return _.get(group, 'groupActors', []);

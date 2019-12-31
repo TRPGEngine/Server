@@ -248,6 +248,14 @@ export class ChatLog extends Model implements ChatMessagePayload {
     // 如果撤回时间在2分钟内，或为管理员撤回则允许撤回
 
     // 撤回消息
+    const updatedMsgPayload = {
+      revoke: true,
+      message: '[撤回消息]',
+      data: {
+        origin: msg.message,
+        ...msg.data,
+      },
+    };
     let isRevoked = false;
     if (isCachedMsg) {
       await app.cache.lockScope(ChatLog.CACHE_DUMP_LOCK, async () => {
@@ -256,7 +264,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
         if (index >= 0) {
           await ChatLog.updateCachedChatLog(index, {
             ...list[index],
-            revoke: true,
+            ...updatedMsgPayload,
           });
           isRevoked = true;
         }
@@ -268,6 +276,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
       await ChatLog.update(
         {
           revoke: true,
+          ...updatedMsgPayload,
         },
         {
           where: {
@@ -278,32 +287,36 @@ export class ChatLog extends Model implements ChatMessagePayload {
     }
 
     // 通知所有用户可以看得到消息的人已撤回
+    const notifyPayload = {
+      ...updatedMsgPayload,
+      uuid: msgUUID,
+    };
     if (!_.isEmpty(msg.to_uuid)) {
       // 该消息是发送给个人的
       app.player.manager.unicastSocketEvent(
         msg.to_uuid,
-        'chat::revokeMessage',
+        'chat::updateMessage',
         {
           converseUUID: msg.sender_uuid,
-          msgUUID: msgUUID,
+          payload: notifyPayload,
         }
       );
       app.player.manager.unicastSocketEvent(
         msg.sender_uuid,
-        'chat::revokeMessage',
+        'chat::updateMessage',
         {
           converseUUID: msg.to_uuid,
-          msgUUID: msgUUID,
+          payload: notifyPayload,
         }
       );
     } else if (!_.isEmpty(msg.converse_uuid)) {
       // 该消息为团消息
       app.player.manager.roomcastSocketEvent(
         msg.converse_uuid,
-        'chat::revokeMessage',
+        'chat::updateMessage',
         {
           converseUUID: msg.converse_uuid,
-          msgUUID: msgUUID,
+          payload: notifyPayload,
         }
       );
     }

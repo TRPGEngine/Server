@@ -12,7 +12,7 @@ export type DeployVersionPlatform =
 export class DeployVersion extends Model {
   version: string;
   platform: DeployVersionPlatform;
-  downloadUrl: string;
+  download_url: string;
   describe: string;
 
   /**

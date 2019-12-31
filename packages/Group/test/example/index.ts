@@ -33,12 +33,15 @@ export const createTestGroupActor = async (
     groupId = group.id;
   }
 
+  const testUser = await getTestUser();
+
   const groupActor: GroupActor = await GroupActor.create({
     actor_uuid: 'test_actor',
     actor_info: {},
     name: 'test',
     groupId,
     actorId,
+    ownerId: testUser.id,
   });
 
   testExampleStack.append(groupActor);

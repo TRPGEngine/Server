@@ -41,6 +41,9 @@ describe('group model function', () => {
         id: testGroupActor.id,
         uuid: testGroupActor.uuid,
       });
+      expect(actors[0]).toHaveProperty('owner'); // 需要有owner信息
+      expect(actors[0].owner).not.toBeNull();
+      expect(actors[0].owner.id).toBe(testGroupActor.ownerId);
     });
 
     describe('GroupGroup.searchGroup should be ok', () => {
