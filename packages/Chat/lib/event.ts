@@ -325,7 +325,6 @@ export const message: EventFunc = async function message(data, cb) {
   const type = data.type || 'normal';
   const is_public = data.is_public || false;
   const is_group = data.is_group || false;
-  const date = data.date;
   const _uuid = generateUUID();
   const _data = data.data || null;
   const _pkg = {
@@ -336,7 +335,7 @@ export const message: EventFunc = async function message(data, cb) {
     type,
     is_public,
     is_group,
-    date,
+    date: new Date().toISOString(), // 将消息时间统一成服务端时间
     uuid: _uuid,
     data: _data,
   };
