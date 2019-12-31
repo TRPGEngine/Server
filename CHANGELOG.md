@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/TRPGEngine/Server/compare/v1.4.0...v1.5.0) (2019-12-31)
+
+
+### Features
+
+* **chat:** 处理发送消息时将客户端时间统一成服务端时间 ([97eec9f](https://github.com/TRPGEngine/Server/commit/97eec9f2d985d5b9efec16a81becac33061b8703))
+* **chat:** 开放消息撤回事件 ([6da1700](https://github.com/TRPGEngine/Server/commit/6da1700a5bbc16eff8a8afc4e45e5c24f5b50462))
+* **group:** 增加 GroupGroup.findGroupActorsByUUID 返回角色列表的owner的信息 ([a635f96](https://github.com/TRPGEngine/Server/commit/a635f962988b3ddf498fd9dc15066c8048ba82ed))
+
+
+### Bug Fixes
+
+* **deploy:** 修复错误的字段声明 ([2923d1f](https://github.com/TRPGEngine/Server/commit/2923d1f226747b285d28e0900d56a9084666833b))
+
 ## [1.4.0](https://github.com/TRPGEngine/Server/compare/v1.3.0...v1.4.0) (2019-12-21)
 
 
