@@ -28,7 +28,12 @@ export const getPlayerUserCacheKey = (uuid: string): string =>
 
 export class PlayerUser extends Model {
   // 保护字段
-  static protectedField: string[] = ['password', 'salt', 'token', 'app_token'];
+  static passwordField: string[] = ['password', 'salt'];
+  static protectedField: string[] = [
+    ...PlayerUser.passwordField,
+    'token',
+    'app_token',
+  ];
 
   id: number;
   uuid: string;
@@ -127,7 +132,7 @@ export class PlayerUser extends Model {
     username: string,
     password: string
   ): Promise<PlayerUser> {
-    return PlayerUser.findOne({
+    return PlayerUser.scope('login').findOne({
       where: {
         username,
         password: fn('SHA1', fn('CONCAT', fn('MD5', password), col('salt'))),
@@ -261,6 +266,13 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
       defaultScope: {
         attributes: {
           exclude: PlayerUser.protectedField,
+        },
+      },
+      scopes: {
+        login: {
+          attributes: {
+            exclude: PlayerUser.passwordField,
+          },
         },
       },
       hooks: {

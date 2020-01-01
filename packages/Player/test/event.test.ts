@@ -19,6 +19,7 @@ describe.skip('account', () => {
     expect(ret).toHaveProperty('info');
     expect(typeof ret.info.uuid).toBe('string');
     expect(ret.info.username).toBe('admin9');
+    expect(typeof ret.info.token).toBe('string');
 
     // 登录完毕后退出登录
     await sleep(500); // 因为刚登录时数据还没有写入数据库，因此等待100毫秒让token写入数据库
