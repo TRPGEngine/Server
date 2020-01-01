@@ -6,6 +6,7 @@ import {
 } from 'packages/Chat/types/message';
 import _ from 'lodash';
 import generateUUID from 'uuid/v4';
+import emoji from 'node-emoji';
 import Debug from 'debug';
 const debug = Debug('trpg:component:chat:model:log');
 
@@ -66,6 +67,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
     }
     const date = _.isEmpty(payload.date) ? new Date() : new Date(payload.date);
     payload.date = date.toISOString();
+    payload.message = emoji.unemojify(payload.message);
 
     // 这里直接向redis发送消息。不等待返回
     // 这样可以同步向
@@ -101,8 +103,9 @@ export class ChatLog extends Model implements ChatMessagePayload {
       const logs: {}[] = await ChatLog.getCachedChatLog();
       const size = logs.length;
       if (size > 0) {
-        await trpgapp.cache.lclear(ChatLog.CACHE_KEY, 0, size);
         await ChatLog.bulkCreate(logs);
+        // 成功后再清除。否则先不清除了
+        await trpgapp.cache.lclear(ChatLog.CACHE_KEY, 0, size);
       }
     });
   }

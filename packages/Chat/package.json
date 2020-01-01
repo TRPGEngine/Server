@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "chat component",
   "main": "index.js",
-  "scripts": {
-    "test": "set DEBUG=trpg:*,socket.io:socket && node test/test.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TRPGEngine/Chat.git"
@@ -22,6 +19,10 @@
   "homepage": "https://github.com/TRPGEngine/Chat#readme",
   "dependencies": {
     "debug": "^3.1.0",
+    "node-emoji": "^1.10.0",
     "uuid": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node-emoji": "^1.8.1"
   }
 }

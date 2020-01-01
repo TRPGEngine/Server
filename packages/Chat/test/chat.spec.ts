@@ -11,7 +11,7 @@ const context = buildAppContext();
 testExampleStack.regAfterAll();
 
 describe('chat log func', () => {
-  const logCacheKey = 'chat:log-cache';
+  const logCacheKey = ChatLog.CACHE_KEY;
   const testChatLogPayload: ChatMessagePartial = {
     uuid: 'test',
     sender_uuid: 'test',
@@ -19,21 +19,36 @@ describe('chat log func', () => {
     message: 'test',
   };
 
+  afterEach(async () => {
+    // 清理chat log cache
+    await context.app.cache.lclear(logCacheKey, 0, -1); // 清除所有缓存
+  });
+
   test('ChatLog.appendCachedChatLog should be ok', async () => {
-    await ChatLog.appendCachedChatLog(testChatLogPayload);
+    ChatLog.appendCachedChatLog(testChatLogPayload);
 
     const logList = await context.app.cache.lget(logCacheKey);
     expect(logList).toHaveProperty('length');
     expect(logList.length).toBeGreaterThan(0);
+  });
 
-    await context.app.cache.lclear(logCacheKey, logList.length - 1, 1); // 清除最后一条
+  test('ChatLog.appendCachedChatLog should process emoji', async () => {
+    const payload = ChatLog.appendCachedChatLog({
+      ...testChatLogPayload,
+      message: '🐱', // This evil make me lost 10 minutes chat log
+    });
+
+    expect(payload.message).toBe(':cat:');
   });
 
   test('ChatLog.getCachedChatLog should be ok', async () => {
     await context.app.cache.rpush('chat:log-cache', testChatLogPayload);
 
     const logList = await ChatLog.getCachedChatLog();
-    expect(logList).toMatchObject([testChatLogPayload]);
+    expect(logList.length).toBeGreaterThan(0);
+    expect(
+      _.findIndex(logList, (x) => _.isEqual(x, testChatLogPayload))
+    ).toBeGreaterThanOrEqual(0);
 
     await context.app.cache.lclear(logCacheKey, logList.length - 1, 1); // 清除最后一条
   });
@@ -46,7 +61,12 @@ describe('chat log func', () => {
     await ChatLog.dumpCachedChatLog();
 
     expect(mockBulkCreate).toBeCalledTimes(1);
-    expect(mockBulkCreate.mock.calls[0][0]).toMatchObject([testChatLogPayload]);
+    const callArg = mockBulkCreate.mock.calls[0][0];
+    expect(_.isArray(callArg)).toBe(true);
+    expect(callArg.length).toBeGreaterThan(0);
+    expect(
+      _.findIndex(callArg, (x) => _.isEqual(x, testChatLogPayload))
+    ).toBeGreaterThanOrEqual(0);
 
     expect(await context.app.cache.lget(ChatLog.CACHE_KEY)).toMatchObject([]);
   });
