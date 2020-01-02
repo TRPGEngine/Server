@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/TRPGEngine/Server/compare/v1.5.0...v1.5.1) (2020-01-02)
+
+
+### Bug Fixes
+
+* **chat:** 修复emoji表情无法写入数据库的问题 ([29c98a5](https://github.com/TRPGEngine/Server/commit/29c98a5d38c66f7d32aecbb2ab27059d849dd8ae))
+* **player:** 修复登录时不返回token导致无法正常退出登录的bug ([5d25845](https://github.com/TRPGEngine/Server/commit/5d25845cc3cdfce227b640d87c0a217e3e8f075b))
+
 ## [1.5.0](https://github.com/TRPGEngine/Server/compare/v1.4.0...v1.5.0) (2019-12-31)
 
 

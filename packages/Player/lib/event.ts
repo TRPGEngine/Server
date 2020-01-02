@@ -168,7 +168,7 @@ export const loginWithToken: EventFunc<{
   } else {
     cond['token'] = token;
   }
-  let user = await db.models.player_user.findOne({ where: cond });
+  const user = await PlayerUser.scope('login').findOne({ where: cond });
 
   if (!user) {
     debug('login with token fail, try to login %s', uuid);
