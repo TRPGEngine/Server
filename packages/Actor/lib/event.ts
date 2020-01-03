@@ -341,7 +341,7 @@ export const updateActor: EventFunc<{
       throw new Error('无法更新角色信息: 该角色不存在');
     }
 
-    let oldAvatar = actor.avatar.toString();
+    let oldAvatar = String(actor.avatar ?? '');
     actor.name = name;
     actor.avatar = avatar;
     actor.desc = desc;
