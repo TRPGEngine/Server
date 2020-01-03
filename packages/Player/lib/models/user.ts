@@ -28,9 +28,10 @@ export const getPlayerUserCacheKey = (uuid: string): string =>
 
 export class PlayerUser extends Model {
   // 保护字段
-  static passwordField: string[] = ['password', 'salt'];
+  static passwordField: string[] = ['password'];
   static protectedField: string[] = [
     ...PlayerUser.passwordField,
+    'salt',
     'token',
     'app_token',
   ];
