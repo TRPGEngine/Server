@@ -1,4 +1,4 @@
-import { getTestUser } from './example';
+import { getTestUser, testUserInfo } from './example';
 import {
   PlayerUser,
   getPlayerUserCacheKey,
@@ -63,6 +63,19 @@ describe('PlayerUser', () => {
         getPlayerUserCacheKey(testUserUUID)
       );
       expect(cache2).toBeNull();
+    });
+  });
+
+  describe('PlayerUser.findByUsernameAndPassword', () => {
+    test('PlayerUser.findByUsernameAndPassword should get token, app_token, salt', async () => {
+      const user = await PlayerUser.findByUsernameAndPassword(
+        testUserInfo.username,
+        testUserInfo.password
+      );
+
+      expect(user).toHaveProperty('token');
+      expect(user).toHaveProperty('app_token');
+      expect(user).toHaveProperty('salt');
     });
   });
 });
