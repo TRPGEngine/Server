@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.3](https://github.com/TRPGEngine/Server/compare/v1.5.2...v1.5.3) (2020-01-03)
+
+
+### Bug Fixes
+
+* 修复在某些情况下无法更新人物卡的bug ([378bdb1](https://github.com/TRPGEngine/Server/commit/378bdb1ec126e48782b004ae6ccae5acad0093f3))
+
 ### [1.5.2](https://github.com/TRPGEngine/Server/compare/v1.5.1...v1.5.2) (2020-01-03)
 
 
