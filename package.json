@@ -24,7 +24,7 @@
     "test:coverage": "jest --config=./test/jest.config.js --runInBand --coverage",
     "test:noserver": "npm run test --noserver",
     "test:watch": "jest --config=./test/jest.config.js --runInBand --watch",
-    "test:ci": "cross-env JEST_JUNIT_OUTPUT_DIR=test/reports/jest/results.xml NODE_ENV=ci npm run test:coverage -- --ci --reporters=default --reporters=jest-junit",
+    "test:ci": "cross-env JEST_JUNIT_OUTPUT_DIR=test/reports/jest/results.xml NODE_ENV=ci npm run test:coverage -- --ci --reporters=default --reporters=jest-junit --detectOpenHandles",
     "release": "standard-version -a"
   },
   "husky": {
