@@ -18,7 +18,9 @@ faqRouter.get('/feedback', (ctx, next) => {
 faqRouter.get('/feedback/faq', (ctx, next) => {
   const faq = require('../../db/faq.js');
 
-  ctx.body = faq.list.map(([q, a]) => ({ q, a }));
+  ctx.body = {
+    list: faq.list.map(([q, a]) => ({ q, a })),
+  };
 });
 
 faqRouter.post('/feedback/submit', async (ctx, next) => {
