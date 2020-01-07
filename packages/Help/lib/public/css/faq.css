@@ -1,0 +1,12 @@
+* {
+  font-family: PingFang SC, "Microsoft YaHei", arial, serif;
+}
+ul.faq li {
+  list-style-type: decimal-leading-zero;
+}
+ul.faq li p:nth-of-type(1):before {
+  content: "Q: ";
+}
+ul.faq li p:nth-of-type(2):before {
+  content: "A: ";
+}

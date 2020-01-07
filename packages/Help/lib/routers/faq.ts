@@ -1,19 +1,27 @@
-const Router = require('koa-router');
-const router = new Router();
+import { TRPGRouter } from 'trpg/core';
+import { HelpFeedback } from '../models/feedback';
 
-router.get('/faq', (ctx, next) => {
+const faqRouter = new TRPGRouter();
+
+faqRouter.get('/faq', (ctx, next) => {
   const template = require('../views/faq.marko');
 
   ctx.render(template);
 });
 
-router.get('/feedback', (ctx, next) => {
+faqRouter.get('/feedback', (ctx, next) => {
   const template = require('../views/feedback.marko');
 
   ctx.render(template);
 });
 
-router.post('/feedback/submit', async (ctx, next) => {
+faqRouter.get('/feedback/faq', (ctx, next) => {
+  const faq = require('../../db/faq.js');
+
+  ctx.body = faq.list.map(([q, a]) => ({ q, a }));
+});
+
+faqRouter.post('/feedback/submit', async (ctx, next) => {
   let data = ctx.request.body;
   let username = data['username'];
   let contact = data['contact-link'];
@@ -30,8 +38,7 @@ router.post('/feedback/submit', async (ctx, next) => {
   }
 
   try {
-    let db = await ctx.trpgapp.storage.db;
-    await db.models.help_feedback.createAsync({
+    await HelpFeedback.create({
       username,
       contact,
       content,
@@ -44,4 +51,4 @@ router.post('/feedback/submit', async (ctx, next) => {
   }
 });
 
-module.exports = router;
+export default faqRouter;
