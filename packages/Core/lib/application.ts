@@ -15,7 +15,6 @@ import SocketService, { EventFunc } from './socket';
 import { getLogger } from './logger';
 const logger = getLogger();
 const appLogger = getLogger('application');
-import xss from 'xss';
 import BasePackage from 'lib/package';
 import { CoreSchedulejobRecord } from './internal/models/schedulejob-record';
 
@@ -536,7 +535,6 @@ export class Application extends events.EventEmitter {
   }
 
   log = applog;
-  xss = xss;
 
   jwtSign = (payload: any) => this.webservice.jwtSign(payload);
   jwtVerify = (token: string) => this.webservice.jwtVerify(token);
