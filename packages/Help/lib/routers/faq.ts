@@ -24,18 +24,24 @@ faqRouter.get('/feedback/faq', (ctx, next) => {
 });
 
 faqRouter.post('/feedback/submit', async (ctx, next) => {
-  let data = ctx.request.body;
-  let username = data['username'];
-  let contact = data['contact-link'];
-  let content = data['feedback-content'];
+  const data = ctx.request.body;
+  const username = data['username'];
+  const contact = data['contact'];
+  const content = data['content'];
 
   if (!username) {
-    ctx.body = '请填写用户名';
+    ctx.body = {
+      result: false,
+      msg: '请填写用户名',
+    };
     return;
   }
 
   if (!content) {
-    ctx.body = '请填写内容';
+    ctx.body = {
+      result: false,
+      msg: '请填写内容',
+    };
     return;
   }
 
@@ -46,10 +52,15 @@ faqRouter.post('/feedback/submit', async (ctx, next) => {
       content,
     });
 
-    ctx.body = '提交成功';
+    ctx.body = {
+      result: true,
+    };
   } catch (err) {
     ctx.trpgapp.error(err); // 汇报错误
-    ctx.body = '提交失败';
+    ctx.body = {
+      result: false,
+      msg: '提交失败:' + err,
+    };
   }
 });
 
