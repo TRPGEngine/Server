@@ -444,17 +444,17 @@ export class RedisCache implements ICache {
     const timestamp = new Date().valueOf().toString(); // 锁的值任意
     const ret = await this.redis.set(key, timestamp, 'EX', 10, 'NX');
     if (ret === 'OK') {
-      debug('[redis]', `lock ${key} success`);
+      debug('[redis]', `lock [${key}] success`);
       return true;
     } else {
-      debug('[redis]', `lock ${key} failed`);
+      debug('[redis]', `lock [${key}] failed`);
       return false;
     }
   }
 
   async unlock(key: string): Promise<void> {
     key = 'lock:' + this.genKey(key);
-    debug('[redis]', `unlock ${key}`);
+    debug('[redis]', `unlock [${key}]`);
     await this.redis.del(key);
   }
 

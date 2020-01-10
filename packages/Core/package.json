@@ -43,8 +43,7 @@
     "orm-transaction": "github:TRPGEngine/node-orm-transaction",
     "pinyin": "^2.9.0",
     "raven": "^2.6.4",
-    "socket.io": "^2.0.2",
-    "xss": "^1.0.6"
+    "socket.io": "^2.0.2"
   },
   "devDependencies": {
     "@types/graphql": "^14.2.2",

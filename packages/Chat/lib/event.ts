@@ -317,8 +317,7 @@ export const message: EventFunc = async function message(data, cb) {
   const app = this.app;
 
   const player = app.player;
-  let message = data.message;
-  message = app.xss.filterXSS(message); // 将传输的信息进行xss处理 // TODO: 可能需要处理单独的发送< 与 > 的情况
+  const message = data.message;
   const sender_uuid = data.sender_uuid;
   const to_uuid = data.to_uuid;
   const converse_uuid = data.converse_uuid;

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/TRPGEngine/Server/compare/v1.5.3...v1.6.0) (2020-01-10)
+
+
+### Features
+
+* **chat:** 移除message的xss处理。使用react原生的xss来进行xss的处理 ([cc140d9](https://github.com/TRPGEngine/Server/commit/cc140d908677bd4a756e3989afc3dad37b7f356d))
+
 ### [1.5.3](https://github.com/TRPGEngine/Server/compare/v1.5.2...v1.5.3) (2020-01-03)
 
 

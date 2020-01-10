@@ -1,0 +1,59 @@
+* {
+  font-family: PingFang SC, "Microsoft YaHei", arial, serif;
+  color: #333;
+}
+
+input, textarea {
+  background-color: transparent;
+  font-size: 16px;
+  border: 1px solid #DDDCDD;
+  outline: 0;
+  padding: 4px 6px;
+  border-radius: 3px;
+  resize: none;
+  vertical-align: top;
+}
+input:focus, textarea:focus {
+  border-color: #705949;
+}
+input[type="submit"] {
+  padding: 6px 12px;
+  width: 100%;
+  cursor: pointer;
+}
+input[type="submit"]:focus {
+  border-color: #DDDCDD;
+}
+
+p {
+  display: flex;
+}
+
+span {
+  padding-top: 4px;
+  margin-right: 4px;
+  width: 80px;
+}
+
+input, textarea {
+  flex: 1;
+}
+
+a {
+  text-decoration: none;
+  background-color: #705949;
+  color: white;
+  padding: 4px 6px;
+  display: block;
+  border-radius: 3px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+form {
+  border-top: 1px dashed #ccc;
+}
+
+body {
+  max-width: 640px;
+}

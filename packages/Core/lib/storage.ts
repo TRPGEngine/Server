@@ -12,7 +12,7 @@ import SequelizeStatic, {
 import Debug from 'debug';
 const debug = Debug('trpg:storage');
 const debugSQL = Debug('trpg:storage:sql');
-import { ModelFn, TRPGApplication } from 'trpg/core';
+import { TRPGApplication } from 'trpg/core';
 
 import { getLogger } from './logger';
 const appLogger = getLogger('application');
@@ -67,7 +67,7 @@ export default class Storage {
   db: DBInstance;
   _Sequelize = SequelizeStatic;
   Op = Op;
-  models: (typeof TRPGModel)[] = [];
+  models: typeof TRPGModel[] = [];
 
   constructor(dbconfig: TRPGDbOptions, app: TRPGApplication) {
     this.db = this.initDb(dbconfig);
