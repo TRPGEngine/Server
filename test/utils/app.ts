@@ -39,7 +39,7 @@ export interface TRPGAppInstanceContext {
  * NOTICE: 不要结构这个对象。因为他初始值是没有数据的，是通过beforeAll的方式加载进来的
  */
 export const buildAppContext = (): TRPGAppInstanceContext => {
-  let context: TRPGAppInstanceContext = {
+  const context: TRPGAppInstanceContext = {
     app: null,
     db: null,
     port: config.get<number>('port'),
