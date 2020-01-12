@@ -1,10 +1,43 @@
-import { Orm, DBInstance, Model } from 'trpg/core';
+import {
+  Orm,
+  DBInstance,
+  Model,
+  BelongsToManyGetAssociationsMixin,
+} from 'trpg/core';
 import { ChatEmotionItem } from './item';
+import { PlayerUser } from 'packages/Player/lib/models/user';
+
+declare module 'packages/Player/lib/models/user' {
+  interface PlayerUser {
+    getEmotionCatalogs?: BelongsToManyGetAssociationsMixin<ChatEmotionCatalog>;
+  }
+}
 
 export class ChatEmotionCatalog extends Model {
   id!: number;
   uuid!: string;
   name: string;
+
+  /**
+   * 获取指定用户所拥有的所有的表情包的集合以及该集合下的表情图片
+   * TODO: 因为数据量有点大，因此需要性能优化一下(压缩字段, 缓存请求)
+   * @param userUUID 用户的UUID
+   */
+  static async getUserEmotionCatalogByUUID(
+    userUUID: string
+  ): Promise<ChatEmotionCatalog[]> {
+    const user = await PlayerUser.findByUUID(userUUID);
+    const catalogs: ChatEmotionCatalog[] = await user.getEmotionCatalogs({
+      include: [
+        {
+          model: ChatEmotionItem,
+          as: 'items',
+        },
+      ],
+    });
+
+    return catalogs;
+  }
 }
 
 export default function ChatEmotionCatalogDefinition(
