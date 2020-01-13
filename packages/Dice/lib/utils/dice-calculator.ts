@@ -97,7 +97,35 @@ export function infix2Suffix(rawExp: string): string[] {
  * @param expression 投骰表达式
  */
 export function calDiceExpression(expression: string): number {
-  // TODO
+  const suffixExp = infix2Suffix(expression);
+  const stack: number[] = [];
 
-  return -1;
+  for (let i = 0; i < suffixExp.length; i++) {
+    const item = suffixExp[i];
+    if (digitalRE.test(item)) {
+      // 是数字, 压入栈
+      stack.push(Number(item));
+    } else {
+      // 不是数字，处理
+      const right = stack.pop();
+      const left = stack.pop();
+
+      switch (item) {
+        case '+':
+          stack.push(left + right);
+          break;
+        case '-':
+          stack.push(left - right);
+          break;
+        case '*':
+          stack.push(left * right);
+          break;
+        case '/':
+          stack.push(left / right);
+          break;
+      }
+    }
+  }
+
+  return stack[0];
 }

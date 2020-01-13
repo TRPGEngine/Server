@@ -1,4 +1,8 @@
-import { standardDiceRE, infix2Suffix } from '../dice-calculator';
+import {
+  standardDiceRE,
+  infix2Suffix,
+  calDiceExpression,
+} from '../dice-calculator';
 
 describe('dice calculator', () => {
   describe('standard dice expression', () => {
@@ -15,14 +19,20 @@ describe('dice calculator', () => {
     });
   });
 
-  describe.only('infix2Suffix', () => {
+  describe('infix2Suffix', () => {
     // 中缀表达式转后缀表达式
     test.each([
       ['1+1', ['1', '1', '+']],
+      ['1+1-1', ['1', '1', '+', '1', '-']],
+      ['1-1+1', ['1', '1', '-', '1', '+']],
       ['1+2*3', ['1', '2', '3', '*', '+']],
       ['1*2+3', ['1', '2', '*', '3', '+']],
       ['1*2*4+3', ['1', '2', '*', '4', '*', '3', '+']],
       ['1+2*(3+1)', ['1', '2', '3', '1', '+', '*', '+']],
+      [
+        '5 + ( ( 1 + 2 ) * 4 ) - 3',
+        ['5', '1', '2', '+', '4', '*', '+', '3', '-'],
+      ],
     ])('%s => %s', (exp: string, res: string[]) => {
       expect(infix2Suffix(exp)).toStrictEqual(res);
     });
@@ -36,8 +46,9 @@ describe('dice calculator', () => {
       ['1/2', 0.5],
       ['10-5', 5],
       ['1+2*(2+1)', 7],
-    ])('%s = %d', (expression, result) => {
-      expect(expression).toBe(result);
+      ['5+((1+2)*4)-3', 14],
+    ])('%s = %d', (expression: string, result) => {
+      expect(calDiceExpression(expression)).toBe(result);
     });
   });
 });
