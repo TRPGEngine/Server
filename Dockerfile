@@ -45,8 +45,6 @@ COPY packages/Notify/package.json packages/Notify/package-lock.json ./packages/N
 COPY packages/Player/package.json packages/Player/package-lock.json ./packages/Player/
 COPY packages/QQConnect/package.json packages/QQConnect/package-lock.json ./packages/QQConnect/
 COPY packages/Report/package.json packages/Report/package-lock.json ./packages/Report/
-COPY packages/Website/package.json packages/Website/package-lock.json ./packages/Website/
-COPY packages/Website/website/package.json packages/Website/website/package-lock.json ./packages/Website/website/
 
 RUN npm install && npm run packages:install
 
