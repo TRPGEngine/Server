@@ -20,5 +20,8 @@ describe('chat emotion event', () => {
     expect(ret.result).toBe(true);
     expect(ret.catalogs).toBeTruthy();
     expect(Array.isArray(ret.catalogs)).toBe(true);
+    if (ret.catalogs.length > 0) {
+      expect(ret.catalogs[0]).toHaveProperty('items');
+    }
   });
 });

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/TRPGEngine/Server/compare/v1.6.0...v1.7.0) (2020-01-17)
+
+
+### Features
+
+* **chatemotion:** 增加doutula的爬虫实现 ([86dfb4f](https://github.com/TRPGEngine/Server/commit/86dfb4fb235644e9616bddfaca9e806983efe51f))
+
 ## [1.6.0](https://github.com/TRPGEngine/Server/compare/v1.5.3...v1.6.0) (2020-01-10)
 
 
