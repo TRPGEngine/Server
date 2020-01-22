@@ -9,14 +9,14 @@ import _ from 'lodash';
 import * as event from './event';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 
-module.exports = function NotifyComponent(app) {
+module.exports = function Notify(app) {
   initStorage.call(app);
   initFunction.call(app);
   initSocket.call(app);
 
   return {
-    name: 'NotifyComponent',
-    require: ['PlayerComponent', 'ChatComponent'],
+    name: 'Notify',
+    require: ['Player', 'Chat'],
   };
 };
 
