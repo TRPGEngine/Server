@@ -129,6 +129,13 @@ function initFunction() {
     app.chat.tryNotify = async (pkg) => {
       originTryNotify(pkg);
       const { message, sender_uuid, to_uuid } = pkg;
+
+      if (_.isNil(to_uuid)) {
+        // NOTICE: 目前仅发送单播
+        console.log('目前推送通知系统仅发送单播消息, 目标为空');
+        return;
+      }
+
       if (app.player.isSystemUUID(to_uuid)) {
         // 不尝试向系统发送推送
         debug('send chat notify cancel. target is system uuid[%s]', to_uuid);

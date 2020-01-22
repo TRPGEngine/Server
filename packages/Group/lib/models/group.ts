@@ -272,8 +272,10 @@ export class GroupGroup extends Model {
   async sendAddMemberNotify(memberUUID: string) {
     const user = await PlayerUser.findByUUID(memberUUID);
     const name = user.getName();
+    const groupUUID = this.uuid; // 团UUID
 
-    await ChatLog.sendSimpleSystemMsg(null, this.uuid, `${name} 加入本团`);
+    // 发送团所有人都可见的简单系统消息
+    await ChatLog.sendSimpleSystemMsg(null, groupUUID, `${name} 加入本团`);
   }
 
   /**
