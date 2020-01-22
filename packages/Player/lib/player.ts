@@ -15,6 +15,7 @@ import { Socket } from 'trpg/core';
 import { AxiosResponse } from 'axios';
 import SSORouter from './routers/sso';
 import registerRouter from './routers/register';
+import { isTestEnv } from 'lib/helper/utils';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -151,6 +152,11 @@ export default class Player extends BasePackage {
       },
       // 记录用户离线时间
       recordUserOfflineDate: async function(socket: Socket) {
+        if (isTestEnv()) {
+          // 测试环境不记录用户离线时间
+          return;
+        }
+
         try {
           const player = app.player.manager.findPlayer(socket);
           if (player) {
