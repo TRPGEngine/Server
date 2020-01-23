@@ -5,3 +5,7 @@ export function sleep(milliseconds: number): Promise<void> {
     setTimeout(resolve, milliseconds);
   });
 }
+
+export function isTestEnv(): boolean {
+  return ['test', 'ci'].includes(process.env.NODE_ENV);
+}

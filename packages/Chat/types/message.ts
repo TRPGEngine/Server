@@ -13,7 +13,7 @@ export interface ChatMessagePayload {
   uuid: string;
   message: string;
   sender_uuid: string;
-  to_uuid: string;
+  to_uuid: string | null;
   converse_uuid: string;
   type: ChatMessageType;
   is_public: boolean;

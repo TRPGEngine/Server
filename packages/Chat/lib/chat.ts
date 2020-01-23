@@ -6,6 +6,16 @@ import ChatConverseDefinition from './models/converse';
 import { ChatMessagePartial } from '../types/message';
 import BasePackage from 'lib/package';
 
+// 注入方法声明
+declare module 'packages/Core/lib/application' {
+  interface Application {
+    chat: {
+      tryNotify(pkg: ChatMessagePartial): void;
+      [others: string]: any;
+    };
+  }
+}
+
 export default class Chat extends BasePackage {
   public name: string = 'Chat';
   public require: string[] = ['Player'];

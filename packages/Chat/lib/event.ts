@@ -2,7 +2,7 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:chat:event');
 import generateUUID from 'uuid/v4';
 import _ from 'lodash';
-import { ChatMessagePartial } from '../types/message';
+import { ChatMessagePartial, ChatMessagePayload } from '../types/message';
 import { ChatLog } from './models/log';
 import { EventFunc } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
@@ -316,7 +316,6 @@ export const getOfflineUserConverse: EventFunc = async function getOfflineUserCo
 export const message: EventFunc = async function message(data, cb) {
   const app = this.app;
 
-  const player = app.player;
   const message = data.message;
   const sender_uuid = data.sender_uuid;
   const to_uuid = data.to_uuid;
@@ -326,7 +325,7 @@ export const message: EventFunc = async function message(data, cb) {
   const is_group = data.is_group || false;
   const _uuid = generateUUID();
   const _data = data.data || null;
-  const _pkg = {
+  const _pkg: ChatMessagePayload = {
     message,
     sender_uuid,
     to_uuid,
@@ -341,34 +340,8 @@ export const message: EventFunc = async function message(data, cb) {
 
   debug('[用户#%s]: %s', sender_uuid, message);
   if (!!message) {
-    const pkg = addChatLog.call(app, _pkg);
-    if (!pkg) {
-      cb({ result: false, msg: '信息服务出现异常' });
-      return;
-    }
+    const pkg = await ChatLog.sendMsg(_pkg);
 
-    if (!is_public) {
-      // 仅个人可见
-      if (sender_uuid !== to_uuid) {
-        // 私聊
-        const isOnline = await player.manager.checkPlayerOnline(to_uuid);
-        if (isOnline) {
-          player.manager.unicastSocketEvent(to_uuid, 'chat::message', pkg);
-        } else {
-          debug('[用户:%s]: 接收方%s不在线', sender_uuid, to_uuid);
-          app.chat.tryNotify(pkg);
-        }
-      }
-    } else {
-      // 所有人可见
-      if (!is_group) {
-        // 公聊
-        player.manager.broadcastSocketEvent('chat::message', pkg);
-      } else {
-        // 群聊
-        player.manager.roomcastSocketEvent(converse_uuid, 'chat::message', pkg);
-      }
-    }
     cb({ result: true, pkg });
   } else {
     cb({ result: false, msg: '聊天内容不能为空' });
