@@ -2,54 +2,49 @@ import { buildAppContext } from 'test/utils/app';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ChatConverse } from '../lib/models/converse';
 import { ChatLog } from '../lib/models/log';
+import { handleLogin } from 'packages/Player/test/example';
 
 const context = buildAppContext();
 
 let listenedEvent = {};
 
-function registerSocketListener(eventName, cb) {
-  if (listenedEvent[eventName]) {
-    // 加入事件列表
-    listenedEvent[eventName].push(cb);
-  } else {
-    listenedEvent[eventName] = [cb];
-    context.socket.on(eventName, (data) => {
-      // 循环调用所有注册的事件回调
-      if (listenedEvent[eventName]) {
-        // 如果有该事件存在
-        for (const fn of listenedEvent[eventName]) {
-          fn(data);
-        }
-      }
-    });
-  }
-}
+// function registerSocketListener(eventName, cb) {
+//   if (listenedEvent[eventName]) {
+//     // 加入事件列表
+//     listenedEvent[eventName].push(cb);
+//   } else {
+//     listenedEvent[eventName] = [cb];
+//     context.socket.on(eventName, (data) => {
+//       // 循环调用所有注册的事件回调
+//       if (listenedEvent[eventName]) {
+//         // 如果有该事件存在
+//         for (const fn of listenedEvent[eventName]) {
+//           fn(data);
+//         }
+//       }
+//     });
+//   }
+// }
 
-describe('message action', () => {
-  beforeAll(() => {
-    this.shouldTriggerOnce = (eventName) => {
-      return new Promise((resolve) => {
-        registerSocketListener(eventName, (data) => {
-          resolve(data);
-        });
-      });
-    };
-  });
-
-  test.todo('message should be ok');
-});
+// describe('message action', () => {
+// beforeAll(() => {
+//   this.shouldTriggerOnce = (eventName) => {
+//     return new Promise((resolve) => {
+//       registerSocketListener(eventName, (data) => {
+//         resolve(data);
+//       });
+//     });
+//   };
+// });
+// });
 
 describe('chat event action', () => {
   let userInfo: any = {};
   let userInfoDbInstance = null;
 
   beforeAll(async () => {
-    const loginInfo = await context.emitEvent('player::login', {
-      username: 'admin1',
-      password: '21232f297a57a5a743894a0e4a801fc3',
-    });
-    expect(loginInfo.result).toBe(true);
-    userInfo = loginInfo.info;
+    const loginInfo = await handleLogin(context);
+    userInfo = loginInfo;
 
     userInfoDbInstance = await PlayerUser.findOne({
       where: { uuid: userInfo.uuid },
@@ -122,6 +117,26 @@ describe('chat event action', () => {
     afterEach(async () => {
       await testChatLog.destroy();
       await testChatConverseLog.destroy();
+    });
+
+    test('message should be ok', async () => {
+      const message = 'any text';
+      const to_uuid = 'test1';
+      const ret = await context.emitEvent('chat::message', {
+        sender_uuid: 'any',
+        to_uuid,
+        message,
+      });
+
+      expect(ret).toBeSuccess();
+      expect(ret).toHaveProperty('pkg');
+      expect(ret.pkg.sender_uuid).toBe(userInfo.uuid); // 返回的消息的发送消息不会被请求的消息伪造
+      expect(ret.pkg.to_uuid).toBe(to_uuid);
+      expect(ret.pkg.message).toBe(message);
+      // ------- 默认值 -------
+      expect(ret.pkg.type).toBe('normal');
+      expect(ret.pkg.is_public).toBe(false);
+      expect(ret.pkg.is_group).toBe(false);
     });
 
     test('getUserChatLog should be ok', async () => {
