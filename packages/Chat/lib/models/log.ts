@@ -8,11 +8,13 @@ import _ from 'lodash';
 import generateUUID from 'uuid/v4';
 import emoji from 'node-emoji';
 import Debug from 'debug';
+import { isUUID } from 'lib/helper/string-helper';
 const debug = Debug('trpg:component:chat:model:log');
 
 export class ChatLog extends Model implements ChatMessagePayload {
   static CACHE_KEY = 'chat:log-cache';
   static CACHE_DUMP_LOCK = 'chat:dumpLog';
+  static MESSAGE_TYPE_BLACKLIST = ['card', 'tip'];
 
   uuid: string;
   sender_uuid: string;
@@ -55,6 +57,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
 
   /**
    * 往缓存的聊天记录里塞数据
+   * 并对消息进行一些处理
    */
   public static appendCachedChatLog(
     payload: ChatMessagePartial
@@ -68,6 +71,14 @@ export class ChatLog extends Model implements ChatMessagePayload {
     const date = _.isEmpty(payload.date) ? new Date() : new Date(payload.date);
     payload.date = date.toISOString();
     payload.message = emoji.unemojify(payload.message);
+    if (
+      isUUID(payload.sender_uuid) &&
+      ChatLog.MESSAGE_TYPE_BLACKLIST.includes(payload.type)
+    ) {
+      // 如果发送的消息的来源是用户(sender_uuid为UUID)且类型是黑名单消息
+      // 则将其强制转化为普通消息
+      payload.type = 'normal';
+    }
 
     // 这里直接向redis发送消息。不等待返回
     // 这样可以同步向
