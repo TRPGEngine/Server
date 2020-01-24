@@ -315,9 +315,15 @@ export const getOfflineUserConverse: EventFunc = async function getOfflineUserCo
 
 export const message: EventFunc = async function message(data, cb) {
   const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
+  }
 
   const message = data.message;
-  const sender_uuid = data.sender_uuid;
+  const sender_uuid = player.uuid;
   const to_uuid = data.to_uuid;
   const converse_uuid = data.converse_uuid;
   const type = data.type || 'normal';
