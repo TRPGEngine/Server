@@ -274,6 +274,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
     // 如果撤回时间在2分钟内，或为管理员撤回则允许撤回
 
     // 撤回消息
+    // 撤回消息时特殊的，消息类型不变但会在客户端显示成撤回一条消息的系统提示
     const updatedMsgPayload = {
       revoke: true,
       message: '[撤回消息]',
