@@ -3,6 +3,7 @@ import {
   DBInstance,
   Model,
   BelongsToManyGetAssociationsMixin,
+  BelongsToManyAddAssociationMixin,
 } from 'trpg/core';
 import { ChatEmotionItem } from './item';
 import { PlayerUser } from 'packages/Player/lib/models/user';
@@ -10,6 +11,10 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 declare module 'packages/Player/lib/models/user' {
   interface PlayerUser {
     getEmotionCatalogs?: BelongsToManyGetAssociationsMixin<ChatEmotionCatalog>;
+    addEmotionCatalog?: BelongsToManyAddAssociationMixin<
+      ChatEmotionCatalog,
+      number
+    >;
   }
 }
 
@@ -37,6 +42,19 @@ export class ChatEmotionCatalog extends Model {
     });
 
     return catalogs;
+  }
+
+  /**
+   * 增加用户表情包
+   * @param userUUID 用户UUID
+   * @param catalog 表情包
+   */
+  static async addUserEmotionCatalog(
+    userUUID: string,
+    catalog: ChatEmotionCatalog
+  ) {
+    const user = await PlayerUser.findByUUID(userUUID);
+    await user.addEmotionCatalog(catalog);
   }
 }
 
