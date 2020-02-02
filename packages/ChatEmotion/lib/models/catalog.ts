@@ -4,9 +4,11 @@ import {
   Model,
   BelongsToManyGetAssociationsMixin,
   BelongsToManyAddAssociationMixin,
+  BelongsToManyRemoveAssociationMixin,
 } from 'trpg/core';
 import { ChatEmotionItem } from './item';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import _ from 'lodash';
 
 declare module 'packages/Player/lib/models/user' {
   interface PlayerUser {
@@ -15,8 +17,19 @@ declare module 'packages/Player/lib/models/user' {
       ChatEmotionCatalog,
       number
     >;
+    removeEmotionCatalog?: BelongsToManyRemoveAssociationMixin<
+      ChatEmotionCatalog,
+      number
+    >;
   }
 }
+
+/**
+ * 生成用户的缓存key
+ * @param uuid 用户UUID
+ */
+export const getUserEmotionCatalogCacheKey = (userUUID: string): string =>
+  `chatemotion:user:${userUUID}:catalog`;
 
 export class ChatEmotionCatalog extends Model {
   id!: number;
@@ -31,17 +44,40 @@ export class ChatEmotionCatalog extends Model {
   static async getUserEmotionCatalogByUUID(
     userUUID: string
   ): Promise<ChatEmotionCatalog[]> {
-    const user = await PlayerUser.findByUUID(userUUID);
-    const catalogs: ChatEmotionCatalog[] = await user.getEmotionCatalogs({
-      include: [
-        {
-          model: ChatEmotionItem,
-          as: 'items',
-        },
-      ],
-    });
+    // 尝试获取表情包缓存
+    const cacheKey = getUserEmotionCatalogCacheKey(userUUID);
+    const app = ChatEmotionCatalog.getApplication();
+    const cacheList = await app.cache.get(cacheKey);
 
-    return catalogs;
+    if (_.isArray(cacheList)) {
+      // 应用缓存
+      return cacheList.map(
+        (val) =>
+          new ChatEmotionCatalog(val, {
+            isNewRecord: false,
+            include: [
+              {
+                model: ChatEmotionItem,
+                as: 'items',
+              },
+            ],
+          })
+      );
+    } else {
+      const user = await PlayerUser.findByUUID(userUUID);
+      const catalogs: ChatEmotionCatalog[] = await user.getEmotionCatalogs({
+        include: [
+          {
+            model: ChatEmotionItem,
+            as: 'items',
+          },
+        ],
+      });
+
+      await app.cache.set(cacheKey, catalogs); // 设置缓存
+
+      return catalogs;
+    }
   }
 
   /**
@@ -55,6 +91,10 @@ export class ChatEmotionCatalog extends Model {
   ) {
     const user = await PlayerUser.findByUUID(userUUID);
     await user.addEmotionCatalog(catalog);
+
+    // 清理表情包缓存
+    const app = ChatEmotionCatalog.getApplication();
+    await app.cache.remove(getUserEmotionCatalogCacheKey(user.uuid));
   }
 }
 
