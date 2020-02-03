@@ -32,6 +32,14 @@ describe('group model function', () => {
   });
 
   describe('GroupGroup', () => {
+    test('GroupGroup.findByUUID should be ok', async () => {
+      const group = await GroupGroup.findByUUID(testGroup.uuid);
+      expect(group.id).toBe(testGroup.id);
+
+      // 获取时应当返回团人数
+      expect(group.toJSON()).toHaveProperty('members_count');
+    });
+
     test('GroupGroup.findGroupActorsByUUID should be ok', async () => {
       const actors = await GroupGroup.findGroupActorsByUUID(testGroup.uuid);
 

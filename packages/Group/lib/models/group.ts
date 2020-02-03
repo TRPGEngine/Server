@@ -39,6 +39,8 @@ export class GroupGroup extends Model {
   managers_uuid: string[];
   maps_uuid: string[];
 
+  members_count?: number;
+
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
   getMembers?: BelongsToManyGetAssociationsMixin<PlayerUser>;
@@ -48,15 +50,22 @@ export class GroupGroup extends Model {
   countMembers?: BelongsToManyCountAssociationsMixin;
 
   /**
-   * 根据UUID查找团
+   * 根据UUID查找团 并在查找结果里写入members_count的数据
+   * TODO: 增加缓存以及缓存失效的操作
    * @param groupUUID 团UUID
    */
-  static findByUUID(groupUUID: string): Promise<GroupGroup> {
-    return GroupGroup.findOne({
+  static async findByUUID(groupUUID: string): Promise<GroupGroup> {
+    const group: GroupGroup = await GroupGroup.findOne({
       where: {
         uuid: groupUUID,
       },
     });
+
+    // 获取团信息时检查获取团人数
+    const members_count = await group.getMembersCount();
+    group.setDataValue('members_count', members_count); // NOTE: 因为members_count不是数据库字段，因此如果后续有保存之类的操作会无视掉该字段的变更
+
+    return group;
   }
 
   /**
@@ -360,7 +369,7 @@ export default function GroupGroupDefinition(Sequelize: Orm, db: DBInstance) {
   });
 
   // 定义group members的中间模型
-  let GroupMembers = db.define('group_group_members', {
+  const GroupMembers = db.define('group_group_members', {
     selected_group_actor_uuid: { type: Sequelize.STRING },
   });
   PlayerUser.belongsToMany(GroupGroup, {
