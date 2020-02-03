@@ -9,6 +9,7 @@ import {
   Op,
   BelongsToManyRemoveAssociationMixin,
   BelongsToManyHasAssociationMixin,
+  BelongsToManyCountAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
@@ -44,6 +45,7 @@ export class GroupGroup extends Model {
   hasMember?: BelongsToManyHasAssociationMixin<PlayerUser, number>;
   hasMembers?: BelongsToManyHasAssociationsMixin<PlayerUser, number>;
   removeMember?: BelongsToManyRemoveAssociationMixin<PlayerUser, number>;
+  countMembers?: BelongsToManyCountAssociationsMixin;
 
   /**
    * 根据UUID查找团
@@ -306,6 +308,13 @@ export class GroupGroup extends Model {
    */
   getManagerUUIDs(): string[] {
     return Array.from(new Set([this.owner_uuid].concat(this.managers_uuid)));
+  }
+
+  /**
+   * 获取当前团人数
+   */
+  getMembersCount(): Promise<number> {
+    return this.countMembers();
   }
 }
 

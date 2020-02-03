@@ -134,6 +134,21 @@ describe('group model function', () => {
         (await testGroup.getMembers()).map<string>((x) => x.uuid)
       ).not.toContain(testUser9.uuid);
     });
+
+    test('group.getMembersCount should be ok', async () => {
+      const testUser = await getOtherTestUser('admin9');
+      const num = await testGroup.getMembersCount();
+
+      await testGroup.addMember(testUser);
+
+      const num2 = await testGroup.getMembersCount();
+      expect(num2).toBe(num + 1);
+
+      await testGroup.removeMember(testUser);
+
+      const num3 = await testGroup.getMembersCount();
+      expect(num3).toBe(num);
+    });
   });
 
   describe('GroupActor', () => {
