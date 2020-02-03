@@ -157,6 +157,25 @@ describe('group model function', () => {
       const num3 = await testGroup.getMembersCount();
       expect(num3).toBe(num);
     });
+
+    test('group.members_count should be update when add/remove member', async () => {
+      const testUser = await getOtherTestUser('admin9');
+
+      const testGroup1 = await GroupGroup.findByPk(testGroup.id);
+      const num1 = testGroup1.members_count ?? 0;
+
+      await testGroup.addMember(testUser);
+
+      const testGroup2 = await GroupGroup.findByPk(testGroup.id);
+      const num2 = testGroup2.members_count;
+      expect(num2).toBe(num1 + 1);
+
+      await testGroup.removeMember(testUser);
+
+      const testGroup3 = await GroupGroup.findByPk(testGroup.id);
+      const num3 = testGroup3.members_count;
+      expect(num3).toBe(num1);
+    });
   });
 
   describe('GroupActor', () => {
