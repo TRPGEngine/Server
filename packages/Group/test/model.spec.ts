@@ -44,14 +44,16 @@ describe('group model function', () => {
       const actors = await GroupGroup.findGroupActorsByUUID(testGroup.uuid);
 
       expect(Array.isArray(actors)).toBe(true);
-      expect(actors).toHaveLength(1);
-      expect(actors[0].toJSON()).toMatchObject({
+      expect(actors.length).toBeGreaterThanOrEqual(1);
+      const checkedActor = actors.find((a) => a.id === testGroupActor.id);
+      expect(checkedActor).not.toBeNull();
+      expect(checkedActor.toJSON()).toMatchObject({
         id: testGroupActor.id,
         uuid: testGroupActor.uuid,
       });
-      expect(actors[0]).toHaveProperty('owner'); // 需要有owner信息
-      expect(actors[0].owner).not.toBeNull();
-      expect(actors[0].owner.id).toBe(testGroupActor.ownerId);
+      expect(checkedActor).toHaveProperty('owner'); // 需要有owner信息
+      expect(checkedActor.owner).not.toBeNull();
+      expect(checkedActor.owner.id).toBe(testGroupActor.ownerId);
     });
 
     describe('GroupGroup.searchGroup should be ok', () => {
