@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/TRPGEngine/Server/compare/v1.7.1...v1.8.0) (2020-02-07)
+
+
+### Features
+
+* **group:** 获取用户数据时会返回成员数 ([bab81cf](https://github.com/TRPGEngine/Server/commit/bab81cf77d7e9089d83f5b584933c82a2ede172e))
+
+
+### Bug Fixes
+
+* **chat:** 修复用户可以伪造发送者的bug ([123a30f](https://github.com/TRPGEngine/Server/commit/123a30fa2fd2c776c3c5fafd15347b84225cf138))
+* **chat:** 修复用户可以直接发送card, tip类型数据而服务器不过经过任何处理的问题 ([944d9e1](https://github.com/TRPGEngine/Server/commit/944d9e102e3ded78e270f466a1771b466b7d8dcd))
+
 ### [1.7.1](https://github.com/TRPGEngine/Server/compare/v1.7.0...v1.7.1) (2020-01-23)
 
 ## [1.7.0](https://github.com/TRPGEngine/Server/compare/v1.6.0...v1.7.0) (2020-01-17)

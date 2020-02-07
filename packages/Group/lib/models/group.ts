@@ -9,11 +9,14 @@ import {
   Op,
   BelongsToManyRemoveAssociationMixin,
   BelongsToManyHasAssociationMixin,
+  BelongsToManyCountAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
+import Debug from 'debug';
+const debug = Debug('trpg:component:group:model:group');
 
 type GroupType = 'group' | 'channel' | 'test';
 
@@ -38,18 +41,22 @@ export class GroupGroup extends Model {
   managers_uuid: string[];
   maps_uuid: string[];
 
+  members_count?: number;
+
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
   getMembers?: BelongsToManyGetAssociationsMixin<PlayerUser>;
   hasMember?: BelongsToManyHasAssociationMixin<PlayerUser, number>;
   hasMembers?: BelongsToManyHasAssociationsMixin<PlayerUser, number>;
   removeMember?: BelongsToManyRemoveAssociationMixin<PlayerUser, number>;
+  countMembers?: BelongsToManyCountAssociationsMixin;
 
   /**
    * 根据UUID查找团
+   * TODO: 增加缓存以及缓存失效的操作
    * @param groupUUID 团UUID
    */
-  static findByUUID(groupUUID: string): Promise<GroupGroup> {
+  static async findByUUID(groupUUID: string): Promise<GroupGroup> {
     return GroupGroup.findOne({
       where: {
         uuid: groupUUID,
@@ -307,6 +314,13 @@ export class GroupGroup extends Model {
   getManagerUUIDs(): string[] {
     return Array.from(new Set([this.owner_uuid].concat(this.managers_uuid)));
   }
+
+  /**
+   * 获取当前团人数
+   */
+  getMembersCount(): Promise<number> {
+    return this.countMembers();
+  }
 }
 
 export default function GroupGroupDefinition(Sequelize: Orm, db: DBInstance) {
@@ -328,6 +342,11 @@ export default function GroupGroupDefinition(Sequelize: Orm, db: DBInstance) {
       owner_uuid: { type: Sequelize.STRING, required: true },
       managers_uuid: { type: Sequelize.JSON, defaultValue: [] },
       maps_uuid: { type: Sequelize.JSON, defaultValue: [] },
+      members_count: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        comment: '一个反范式操作，用于方便的获取用户数',
+      },
     },
     {
       tableName: 'group_group',
@@ -350,10 +369,41 @@ export default function GroupGroupDefinition(Sequelize: Orm, db: DBInstance) {
     as: 'owner',
   });
 
+  // 更新团的成员数
+  const updateGroupMembersCountHook = async (groupId: number) => {
+    const group: GroupGroup = await GroupGroup.findByPk(groupId);
+    group.members_count = await group.getMembersCount();
+    await group.save();
+    debug(
+      'update group[%s] members count -> %d',
+      group.uuid,
+      group.members_count
+    );
+  };
   // 定义group members的中间模型
-  let GroupMembers = db.define('group_group_members', {
-    selected_group_actor_uuid: { type: Sequelize.STRING },
-  });
+  const GroupMembers = db.define(
+    'group_group_members',
+    {
+      selected_group_actor_uuid: { type: Sequelize.STRING },
+    },
+    {
+      hooks: {
+        afterBulkCreate: async (ins) => {
+          await Promise.all(
+            _.map(ins, 'groupGroupId').map((id: number) =>
+              updateGroupMembersCountHook(id)
+            )
+          );
+        },
+        afterBulkDestroy: async (options) => {
+          const groupId = options.where['groupGroupId'];
+          if (_.isNumber(groupId)) {
+            await updateGroupMembersCountHook(groupId);
+          }
+        },
+      },
+    }
+  );
   PlayerUser.belongsToMany(GroupGroup, {
     through: GroupMembers,
     as: 'groups',

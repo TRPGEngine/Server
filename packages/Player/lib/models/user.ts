@@ -119,7 +119,7 @@ export class PlayerUser extends Model {
           uuid: userUUID,
         },
       });
-      await app.cache.set(cacheKey, user);
+      await app.cache.set(cacheKey, user); // 设置缓存
       return user;
     }
   }

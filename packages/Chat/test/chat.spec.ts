@@ -24,21 +24,43 @@ describe('chat log func', () => {
     await context.app.cache.lclear(logCacheKey, 0, -1); // 清除所有缓存
   });
 
-  test('ChatLog.appendCachedChatLog should be ok', async () => {
-    ChatLog.appendCachedChatLog(testChatLogPayload);
+  describe('ChatLog.appendCachedChatLog should be ok', () => {
+    test('normal msg should be ok', async () => {
+      ChatLog.appendCachedChatLog(testChatLogPayload);
 
-    const logList = await context.app.cache.lget(logCacheKey);
-    expect(logList).toHaveProperty('length');
-    expect(logList.length).toBeGreaterThan(0);
-  });
-
-  test('ChatLog.appendCachedChatLog should process emoji', async () => {
-    const payload = ChatLog.appendCachedChatLog({
-      ...testChatLogPayload,
-      message: '🐱', // This evil make me lost 10 minutes chat log
+      const logList = await context.app.cache.lget(logCacheKey);
+      expect(logList).toHaveProperty('length');
+      expect(logList.length).toBeGreaterThan(0);
     });
 
-    expect(payload.message).toBe(':cat:');
+    test('should be process emoji', async () => {
+      const payload = ChatLog.appendCachedChatLog({
+        ...testChatLogPayload,
+        message: '🐱', // This evil make me lost 10 minutes chat log
+      });
+
+      expect(payload.message).toBe(':cat:');
+    });
+
+    test('should change msg type if user send blacklist type', () => {
+      const payload = ChatLog.appendCachedChatLog({
+        ...testChatLogPayload,
+        sender_uuid: '857b3f0a-a777-11e5-bf7f-feff819cdc9f',
+        type: 'tip',
+      });
+
+      expect(payload.type).toBe('normal');
+    });
+
+    test('should not change msg type if system send blacklist type', () => {
+      const payload = ChatLog.appendCachedChatLog({
+        ...testChatLogPayload,
+        sender_uuid: 'trpgsystem',
+        type: 'tip',
+      });
+
+      expect(payload.type).toBe('tip');
+    });
   });
 
   test('ChatLog.getCachedChatLog should be ok', async () => {

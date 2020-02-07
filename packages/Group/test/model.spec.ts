@@ -32,6 +32,14 @@ describe('group model function', () => {
   });
 
   describe('GroupGroup', () => {
+    test('GroupGroup.findByUUID should be ok', async () => {
+      const group = await GroupGroup.findByUUID(testGroup.uuid);
+      expect(group.id).toBe(testGroup.id);
+
+      // 获取时应当返回团人数
+      expect(group.toJSON()).toHaveProperty('members_count');
+    });
+
     test('GroupGroup.findGroupActorsByUUID should be ok', async () => {
       const actors = await GroupGroup.findGroupActorsByUUID(testGroup.uuid);
 
@@ -133,6 +141,40 @@ describe('group model function', () => {
       expect(
         (await testGroup.getMembers()).map<string>((x) => x.uuid)
       ).not.toContain(testUser9.uuid);
+    });
+
+    test('group.getMembersCount should be ok', async () => {
+      const testUser = await getOtherTestUser('admin9');
+      const num = await testGroup.getMembersCount();
+
+      await testGroup.addMember(testUser);
+
+      const num2 = await testGroup.getMembersCount();
+      expect(num2).toBe(num + 1);
+
+      await testGroup.removeMember(testUser);
+
+      const num3 = await testGroup.getMembersCount();
+      expect(num3).toBe(num);
+    });
+
+    test('group.members_count should be update when add/remove member', async () => {
+      const testUser = await getOtherTestUser('admin9');
+
+      const testGroup1 = await GroupGroup.findByPk(testGroup.id);
+      const num1 = testGroup1.members_count ?? 0;
+
+      await testGroup.addMember(testUser);
+
+      const testGroup2 = await GroupGroup.findByPk(testGroup.id);
+      const num2 = testGroup2.members_count;
+      expect(num2).toBe(num1 + 1);
+
+      await testGroup.removeMember(testUser);
+
+      const testGroup3 = await GroupGroup.findByPk(testGroup.id);
+      const num3 = testGroup3.members_count;
+      expect(num3).toBe(num1);
     });
   });
 

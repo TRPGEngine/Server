@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -57,6 +57,7 @@
     "fs-extra": "^8.0.1",
     "get-port": "^5.0.0",
     "ioredis": "^4.14.1",
+    "is-uuid": "^1.0.2",
     "lodash": "^4.17.15",
     "memoize-one": "^5.0.4",
     "moment": "^2.24.0",
@@ -77,6 +78,7 @@
     "@types/config": "0.0.34",
     "@types/debug": "^4.1.4",
     "@types/fs-extra": "^7.0.0",
+    "@types/is-uuid": "^1.0.0",
     "@types/jest": "^24.0.18",
     "@types/lodash": "^4.14.126",
     "@types/memoize-one": "^4.1.1",

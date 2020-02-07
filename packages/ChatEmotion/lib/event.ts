@@ -25,6 +25,9 @@ export const getUserEmotionCatalog: EventFunc = async function getUserEmotionCat
   return { catalogs };
 };
 
+/**
+ * 使用暗号增加用户表情包
+ */
 export const addUserEmotionWithSecretSignal: EventFunc<{
   code: string;
 }> = async function(data, cb, db) {
@@ -55,13 +58,12 @@ export const addUserEmotionWithSecretSignal: EventFunc<{
     throw new Error('该暗号不存在');
   }
 
-  const catalog = secretSignal.catalog;
+  const catalog: ChatEmotionCatalog = secretSignal.catalog;
   if (!catalog) {
     throw new Error('该表情包不存在');
   }
 
-  const user = await PlayerUser.findByUUID(player.uuid);
-  await (user as any).addEmotionCatalog(catalog);
+  await ChatEmotionCatalog.addUserEmotionCatalog(player.uuid, catalog);
 
   return { catalog };
 };

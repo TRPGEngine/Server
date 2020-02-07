@@ -1609,6 +1609,14 @@
                     "field": "maps_uuid",
                     "seqType": "Sequelize.JSON"
                 },
+                "members_count": {
+                    "defaultValue": {
+                        "value": 0
+                    },
+                    "comment": "一个反范式操作，用于方便的获取用户数",
+                    "field": "members_count",
+                    "seqType": "Sequelize.INTEGER"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -2908,5 +2916,5 @@
             "indexes": []
         }
     },
-    "revision": 32
+    "revision": 33
 }

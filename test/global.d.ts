@@ -13,6 +13,9 @@ declare namespace NodeJS {
 
 declare namespace jest {
   interface Matchers<R> {
+    /**
+     * Socket 请求通用结果返回成功
+     */
     toBeSuccess(): R;
   }
 }
