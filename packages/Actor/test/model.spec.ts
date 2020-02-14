@@ -31,6 +31,49 @@ describe('ActorTemplate', () => {
       expect(t.built_in).toBe(true);
     }
   });
+
+  test('ActorTemplate.createTemplate should be ok', async () => {
+    const testUser = await getTestUser();
+    const testCase = {
+      name: 'test name',
+      desc: 'test desc',
+      avatar: 'test avatar',
+      layout: 'test layout',
+    };
+    const template = await ActorTemplate.createTemplate(
+      testCase.name,
+      testCase.desc,
+      testCase.avatar,
+      testCase.layout,
+      testUser.uuid
+    );
+
+    try {
+      expect(template).toMatchObject({
+        ...testCase,
+        creatorId: testUser.id,
+      });
+
+      await expect(
+        (async () => {
+          await ActorTemplate.createTemplate(
+            testCase.name,
+            testCase.desc,
+            testCase.avatar,
+            testCase.layout,
+            testUser.uuid
+          );
+        })()
+      ).rejects.toThrowError('该模板名字已存在');
+    } finally {
+      await ActorTemplate.destroy({
+        where: {
+          id: template.id,
+        },
+        force: true,
+      });
+    }
+  });
 });
 
 describe('ActorActor', () => {
