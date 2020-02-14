@@ -35,13 +35,13 @@ templateRouter.get('/template/info/:templateUUID', async (ctx) => {
  */
 templateRouter.post('/template/create', ssoAuth(), async (ctx) => {
   const player = ctx.state.player;
-  const { name, desc, avatar, info } = ctx.request.body;
+  const { name, desc, avatar, layout } = ctx.request.body;
 
   const template = await ActorTemplate.createTemplate(
     name,
     desc,
     avatar,
-    info,
+    layout,
     player.uuid
   );
 
