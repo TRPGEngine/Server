@@ -88,39 +88,24 @@ export const createTemplate: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw '用户不存在，请检查登录状态';
   }
 
-  let name = data.name;
-  let desc = data.desc || '';
-  let avatar = data.avatar || '';
-  let info = data.info;
+  const name = data.name;
+  const desc = data.desc || '';
+  const avatar = data.avatar || '';
+  const info = data.info;
 
-  if (!name) {
-    throw '缺少模板名';
-  }
-
-  if (!info) {
-    throw '缺少模板信息';
-  }
-
-  let isExistTemplate = await db.models.actor_template.findOne({
-    where: { name },
-  });
-  if (isExistTemplate) {
-    throw '该模板名字已存在';
-  }
-
-  const user = await PlayerUser.findByUUID(player.uuid);
-  let template = await db.models.actor_template.create({
+  const template = await ActorTemplate.createTemplate(
     name,
     desc,
     avatar,
     info,
-  });
-  await template.setCreator(user);
+    player.uuid
+  );
+
   return { template };
 };
 
