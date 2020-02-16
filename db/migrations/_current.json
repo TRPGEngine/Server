@@ -1115,7 +1115,7 @@
                         "value": "user"
                     },
                     "field": "type",
-                    "seqType": "Sequelize.ENUM('user', 'channel', 'group', 'system')"
+                    "seqType": "Sequelize.ENUM('user', 'channel', 'group', 'system', 'multiuser')"
                 },
                 "name": {
                     "field": "name",
@@ -2916,5 +2916,5 @@
             "indexes": []
         }
     },
-    "revision": 33
+    "revision": 34
 }
