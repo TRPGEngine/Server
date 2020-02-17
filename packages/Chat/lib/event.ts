@@ -6,6 +6,7 @@ import { ChatMessagePartial, ChatMessagePayload } from '../types/message';
 import { ChatLog } from './models/log';
 import { EventFunc } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import { isUUID } from 'lib/helper/string-helper';
 
 /**
  * 增加聊天消息
@@ -326,11 +327,18 @@ export const message: EventFunc = async function message(data, cb) {
   const sender_uuid = player.uuid;
   const to_uuid = data.to_uuid;
   const converse_uuid = data.converse_uuid;
-  const type = data.type || 'normal';
+  let type = data.type || 'normal';
   const is_public = data.is_public || false;
   const is_group = data.is_group || false;
   const _uuid = generateUUID();
   const _data = data.data || null;
+
+  if (isUUID(sender_uuid) && ChatLog.MESSAGE_TYPE_BLACKLIST.includes(type)) {
+    // 如果发送的消息的来源是用户(sender_uuid为UUID)且类型是黑名单消息
+    // 则将其强制转化为普通消息
+    type = 'normal';
+  }
+
   const _pkg: ChatMessagePayload = {
     message,
     sender_uuid,
