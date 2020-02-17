@@ -9,7 +9,6 @@ import SequelizeStatic, {
   CreateOptions,
   Transaction,
 } from 'sequelize';
-// const transaction = require('orm-transaction'); // TODO
 import Debug from 'debug';
 const debug = Debug('trpg:storage');
 const debugSQL = Debug('trpg:storage:sql');
