@@ -294,5 +294,28 @@ describe('group model function', () => {
         name: testGroupActor.name,
       });
     });
+
+    test('GroupActor.assignGroupActor should be ok', async () => {
+      const testUser = await getTestUser();
+      const testUser9 = await getOtherTestUser('admin9');
+      testGroupActor.passed = true;
+      await testGroupActor.save();
+
+      await GroupActor.assignGroupActor(
+        testGroup.uuid,
+        testGroupActor.uuid,
+        testUser.uuid,
+        testUser9.uuid
+      );
+
+      const groupActor: GroupActor = await GroupActor.findOne({
+        where: {
+          uuid: testGroupActor.uuid,
+        },
+      });
+      const owner: PlayerUser = await groupActor.getOwner();
+
+      expect(owner.uuid).toBe(testUser9.uuid);
+    });
   });
 });

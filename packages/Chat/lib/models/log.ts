@@ -198,7 +198,8 @@ export class ChatLog extends Model implements ChatMessagePayload {
 
   /**
    * 发送简单个人系统消息
-   * @param to_uuid 发送系统消息的对象
+   * @param to_uuid 发送系统消息的对象，与converse_uuid必须有一个
+   * @param converse_uuid 会话消息，与to_uuid必须有一个
    * @param message 发送系统消息的内容
    */
   public static sendSimpleSystemMsg(
