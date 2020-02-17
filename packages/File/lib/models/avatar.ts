@@ -88,6 +88,7 @@ export default function FileAvatarDefinition(Sequelize: Orm, db: DBInstance) {
     {
       tableName: 'file_avatar',
       sequelize: db,
+      paranoid: true,
     }
   );
 

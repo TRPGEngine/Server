@@ -10,6 +10,7 @@ import FileChatimgDefinition from './models/chatimg';
 import FileFileDefinition from './models/file';
 import FileOSSDefinition from './models/oss';
 import FileDocumentDefinition from './models/document';
+import { TRPGApplication } from 'trpg/core';
 
 function deleteall(path) {
   var files = [];
@@ -47,7 +48,7 @@ function checkDir() {
   fs.ensureDir(chatimgDir);
 }
 
-module.exports = function FileComponent(app) {
+module.exports = function FileComponent(app: TRPGApplication) {
   checkDir(); // 创建上传文件夹
   app.storage.registerModel(FileAvatarDefinition);
   app.storage.registerModel(FileChatimgDefinition);
@@ -72,70 +73,81 @@ module.exports = function FileComponent(app) {
   app.registerEvent('file::bindAttachUUID', bindAttachUUID);
   app.registerEvent('file::getFileInfo', getFileInfo);
 
+  const cleanAvatar = app.get('file.clean.avatar', false);
+  const cleanTemporary = app.get('file.clean.avatar', true);
+
   // Timer
+  // TODO: 这个逻辑在分布式系统里面可能会有问题
   app.registerTimer(async function clearTemporaryFile() {
     // 每4小时定时清理public/uploads/temporary文件夹
     const db = app.storage.db;
     const Op = app.storage.Op;
     try {
       // 清理avatar
-      debug('start clear no-attach file...');
-      let ltdate = new Date(
-        new Date().setTime(new Date().getTime() - 1000 * 60 * 60 * 1)
-      ); // 只找一小时内没有绑定关联uuid的
-      let list = await db.models.file_avatar.findAll({
-        where: {
-          attach_uuid: null,
-          createdAt: { [Op.lt]: ltdate },
-        },
-      });
-      let count = list.length;
-      for (let fi of list) {
-        let filename = fi.name;
-
-        let isExistOther = await db.models.file_avatar.findOne({
+      if (cleanAvatar === true) {
+        debug('start clear no-attach file...');
+        let ltdate = new Date(
+          new Date().setTime(new Date().getTime() - 1000 * 60 * 60 * 1)
+        ); // 只找一小时内没有绑定关联uuid的
+        let list = await db.models.file_avatar.findAll({
           where: {
-            name: filename,
-            attach_uuid: { [Op.ne]: null },
+            attach_uuid: null,
+            createdAt: { [Op.lt]: ltdate },
           },
         });
-        if (!isExistOther) {
-          await removeFileAsync(`./public/avatar/${filename}`); // remove origin image
-          await removeFileAsync(`./public/avatar/thumbnail/${filename}`); // remove thumbnail image
-        } else {
-          debug('exist other file relation, only remove record:', filename);
-        }
+        let count = list.length;
+        for (let fi of list) {
+          let filename = fi.name;
 
-        await fi.destroy();
+          let isExistOther = await db.models.file_avatar.findOne({
+            where: {
+              name: filename,
+              attach_uuid: { [Op.ne]: null },
+            },
+          });
+          if (!isExistOther) {
+            await removeFileAsync(`./public/avatar/${filename}`); // remove origin image
+            await removeFileAsync(`./public/avatar/thumbnail/${filename}`); // remove thumbnail image
+          } else {
+            debug('exist other file relation, only remove record:', filename);
+          }
+
+          await fi.destroy();
+        }
+        debug(`remove ${count} avatar file record success!`);
       }
-      debug(`remove ${count} avatar file record success!`);
 
       // 清理uploads文件
-      let ltdate_f = new Date(
-        new Date().setTime(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
-      ); // 创建时间超过7天
-      let list_f = await db.models.file_file.findAll({
-        where: {
-          is_expired: false,
-          createdAt: { [Op.lt]: ltdate_f },
-        },
-      });
-      for (let fi of list_f) {
-        fi.is_expired = true;
-        await fi.save();
-      }
-      for (let fi of list_f) {
-        let filename = fi.name;
-        let size = fi.size;
-        let isExistOther = await db.models.file_avatar.findOne({
-          where: { name: filename },
+      if (cleanTemporary === true) {
+        debug('start clear uploads file');
+        let ltdate_f = new Date(
+          new Date().setTime(new Date().getTime() - 1000 * 60 * 60 * 24 * 7)
+        ); // 创建时间超过7天
+        let list_f = await db.models.file_file.findAll({
+          where: {
+            is_expired: false,
+            createdAt: { [Op.lt]: ltdate_f },
+          },
         });
-        if (!isExistOther) {
-          debug(`start remove temporary file: ${filename}[${filesize(size)}]`);
-          await removeFileAsync(`./public/uploads/temporary/${filename}`);
+        for (let fi of list_f) {
+          fi.is_expired = true;
+          await fi.save();
         }
+        for (let fi of list_f) {
+          let filename = fi.name;
+          let size = fi.size;
+          let isExistOther = await db.models.file_avatar.findOne({
+            where: { name: filename },
+          });
+          if (!isExistOther) {
+            debug(
+              `start remove temporary file: ${filename}[${filesize(size)}]`
+            );
+            await removeFileAsync(`./public/uploads/temporary/${filename}`);
+          }
+        }
+        debug(`clear temporary file success!`);
       }
-      debug(`clear temporary file success!`);
     } catch (e) {
       console.error(e);
       app.error(e);
