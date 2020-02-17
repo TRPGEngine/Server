@@ -1,7 +1,5 @@
 import Debug from 'debug';
 const debug = Debug('trpg:component:player:event');
-import md5 from './utils/md5';
-import sha1 from './utils/sha1';
 import uuid from 'uuid/v1';
 import _ from 'lodash';
 import { EventFunc } from 'trpg/core';
@@ -561,6 +559,11 @@ export const agreeFriendInvite: EventFunc<{
   }
 
   const inviteUUID = data.uuid;
+
+  if (_.isNil(inviteUUID)) {
+    throw new Error('数据异常');
+  }
+
   const invite = await db.models.player_invite.findOne({
     where: {
       uuid: inviteUUID,

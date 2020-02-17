@@ -13,7 +13,10 @@ const debug = Debug('trpg:component:chat:model:log');
 export class ChatLog extends Model implements ChatMessagePayload {
   static CACHE_KEY = 'chat:log-cache';
   static CACHE_DUMP_LOCK = 'chat:dumpLog';
-  static MESSAGE_TYPE_BLACKLIST = ['card', 'tip']; // 不在通用处理而是在入口处(消息事件)处理。 内部代发允许使用这些字段
+  static MESSAGE_TYPE_BLACKLIST = [
+    //'card', // 发送角色卡用的是卡片类型的消息
+    'tip',
+  ]; // 不在通用处理而是在入口处(消息事件)处理。 内部代发允许使用这些字段
 
   uuid: string;
   sender_uuid: string;
