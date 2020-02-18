@@ -1625,6 +1625,13 @@
                     "field": "members_count",
                     "seqType": "Sequelize.INTEGER"
                 },
+                "rule": {
+                    "defaultValue": {
+                        "value": ""
+                    },
+                    "field": "rule",
+                    "seqType": "Sequelize.TEXT"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -2924,5 +2931,5 @@
             "indexes": []
         }
     },
-    "revision": 35
+    "revision": 36
 }

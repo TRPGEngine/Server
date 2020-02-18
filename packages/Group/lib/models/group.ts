@@ -40,6 +40,7 @@ export class GroupGroup extends Model {
   owner_uuid: string;
   managers_uuid: string[];
   maps_uuid: string[];
+  rule: string;
 
   members_count?: number;
 
@@ -50,6 +51,8 @@ export class GroupGroup extends Model {
   hasMembers?: BelongsToManyHasAssociationsMixin<PlayerUser, number>;
   removeMember?: BelongsToManyRemoveAssociationMixin<PlayerUser, number>;
   countMembers?: BelongsToManyCountAssociationsMixin;
+
+  static EDITABLE_FIELDS = ['avatar', 'name', 'sub_name', 'desc', 'rule'];
 
   /**
    * 根据UUID查找团
@@ -137,6 +140,37 @@ export class GroupGroup extends Model {
     }
 
     return [];
+  }
+
+  /**
+   * 更新团信息
+   * @param groupUUID 团UUID
+   * @param groupInfo 团信息
+   * @param playerUUID 操作用户UUID
+   */
+  static async updateInfo(
+    groupUUID: string,
+    groupInfo: { [key: string]: any },
+    playerUUID: string
+  ) {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (!group) {
+      throw '找不到团';
+    }
+    if (!group.isManagerOrOwner(playerUUID)) {
+      throw '没有修改权限';
+    }
+
+    // IDEA: 为防止意外暂时只允许修改 EDITABLE_FIELDS 指定的字段
+    for (const field of GroupGroup.EDITABLE_FIELDS) {
+      if (!_.isNil(groupInfo[field])) {
+        group[field] = groupInfo[field];
+      }
+    }
+
+    await group.save();
+
+    return group;
   }
 
   /**
@@ -346,6 +380,10 @@ export default function GroupGroupDefinition(Sequelize: Orm, db: DBInstance) {
         type: Sequelize.INTEGER,
         defaultValue: 0,
         comment: '一个反范式操作，用于方便的获取用户数',
+      },
+      rule: {
+        type: Sequelize.TEXT,
+        defaultValue: '',
       },
     },
     {

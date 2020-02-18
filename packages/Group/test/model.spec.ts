@@ -229,15 +229,17 @@ describe('group model function', () => {
         testUser.uuid
       );
 
-      expect(groupActor.toJSON()).toHaveProperty('actor');
-      expect(groupActor.toJSON()).toHaveProperty('group');
+      try {
+        expect(groupActor.toJSON()).toHaveProperty('actor');
+        expect(groupActor.toJSON()).toHaveProperty('group');
 
-      // 角色信息复制
-      expect(groupActor.name).toBe(testActor.name);
-      expect(groupActor.desc).toBe(testActor.desc);
-      expect(groupActor.avatar).toBe(testActor.avatar);
-
-      await groupActor.destroy();
+        // 角色信息复制
+        expect(groupActor.name).toBe(testActor.name);
+        expect(groupActor.desc).toBe(testActor.desc);
+        expect(groupActor.avatar).toBe(testActor.avatar);
+      } finally {
+        await groupActor.destroy();
+      }
     });
 
     test('GroupActor.agreeApprovalGroupActor should be ok', async () => {
