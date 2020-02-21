@@ -6,10 +6,12 @@ import {
   BelongsToGetAssociationMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import _ from 'lodash';
 
 const at = require('trpg-actor-template');
 
 export class ActorTemplate extends Model {
+  id: number;
   uuid: string;
   name: string;
   desc: string;
@@ -18,6 +20,8 @@ export class ActorTemplate extends Model {
   layout: string;
   built_in: boolean;
   is_public: boolean;
+
+  creatorId?: PlayerUser;
 
   getCreator?: BelongsToGetAssociationMixin<PlayerUser>;
 
@@ -74,6 +78,42 @@ export class ActorTemplate extends Model {
 
     return templates;
   }
+
+  static async createTemplate(
+    name: string,
+    desc: string,
+    avatar: string,
+    layout: string,
+    playerUUID: string
+  ): Promise<ActorTemplate> {
+    if (_.isEmpty(name)) {
+      throw new Error('缺少模板名');
+    }
+
+    if (_.isEmpty(layout)) {
+      throw new Error('缺少模板布局');
+    }
+
+    const isExistTemplate = await ActorTemplate.findOne({
+      where: { name },
+      attributes: ['id'],
+    });
+
+    if (!_.isNil(isExistTemplate)) {
+      throw new Error('该模板名字已存在');
+    }
+
+    const user = await PlayerUser.findByUUID(playerUUID);
+    const template = await ActorTemplate.create({
+      name,
+      desc,
+      avatar,
+      layout,
+      creatorId: user.id,
+    });
+
+    return template;
+  }
 }
 
 export default function ActorTemplateDefinition(
@@ -86,25 +126,22 @@ export default function ActorTemplateDefinition(
       name: { type: Sequelize.STRING, required: true },
       desc: { type: Sequelize.STRING },
       avatar: { type: Sequelize.STRING },
-      info: { type: Sequelize.TEXT },
-      layout: { type: Sequelize.TEXT },
+      info: { type: Sequelize.TEXT }, // 模板信息，弃用
+      layout: { type: Sequelize.TEXT }, // 模板布局
       built_in: { type: Sequelize.BOOLEAN },
       is_public: { type: Sequelize.BOOLEAN, defaultValue: true },
     },
     { tableName: 'actor_template', sequelize: db, paranoid: true }
   );
 
-  let User = db.models.player_user as any;
-  if (!!User) {
-    ActorTemplate.belongsTo(User, {
-      foreignKey: 'creatorId',
-      as: 'creator',
-    });
-    User.hasMany(ActorTemplate, {
-      foreignKey: 'creatorId',
-      as: 'templates',
-    });
-  }
+  ActorTemplate.belongsTo(PlayerUser, {
+    foreignKey: 'creatorId',
+    as: 'creator',
+  });
+  PlayerUser.hasMany(ActorTemplate, {
+    foreignKey: 'creatorId',
+    as: 'templates',
+  });
 
   return ActorTemplate;
 }

@@ -119,7 +119,10 @@ export class PlayerUser extends Model {
           uuid: userUUID,
         },
       });
-      await app.cache.set(cacheKey, user); // 设置缓存
+      if (!_.isNil(user)) {
+        // 仅不为空的时候记录缓存
+        await app.cache.set(cacheKey, user); // 设置缓存
+      }
       return user;
     }
   }

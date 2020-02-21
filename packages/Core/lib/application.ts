@@ -236,7 +236,7 @@ export class Application extends events.EventEmitter {
   }
 
   // loopNum 循环次数,不传则为无限循环
-  registerTimer(fn: () => void, millisec: number, loopNum: number) {
+  registerTimer(fn: () => void, millisec: number, loopNum?: number) {
     let indexNum = 0;
     const timer = setInterval(() => {
       fn();

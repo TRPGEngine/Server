@@ -85,6 +85,7 @@ export const updateInfo: EventFunc<{
     name: string;
     sub_name: string;
     desc: string;
+    rule: string;
   };
 }> = async function updateInfo(data, cb, db) {
   const { app, socket } = this;
@@ -103,30 +104,8 @@ export const updateInfo: EventFunc<{
     throw '缺少参数';
   }
 
-  const group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  if (!group.isManagerOrOwner(player.uuid)) {
-    throw '没有修改权限';
-  }
+  const group = await GroupGroup.updateInfo(groupUUID, groupInfo, player.uuid);
 
-  // IDEA: 为防止意外暂时只允许修改下列属性
-  const info = {
-    avatar: groupInfo.avatar,
-    name: groupInfo.name,
-    sub_name: groupInfo.sub_name,
-    desc: groupInfo.desc,
-  };
-  for (let key in info) {
-    if (info[key] !== undefined) {
-      group[key] = info[key];
-    }
-  }
-
-  await group.save();
   return { group };
 };
 

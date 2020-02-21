@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/TRPGEngine/Server/compare/v1.8.0...v1.9.0) (2020-02-21)
+
+
+### Features
+
+* **actor:** 增加创建模板的接口 ([5b4b7fd](https://github.com/TRPGEngine/Server/commit/5b4b7fdc7b0815901ed1feb627e7ca8da8165aad))
+* **chat:** 增加多人会话的创建 ([e03c652](https://github.com/TRPGEngine/Server/commit/e03c652148cfe9a5ac06710471b4c86c17d4347f))
+* **group:** 增加group rule 字段并抽象更新逻辑 ([c952c2e](https://github.com/TRPGEngine/Server/commit/c952c2e56ce5a1a6d8c71bc33ae0ec5a71d63120))
+
+
+### Bug Fixes
+
+* 修复dice包代发tip消息类型出现问题的bug ([287dd6f](https://github.com/TRPGEngine/Server/commit/287dd6fce76bc3817083c9e0a60fce3fe552a87e))
+* **chat:** 修复加了消息类型黑名单后无法发送人物卡的问题 ([abe7730](https://github.com/TRPGEngine/Server/commit/abe77305f43439e84b1c1d376a317b94cd70f8e0))
+
 ## [1.8.0](https://github.com/TRPGEngine/Server/compare/v1.7.1...v1.8.0) (2020-02-07)
 
 

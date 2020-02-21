@@ -67,18 +67,28 @@ describe('group action', () => {
   });
 
   test('updateInfo should be ok', async () => {
+    const name = generateRandomStr(30);
+    const sub_name = generateRandomStr(30);
     const desc = generateRandomStr(30);
+    const rule = generateRandomStr(30);
     let ret = await context.emitEvent('group::updateInfo', {
       groupUUID: testGroup.uuid,
       groupInfo: {
+        name,
+        sub_name,
         desc,
+        rule,
       },
     });
 
     expect(ret.result).toBe(true);
+
     expect(ret).toHaveProperty('group');
     expect(ret).toHaveProperty('group.uuid', testGroup.uuid);
+    expect(ret).toHaveProperty('group.name', name);
+    expect(ret).toHaveProperty('group.sub_name', sub_name);
     expect(ret).toHaveProperty('group.desc', desc);
+    expect(ret).toHaveProperty('group.rule', rule);
   });
 
   test.todo('findGroup should be ok');

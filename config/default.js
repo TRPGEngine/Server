@@ -61,6 +61,11 @@ module.exports = {
         headers: {},
       },
     },
+    clean: {
+      // 定期清理
+      avatar: false, // 定期清理avatar
+      temporary: true, // 定期清理临时文件夹
+    },
   },
   report: {
     enable: true,

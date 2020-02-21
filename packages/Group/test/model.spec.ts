@@ -44,14 +44,16 @@ describe('group model function', () => {
       const actors = await GroupGroup.findGroupActorsByUUID(testGroup.uuid);
 
       expect(Array.isArray(actors)).toBe(true);
-      expect(actors).toHaveLength(1);
-      expect(actors[0].toJSON()).toMatchObject({
+      expect(actors.length).toBeGreaterThanOrEqual(1);
+      const checkedActor = actors.find((a) => a.id === testGroupActor.id);
+      expect(checkedActor).not.toBeNull();
+      expect(checkedActor.toJSON()).toMatchObject({
         id: testGroupActor.id,
         uuid: testGroupActor.uuid,
       });
-      expect(actors[0]).toHaveProperty('owner'); // 需要有owner信息
-      expect(actors[0].owner).not.toBeNull();
-      expect(actors[0].owner.id).toBe(testGroupActor.ownerId);
+      expect(checkedActor).toHaveProperty('owner'); // 需要有owner信息
+      expect(checkedActor.owner).not.toBeNull();
+      expect(checkedActor.owner.id).toBe(testGroupActor.ownerId);
     });
 
     describe('GroupGroup.searchGroup should be ok', () => {
@@ -227,15 +229,17 @@ describe('group model function', () => {
         testUser.uuid
       );
 
-      expect(groupActor.toJSON()).toHaveProperty('actor');
-      expect(groupActor.toJSON()).toHaveProperty('group');
+      try {
+        expect(groupActor.toJSON()).toHaveProperty('actor');
+        expect(groupActor.toJSON()).toHaveProperty('group');
 
-      // 角色信息复制
-      expect(groupActor.name).toBe(testActor.name);
-      expect(groupActor.desc).toBe(testActor.desc);
-      expect(groupActor.avatar).toBe(testActor.avatar);
-
-      await groupActor.destroy();
+        // 角色信息复制
+        expect(groupActor.name).toBe(testActor.name);
+        expect(groupActor.desc).toBe(testActor.desc);
+        expect(groupActor.avatar).toBe(testActor.avatar);
+      } finally {
+        await groupActor.destroy();
+      }
     });
 
     test('GroupActor.agreeApprovalGroupActor should be ok', async () => {
@@ -291,6 +295,29 @@ describe('group model function', () => {
         actor_info: testGroupActor.actor_info,
         name: testGroupActor.name,
       });
+    });
+
+    test('GroupActor.assignGroupActor should be ok', async () => {
+      const testUser = await getTestUser();
+      const testUser9 = await getOtherTestUser('admin9');
+      testGroupActor.passed = true;
+      await testGroupActor.save();
+
+      await GroupActor.assignGroupActor(
+        testGroup.uuid,
+        testGroupActor.uuid,
+        testUser.uuid,
+        testUser9.uuid
+      );
+
+      const groupActor: GroupActor = await GroupActor.findOne({
+        where: {
+          uuid: testGroupActor.uuid,
+        },
+      });
+      const owner: PlayerUser = await groupActor.getOwner();
+
+      expect(owner.uuid).toBe(testUser9.uuid);
     });
   });
 });

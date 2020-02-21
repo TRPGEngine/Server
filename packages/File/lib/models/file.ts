@@ -88,6 +88,7 @@ export default function FileFileDefinition(Sequelize: Orm, db: DBInstance) {
     {
       tableName: 'file_file',
       sequelize: db,
+      paranoid: true,
       hooks: {
         beforeCreate(file) {
           if (!file.ext) {

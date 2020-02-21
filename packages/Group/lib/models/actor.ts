@@ -10,6 +10,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupGroup } from './group';
 import _ from 'lodash';
+import { ChatLog } from 'packages/Chat/lib/models/log';
 
 export class GroupActor extends Model {
   id: number;
@@ -29,6 +30,7 @@ export class GroupActor extends Model {
   ownerId?: number;
   getActor?: BelongsToGetAssociationMixin<ActorActor>;
   getOwner?: BelongsToGetAssociationMixin<PlayerUser>;
+  setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   getGroup?: BelongsToGetAssociationMixin<GroupGroup>;
   setActor?: BelongsToSetAssociationMixin<ActorActor, number>;
 
@@ -286,6 +288,83 @@ export class GroupActor extends Model {
     }
 
     await groupActor.destroy();
+  }
+
+  /**
+   * 分配团角色到团
+   * @param groupUUID 团UUID
+   * @param groupActorUUID 团角色UUID
+   * @param playerUUID 操作人UUID
+   * @param targetUUID 分配到角色的用户的UUID
+   */
+  static async assignGroupActor(
+    groupUUID: string,
+    groupActorUUID: string,
+    playerUUID: string,
+    targetUUID: string
+  ): Promise<GroupActor> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(group)) {
+      throw new Error('该团不存在');
+    }
+
+    if (!group.isManagerOrOwner(playerUUID)) {
+      throw new Error('该操作没有权限');
+    }
+
+    const user = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(user)) {
+      throw new Error('操作人不存在');
+    }
+
+    const groupActor: GroupActor = await GroupActor.findOne({
+      where: { uuid: groupActorUUID, groupId: group.id },
+      include: [
+        {
+          model: PlayerUser,
+          as: 'owner',
+        },
+      ],
+    });
+
+    if (_.isNil(groupActor)) {
+      throw new Error('该团角色不存在');
+    }
+
+    if (!groupActor.enabled) {
+      throw new Error('该角色不可用');
+    }
+
+    if (!groupActor.passed) {
+      throw new Error('该角色尚不是正式角色');
+    }
+
+    const target = await PlayerUser.findByUUID(targetUUID);
+    if (_.isNil(target)) {
+      throw new Error('目标用户不存在');
+    }
+
+    await groupActor.setOwner(target);
+
+    // notify
+    ChatLog.sendSimpleSystemMsg(
+      target.uuid,
+      null,
+      `您被分配角色卡${group.name} - ${groupActor.name}`
+    );
+
+    if (!_.isNil(groupActor.owner)) {
+      // 如果有原拥有者的话
+      ChatLog.sendSimpleSystemMsg(
+        groupActor.owner.uuid,
+        null,
+        `您的角色卡${
+          groupActor.name
+        }已经被${user.getName()}分配给了${target.getName()}`
+      );
+    }
+
+    return groupActor;
   }
 
   async getObjectAsync() {

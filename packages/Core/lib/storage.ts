@@ -7,8 +7,8 @@ import SequelizeStatic, {
   DataType,
   ModelAttributeColumnOptions,
   CreateOptions,
+  Transaction,
 } from 'sequelize';
-// const transaction = require('orm-transaction'); // TODO
 import Debug from 'debug';
 const debug = Debug('trpg:storage');
 const debugSQL = Debug('trpg:storage:sql');
@@ -124,6 +124,24 @@ export default class Storage {
 
   query(sql: string) {
     return this.db.query(sql);
+  }
+
+  /**
+   * 创建事务
+   */
+  async transaction<T>(
+    name: string,
+    callback: (transaction: Transaction) => PromiseLike<T>
+  ): Promise<T> {
+    try {
+      debug('create transaction:', name);
+      const ret: T = await this.db.transaction(callback);
+      debug('transaction completed:', name);
+      return ret;
+    } catch (e) {
+      debug('transaction error:', name);
+      throw e;
+    }
   }
 
   async close(): Promise<void> {

@@ -529,6 +529,10 @@
                     "field": "updatedAt",
                     "seqType": "Sequelize.DATE"
                 },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
                 "ownerId": {
                     "allowNull": true,
                     "references": {
@@ -716,6 +720,10 @@
                 "updatedAt": {
                     "allowNull": false,
                     "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
                     "seqType": "Sequelize.DATE"
                 },
                 "ownerId": {
@@ -1115,7 +1123,7 @@
                         "value": "user"
                     },
                     "field": "type",
-                    "seqType": "Sequelize.ENUM('user', 'channel', 'group', 'system')"
+                    "seqType": "Sequelize.ENUM('user', 'channel', 'group', 'system', 'multiuser')"
                 },
                 "name": {
                     "field": "name",
@@ -1616,6 +1624,13 @@
                     "comment": "一个反范式操作，用于方便的获取用户数",
                     "field": "members_count",
                     "seqType": "Sequelize.INTEGER"
+                },
+                "rule": {
+                    "defaultValue": {
+                        "value": ""
+                    },
+                    "field": "rule",
+                    "seqType": "Sequelize.TEXT"
                 },
                 "createdAt": {
                     "allowNull": false,
@@ -2916,5 +2931,5 @@
             "indexes": []
         }
     },
-    "revision": 33
+    "revision": 36
 }
