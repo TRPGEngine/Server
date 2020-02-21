@@ -42,14 +42,22 @@ describe('chat log func', () => {
       expect(payload.message).toBe(':cat:');
     });
 
-    test('should change msg type if user send blacklist type', () => {
+    test('should change msg type if user send blacklist type', async () => {
       const payload = ChatLog.appendCachedChatLog({
         ...testChatLogPayload,
         sender_uuid: '857b3f0a-a777-11e5-bf7f-feff819cdc9f',
         type: 'tip',
       });
 
-      expect(payload.type).toBe('normal');
+      expect(payload.type).toBe('tip'); // 通过系统内部发送应为tip
+
+      const ret = await context.emitEvent('chat::message', {
+        ...testChatLogPayload,
+        sender_uuid: '857b3f0a-a777-11e5-bf7f-feff819cdc9f',
+        type: 'tip',
+      });
+      expect(ret.result).toBe(true);
+      expect(ret.pkg.type).toBe('normal'); // 通过event发送的消息类型应变为normal
     });
 
     test('should not change msg type if system send blacklist type', () => {

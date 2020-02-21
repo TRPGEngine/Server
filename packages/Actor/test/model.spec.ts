@@ -74,6 +74,8 @@ describe('ActorTemplate', () => {
       });
     }
   });
+
+  test.todo('ActorTemplate.upgradeTemplate should be ok');
 });
 
 describe('ActorActor', () => {

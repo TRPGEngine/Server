@@ -4,6 +4,7 @@ import {
   ChatEmotionCatalog,
   getUserEmotionCatalogCacheKey,
 } from '../lib/models/catalog';
+import { createTestChatEmotionCatalog } from './example';
 
 const context = buildAppContext();
 
@@ -43,7 +44,7 @@ describe('ChatEmotionCatalog', () => {
   test('ChatEmotionCatalog.addUserEmotionCatalog should be ok', async () => {
     // 使用其他的测试用户防止redis缓存检测与上面的冲突
     const testUser = await getOtherTestUser('admin9');
-    const testCatalog = await ChatEmotionCatalog.findOne();
+    const testCatalog = await createTestChatEmotionCatalog();
     const cacheKey = getUserEmotionCatalogCacheKey(testUser.uuid);
 
     await context.app.cache.set(cacheKey, 'any test string'); // 假装之前有缓存
