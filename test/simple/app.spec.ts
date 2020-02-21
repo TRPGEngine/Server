@@ -1,5 +1,6 @@
 import { buildAppContext } from 'test/utils/app';
 import Application from 'packages/Core/lib/application';
+import { sleep } from 'lib/helper/utils';
 
 const context = buildAppContext();
 
@@ -15,12 +16,14 @@ describe('app context', () => {
     expect(typeof context.port).toBe('number');
   });
 
-  test('context should contains socket and emitEvent', () => {
+  test('context should contains socket and emitEvent', async () => {
     expect(context).toHaveProperty('socket');
     expect(typeof context.socket).toBe('object');
-    expect(context.socket.connected).toBe(true);
     expect(context).toHaveProperty('emitEvent');
     expect(typeof context.emitEvent).toBe('function');
+
+    await sleep(500); // 延时一段时间后检测是否连接上
+    expect(context.socket.connected).toBe(true);
   });
 
   test('context.emitEvent should be ok', async () => {

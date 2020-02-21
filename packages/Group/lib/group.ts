@@ -8,6 +8,7 @@ import GroupActorDefinition from './models/actor';
 import GroupRequestDefinition from './models/request';
 import GroupDetailDefinition from './models/detail';
 import actorRouter from './routers/actor';
+import GroupChannelDefinition from './models/channel';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -19,6 +20,7 @@ export default class Group extends BasePackage {
     this.regModel(GroupActorDefinition);
     this.regModel(GroupRequestDefinition);
     this.regModel(GroupDetailDefinition);
+    this.regModel(GroupChannelDefinition);
 
     const app = this.app;
     const db = this.db;
