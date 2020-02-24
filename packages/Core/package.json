@@ -30,6 +30,7 @@
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.4.1",
     "koa-bodyparser": "^4.2.0",
+    "koa-compose": "^4.1.0",
     "koa-helmet": "^4.1.0",
     "koa-logger": "git+https://github.com/moonrailgun/logger.git#transporter",
     "koa-session": "^5.5.1",

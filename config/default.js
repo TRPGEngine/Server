@@ -47,6 +47,7 @@ module.exports = {
   redisUrl: '',
   webserviceHomepage: '/dashboard/home',
   file: {
+    storage: 'local', // local, qiniu等
     oss: {
       qiniu: {
         domain: '', // 外链站点 http://example.com/

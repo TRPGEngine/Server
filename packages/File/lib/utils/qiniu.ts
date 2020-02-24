@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 const accessKey = _.get(config, 'file.oss.qiniu.accessKey', '');
 const secretKey = _.get(config, 'file.oss.qiniu.secretKey', '');
-const bucket = _.get(config, 'file.oss.qiniu.bucket', '');
+export const bucket = _.get(config, 'file.oss.qiniu.bucket', '');
 
 const qiniuConfig = new qiniu.conf.Config({
   zone: qiniu.zone.Zone_z0,
@@ -44,7 +44,7 @@ export interface QiniuUploadFileBody {
 
 /**
  * 上传文件
- * @param key oss中的key。 最好加前缀
+ * @param key oss中的key。 最好加前缀 如avatar/
  * @param filepath 文件名
  */
 export function putFile(
