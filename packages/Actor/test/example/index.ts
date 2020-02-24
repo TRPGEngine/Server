@@ -6,7 +6,7 @@ import { getTestUser } from 'packages/Player/test/example';
 export const createTestActor = async (): Promise<ActorActor> => {
   const testUser = await getTestUser();
   const firstTemplate = await ActorTemplate.findOne(); // 获取一个模板UUID
-  const group: ActorActor = await ActorActor.create({
+  const actor: ActorActor = await ActorActor.create({
     name: 'test actor name',
     desc: '',
     avatar: '',
@@ -17,7 +17,7 @@ export const createTestActor = async (): Promise<ActorActor> => {
     ownerId: testUser.id,
   });
 
-  testExampleStack.append(group);
+  testExampleStack.append(actor);
 
-  return group;
+  return actor;
 };

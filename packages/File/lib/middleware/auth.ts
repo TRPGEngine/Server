@@ -6,7 +6,7 @@ export default function auth(): TRPGMiddleware {
     const trpgapp = ctx.trpgapp;
 
     // TODO: 目前先基于header的user-uuid 之后改成jwt校验防止伪造
-    let user_uuid = ctx.request.header['user-uuid'];
+    const user_uuid = ctx.request.header['user-uuid'];
     if (!user_uuid) {
       ctx.response.status = 403;
       throw '缺少必要参数';
