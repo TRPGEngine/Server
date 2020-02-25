@@ -6,7 +6,7 @@ import path from 'path';
 
 /**
  * 该中间件依赖于upload中间件
- * 根据文件buffer修改文件名
+ * 根据文件buffer计算sha256的值修改文件名
  */
 export function sha256(): TRPGMiddleware<UploadFileState> {
   return (ctx, next) => {

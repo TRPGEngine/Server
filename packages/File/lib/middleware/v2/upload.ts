@@ -12,16 +12,13 @@ export interface UploadFileState {
  * 这个中间件只接受单个文件的上传
  * 文件处理只放在内存中
  */
-export function upload(
-  field: string,
-  dir: string | boolean = false
-): TRPGMiddleware<UploadFileState> {
+export function upload(fieldName: string): TRPGMiddleware<UploadFileState> {
   const ins = multer({
     storage: multer.memoryStorage(),
     limits: config.limits,
   });
 
-  const middleware1 = ins.single(field);
+  const middleware1 = ins.single(fieldName);
   const middleware2: TRPGMiddleware<UploadFileState> = async (ctx, next) => {
     const file: multer.File = _.get(ctx, 'req.file');
 

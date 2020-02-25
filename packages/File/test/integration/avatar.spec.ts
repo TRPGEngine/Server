@@ -10,7 +10,7 @@ const context = buildAppContext();
 
 testExampleStack.regAfterAll();
 
-describe('chatimg router', () => {
+describe('avatar router', () => {
   it('/file/avatar', async () => {
     const testUser = await getTestUser();
     const testActor = await createTestActor();
@@ -68,5 +68,31 @@ describe('chatimg router', () => {
         },
       },
     });
+  });
+});
+
+describe('avatar router v2', () => {
+  it('/file/v2/avatar/', async () => {
+    const testUser = await getTestUser();
+    const testActor = await createTestActor();
+    const file = path.resolve(__dirname, '../example/example-image.png');
+    const header = {
+      'user-uuid': testUser.uuid,
+      'avatar-type': 'actor',
+      'attach-uuid': testActor.uuid,
+    };
+    const { body } = await context.request.upload(
+      '/file/v2/avatar/upload',
+      [
+        {
+          name: 'avatar',
+          file,
+        },
+      ],
+      header
+    );
+
+    expect(body).toHaveProperty('url');
+    expect(body).toHaveProperty('isLocal');
   });
 });
