@@ -34,6 +34,14 @@ module.exports = {
     // 该问题不能用close task来清除redis来解决, 因为会出现多实例反复关闭的问题
     secret: randomString(10),
   },
+  logger: {
+    type: 'local', // 可选: local,loggly
+    loggly: {
+      token: '',
+      subdomain: '',
+      tags: ['trpg-server'],
+    },
+  },
   dashboard: {
     enable: process.env.NODE_ENV === 'development' ? true : false,
     // dashboard模块网页端的账号密码

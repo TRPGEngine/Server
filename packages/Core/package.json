@@ -21,6 +21,7 @@
   "homepage": "https://github.com/TRPGEngine/Core#readme",
   "dependencies": {
     "@koa/cors": "^2.2.3",
+    "@log4js-node/loggly": "^1.0.0",
     "@types/jsonwebtoken": "^8.3.2",
     "apollo-server-koa": "^2.6.9",
     "fs-extra": "^5.0.0",

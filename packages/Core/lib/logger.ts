@@ -1,34 +1,57 @@
 import log4js, { Logger } from 'log4js';
+import config from 'config';
+import _ from 'lodash';
+
+const appenders = {
+  datelog: {
+    type: 'dateFile',
+    filename: './logs/debug/log',
+    pattern: 'yyyyMMddhh',
+    // "absolute": false,
+    alwaysIncludePattern: true,
+    compress: true,
+  },
+  app: {
+    type: 'file',
+    filename: './logs/app.log',
+    maxLogSize: 1024 * 1024, // 1Mb
+    backups: 3,
+  },
+  error: {
+    type: 'file',
+    filename: './logs/error.log',
+    maxLogSize: 1024 * 1024, // 1Mb
+    backups: 3,
+  },
+
+  // 以下是默认日志服务的备用项
+  // key 应该为config 中logger.type配置
+  loggly: {
+    type: '@log4js-node/loggly',
+    token: _.get(config, 'logger.loggly.token'),
+    subdomain: _.get(config, 'logger.loggly.subdomain'),
+    tags: _.get(config, 'logger.loggly.tags'),
+  },
+};
+
+// 额外的日志类型, 如果不为local则增加额外日志
+const extraLoggerType = _.get(config, 'logger.type', 'local');
+const defaultLoggerAppenders = ['datelog'];
+if (
+  extraLoggerType !== 'local' &&
+  _.keys(appenders).includes(extraLoggerType)
+) {
+  defaultLoggerAppenders.push(extraLoggerType);
+}
 
 interface LoggerList {
   [loggerName: string]: Logger;
 }
 
 log4js.configure({
-  appenders: {
-    datelog: {
-      type: 'dateFile',
-      filename: './logs/debug/log',
-      pattern: 'yyyyMMddhh',
-      // "absolute": false,
-      alwaysIncludePattern: true,
-      compress: true,
-    },
-    app: {
-      type: 'file',
-      filename: './logs/app.log',
-      maxLogSize: 1024 * 1024, // 1Mb
-      backups: 3,
-    },
-    error: {
-      type: 'file',
-      filename: './logs/error.log',
-      maxLogSize: 1024 * 1024, // 1Mb
-      backups: 3,
-    },
-  },
+  appenders,
   categories: {
-    default: { appenders: ['datelog'], level: 'debug' },
+    default: { appenders: defaultLoggerAppenders, level: 'debug' },
     application: { appenders: ['app'], level: 'debug' },
     error: { appenders: ['error'], level: 'error' },
   },
@@ -54,4 +77,19 @@ export function getLogger(loggerName?: string): Logger {
       return defaultLogger;
     }
   }
+}
+
+/**
+ * 关闭日志，确保退出时能完成所有的异步操作
+ */
+export function closeLogger(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    log4js.shutdown((err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
 }
