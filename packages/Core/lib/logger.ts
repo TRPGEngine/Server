@@ -23,16 +23,20 @@ const appenders = {
     maxLogSize: 1024 * 1024, // 1Mb
     backups: 3,
   },
-
-  // 以下是默认日志服务的备用项
-  // key 应该为config 中logger.type配置
-  loggly: {
-    type: '@log4js-node/loggly',
-    token: _.get(config, 'logger.loggly.token'),
-    subdomain: _.get(config, 'logger.loggly.subdomain'),
-    tags: _.get(config, 'logger.loggly.tags'),
-  },
 };
+
+// 以下是默认日志服务的备用项
+// key 应该为config 中logger.type配置
+// loggly
+const logglyConf = _.get(config, 'logger.loggly');
+if (!_.isEmpty(logglyConf.token)) {
+  appenders['loggly'] = {
+    type: '@log4js-node/loggly',
+    token: logglyConf.token,
+    subdomain: logglyConf.subdomain,
+    tags: logglyConf.tags,
+  };
+}
 
 // 额外的日志类型, 如果不为local则增加额外日志
 const extraLoggerType = _.get(config, 'logger.type', 'local');
