@@ -52,3 +52,34 @@ export const genThumbnail = async (
 
   return { image: newImage, isThumbnail: true };
 };
+
+export async function compressImageBuffer(
+  imageBuffer: Buffer,
+  targetWidth: number,
+  targetHeight: number
+) {
+  let image = await Jimp.read(imageBuffer);
+
+  if (targetWidth < image.getWidth() && targetHeight < image.getHeight()) {
+    // 仅当目标宽高有一项超过目标大小，则压缩
+    image = await new Promise((resolve, reject) =>
+      image.cover(
+        targetWidth,
+        targetHeight,
+        Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE,
+        (err, val) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(val);
+          }
+        }
+      )
+    );
+  }
+
+  const buffer = await image.getBufferAsync(image.getMIME());
+  const size = buffer.byteLength;
+
+  return { buffer, size };
+}
