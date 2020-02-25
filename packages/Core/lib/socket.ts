@@ -211,7 +211,14 @@ export default class SocketService {
         } else {
           debug('%s <-- %o', eventName, data);
         }
-        logger.info(eventName, '<--', data);
+        logger.info(
+          {
+            tags: ['ws', 'rev'],
+          },
+          eventName,
+          socketId,
+          data
+        );
 
         const startTime = new Date().valueOf(); // 记录开始时间
         event.fn.call(wrap, data, (res: SocketCallbackResult) => {
@@ -225,10 +232,25 @@ export default class SocketService {
             debug('%s --> %o', eventName, res);
           }
 
+          // 记录日志
           if (res.result === false) {
-            logger.error(eventName, '-->', res);
+            logger.error(
+              {
+                tags: ['ws', 'send'],
+              },
+              eventName,
+              socketId,
+              res
+            );
           } else {
-            logger.info(eventName, '-->', res);
+            logger.info(
+              {
+                tags: ['ws', 'send'],
+              },
+              eventName,
+              socketId,
+              res
+            );
           }
         });
       });
