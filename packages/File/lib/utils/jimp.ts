@@ -81,5 +81,5 @@ export async function compressImageBuffer(
   const buffer = await image.getBufferAsync(image.getMIME());
   const size = buffer.byteLength;
 
-  return { buffer, size };
+  return { buffer, size, image };
 }

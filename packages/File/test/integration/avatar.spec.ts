@@ -94,5 +94,6 @@ describe('avatar router v2', () => {
 
     expect(body).toHaveProperty('url');
     expect(body).toHaveProperty('isLocal');
+    expect(body).toHaveProperty('uuid');
   });
 });
