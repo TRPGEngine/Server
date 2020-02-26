@@ -217,14 +217,15 @@ export default class SocketService {
           },
           eventName,
           socketId,
-          data
+          JSON.stringify(data)
         );
 
         const startTime = new Date().valueOf(); // 记录开始时间
         event.fn.call(wrap, data, (res: SocketCallbackResult) => {
           cb(res);
           const endTime = new Date().valueOf(); // 记录结束时间
-          this.recordSocketTime(eventName, endTime - startTime);
+          const usageTime = endTime - startTime; // 用时，单位为毫秒
+          this.recordSocketTime(eventName, usageTime);
           res = JSON.parse(JSON.stringify(res));
           if (verbose) {
             debug('[%s]%s --> %o', socketId, eventName, res);
@@ -240,7 +241,8 @@ export default class SocketService {
               },
               eventName,
               socketId,
-              res
+              JSON.stringify(res),
+              usageTime + 'ms'
             );
           } else {
             logger.info(
@@ -249,7 +251,8 @@ export default class SocketService {
               },
               eventName,
               socketId,
-              res
+              JSON.stringify(res),
+              usageTime + 'ms'
             );
           }
         });
