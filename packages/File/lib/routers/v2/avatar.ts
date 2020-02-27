@@ -33,7 +33,7 @@ avatarV2Router.post(
     const type = ctx.header['avatar-type'] || 'actor';
     const attach_uuid: string = ctx.header['attach-uuid'] || null;
 
-    await trpgapp.storage.transaction('processAvatar', async () => {
+    await trpgapp.storage.transaction('processAvatar', async (transaction) => {
       if (attach_uuid) {
         // attach_uuid应唯一:一个用户只能有一个对应的头像文件、一个角色只能有一个对应的图片
         // 没有attach_uuid的文件被视为可以删除
@@ -43,20 +43,24 @@ avatarV2Router.post(
           },
           {
             where: { attach_uuid, type },
+            transaction,
           }
         );
       }
 
-      const avatar: FileAvatar = await FileAvatar.create({
-        name: file.filename,
-        size: file.size,
-        type,
-        attach_uuid,
-        width: imageInfo.width,
-        height: imageInfo.height,
-        owner_uuid: ctx.player.user.uuid,
-        ownerId: ctx.player.user.id,
-      });
+      const avatar: FileAvatar = await FileAvatar.create(
+        {
+          name: file.filename,
+          size: file.size,
+          type,
+          attach_uuid,
+          width: imageInfo.width,
+          height: imageInfo.height,
+          owner_uuid: ctx.player.user.uuid,
+          ownerId: ctx.player.user.id,
+        },
+        { transaction }
+      );
 
       ctx.body = { url: state.url, isLocal: state.isLocal, uuid: avatar.uuid };
     });
