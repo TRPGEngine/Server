@@ -906,6 +906,20 @@
                     "field": "info",
                     "seqType": "Sequelize.JSON"
                 },
+                "shared": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "shared",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "fork_count": {
+                    "defaultValue": {
+                        "value": 0
+                    },
+                    "field": "fork_count",
+                    "seqType": "Sequelize.INTEGER"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -3030,5 +3044,5 @@
             "indexes": []
         }
     },
-    "revision": 37
+    "revision": 38
 }
