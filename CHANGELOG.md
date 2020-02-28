@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/TRPGEngine/Server/compare/v1.9.0...v1.10.0) (2020-02-28)
+
+
+### Features
+
+* 增加loggly 日志支持 ([12ed7bf](https://github.com/TRPGEngine/Server/commit/12ed7bf43c465188856c657511344acfd8c375ac))
+* **actor:** 人物的分享与fork ([c9586d4](https://github.com/TRPGEngine/Server/commit/c9586d419a3f3f179cdaf6fa5b3f93f43715ea03))
+* **core:** 增加http请求的路由日志 ([050e94c](https://github.com/TRPGEngine/Server/commit/050e94c1348d52cf942082efea780e763612ebaf))
+* **file:** 增加v2版本的allowmime中间件和thumbnail中间件 ([e82c584](https://github.com/TRPGEngine/Server/commit/e82c584bd4095dbfa33d47d203cc841f1fca6cfd))
+* **file:** 增加存储到远程oss的文件管理中间件与存储记录 ([b28d351](https://github.com/TRPGEngine/Server/commit/b28d35192797494d9e462e776a581317fa707cc7))
+* **file:** 增加第二版avatar路由 ([d689e4e](https://github.com/TRPGEngine/Server/commit/d689e4e4f2a97b1d7a5e5dbcc0c55edf074866ca))
+* **group:** 增加group_channel模型 ([41a19be](https://github.com/TRPGEngine/Server/commit/41a19be535d7d4932df98f76b02471ee38e355f4))
+* **group:** 增加团信息编辑后通知更新团信息 ([c5f23c1](https://github.com/TRPGEngine/Server/commit/c5f23c1fe1b5cb491b22fef857470bf950ea2149))
+* **group:** 增加团角色编辑与通过时通知所有用户更新团角色信息的操作 ([3259e33](https://github.com/TRPGEngine/Server/commit/3259e332065a200cc54cf9556bcfe3f73bc96f87))
+
+
+### Bug Fixes
+
+* 修复loggly没有配置时无法启动的问题 ([bcb87a2](https://github.com/TRPGEngine/Server/commit/bcb87a2938960fd65bee852776f9307c2d2d84bb))
+* **file:** 修复部分事务没有被真正应用的问题 ([7dd77e0](https://github.com/TRPGEngine/Server/commit/7dd77e0dabb27f481363765ab60205236f7f6fb2))
+
 ## [1.9.0](https://github.com/TRPGEngine/Server/compare/v1.8.0...v1.9.0) (2020-02-21)
 
 
