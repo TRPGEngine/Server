@@ -1,5 +1,6 @@
 import documentRouter from './routers/document';
 import { TRPGRouter } from 'trpg/core';
+import avatarV2Router from './routers/v2/avatar';
 
 export function initFileService(app) {
   const webservice = app.webservice;
@@ -12,5 +13,8 @@ export function initFileService(app) {
   router.use('/file/avatar', avatar.routes());
   router.use('/file/chatimg', chatimg.routes());
   router.use('/file', documentRouter.routes());
+
+  router.use('/file/v2/avatar', avatarV2Router.routes());
+
   webservice.use(router.routes());
 }

@@ -15,6 +15,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
+import { notifyUpdateGroupInfo } from '../notify';
 import Debug from 'debug';
 const debug = Debug('trpg:component:group:model:group');
 
@@ -169,6 +170,8 @@ export class GroupGroup extends Model {
     }
 
     await group.save();
+
+    notifyUpdateGroupInfo(group.uuid, group.toJSON());
 
     return group;
   }

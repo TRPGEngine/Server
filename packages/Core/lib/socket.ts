@@ -211,13 +211,21 @@ export default class SocketService {
         } else {
           debug('%s <-- %o', eventName, data);
         }
-        logger.info(eventName, '<--', data);
+        logger.info(
+          {
+            tags: ['ws', 'rev'],
+          },
+          eventName,
+          socketId,
+          JSON.stringify(data)
+        );
 
         const startTime = new Date().valueOf(); // 记录开始时间
         event.fn.call(wrap, data, (res: SocketCallbackResult) => {
           cb(res);
           const endTime = new Date().valueOf(); // 记录结束时间
-          this.recordSocketTime(eventName, endTime - startTime);
+          const usageTime = endTime - startTime; // 用时，单位为毫秒
+          this.recordSocketTime(eventName, usageTime);
           res = JSON.parse(JSON.stringify(res));
           if (verbose) {
             debug('[%s]%s --> %o', socketId, eventName, res);
@@ -225,10 +233,27 @@ export default class SocketService {
             debug('%s --> %o', eventName, res);
           }
 
+          // 记录日志
           if (res.result === false) {
-            logger.error(eventName, '-->', res);
+            logger.error(
+              {
+                tags: ['ws', 'send'],
+              },
+              eventName,
+              socketId,
+              JSON.stringify(res),
+              usageTime + 'ms'
+            );
           } else {
-            logger.info(eventName, '-->', res);
+            logger.info(
+              {
+                tags: ['ws', 'send'],
+              },
+              eventName,
+              socketId,
+              JSON.stringify(res),
+              usageTime + 'ms'
+            );
           }
         });
       });

@@ -12,7 +12,7 @@ import { Cache, RedisCache, ICache } from './cache';
 import ReportService from './report';
 import WebService from './webservice';
 import SocketService, { EventFunc } from './socket';
-import { getLogger } from './logger';
+import { getLogger, closeLogger } from './logger';
 const logger = getLogger();
 const appLogger = getLogger('application');
 import BasePackage from 'lib/package';
@@ -418,6 +418,9 @@ export class Application extends events.EventEmitter {
     }
     this.scheduleJob.forEach(({ job }) => job.cancel()); // 关闭计划任务列表
     debug('closed all scheduleJob');
+
+    await closeLogger(); // 关闭日志
+    debug('shutdown all logger');
 
     if (!_.isNil(this.cache)) {
       // 关闭redis连接

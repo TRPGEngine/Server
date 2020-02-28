@@ -16,33 +16,37 @@ export default function avatarStorage(): TRPGMiddleware {
     const filename = _.get(ctx.req, 'file.filename');
     const size = _.get(ctx.req, 'file.size');
     const has_thumbnail = _.get(ctx.req, 'file.has_thumbnail', false);
-    const type = ctx.header['avatar-type'] || 'actor';
     const { width, height } = ctx.header;
-    const db = trpgapp.storage.db;
+    const type = ctx.header['avatar-type'] || 'actor';
     const attach_uuid: string = ctx.header['attach-uuid'] || null;
-    await db.transactionAsync(async () => {
+    await trpgapp.storage.transaction('uploadAvatar', async (transaction) => {
       if (attach_uuid) {
         // attach_uuid应唯一:一个用户只能有一个对应的头像文件、一个角色只能有一个对应的图片
         // 没有attach_uuid的文件会被定时删除
-        let oldAvatars = await FileAvatar.findAll({
-          where: { attach_uuid, type },
-        });
-        for (let oldAvatar of oldAvatars) {
-          oldAvatar.attach_uuid = null;
-          await oldAvatar.save();
-        }
+        await FileAvatar.update(
+          {
+            attach_uuid: null,
+          },
+          {
+            where: { attach_uuid, type },
+            transaction,
+          }
+        );
       }
-      const avatar: FileAvatar = await FileAvatar.create({
-        name: filename,
-        size,
-        type,
-        attach_uuid,
-        width,
-        height,
-        has_thumbnail,
-        owner_uuid: ctx.player.user.uuid,
-        ownerId: ctx.player.user.id,
-      });
+      const avatar: FileAvatar = await FileAvatar.create(
+        {
+          name: filename,
+          size,
+          type,
+          attach_uuid,
+          width,
+          height,
+          has_thumbnail,
+          owner_uuid: ctx.player.user.uuid,
+          ownerId: ctx.player.user.id,
+        },
+        { transaction }
+      );
       ctx.avatar = avatar.getObject();
     });
 

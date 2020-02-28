@@ -1,5 +1,6 @@
 import { buildAppContext } from 'test/utils/app';
 import { InfoWebsite } from '../lib/models/Website';
+import _ from 'lodash';
 
 const context = buildAppContext();
 
@@ -31,9 +32,8 @@ describe('Info website', () => {
     expect(info).toHaveProperty('content');
     expect(info).toHaveProperty('icon');
     expect(info.title).toBe('百度一下，你就知道');
-    expect(info.content).toBe(
-      '输入法手写拼音关闭百度首页设置登录新闻hao123地图视频贴吧学术登录设置更多产品网页资讯贴吧知道音乐图片视频地图文库更多»'
-    );
+    expect(typeof info.content).toBe('string');
+    expect(_.isEmpty(info.content)).toBe(false);
     expect(typeof info.icon).toBe('string');
     expect(info.icon.startsWith('https://www.baidu.com/img/')).toBe(true);
     expect(info.icon.endsWith('.png')).toBe(true);

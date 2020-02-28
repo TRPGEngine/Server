@@ -16,6 +16,15 @@ const avatarRouter = new TRPGRouter<{
   player?: PlayerJWTPayload;
 }>();
 
+/**
+ * 需要参数:
+ * head:
+ *  - user-uuid
+ *  - avatar-type
+ *  - attach-uuid
+ * field:
+ *  - avatar: file
+ */
 avatarRouter.post(
   '/',
   auth(),

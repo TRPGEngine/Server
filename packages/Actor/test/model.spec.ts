@@ -1,9 +1,10 @@
 import { buildAppContext } from 'test/utils/app';
 import { ActorTemplate } from '../lib/models/template';
 import { createTestActor } from './example';
-import { getTestUser } from 'packages/Player/test/example';
+import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import testExampleStack from 'test/utils/example';
 import { ActorActor } from '../lib/models/actor';
+import _ from 'lodash';
 
 buildAppContext();
 
@@ -74,6 +75,8 @@ describe('ActorTemplate', () => {
       });
     }
   });
+
+  test.todo('ActorTemplate.upgradeTemplate should be ok');
 });
 
 describe('ActorActor', () => {
@@ -89,5 +92,77 @@ describe('ActorActor', () => {
         },
       })
     ).toBeNull();
+  });
+
+  test('ActorActor.findSharedActor should be ok', async () => {
+    const testActor = await createTestActor();
+    // 不会搜到未分享的用户
+    expect(
+      _.map(await ActorActor.findSharedActor(null), 'uuid').includes(
+        testActor.uuid
+      )
+    ).toBe(false);
+
+    testActor.shared = true;
+    await testActor.save();
+
+    // 会搜到已分享的用户
+    expect(
+      _.map(await ActorActor.findSharedActor(null), 'uuid').includes(
+        testActor.uuid
+      )
+    ).toBe(true);
+
+    // 可以指定模板
+    expect(
+      _.map(
+        await ActorActor.findSharedActor(testActor.template_uuid),
+        'uuid'
+      ).includes(testActor.uuid)
+    ).toBe(true);
+  });
+
+  test('ActorActor.shareActor should be ok', async () => {
+    const testUser = await getTestUser();
+    const testActor = await createTestActor();
+    await ActorActor.shareActor(testActor.uuid, testUser.uuid);
+    expect(
+      (await ActorActor.findOne({ where: { uuid: testActor.uuid } })).shared
+    ).toBe(true);
+  });
+
+  test('ActorActor.unshareActor should be ok', async () => {
+    const testUser = await getTestUser();
+    const testActor = await createTestActor();
+    testActor.shared = true;
+    await testActor.save();
+    await ActorActor.unshareActor(testActor.uuid, testUser.uuid);
+    expect(
+      (await ActorActor.findOne({ where: { uuid: testActor.uuid } })).shared
+    ).toBe(false);
+  });
+
+  test('ActorActor.forkActor should be ok', async () => {
+    const testUser = await getOtherTestUser('admin9');
+    const testTargetActor = await createTestActor();
+    testTargetActor.shared = true;
+    await testTargetActor.save();
+
+    const actor = await ActorActor.forkActor(
+      testTargetActor.uuid,
+      testUser.uuid
+    );
+
+    try {
+      expect(actor.uuid).not.toBe(testTargetActor.uuid);
+      expect(actor.name).toBe(testTargetActor.name);
+      expect(actor.avatar).toBe(testTargetActor.avatar);
+      expect(actor.desc).toBe(testTargetActor.desc);
+      expect(actor.template_uuid).toBe(testTargetActor.template_uuid);
+      expect(actor.info).toMatchObject(testTargetActor.info);
+      expect((await actor.getOwner()).uuid).toBe(testUser.uuid);
+    } finally {
+      await actor.destroy({ force: true });
+    }
   });
 });

@@ -23,13 +23,24 @@ export interface TRPGAppInstanceContext {
   socket: SocketIOClient.Socket;
   emitEvent: (eventName: string, data?: {}) => Promise<any>;
   request: {
+    supertest: supertest.SuperTest<supertest.Test>;
     get: <T extends object = any>(url: string) => Promise<Response<T>>;
     post: <T extends object = any>(
       url: string,
       data: {},
       headers?: {}
     ) => Promise<Response<T>>;
+    upload: <T extends object = any>(
+      url: string,
+      files: UploadFileField[],
+      headers?: {}
+    ) => Promise<Response<T>>;
   };
+}
+
+interface UploadFileField {
+  name: string;
+  file: string; // 文件路径
 }
 
 /**
@@ -81,6 +92,7 @@ export const buildAppContext = (): TRPGAppInstanceContext => {
     // 创建http服务测试框架
     const st = supertest(app.webservice.getHttpServer());
     context.request = {
+      supertest: st,
       get(url) {
         return new Promise((resolve, reject) => {
           st.get(url).end((err, res) => {
@@ -95,6 +107,32 @@ export const buildAppContext = (): TRPGAppInstanceContext => {
       post(url, data, headers?) {
         return new Promise((resolve, reject) => {
           const ins = st.post(url).send(data);
+
+          if (!_.isEmpty(headers)) {
+            _.toPairs(headers).map(([key, val]) => {
+              ins.set(key, String(val));
+            });
+          }
+
+          ins.end((err, res) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(res);
+            }
+          });
+        });
+      },
+      upload(url, files, headers?) {
+        return new Promise<supertest.Response>((resolve, reject) => {
+          const ins = st.post(url);
+
+          if (!_.isEmpty(files)) {
+            for (const item of files) {
+              const { name, file } = item;
+              ins.attach(name, file);
+            }
+          }
 
           if (!_.isEmpty(headers)) {
             _.toPairs(headers).map(([key, val]) => {

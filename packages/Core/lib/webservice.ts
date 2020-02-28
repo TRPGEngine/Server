@@ -1,7 +1,7 @@
 require('marko/node-require');
 import http from 'http';
 import Koa from 'koa';
-import logger from 'koa-logger';
+import koaLogger from 'koa-logger';
 import helmet from 'koa-helmet';
 import cors from '@koa/cors';
 import bodyParser from 'koa-bodyparser';
@@ -15,6 +15,7 @@ import Debug from 'debug';
 const debug = Debug('trpg:webservice');
 const koaDebug = Debug('trpg:webservice:koa');
 import { getLogger } from './logger';
+const logger = getLogger();
 const appLogger = getLogger('application');
 import _ from 'lodash';
 
@@ -130,7 +131,7 @@ export default class WebService {
   initMiddleware() {
     this._app.keys = ['trpg'];
     this.use(
-      logger((str: string) => {
+      koaLogger((str: string) => {
         koaDebug(str.trim());
       })
     );
@@ -166,6 +167,29 @@ export default class WebService {
         return next();
       });
     }
+
+    this.use(async (ctx, next) => {
+      // 路由请求日志记录
+      const startDate = new Date().valueOf();
+      await next();
+      const usageTime = new Date().valueOf() - startDate;
+
+      const url = ctx.url;
+      const status = ctx.status;
+      if (status !== 500) {
+        logger.info({ tags: ['http'] }, status, url, usageTime + 'ms');
+      } else {
+        // 错误日记记录
+        // 需要更加详情
+        logger.error(
+          { tags: ['http'] },
+          status,
+          url,
+          usageTime + 'ms',
+          _.get(ctx, 'body.msg')
+        );
+      }
+    });
 
     // 错误处理机制
     this.use(async (ctx, next) => {

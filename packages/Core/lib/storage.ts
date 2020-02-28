@@ -128,6 +128,7 @@ export default class Storage {
 
   /**
    * 创建事务
+   * 必须要应用参数transaction, 否则不生效
    */
   async transaction<T>(
     name: string,
