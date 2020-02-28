@@ -11,6 +11,7 @@ import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupGroup } from './group';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
+import { nofifyUpdateGroupActorInfo } from '../notify';
 
 export class GroupActor extends Model {
   id: number;
@@ -104,16 +105,7 @@ export class GroupActor extends Model {
     await groupActor.save();
 
     // 通知房间所有用户更新团人物信息
-    const trpgapp = GroupActor.getApplication();
-    trpgapp.player.manager.roomcastSocketEvent(
-      group.uuid,
-      'group::updateGroupActorInfo',
-      {
-        groupUUID: group.uuid,
-        groupActorUUID: groupActor.uuid,
-        groupActorInfo: groupActor.toJSON(),
-      }
-    );
+    nofifyUpdateGroupActorInfo(group.uuid, groupActor);
 
     return groupActor;
   }
@@ -267,16 +259,7 @@ export class GroupActor extends Model {
     await groupActor.save();
 
     // 通知房间所有用户更新团人物信息
-    const trpgapp = GroupActor.getApplication();
-    trpgapp.player.manager.roomcastSocketEvent(
-      group.uuid,
-      'group::updateGroupActorInfo',
-      {
-        groupUUID: group.uuid,
-        groupActorUUID: groupActor.uuid,
-        groupActorInfo: groupActor.toJSON(),
-      }
-    );
+    nofifyUpdateGroupActorInfo(group.uuid, groupActor);
 
     return groupActor;
   }

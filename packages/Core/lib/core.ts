@@ -3,6 +3,7 @@ import Debug from 'debug';
 const debug = Debug('trpg:core');
 import internal from './internal/internal';
 import exitHook from 'async-exit-hook';
+import { setGlobalApplication } from 'lib/application';
 
 type Config = {
   [name: string]: string | number | {};
@@ -24,6 +25,8 @@ export default function createApplication(conf: Config): Application {
     console.log('应用关闭成功!');
     cb();
   });
+
+  setGlobalApplication(app);
 
   return app;
 }
