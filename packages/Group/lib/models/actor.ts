@@ -103,6 +103,18 @@ export class GroupActor extends Model {
 
     await groupActor.save();
 
+    // 通知房间所有用户更新团人物信息
+    const trpgapp = GroupActor.getApplication();
+    trpgapp.player.manager.roomcastSocketEvent(
+      group.uuid,
+      'group::updateGroupActorInfo',
+      {
+        groupUUID: group.uuid,
+        groupActorUUID: groupActor.uuid,
+        groupActorInfo: groupActor.toJSON(),
+      }
+    );
+
     return groupActor;
   }
 
@@ -253,6 +265,19 @@ export class GroupActor extends Model {
       groupActor.actor_template_uuid = actor.template_uuid;
     }
     await groupActor.save();
+
+    // 通知房间所有用户更新团人物信息
+    const trpgapp = GroupActor.getApplication();
+    trpgapp.player.manager.roomcastSocketEvent(
+      group.uuid,
+      'group::updateGroupActorInfo',
+      {
+        groupUUID: group.uuid,
+        groupActorUUID: groupActor.uuid,
+        groupActorInfo: groupActor.toJSON(),
+      }
+    );
+
     return groupActor;
   }
 
