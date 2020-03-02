@@ -11,15 +11,16 @@ const dirs = fs.readdirSync(layoutDir);
 
 const records = [];
 for (const name of dirs) {
-  const info = fs.readJsonSync(path.resolve(layoutDir, name, 'info.json'));
+  const manifest = fs.readJsonSync(
+    path.resolve(layoutDir, name, 'manifest.json')
+  );
   const layout = fs.readFileSync(path.resolve(layoutDir, name, 'layout.xml'), {
     encoding: 'utf-8',
   });
 
   records.push({
-    name: info.name,
-    desc: info.desc,
-    info: JSON.stringify(info),
+    name: manifest.name,
+    desc: manifest.desc,
     layout,
     built_in: true,
   });
@@ -33,7 +34,7 @@ module.exports = {
 
     for (const record of records) {
       const name = record.name;
-      console.log('handle dump built-in template', name);
+      console.log('handle dump built-in template:', name);
       const template = await db.models.actor_template.findOne({
         where: {
           name,
@@ -46,7 +47,6 @@ module.exports = {
         console.log('update template');
         await template.restore();
         template.desc = record.desc;
-        template.info = record.info;
         template.layout = record.layout;
         template.deletedAt = null;
         await template.save();
@@ -55,6 +55,8 @@ module.exports = {
         console.log('create template');
         await db.models.actor_template.create(record);
       }
+
+      console.log('===============');
     }
   },
   down: (queryInterface, Sequelize) => {
