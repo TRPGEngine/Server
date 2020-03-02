@@ -40,20 +40,32 @@ module.exports = {
           name,
           built_in: true,
         },
-        paranoid: false,
+        paranoid: false, // 返回所有的
       });
       if (template) {
         // 已存在，更新其他内容
-        console.log('update template');
-        await template.restore();
-        template.desc = record.desc;
-        template.layout = record.layout;
-        template.deletedAt = null;
-        await template.save();
+        await template.restore(); // 恢复前面移除的字段
+
+        let isModified = false;
+        if (template.desc !== record.desc) {
+          isModified = true;
+          template.desc = record.desc;
+        }
+        if (template.layout !== record.layout) {
+          isModified = true;
+          template.layout = record.layout;
+        }
+
+        if (isModified === true) {
+          await template.save();
+          console.log('update template');
+        } else {
+          console.log('nomore edit, skip');
+        }
       } else {
         // 不存在, 创建
-        console.log('create template');
         await db.models.actor_template.create(record);
+        console.log('created template');
       }
 
       console.log('===============');
