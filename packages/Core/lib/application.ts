@@ -342,6 +342,13 @@ export class Application extends events.EventEmitter {
     this.closeTasks[packageName] = fn;
   }
 
+  /**
+   * 注册脱敏字段
+   */
+  registerSocketDataMask(eventName: string, fieldName: string) {
+    this.io.registerSocketDataMask(eventName, fieldName);
+  }
+
   request = {
     get<T = any>(url: string, query?: any, config?: AxiosRequestConfig) {
       return axios({

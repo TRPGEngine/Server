@@ -25,6 +25,13 @@ export type SocketCallbackResult = {
 export type SocketCallbackFn = (ret: SocketCallbackResult) => Promise<void>;
 
 /**
+ * 用于将socket数据进行脱敏处理
+ */
+interface SocketDataMaskMapType {
+  [eventName: string]: string[];
+}
+
+/**
  * 进行一层数据处理的封装后的Socket事件方法
  */
 export type SocketEventFn = (
@@ -64,6 +71,7 @@ export default class SocketService {
   _app: TRPGApplication;
   _io: Server;
   events: SocketEventType[];
+  socketDataMaskMap: SocketDataMaskMapType = {};
 
   constructor(app: TRPGApplication) {
     if (!app) {
@@ -205,19 +213,23 @@ export default class SocketService {
         }
         const socketId = wrap.socket.id;
         const verbose = app.get('verbose');
-        data = JSON.parse(JSON.stringify(data));
+        const debugData = this.processSocketDataMask(
+          eventName,
+          JSON.parse(JSON.stringify(data))
+        );
         if (verbose) {
-          debug('[%s]%s <-- %o', socketId, eventName, data);
+          debug('[%s]%s <-- %o', socketId, eventName, debugData);
         } else {
-          debug('%s <-- %o', eventName, data);
+          debug('%s <-- %o', eventName, debugData);
         }
+
         logger.info(
           {
             tags: ['ws', 'rev'],
           },
           eventName,
           socketId,
-          JSON.stringify(data)
+          JSON.stringify(debugData)
         );
 
         const startTime = new Date().valueOf(); // 记录开始时间
@@ -226,7 +238,10 @@ export default class SocketService {
           const endTime = new Date().valueOf(); // 记录结束时间
           const usageTime = endTime - startTime; // 用时，单位为毫秒
           this.recordSocketTime(eventName, usageTime);
-          res = JSON.parse(JSON.stringify(res));
+          res = this.processSocketDataMask(
+            eventName,
+            JSON.parse(JSON.stringify(res))
+          ) as any;
           if (verbose) {
             debug('[%s]%s --> %o', socketId, eventName, res);
           } else {
@@ -258,6 +273,35 @@ export default class SocketService {
         });
       });
     }
+  }
+
+  /**
+   * 注册Socket脱敏数据
+   */
+  registerSocketDataMask(eventName: string, fieldPath: string) {
+    const socketDataMaskMap = this.socketDataMaskMap;
+    if (Array.isArray(socketDataMaskMap[eventName])) {
+      socketDataMaskMap[eventName].push(fieldPath);
+    } else {
+      socketDataMaskMap[eventName] = [fieldPath];
+    }
+  }
+
+  /**
+   * 处理Socket脱敏数据
+   */
+  processSocketDataMask(eventName: string, eventData: object): object {
+    eventData = _.clone(eventData);
+    const socketDataMaskMap = this.socketDataMaskMap;
+    if (Array.isArray(socketDataMaskMap[eventName])) {
+      socketDataMaskMap[eventName].forEach((fieldPath) => {
+        if (_.has(eventData, fieldPath)) {
+          _.unset(eventData, fieldPath);
+        }
+      });
+    }
+
+    return eventData;
   }
 
   // 应用中间件
