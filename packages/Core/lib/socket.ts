@@ -121,7 +121,7 @@ export default class SocketService {
       });
       socket.on('hello', (data, cb) => {
         var res = { data, version: packageInfo.version };
-        cb(res);
+        _.isFunction(cb) && cb(res);
       });
 
       app.emit('connection', socket);
