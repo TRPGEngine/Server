@@ -25,7 +25,7 @@ describe('Info website', () => {
   }, 10000);
 
   it('getWebsiteInfo with other should be ok', async () => {
-    const url = 'https://baidu.com';
+    const url = 'https://www.baidu.com';
     const info = await InfoWebsite.getWebsiteInfo(url);
 
     expect(info).toHaveProperty('title');

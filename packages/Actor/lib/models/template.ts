@@ -127,7 +127,7 @@ export default function ActorTemplateDefinition(
       desc: { type: Sequelize.STRING },
       avatar: { type: Sequelize.STRING },
       info: { type: Sequelize.TEXT }, // 模板信息，弃用
-      layout: { type: Sequelize.TEXT }, // 模板布局
+      layout: { type: Sequelize.TEXT({ length: 'medium' }) }, // 模板布局
       built_in: { type: Sequelize.BOOLEAN },
       is_public: { type: Sequelize.BOOLEAN, defaultValue: true },
     },

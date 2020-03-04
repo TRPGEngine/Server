@@ -986,7 +986,7 @@
                 },
                 "layout": {
                     "field": "layout",
-                    "seqType": "Sequelize.TEXT"
+                    "seqType": "Sequelize.TEXT(\"medium\")"
                 },
                 "built_in": {
                     "field": "built_in",
@@ -3044,5 +3044,5 @@
             "indexes": []
         }
     },
-    "revision": 38
+    "revision": 39
 }

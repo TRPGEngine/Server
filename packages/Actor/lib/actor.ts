@@ -33,5 +33,7 @@ export default class Actor extends BasePackage {
 
     this.regRoute(actorRouter);
     this.regRoute(templateRouter);
+
+    this.app.registerSocketDataMask('actor::getTemplate', 'template.layout');
   }
 }

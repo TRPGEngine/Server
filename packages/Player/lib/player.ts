@@ -42,6 +42,8 @@ export default class Player extends BasePackage {
     this.initTimer();
 
     this.app.registerCloseTask('Player', () => this.app.player.manager.close());
+    this.app.registerSocketDataMask('player::login', 'password');
+    this.app.registerSocketDataMask('player::loginWithToken', 'token');
   }
 
   private initConfig() {
