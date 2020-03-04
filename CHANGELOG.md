@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/TRPGEngine/Server/compare/v1.10.0...v1.11.0) (2020-03-04)
+
+
+### Features
+
+* 增加socket 日志信息脱敏 ([0198026](https://github.com/TRPGEngine/Server/commit/019802689dbd325065b5ffa0b246e199f80a1d2e))
+
+
+### Bug Fixes
+
+* **layout:** 修复coc7人物卡缺少兴趣点显示与资产情况计算不正确的bug ([727b9aa](https://github.com/TRPGEngine/Server/commit/727b9aa9ed261c78b0f2f93cc28560f22fa229eb))
+* 修复一个可能会导致服务器崩溃的问题 ([aeccbae](https://github.com/TRPGEngine/Server/commit/aeccbae1abea9b62e813b63bd45cb50496f31b9a))
+
 ## [1.10.0](https://github.com/TRPGEngine/Server/compare/v1.9.0...v1.10.0) (2020-02-28)
 
 
