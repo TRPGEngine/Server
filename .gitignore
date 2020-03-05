@@ -11,3 +11,4 @@ test/bench/out.log
 dist/
 test/coverage
 test/reports
+.idea/
