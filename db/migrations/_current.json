@@ -1949,6 +1949,9 @@
                     "seqType": "Sequelize.INTEGER"
                 },
                 "master_name": {
+                    "defaultValue": {
+                        "value": "主持人"
+                    },
                     "field": "master_name",
                     "seqType": "Sequelize.STRING"
                 },
@@ -1961,6 +1964,9 @@
                     "seqType": "Sequelize.JSON"
                 },
                 "allow_quick_dice": {
+                    "defaultValue": {
+                        "value": true
+                    },
                     "field": "allow_quick_dice",
                     "seqType": "Sequelize.BOOLEAN"
                 },
@@ -3044,5 +3050,5 @@
             "indexes": []
         }
     },
-    "revision": 39
+    "revision": 40
 }

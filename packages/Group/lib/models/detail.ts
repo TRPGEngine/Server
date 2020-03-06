@@ -14,6 +14,7 @@ export default function GroupDetailDefinition(Sequelize: Orm, db: DBInstance) {
     {
       master_name: {
         type: Sequelize.STRING,
+        defaultValue: '主持人',
       },
       background_image_url: {
         type: Sequelize.STRING,
@@ -23,6 +24,7 @@ export default function GroupDetailDefinition(Sequelize: Orm, db: DBInstance) {
       },
       allow_quick_dice: {
         type: Sequelize.BOOLEAN,
+        defaultValue: true,
       },
     },
     {
@@ -31,7 +33,8 @@ export default function GroupDetailDefinition(Sequelize: Orm, db: DBInstance) {
     }
   );
 
-  GroupDetail.belongsTo(GroupGroup, { as: 'group' });
+  GroupDetail.belongsTo(GroupGroup, { as: 'group', foreignKey: 'groupId' });
+  GroupGroup.hasOne(GroupDetail, { as: 'detail', foreignKey: 'groupId' });
 
   return GroupDetail;
 }
