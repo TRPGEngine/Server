@@ -11,7 +11,7 @@ import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupGroup } from './group';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
-import { nofifyUpdateGroupActorInfo } from '../notify';
+import { nofifyUpdateGroupActorInfo, nofifyUpdateGroupActor } from '../notify';
 
 export class GroupActor extends Model {
   id: number;
@@ -259,7 +259,7 @@ export class GroupActor extends Model {
     await groupActor.save();
 
     // 通知房间所有用户更新团人物信息
-    nofifyUpdateGroupActorInfo(group.uuid, groupActor);
+    nofifyUpdateGroupActor(group.uuid, groupActor);
 
     return groupActor;
   }
@@ -379,16 +379,7 @@ export class GroupActor extends Model {
     const actor = await this.getActor();
 
     return {
-      uuid: this.uuid,
-      name: this.name,
-      desc: this.desc,
-      actor_uuid: this.actor_uuid,
-      actor_info: this.actor_info,
-      avatar: this.avatar,
-      passed: this.passed,
-      enabled: this.enabled,
-      createAt: this.createAt,
-      updateAt: this.updateAt,
+      ...this.toJSON(),
       actor: actor,
     };
   }

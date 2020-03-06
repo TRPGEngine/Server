@@ -4,7 +4,11 @@ import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupGroup } from 'packages/Group/lib/models/group';
 import { GroupActor } from 'packages/Group/lib/models/actor';
 import { createTestActor } from 'packages/Actor/test/example';
-import { createTestGroup, createTestGroupActor } from './example';
+import {
+  createTestGroup,
+  createTestGroupActor,
+  createTestGroupDetail,
+} from './example';
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import testExampleStack from 'test/utils/example';
@@ -112,6 +116,40 @@ describe('group model function', () => {
         await testGroupTmp.save();
 
         await checkAllSearchType(testGroupTmp, false);
+      });
+    });
+
+    describe('GroupGroup.getAllUserGroupList should be ok', () => {
+      test('have no detail', async () => {
+        const testGroup = await createTestGroup();
+        const user = await getTestUser();
+        await testGroup.addMember(user);
+        const groups = await GroupGroup.getAllUserGroupList(user.uuid);
+
+        expect(groups.length).toBeGreaterThan(0);
+
+        const testTargetGroup = _.find(groups, ['uuid', testGroup.uuid]);
+        expect(testTargetGroup).toHaveProperty('detail'); // 该数据应当有detail字段
+        expect(testTargetGroup.detail).toBeNull();
+      });
+      test('have detail', async () => {
+        const testGroup = await createTestGroup();
+        await createTestGroupDetail(testGroup.id);
+        const user = await getTestUser();
+        await testGroup.addMember(user);
+        const groups = await GroupGroup.getAllUserGroupList(user.uuid);
+
+        expect(groups.length).toBeGreaterThan(0);
+
+        const testTargetGroup = _.find(groups, ['uuid', testGroup.uuid]);
+        expect(testTargetGroup).toHaveProperty('detail'); // 该数据应当有detail字段
+        expect(testTargetGroup.detail).not.toBeNull();
+        expect(typeof testTargetGroup.detail.master_name === 'string').toBe(
+          true
+        );
+        expect(
+          typeof testTargetGroup.detail.allow_quick_dice === 'boolean'
+        ).toBe(true);
       });
     });
 

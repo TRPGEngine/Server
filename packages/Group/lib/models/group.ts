@@ -17,6 +17,7 @@ import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 import { notifyUpdateGroupInfo } from '../notify';
 import Debug from 'debug';
+import { GroupDetail } from './detail';
 const debug = Debug('trpg:component:group:model:group');
 
 type GroupType = 'group' | 'channel' | 'test';
@@ -44,6 +45,7 @@ export class GroupGroup extends Model {
   rule: string;
 
   members_count?: number;
+  detail?: GroupDetail;
 
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
@@ -174,6 +176,26 @@ export class GroupGroup extends Model {
     notifyUpdateGroupInfo(group.uuid, group.toJSON());
 
     return group;
+  }
+
+  /**
+   * 获取用户所加入的所有团的列表
+   * @param userUUID 用户UUID
+   */
+  static async getAllUserGroupList(userUUID: string): Promise<GroupGroup[]> {
+    if (_.isNil(userUUID)) {
+      throw new Error('缺少必要字段');
+    }
+
+    const user = await PlayerUser.findByUUID(userUUID);
+    return await user.getGroups({
+      include: [
+        {
+          model: GroupDetail,
+          as: 'detail',
+        },
+      ],
+    });
   }
 
   /**

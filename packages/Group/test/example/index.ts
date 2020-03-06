@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { getTestUser } from 'packages/Player/test/example';
 import testExampleStack from 'test/utils/example';
 import { generateRandomStr } from 'test/utils/utils';
+import { GroupDetail } from 'packages/Group/lib/models/detail';
 
 export const createTestGroup = async (): Promise<GroupGroup> => {
   const testUser = await getTestUser();
@@ -47,4 +48,14 @@ export const createTestGroupActor = async (
   testExampleStack.append(groupActor);
 
   return groupActor;
+};
+
+export const createTestGroupDetail = async (groupId: number) => {
+  const groupDetail: GroupDetail = await GroupDetail.create({
+    groupId,
+  });
+
+  testExampleStack.append(groupDetail);
+
+  return groupDetail;
 };

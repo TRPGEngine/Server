@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/TRPGEngine/Server/compare/v1.11.0...v1.12.0) (2020-03-06)
+
+
+### Features
+
+* **group:** 增加返回团列表时返回团的detail信息 ([9099049](https://github.com/TRPGEngine/Server/commit/9099049d60eed319a990d7ee56302f595cec0527))
+
+
+### Bug Fixes
+
+* **group:** 修复拉取团人物数据时数据不全的问题 ([b9547be](https://github.com/TRPGEngine/Server/commit/b9547bedaadd530136aae30f7d3fff6217fc6c3f))
+* **group:** 修复通知传输数据不正确的问题 ([5a3e338](https://github.com/TRPGEngine/Server/commit/5a3e3384eafb936321d4be4f131f8358ec3cfc55))
+
 ## [1.11.0](https://github.com/TRPGEngine/Server/compare/v1.10.0...v1.11.0) (2020-03-04)
 
 
