@@ -577,6 +577,9 @@ export const getGroupInvite: EventFunc<{}> = async function getGroupInvite(
   return { res };
 };
 
+/**
+ * 获取当前用户所加入的所有团的团信息
+ */
 export const getGroupList: EventFunc<{}> = async function getGroupList(
   data,
   cb,
@@ -590,8 +593,8 @@ export const getGroupList: EventFunc<{}> = async function getGroupList(
     throw '用户不存在，请检查登录状态';
   }
 
-  const user = await PlayerUser.findByUUID(player.uuid);
-  const groups = await user.getGroups();
+  const groups = await GroupGroup.getAllUserGroupList(player.uuid)
+
   return { groups };
 };
 
