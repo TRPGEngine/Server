@@ -379,16 +379,7 @@ export class GroupActor extends Model {
     const actor = await this.getActor();
 
     return {
-      uuid: this.uuid,
-      name: this.name,
-      desc: this.desc,
-      actor_uuid: this.actor_uuid,
-      actor_info: this.actor_info,
-      avatar: this.avatar,
-      passed: this.passed,
-      enabled: this.enabled,
-      createAt: this.createAt,
-      updateAt: this.updateAt,
+      ...this.toJSON(),
       actor: actor,
     };
   }
