@@ -20,20 +20,12 @@ export const getTemplate: EventFunc<{
   const uuid = data.uuid;
   if (!uuid || typeof uuid !== 'string') {
     // 返回个人所有的模板
-    const user = await db.models.player_user.findOne({
-      where: {
-        uuid: player.uuid,
-      },
-    });
-    const templates = await user.getTemplates();
+    const user = await PlayerUser.findByUUID(player.uuid);
+    const templates = await (user as any).getTemplates();
     return { templates };
   } else {
     // 返回指定模板信息
-    const template = await db.models.actor_template.findOne({
-      where: {
-        uuid,
-      },
-    });
+    const template = await ActorTemplate.findByUUID(uuid);
     return { template };
   }
 };
