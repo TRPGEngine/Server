@@ -7,6 +7,7 @@ import { ChatLog } from './models/log';
 import { EventFunc } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { isUUID } from 'lib/helper/string-helper';
+import { applyMsgInterceptors } from './interceptors';
 
 /**
  * 增加聊天消息
@@ -354,7 +355,7 @@ export const message: EventFunc = async function message(data, cb) {
 
   debug('[用户#%s]: %s', sender_uuid, message);
   if (!!message) {
-    const pkg = await ChatLog.sendMsg(_pkg);
+    const pkg = await ChatLog.sendMsg(await applyMsgInterceptors(_pkg));
 
     cb({ result: true, pkg });
   } else {

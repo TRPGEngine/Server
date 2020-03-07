@@ -9,7 +9,6 @@ export class DiceLog extends Model {
   dice_request: string;
   dice_expression: string;
   dice_result: number;
-  date: string;
 }
 
 export default function DiceLogDefinition(Sequelize: Orm, db: DBInstance) {
@@ -23,7 +22,6 @@ export default function DiceLogDefinition(Sequelize: Orm, db: DBInstance) {
       dice_request: { type: Sequelize.STRING },
       dice_expression: { type: Sequelize.STRING(1000) },
       dice_result: { type: Sequelize.INTEGER },
-      date: { type: Sequelize.DATE },
     },
     {
       tableName: 'dice_log',

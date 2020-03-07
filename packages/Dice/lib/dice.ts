@@ -3,6 +3,8 @@ const debug = Debug('trpg:component:dice');
 import * as event from './event';
 import BasePackage from 'lib/package';
 import DiceLogDefinition, { DiceLog } from './models/log';
+import { initInterceptors } from './interceptors';
+import { rollPoint, roll } from './utils';
 
 export default class Dice extends BasePackage {
   public name: string = 'Dice';
@@ -14,6 +16,8 @@ export default class Dice extends BasePackage {
     this.initFunction();
     this.initSocket();
     this.initTimer();
+
+    initInterceptors();
   }
 
   initStorage() {
@@ -24,46 +28,14 @@ export default class Dice extends BasePackage {
     const app = this.app;
 
     this.regMethods({
-      rollPoint: function rollPoint(maxPoint, minPoint = 1) {
-        maxPoint = parseInt(String(maxPoint));
-        minPoint = parseInt(String(minPoint));
-        if (maxPoint <= 1) {
-          maxPoint = 100;
-        }
-        if (maxPoint < minPoint) {
-          maxPoint = minPoint + 1;
-        }
-
-        var range = maxPoint - minPoint + 1;
-        var rand = Math.random();
-        return minPoint + Math.floor(rand * range);
-      },
-      roll: function roll(requestStr) {
+      rollPoint,
+      roll: function(requestStr: string) {
         try {
-          let pattern = /(\d*)\s*d\s*(\d*)/gi;
-
-          requestStr = requestStr.replace(/[^\dd\+-\/\*]+/gi, ''); //去除无效或危险字符
-          let express = requestStr.replace(pattern, function(tag, num, dice) {
-            num = num || 1;
-            dice = dice || 100;
-            let res = [];
-            for (var i = 0; i < num; i++) {
-              res.push(app.dice.rollPoint(dice));
-            }
-
-            if (num > 1) {
-              return '(' + res.join('+') + ')';
-            } else {
-              return res.join('+');
-            }
-          });
-
-          let result = eval(express);
-          let str = requestStr + '=' + express + '=' + result;
+          const { str, value } = roll(requestStr);
           return {
             result: true,
             str,
-            value: result,
+            value,
           };
         } catch (err) {
           debug('dice error :' + err);
