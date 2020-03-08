@@ -85,7 +85,11 @@ export class ActorActor extends Model {
    * @param page 页数
    * @param limit 每页总是
    */
-  static async findSharedActor(templateUUID: string, page = 1, limit = 10) {
+  static async findSharedActor(
+    templateUUID = '',
+    page = 1,
+    limit = 10
+  ): Promise<ActorActor[]> {
     const where = { shared: true };
     if (!_.isEmpty(templateUUID)) {
       // 如果有设置搜索的模板UUID, 则加入条件

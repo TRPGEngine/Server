@@ -137,4 +137,63 @@ actorRouter.get('/:actorUUID/access', ssoInfo(), async (ctx) => {
   }
 });
 
+/**
+ * 分享人物卡
+ */
+actorRouter.post('/share', ssoAuth(), async (ctx) => {
+  const { uuid: playerUUID } = ctx.state.player;
+  const { actorUUID } = ctx.request.body;
+  if (_.isNil(actorUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await ActorActor.shareActor(actorUUID, playerUUID);
+
+  ctx.body = {
+    result: true,
+  };
+});
+
+/**
+ * 取消分享人物卡
+ */
+actorRouter.post('/unshare', ssoAuth(), async (ctx) => {
+  const { uuid: playerUUID } = ctx.state.player;
+  const { actorUUID } = ctx.request.body;
+  if (_.isNil(actorUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await ActorActor.unshareActor(actorUUID, playerUUID);
+
+  ctx.body = {
+    result: true,
+  };
+});
+
+/**
+ * fork人物卡
+ */
+actorRouter.post('/fork', ssoAuth(), async (ctx) => {
+  const { uuid: playerUUID } = ctx.state.player;
+  const { targetActorUUID } = ctx.request.body;
+  if (_.isNil(targetActorUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await ActorActor.forkActor(targetActorUUID, playerUUID);
+
+  ctx.body = {
+    result: true,
+  };
+});
+
+actorRouter.get('/findAllSharedActor', async (ctx) => {
+  const actors = await ActorActor.findSharedActor(); // 搜索所有
+
+  ctx.body = {
+    actors,
+  };
+});
+
 export default actorRouter;

@@ -31,7 +31,7 @@ interface RollRes {
 export function roll(requestStr: string): RollRes {
   const pattern = /(\d*)\s*d\s*(\d*)/gi;
 
-  requestStr = requestStr.replace(/[^\dd\+-\/\*]+/gi, ''); //去除无效或危险字符
+  requestStr = requestStr.replace(/[^\dd\+-\/\*\(\)]+/gi, ''); //去除无效或危险字符
   const express = requestStr.replace(pattern, function(tag, num, dice) {
     num = num || 1;
     dice = dice || 100;

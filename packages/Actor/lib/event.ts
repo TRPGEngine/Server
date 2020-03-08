@@ -358,3 +358,75 @@ export const updateActor: EventFunc<{
     return { actor: saveActor.getObject() };
   });
 };
+
+/**
+ * 分享人物卡
+ */
+export const shareActor: EventFunc<{
+  actorUUID: string;
+}> = async function(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (_.isNil(player)) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const actorUUID = data.actorUUID;
+  if (_.isNil(actorUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await ActorActor.shareActor(actorUUID, player.uuid);
+
+  return true;
+};
+
+/**
+ * 取消分享人物卡
+ */
+export const unshareActor: EventFunc<{
+  actorUUID: string;
+}> = async function(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (_.isNil(player)) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const actorUUID = data.actorUUID;
+  if (_.isNil(actorUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await ActorActor.unshareActor(actorUUID, player.uuid);
+
+  return true;
+};
+
+/**
+ * fork人物卡
+ */
+export const forkActor: EventFunc<{
+  targetActorUUID: string;
+}> = async function(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (_.isNil(player)) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const targetActorUUID = data.targetActorUUID;
+  if (_.isNil(targetActorUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  const actor = await ActorActor.forkActor(targetActorUUID, player.uuid);
+
+  return { actor };
+};
