@@ -7,6 +7,7 @@ import {
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
+import { Pagination } from 'trpg/query';
 
 export class ActorActor extends Model {
   id: number;
@@ -89,17 +90,26 @@ export class ActorActor extends Model {
     templateUUID = '',
     page = 1,
     limit = 10
-  ): Promise<ActorActor[]> {
+  ): Promise<Pagination<ActorActor>> {
     const where = { shared: true };
     if (!_.isEmpty(templateUUID)) {
       // 如果有设置搜索的模板UUID, 则加入条件
       where['template_uuid'] = templateUUID;
     }
-    return await ActorActor.findAll({
-      where,
-      limit,
-      offset: (page - 1) * limit,
-    });
+
+    const [count, list] = await Promise.all([
+      ActorActor.count({
+        where,
+      }),
+      ActorActor.findAll({
+        where,
+        limit,
+        offset: (page - 1) * limit,
+        order: [['updatedAt', 'desc']],
+      }),
+    ]);
+
+    return { count, list };
   }
 
   /**
