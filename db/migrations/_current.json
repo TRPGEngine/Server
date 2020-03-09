@@ -1530,10 +1530,6 @@
                     "field": "dice_result",
                     "seqType": "Sequelize.INTEGER"
                 },
-                "date": {
-                    "field": "date",
-                    "seqType": "Sequelize.DATE"
-                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -3050,5 +3046,5 @@
             "indexes": []
         }
     },
-    "revision": 40
+    "revision": 41
 }

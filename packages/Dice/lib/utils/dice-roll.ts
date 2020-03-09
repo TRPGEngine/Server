@@ -1,5 +1,9 @@
 import _ from 'lodash';
 
+/**
+ * NOTICE: 开发中, 暂时未投入使用
+ */
+
 // regexp base on https://github.com/w4123/Dice3/blob/master/src/dice_r_module.cpp
 const matchRE = new RegExp(
   '^[\\s]*[\\.。．][\\s]*r(h)?[\\s]*(([0-9]+)#)?([0-9dk+\\-*x×÷/\\(\\)\\^bp\\.]*)[\\s]*([^]*)$',

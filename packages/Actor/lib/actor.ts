@@ -30,6 +30,9 @@ export default class Actor extends BasePackage {
     this.regSocketEvent('getActor', event.getActor);
     this.regSocketEvent('removeActor', event.removeActor);
     this.regSocketEvent('updateActor', event.updateActor);
+    this.regSocketEvent('shareActor', event.shareActor);
+    this.regSocketEvent('unshareActor', event.unshareActor);
+    this.regSocketEvent('forkActor', event.forkActor);
 
     this.regRoute(actorRouter);
     this.regRoute(templateRouter);

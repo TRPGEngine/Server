@@ -34,7 +34,6 @@ const rolldiceAsync = async function(data) {
     dice_request,
     dice_expression,
     dice_result,
-    date: new Date(),
   });
   return log;
 };
