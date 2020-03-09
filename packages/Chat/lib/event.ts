@@ -353,6 +353,16 @@ export const message: EventFunc = async function message(data, cb) {
     data: _data,
   };
 
+  if (_pkg.is_public === true && _pkg.is_group === false) {
+    // 用户不允许广播消息
+    // 进行一些数据修正
+    if (!_.isNil(_pkg.converse_uuid)) {
+      _pkg.is_group = true;
+    } else {
+      _pkg.is_public = false;
+    }
+  }
+
   debug('[用户#%s]: %s', sender_uuid, message);
   if (!!message) {
     const pkg = await ChatLog.sendMsg(await applyMsgInterceptors(_pkg));
