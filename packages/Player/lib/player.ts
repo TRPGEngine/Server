@@ -15,6 +15,7 @@ import { Socket } from 'trpg/core';
 import { AxiosResponse } from 'axios';
 import SSORouter from './routers/sso';
 import registerRouter from './routers/register';
+import onlineRouter from './routers/online';
 import { isTestEnv } from 'lib/helper/utils';
 
 // 注入方法声明
@@ -242,6 +243,7 @@ export default class Player extends BasePackage {
 
     this.regRoute(registerRouter);
     this.regRoute(SSORouter);
+    this.regRoute(onlineRouter);
   }
 
   private initTimer() {
