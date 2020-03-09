@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.1](https://github.com/TRPGEngine/Server/compare/v1.13.0...v1.13.1) (2020-03-09)
+
+
+### Bug Fixes
+
+* **chat:** 修复用户可以广播消息的bug ([0749c5b](https://github.com/TRPGEngine/Server/commit/0749c5b9e0f8248e8fd8bf4e77ccf61f02bec4bc))
+
 ## [1.13.0](https://github.com/TRPGEngine/Server/compare/v1.12.0...v1.13.0) (2020-03-09)
 
 
