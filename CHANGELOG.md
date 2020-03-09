@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.13.0](https://github.com/TRPGEngine/Server/compare/v1.12.0...v1.13.0) (2020-03-09)
+
+
+### Features
+
+* **actor:** 人物卡分享与取消分享的socket与http入口 ([337fdc4](https://github.com/TRPGEngine/Server/commit/337fdc4821041dcd294b951ea4d87baaff6bf8b0))
+* **actor:** 搜索分享用户增加分页与按照更新时间排序 ([6acda6a](https://github.com/TRPGEngine/Server/commit/6acda6ac4d3cbc08a2046779838cc32e325c8d95))
+* **dice:** 增加聊天信息拦截器，将用户发送的rd指令变成投骰 ([8dbd101](https://github.com/TRPGEngine/Server/commit/8dbd101b8be441a337bed8e05638982d68cd6f99))
+* **player:** 增加路由用于检测用户在线情况 ([7f25e5d](https://github.com/TRPGEngine/Server/commit/7f25e5db6e31c100208a9d29aca0672c0b641e95))
+
 ## [1.12.0](https://github.com/TRPGEngine/Server/compare/v1.11.0...v1.12.0) (2020-03-06)
 
 
