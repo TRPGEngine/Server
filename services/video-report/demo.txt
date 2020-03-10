@@ -1,0 +1,10 @@
+1280,720 # screen size
+100,200,500,120 # text rect range
+
+[00:00]
+[image:120,120,400,400]uuid1.jpg # sprite1 x,y,w,h
+[image:820,120,400,400]uuid2.jpg
+测试文本测试文本
+
+[02:00]
+测试文本测试文本2
