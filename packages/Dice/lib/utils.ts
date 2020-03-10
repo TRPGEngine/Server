@@ -1,11 +1,13 @@
 import _ from 'lodash';
 
+const isNumberStr = (str) => /^\d*$/.test(str);
+
 /**
  * 在一定范围内取随机值
  * @param maxPoint 最大点数
  * @param minPoint 最小点数
  */
-export function rollPoint(maxPoint: number, minPoint = 1) {
+export function rollPoint(maxPoint: number, minPoint = 1): number {
   maxPoint = parseInt(String(maxPoint));
   minPoint = parseInt(String(minPoint));
   if (maxPoint <= 1) {
@@ -26,7 +28,7 @@ interface RollRes {
 }
 /**
  * 投骰
- * @param requestStr 投骰表达式
+ * @param requestStr 投骰表达式 如1d100
  */
 export function roll(requestStr: string): RollRes {
   const pattern = /(\d*)\s*d\s*(\d*)/gi;
@@ -55,6 +57,74 @@ export function roll(requestStr: string): RollRes {
   const str = requestStr + '=' + express + '=' + result;
   return {
     str,
-    value: result,
+    value: Number(result),
+  };
+}
+
+interface RollJudgeRes extends RollRes {
+  isHidden?: boolean; // 是否为暗骰
+  success: boolean; // 是否成功
+}
+/**
+ * 投掷判定骰
+ * @param requestStr 请求
+ * @param contextData 数据上下文
+ */
+export function rollJudge(requestStr: string, contextData: {}): RollJudgeRes {
+  if (!requestStr.startsWith('a')) {
+    return {
+      str: '不正确的表达式',
+      value: 0,
+      success: false,
+    };
+  }
+
+  const args = requestStr.split(' ');
+  const params = args[0];
+
+  let isHiddenDice = params.includes('h'); // 是否为暗骰
+  let bonus = 0; // TODO: 奖励点
+  let targetValue = null; // 判定目标属性
+  let targetProps = ''; // 判定目标属性
+
+  // 字符串处理
+  if (args.length === 2) {
+    if (isNumberStr(args[1])) {
+      targetValue = Number(args[1]);
+    } else {
+      targetProps = args[1];
+    }
+  } else {
+    targetProps = args[1];
+    if (isNumberStr(args[2])) {
+      targetValue = Number(args[2]);
+    }
+  }
+
+  // 读取上下文
+  if (_.isNull(targetValue)) {
+    // 如果没有指定目标, 则尝试从上下文中获取数据
+    const tmp = Number(_.get(contextData, [targetProps]));
+    if (!isNaN(tmp)) {
+      targetValue = tmp;
+    }
+  }
+
+  const { str, value } = roll('1d100');
+
+  let success: boolean;
+  if (value < (targetValue ?? 50)) {
+    // 成功
+    success = true;
+  } else {
+    // 失败
+    success = false;
+  }
+
+  return {
+    str,
+    value,
+    success,
+    isHidden: isHiddenDice,
   };
 }
