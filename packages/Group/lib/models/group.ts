@@ -173,13 +173,14 @@ export class GroupGroup extends Model {
 
     await group.save();
 
-    notifyUpdateGroupInfo(group.uuid, group.toJSON());
+    notifyUpdateGroupInfo(group.uuid, group);
 
     return group;
   }
 
   /**
    * 获取用户所加入的所有团的列表
+   * 返回的信息包含团detail信息
    * @param userUUID 用户UUID
    */
   static async getAllUserGroupList(userUUID: string): Promise<GroupGroup[]> {

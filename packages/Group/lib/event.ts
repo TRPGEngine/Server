@@ -8,6 +8,7 @@ import { GroupGroup } from './models/group';
 import { GroupActor } from './models/actor';
 import { GroupRequest } from './models/request';
 import { ChatLog } from 'packages/Chat/lib/models/log';
+import { GroupDetail } from './models/detail';
 
 export const create: EventFunc<{
   name: string;
@@ -593,7 +594,7 @@ export const getGroupList: EventFunc<{}> = async function getGroupList(
     throw '用户不存在，请检查登录状态';
   }
 
-  const groups = await GroupGroup.getAllUserGroupList(player.uuid)
+  const groups = await GroupGroup.getAllUserGroupList(player.uuid);
 
   return { groups };
 };
@@ -1187,5 +1188,26 @@ export const setGroupStatus: EventFunc<{
     groupUUID,
     groupStatus,
   });
+  return true;
+};
+
+/**
+ * 保存团详情
+ */
+export const saveGroupDetail: EventFunc<{
+  groupUUID: string;
+  detailData: {};
+}> = async function(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户不存在，请检查登录状态';
+  }
+
+  const { groupUUID, detailData } = data;
+
+  await GroupDetail.saveGroupDetail(groupUUID, player.uuid, detailData);
+
   return true;
 };

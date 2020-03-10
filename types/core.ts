@@ -13,6 +13,9 @@ export { TRPGRouter, TRPGMiddleware } from 'packages/Core/types/webservice';
 export {
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
+  BelongsToCreateAssociationMixin,
+  HasOneGetAssociationMixin,
+  HasOneSetAssociationMixin,
   HasManyGetAssociationsMixin,
   HasManySetAssociationsMixin,
   BelongsToManyAddAssociationMixin,

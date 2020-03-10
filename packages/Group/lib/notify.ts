@@ -1,12 +1,13 @@
 import { getGlobalApplication } from 'lib/application';
 import { GroupActor } from './models/actor';
+import { GroupGroup } from './models/group';
 
 /**
  * 通知更新团信息
  */
 export async function notifyUpdateGroupInfo(
   groupUUID: string,
-  groupInfo: object
+  groupInfo: GroupGroup
 ) {
   const trpgapp = getGlobalApplication();
   await trpgapp.player.manager.roomcastSocketEvent(

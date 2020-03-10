@@ -74,6 +74,7 @@ export default class Group extends BasePackage {
     this.regSocketEvent('setMemberToManager', event.setMemberToManager);
     this.regSocketEvent('getGroupStatus', event.getGroupStatus);
     this.regSocketEvent('setGroupStatus', event.setGroupStatus);
+    this.regSocketEvent('saveGroupDetail', event.saveGroupDetail);
 
     this.regRoute(actorRouter);
 
