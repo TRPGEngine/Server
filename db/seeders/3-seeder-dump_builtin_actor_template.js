@@ -34,7 +34,6 @@ module.exports = {
 
     for (const record of records) {
       const name = record.name;
-      console.log('handle dump built-in template:', name);
       const template = await db.models.actor_template.findOne({
         where: {
           name,
@@ -58,17 +57,15 @@ module.exports = {
 
         if (isModified === true) {
           await template.save();
-          console.log('update template');
+          console.log('[UPDATE]', name);
         } else {
-          console.log('nomore edit, skip');
+          console.log('[SKIP]', name);
         }
       } else {
         // 不存在, 创建
         await db.models.actor_template.create(record);
-        console.log('created template');
+        console.log('[CREATE]', name);
       }
-
-      console.log('===============');
     }
   },
   down: (queryInterface, Sequelize) => {

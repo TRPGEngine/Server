@@ -98,7 +98,7 @@ describe('ActorActor', () => {
     const testActor = await createTestActor();
     // 不会搜到未分享的用户
     expect(
-      _.map(await ActorActor.findSharedActor(null), 'uuid').includes(
+      _.map((await ActorActor.findSharedActor(null)).list, 'uuid').includes(
         testActor.uuid
       )
     ).toBe(false);
@@ -108,7 +108,7 @@ describe('ActorActor', () => {
 
     // 会搜到已分享的用户
     expect(
-      _.map(await ActorActor.findSharedActor(null), 'uuid').includes(
+      _.map((await ActorActor.findSharedActor(null)).list, 'uuid').includes(
         testActor.uuid
       )
     ).toBe(true);
@@ -116,7 +116,7 @@ describe('ActorActor', () => {
     // 可以指定模板
     expect(
       _.map(
-        await ActorActor.findSharedActor(testActor.template_uuid),
+        (await ActorActor.findSharedActor(testActor.template_uuid)).list,
         'uuid'
       ).includes(testActor.uuid)
     ).toBe(true);
