@@ -1967,11 +1967,11 @@
                     "field": "welcome_msg_payload",
                     "seqType": "Sequelize.JSON"
                 },
-                "allow_quick_dice": {
+                "disable_quick_dice": {
                     "defaultValue": {
-                        "value": true
+                        "value": false
                     },
-                    "field": "allow_quick_dice",
+                    "field": "disable_quick_dice",
                     "seqType": "Sequelize.BOOLEAN"
                 },
                 "createdAt": {
@@ -3054,5 +3054,5 @@
             "indexes": []
         }
     },
-    "revision": 42
+    "revision": 43
 }

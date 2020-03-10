@@ -18,11 +18,14 @@ declare module './group' {
 }
 
 export class GroupDetail extends Model {
+  id: number;
   master_name: string; // 主持人称呼: 守密人， 地下城主, ...
   disable_check_actor: boolean; // 是否禁止普通用户查看团人物卡信息
   background_image_url: string; // 团聊天背景URL
   welcome_msg_payload: ChatMessagePayload; // 新用户欢迎信息
-  allow_quick_dice: boolean;
+  disable_quick_dice: boolean;
+
+  groupId?: number;
 
   /**
    * 保存团详情信息
@@ -52,10 +55,8 @@ export class GroupDetail extends Model {
     }
 
     for (const key in data) {
-      if (detail.hasOwnProperty(key)) {
-        const val = data[key];
-        detail[key] = val;
-      }
+      const val = data[key];
+      detail[key] = val;
     }
 
     await detail.save();
@@ -67,6 +68,9 @@ export class GroupDetail extends Model {
 }
 
 export default function GroupDetailDefinition(Sequelize: Orm, db: DBInstance) {
+  /**
+   * 注意: 每个团不一定有detail。只有设置后才有detail。因此所有的默认值应当为空或者false之类无信息的值
+   */
   GroupDetail.init(
     {
       master_name: {
@@ -84,9 +88,9 @@ export default function GroupDetailDefinition(Sequelize: Orm, db: DBInstance) {
       welcome_msg_payload: {
         type: Sequelize.JSON,
       },
-      allow_quick_dice: {
+      disable_quick_dice: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true,
+        defaultValue: false,
       },
     },
     {
