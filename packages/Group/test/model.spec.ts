@@ -12,6 +12,7 @@ import {
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import testExampleStack from 'test/utils/example';
+import { GroupDetail } from '../lib/models/detail';
 
 const context = buildAppContext();
 
@@ -183,7 +184,7 @@ describe('group model function', () => {
       ).not.toContain(testUser9.uuid);
     });
 
-    test.only('GroupGroup.getMemberCurrentGroupActorUUID should be ok', async () => {
+    test('GroupGroup.getMemberCurrentGroupActorUUID should be ok', async () => {
       const testUser = await getTestUser();
       const testGroup = await createTestGroup();
 
@@ -388,6 +389,28 @@ describe('group model function', () => {
       const owner: PlayerUser = await groupActor.getOwner();
 
       expect(owner.uuid).toBe(testUser9.uuid);
+    });
+  });
+
+  describe('GroupDetail', () => {
+    test('GroupDetail.saveGroupDetail should be ok', async () => {
+      const master_name = '地下城主';
+      const testUser = await getTestUser();
+      await GroupDetail.saveGroupDetail(testGroup.uuid, testUser.uuid, {
+        master_name,
+      });
+
+      const detail: GroupDetail = await GroupDetail.findOne({
+        where: {
+          groupId: testGroup.id,
+        },
+      });
+
+      expect(detail).not.toBeNull();
+      expect(detail.groupId).toBe(testGroup.id);
+      expect(detail.master_name).toBe(master_name);
+
+      await detail.destroy();
     });
   });
 });
