@@ -62,8 +62,9 @@ export function roll(requestStr: string): RollRes {
 }
 
 interface RollJudgeRes extends RollRes {
-  isHidden?: boolean; // 是否为暗骰
+  isHidden: boolean; // 是否为暗骰
   success: boolean; // 是否成功
+  target: number; // 判定目标点
 }
 /**
  * 投掷判定骰
@@ -72,11 +73,7 @@ interface RollJudgeRes extends RollRes {
  */
 export function rollJudge(requestStr: string, contextData: {}): RollJudgeRes {
   if (!requestStr.startsWith('a')) {
-    return {
-      str: '不正确的表达式',
-      value: 0,
-      success: false,
-    };
+    throw new Error('不正确的表达式:' + requestStr);
   }
 
   const args = requestStr.split(' ');
@@ -125,6 +122,7 @@ export function rollJudge(requestStr: string, contextData: {}): RollJudgeRes {
     str,
     value,
     success,
+    target: targetValue,
     isHidden: isHiddenDice,
   };
 }
