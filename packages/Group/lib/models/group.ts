@@ -333,6 +333,26 @@ export class GroupGroup extends Model {
   }
 
   /**
+   * 获取团成员当前选择的团人物卡UUID
+   * @param groupUUID 团UUID
+   * @param playerUUID 要查找的用户的UUID
+   */
+  static async getMemberCurrentGroupActorUUID(
+    groupUUID: string,
+    playerUUID: string
+  ): Promise<string | null> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    const member = await group.getMemberByUUID(playerUUID);
+
+    const selectedGroupActorUUID = _.get(member, [
+      'group_group_members',
+      'selected_group_actor_uuid',
+    ]);
+
+    return selectedGroupActorUUID;
+  }
+
+  /**
    * 发送加入成员的系统通知
    */
   async sendAddMemberNotify(memberUUID: string) {
@@ -372,6 +392,22 @@ export class GroupGroup extends Model {
    */
   getManagerUUIDs(): string[] {
     return Array.from(new Set([this.owner_uuid].concat(this.managers_uuid)));
+  }
+
+  /**
+   * 获取在某个团中的用户信息
+   * 返回的信息中会包含关联模型关联信息
+   * @param playerUUID 用户UUID
+   */
+  async getMemberByUUID(playerUUID: string): Promise<PlayerUser | null> {
+    return _.first(
+      await this.getMembers({
+        where: {
+          uuid: playerUUID,
+        },
+        limit: 1,
+      })
+    );
   }
 
   /**

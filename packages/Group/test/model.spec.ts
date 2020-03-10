@@ -183,6 +183,38 @@ describe('group model function', () => {
       ).not.toContain(testUser9.uuid);
     });
 
+    test.only('GroupGroup.getMemberCurrentGroupActorUUID should be ok', async () => {
+      const testUser = await getTestUser();
+      const testGroup = await createTestGroup();
+
+      await testGroup.addMember(testUser);
+
+      expect(
+        await GroupGroup.getMemberCurrentGroupActorUUID(
+          testGroup.uuid,
+          testUser.uuid
+        )
+      ).toBeNull();
+
+      const testSelectedGroupActorUUID = 'any';
+      const member = await testGroup.getMemberByUUID(testUser.uuid);
+      _.set(
+        member,
+        'group_group_members.selected_group_actor_uuid',
+        testSelectedGroupActorUUID
+      );
+      await member['group_group_members'].save();
+
+      expect(
+        await GroupGroup.getMemberCurrentGroupActorUUID(
+          testGroup.uuid,
+          testUser.uuid
+        )
+      ).toBe(testSelectedGroupActorUUID);
+
+      await testGroup.removeMember(testUser);
+    });
+
     test('group.getMembersCount should be ok', async () => {
       const testUser = await getOtherTestUser('admin9');
       const num = await testGroup.getMembersCount();
