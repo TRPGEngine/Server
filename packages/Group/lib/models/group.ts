@@ -200,12 +200,6 @@ export class GroupGroup extends Model {
         {
           model: GroupChannel,
           as: 'channels',
-          include: [
-            {
-              model: PlayerUser,
-              as: 'member',
-            },
-          ],
         },
       ],
     });

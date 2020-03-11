@@ -3,8 +3,6 @@ import {
   Orm,
   DBInstance,
   HasManyCreateAssociationMixin,
-  BelongsToManyAddAssociationsMixin,
-  BelongsToManyGetAssociationsMixin,
   HasManyGetAssociationsMixin,
 } from 'trpg/core';
 import { GroupGroup } from './group';
@@ -26,11 +24,9 @@ export class GroupChannel extends Model {
   uuid: string;
   name: string;
   desc: string;
+  members: string[];
 
   groupId?: number;
-
-  addMembers?: BelongsToManyAddAssociationsMixin<PlayerUser, number>;
-  getMembers?: BelongsToManyGetAssociationsMixin<PlayerUser>;
 
   /**
    *
@@ -52,11 +48,6 @@ export class GroupChannel extends Model {
       throw new Error('没有创建频道的权限');
     }
 
-    const channel: GroupChannel = await group.createChannel({
-      name,
-      desc,
-    });
-
     if (_.isEmpty(memberUUIDs)) {
       memberUUIDs = [playerUUID];
     } else {
@@ -65,10 +56,11 @@ export class GroupChannel extends Model {
       }
     }
 
-    const players = await Promise.all(
-      _.uniq(memberUUIDs).map((uuid) => PlayerUser.findByUUID(uuid))
-    );
-    await channel.addMembers(players);
+    const channel: GroupChannel = await group.createChannel({
+      name,
+      desc,
+      members: _.uniq(memberUUIDs),
+    });
 
     // 通知更新团信息
     const channels = await group.getChannels();
@@ -84,6 +76,7 @@ export default function GroupChannelDefinition(Sequelize: Orm, db: DBInstance) {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       name: { type: Sequelize.STRING }, // 对应actor_actor的UUID
       desc: { type: Sequelize.STRING },
+      members: { type: Sequelize.JSON, defaultValue: [] },
     },
     {
       tableName: 'group_channel',
@@ -103,11 +96,6 @@ export default function GroupChannelDefinition(Sequelize: Orm, db: DBInstance) {
   GroupChannel.belongsTo(PlayerUser, {
     foreignKey: 'ownerId',
     as: 'owner',
-  });
-
-  GroupChannel.belongsToMany(PlayerUser, {
-    through: 'group_channel_member',
-    as: 'members',
   });
 
   return GroupChannel;

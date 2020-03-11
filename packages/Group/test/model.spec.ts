@@ -432,10 +432,9 @@ describe('group model function', () => {
         expect(channel.groupId).toBe(testGroup.id);
         expect(channel.name).toBe(name);
         expect(channel.desc).toBe(desc);
-
-        const members: PlayerUser[] = await channel.getMembers();
-        expect(members.length).toBeGreaterThan(0);
-        expect(_.map(members, 'uuid').includes(testUser.uuid)).toBe(true);
+        expect(Array.isArray(channel.members)).toBe(true);
+        expect(channel.members.length).toBeGreaterThan(0);
+        expect(channel.members.includes(testUser.uuid)).toBe(true);
       } finally {
         await channel.destroy();
       }
