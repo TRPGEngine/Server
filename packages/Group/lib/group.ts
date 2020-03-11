@@ -76,6 +76,11 @@ export default class Group extends BasePackage {
     this.regSocketEvent('setGroupStatus', event.setGroupStatus);
     this.regSocketEvent('saveGroupDetail', event.saveGroupDetail);
     this.regSocketEvent('createGroupChannel', event.createGroupChannel);
+    this.regSocketEvent('addGroupChannelMember', event.addGroupChannelMember);
+    this.regSocketEvent(
+      'removeGroupChannelMember',
+      event.removeGroupChannelMember
+    );
 
     this.regRoute(actorRouter);
 

@@ -4,11 +4,12 @@ import {
   DBInstance,
   HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
+  BelongsToGetAssociationMixin,
 } from 'trpg/core';
 import { GroupGroup } from './group';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
-import { notifyUpdateGroupInfo } from '../notify';
+import { notifyUpdateGroupChannel } from '../notify';
 
 declare module './group' {
   interface GroupGroup {
@@ -27,6 +28,16 @@ export class GroupChannel extends Model {
   members: string[];
 
   groupId?: number;
+
+  getGroup?: BelongsToGetAssociationMixin<GroupGroup>;
+
+  static findByUUID(uuid: string): Promise<GroupChannel> {
+    return GroupChannel.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
 
   /**
    *
@@ -62,11 +73,75 @@ export class GroupChannel extends Model {
       members: _.uniq(memberUUIDs),
     });
 
-    // 通知更新团信息
-    const channels = await group.getChannels();
-    notifyUpdateGroupInfo(group.uuid, { channels }); // 通知更新团的channels列表
+    notifyUpdateGroupChannel(group); // 通知更新团的channels列表
 
     return channel;
+  }
+
+  /**
+   * 增加频道成员
+   * @param channelUUID 团UUID
+   * @param playerUUID 操作人UUID
+   * @param memberUUIDs 成员UUID
+   */
+  static async addMember(
+    channelUUID: string,
+    playerUUID: string,
+    memberUUIDs: string[]
+  ): Promise<void> {
+    const channel = await GroupChannel.findByUUID(channelUUID);
+    if (_.isNil(channel)) {
+      throw new Error('找不到该频道');
+    }
+
+    const group: GroupGroup = await channel.getGroup();
+    if (_.isNil(group)) {
+      throw new Error('数据异常, 找不到频道归属的团');
+    }
+
+    if (!group.isManagerOrOwner(playerUUID)) {
+      throw new Error('没有操作权限');
+    }
+
+    channel.members = _.uniq([...channel.members, ...memberUUIDs]);
+    await channel.save();
+  }
+
+  /**
+   * 移除频道成员
+   * @param channelUUID 团UUID
+   * @param playerUUID 操作人UUID
+   * @param memberUUIDs 成员UUID
+   */
+  static async removeMember(
+    channelUUID: string,
+    playerUUID: string,
+    memberUUIDs: string[]
+  ): Promise<void> {
+    const channel = await GroupChannel.findByUUID(channelUUID);
+    if (_.isNil(channel)) {
+      throw new Error('找不到该频道');
+    }
+
+    const group: GroupGroup = await channel.getGroup();
+    if (_.isNil(group)) {
+      throw new Error('数据异常, 找不到频道归属的团');
+    }
+
+    if (!group.isManagerOrOwner(playerUUID)) {
+      throw new Error('没有操作权限');
+    }
+
+    channel.members = _.without(channel.members, ...memberUUIDs);
+
+    if (_.isEmpty(channel.members)) {
+      // 如果频道成员为空，直接就地解散
+      await channel.destroy();
+    } else {
+      await channel.save();
+    }
+
+    notifyUpdateGroupChannel(group);
   }
 }
 
