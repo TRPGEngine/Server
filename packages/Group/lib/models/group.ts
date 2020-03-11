@@ -18,6 +18,7 @@ import { ChatLog } from 'packages/Chat/lib/models/log';
 import { notifyUpdateGroupInfo } from '../notify';
 import Debug from 'debug';
 import { GroupDetail } from './detail';
+import { GroupChannel } from './channel';
 const debug = Debug('trpg:component:group:model:group');
 
 type GroupType = 'group' | 'channel' | 'test';
@@ -46,6 +47,7 @@ export class GroupGroup extends Model {
 
   members_count?: number;
   detail?: GroupDetail;
+  channels?: GroupChannel[];
 
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
@@ -164,7 +166,7 @@ export class GroupGroup extends Model {
       throw '没有修改权限';
     }
 
-    // IDEA: 为防止意外暂时只允许修改 EDITABLE_FIELDS 指定的字段
+    // IDEA: 为防止意外, 暂时只允许修改 EDITABLE_FIELDS 指定的字段
     for (const field of GroupGroup.EDITABLE_FIELDS) {
       if (!_.isNil(groupInfo[field])) {
         group[field] = groupInfo[field];
@@ -194,6 +196,16 @@ export class GroupGroup extends Model {
         {
           model: GroupDetail,
           as: 'detail',
+        },
+        {
+          model: GroupChannel,
+          as: 'channels',
+          include: [
+            {
+              model: PlayerUser,
+              as: 'member',
+            },
+          ],
         },
       ],
     });

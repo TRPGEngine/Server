@@ -18,6 +18,7 @@ export {
   HasOneSetAssociationMixin,
   HasManyGetAssociationsMixin,
   HasManySetAssociationsMixin,
+  HasManyCreateAssociationMixin,
   BelongsToManyAddAssociationMixin,
   BelongsToManyAddAssociationsMixin,
   BelongsToManyGetAssociationsMixin,

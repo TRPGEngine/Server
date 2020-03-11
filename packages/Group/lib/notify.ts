@@ -7,7 +7,7 @@ import { GroupGroup } from './models/group';
  */
 export async function notifyUpdateGroupInfo(
   groupUUID: string,
-  groupInfo: GroupGroup
+  groupInfo: Partial<GroupGroup>
 ) {
   const trpgapp = getGlobalApplication();
   await trpgapp.player.manager.roomcastSocketEvent(

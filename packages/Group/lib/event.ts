@@ -9,6 +9,7 @@ import { GroupActor } from './models/actor';
 import { GroupRequest } from './models/request';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 import { GroupDetail } from './models/detail';
+import { GroupChannel } from './models/channel';
 
 export const create: EventFunc<{
   name: string;
@@ -1210,4 +1211,31 @@ export const saveGroupDetail: EventFunc<{
   await GroupDetail.saveGroupDetail(groupUUID, player.uuid, detailData);
 
   return true;
+};
+
+/**
+ * 创建团子频道
+ */
+export const createGroupChannel: EventFunc<{
+  groupUUID: string;
+  name: string;
+  desc: string;
+}> = async function(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户不存在，请检查登录状态';
+  }
+
+  const { groupUUID, name, desc } = data;
+
+  const channel = await GroupChannel.createChannel(
+    groupUUID,
+    player.uuid,
+    name,
+    desc
+  );
+
+  return { channel };
 };
