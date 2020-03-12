@@ -104,7 +104,12 @@ export class GroupChannel extends Model {
     }
 
     channel.members = _.uniq([...channel.members, ...memberUUIDs]);
+
     await channel.save();
+
+    // 加入房间
+    const trpgapp = GroupChannel.getApplication();
+    trpgapp.player.manager.joinRoomWithUUIDs(channel.uuid, channel.members);
   }
 
   /**
@@ -142,6 +147,10 @@ export class GroupChannel extends Model {
     }
 
     notifyUpdateGroupChannel(group);
+
+    // 离开房间
+    const trpgapp = GroupChannel.getApplication();
+    trpgapp.player.manager.leaveRoomWithUUIDs(channel.uuid, channel.members);
   }
 }
 

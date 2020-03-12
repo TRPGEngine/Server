@@ -7,49 +7,7 @@ import { PlayerUser } from './models/user';
 import { TRPGApplication, Socket } from 'trpg/core';
 import { Platform } from '../types/player';
 import { PlayerInvite } from './models/invite';
-
-/**
- * 自动加入房间
- * @param socket 连接
- */
-const autoJoinSocketRoom = async function autoJoinSocketRoom(
-  this: TRPGApplication,
-  socket: Socket
-) {
-  if (!socket) {
-    debug('add room error. not find this socket');
-    return;
-  }
-
-  const app = this;
-  const player = app.player.manager.findPlayer(socket);
-  if (!player) {
-    debug('Add room error. not find this socket attach player');
-    return;
-  }
-
-  if (!app.group) {
-    debug('Add room error. need group component');
-    return;
-  }
-
-  const user = await PlayerUser.findByUUID(player.uuid);
-  if (!user) {
-    debug('Add room error. Not found user');
-    return;
-  }
-
-  const groups = await (user as any).getGroups();
-
-  // 团UUID就是房间号
-  await Promise.all(
-    groups
-      .map((group) => group.uuid)
-      .map((roomUUID: string) => app.player.manager.joinRoom(roomUUID, socket))
-  ).catch((err) => {
-    debug('auto join room error: %o', err);
-  });
-};
+import { autoJoinSocketRoom } from './managers/socketroom-manager';
 
 export const login: EventFunc<{
   username: string;
@@ -106,7 +64,7 @@ export const login: EventFunc<{
     // 加入到列表中
     if (!!app.player) {
       await app.player.manager.addPlayer(user.uuid, socket, platform);
-      await autoJoinSocketRoom.call(app, socket);
+      await autoJoinSocketRoom(app, socket);
     }
 
     await socket.iosession.set('user', user.getInfo(true)); // 将用户信息加入到session中
@@ -190,7 +148,7 @@ export const loginWithToken: EventFunc<{
     // 加入到列表中
     if (!!app.player) {
       await app.player.manager.addPlayer(user.uuid, socket, platform);
-      await autoJoinSocketRoom.call(app, socket);
+      await autoJoinSocketRoom(app, socket);
     }
     await socket.iosession.set('user', user.getInfo(true)); // 将用户信息加入到session中
 

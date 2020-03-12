@@ -2,13 +2,14 @@ import Debug from 'debug';
 const debug = Debug('trpg:component:group');
 import * as event from './event';
 import BasePackage from 'lib/package';
-import GroupGroupDefinition from './models/group';
+import GroupGroupDefinition, { GroupGroup } from './models/group';
 import GroupInviteDefinition from './models/invite';
 import GroupActorDefinition from './models/actor';
 import GroupRequestDefinition from './models/request';
 import GroupDetailDefinition from './models/detail';
 import actorRouter from './routers/actor';
 import GroupChannelDefinition from './models/channel';
+import { regRoomGather } from 'packages/Player/lib/managers/socketroom-manager';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -87,6 +88,12 @@ export default class Group extends BasePackage {
     this.regStatJob('groupCount', async () => {
       let res = await db.models.group_group.count();
       return res;
+    });
+
+    regRoomGather(async (user) => {
+      const groups: GroupGroup[] = await user.getGroups();
+
+      return groups.map((g) => g.uuid);
     });
   }
 }

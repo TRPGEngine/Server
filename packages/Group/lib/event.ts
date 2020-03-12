@@ -1240,6 +1240,9 @@ export const createGroupChannel: EventFunc<{
     desc
   );
 
+  // 创建频道后创建者加入房间
+  app.player.manager.joinRoom(channel.uuid, socket);
+
   return { channel };
 };
 
