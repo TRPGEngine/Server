@@ -1,6 +1,7 @@
 import Debug from 'debug';
 import { EventFunc } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import { ChatLog } from 'packages/Chat/lib/models/log';
 const debug = Debug('trpg:component:dice:event');
 
 const rolldiceAsync = async function(data) {
@@ -138,10 +139,12 @@ export const acceptDiceRequest: EventFunc = async function acceptDiceRequest(
     }
 
     diceRequestMsgInfo.data.is_accept = true;
-    let chat_log = await app.chat.updateMsgAsync(
+
+    const log = await ChatLog.updateByUUID(
       diceRequestMsgInfo.uuid,
       diceRequestMsgInfo
     );
+
     let rollResult = await rolldiceAsync.call(app, {
       sender_uuid: diceRequestMsgInfo.sender_uuid,
       to_uuid: diceRequestMsgInfo.to_uuid,
@@ -154,9 +157,9 @@ export const acceptDiceRequest: EventFunc = async function acceptDiceRequest(
       rollResult.sender_uuid,
       rollResult.to_uuid,
       rollResult.is_group,
-      chat_log.message + ' 结果:' + rollResult.dice_expression
+      log.message + ' 结果:' + rollResult.dice_expression
     );
-    return { log: chat_log };
+    return { log };
   } else {
     throw '非法数据';
   }
@@ -248,11 +251,13 @@ export const acceptDiceInvite: EventFunc = async function acceptDiceInvite(
     }
 
     diceInviteMsgInfo.data.is_accept_list.push(playerUUID);
-    let chat_log = await app.chat.updateMsgAsync(
+
+    const log = await ChatLog.updateByUUID(
       diceInviteMsgInfo.uuid,
       diceInviteMsgInfo
     );
-    let rollResult = await rolldiceAsync.call(app, {
+
+    const rollResult = await rolldiceAsync.call(app, {
       sender_uuid: diceInviteMsgInfo.sender_uuid,
       to_uuid: diceInviteMsgInfo.to_uuid,
       converse_uuid: diceInviteMsgInfo.converse_uuid,
@@ -264,9 +269,9 @@ export const acceptDiceInvite: EventFunc = async function acceptDiceInvite(
       rollResult.sender_uuid,
       rollResult.to_uuid,
       rollResult.is_group,
-      chat_log.message + ' 结果:' + rollResult.dice_expression
+      log.message + ' 结果:' + rollResult.dice_expression
     );
-    return { log: chat_log };
+    return { log };
   } else {
     throw '非法数据';
   }

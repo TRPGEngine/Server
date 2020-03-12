@@ -70,6 +70,9 @@ export default class Chat extends BasePackage {
         });
         return res;
       },
+      /**
+       * @deprecated
+       */
       updateMsgAsync: async function(msg_uuid, payload) {
         // payload需要为完整的聊天记录对象
         let notify = () => {
