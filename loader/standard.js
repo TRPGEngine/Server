@@ -15,6 +15,7 @@ const notify = require('../packages/Notify');
 const deploy = require('../packages/Deploy');
 const info = require('../packages/Info');
 const oauth = require('../packages/OAuth');
+const trpg = require('../packages/TRPG');
 
 module.exports = function loadModules(app) {
   app.load(player);
@@ -33,6 +34,7 @@ module.exports = function loadModules(app) {
   app.load(deploy);
   app.load(info);
   app.load(oauth);
+  app.load(trpg);
 
   app.load(dashboard); // 尚未测试
 
