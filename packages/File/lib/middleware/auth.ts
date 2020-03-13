@@ -9,13 +9,13 @@ export default function auth(): TRPGMiddleware {
     const user_uuid = ctx.request.header['user-uuid'];
     if (!user_uuid) {
       ctx.response.status = 403;
-      throw '缺少必要参数';
+      throw new Error('缺少必要参数');
     }
 
     const player = trpgapp.player.manager.findPlayerWithUUID(user_uuid); // TODO: 此处需要检查
     if (!player) {
       ctx.response.status = 403;
-      throw '用户不在线，请检查登录状态';
+      throw new Error('用户不在线，请检查登录状态');
     } else {
       const user = await PlayerUser.findByUUID(user_uuid);
       ctx.player = { ...player, user };

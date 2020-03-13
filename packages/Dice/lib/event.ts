@@ -70,12 +70,12 @@ export const sendDiceRequest: EventFunc = async function sendDiceRequest(
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   let sender_uuid = player.uuid;
   let { to_uuid, is_group, dice_request, reason } = data;
   if (!to_uuid || is_group === undefined || !dice_request) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
   // 允许同意请求的用户uuid列表
   let allow_accept_list = [];

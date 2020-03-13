@@ -7,7 +7,7 @@ const geetestWrapper = require('../utils/geetest-wrapper');
 registerRouter.get('/register/gt-register', async function(ctx, next) {
   const geetest = ctx.geetest;
   if (!geetest) {
-    throw '极验未加载';
+    throw new Error('极验未加载');
   }
 
   let data = await geetestWrapper(geetest, 'register', null);
@@ -26,7 +26,7 @@ registerRouter.get('/register/gt-register', async function(ctx, next) {
 registerRouter.post('/register/gt-validate', async function(ctx) {
   const geetest = ctx.geetest;
   if (!geetest) {
-    throw '极验未加载';
+    throw new Error('极验未加载');
   }
 
   let {

@@ -292,7 +292,7 @@ export class GroupActor extends Model {
       throw new Error('找不到该人物所在团');
     }
     if (!group.isManagerOrOwner(playerUUID)) {
-      throw '没有操作权限';
+      throw new Error('没有操作权限');
     }
 
     await groupActor.destroy();

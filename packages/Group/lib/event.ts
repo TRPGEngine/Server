@@ -28,14 +28,14 @@ export const create: EventFunc<{
 
   const { name, sub_name, desc, avatar } = data;
   if (!name) {
-    throw '缺少团名';
+    throw new Error('缺少团名');
   }
 
   const isExist = await GroupGroup.findOne({
     where: { name },
   });
   if (!!isExist) {
-    throw '该团名已存在';
+    throw new Error('该团名已存在');
   }
 
   const user = await PlayerUser.findByUUID(userUUID);

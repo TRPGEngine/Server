@@ -11,14 +11,14 @@ export const bindAttachUUID: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const avatar_uuid = data.avatar_uuid;
   const attach_uuid = data.attach_uuid;
 
   if (_.isNil(avatar_uuid) || _.isNil(attach_uuid)) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const avatar = await FileAvatar.bindAttachUUID(

@@ -160,10 +160,10 @@ export class GroupGroup extends Model {
   ) {
     const group = await GroupGroup.findByUUID(groupUUID);
     if (!group) {
-      throw '找不到团';
+      throw new Error('找不到团');
     }
     if (!group.isManagerOrOwner(playerUUID)) {
-      throw '没有修改权限';
+      throw new Error('没有修改权限');
     }
 
     // IDEA: 为防止意外, 暂时只允许修改 EDITABLE_FIELDS 指定的字段
@@ -316,34 +316,34 @@ export class GroupGroup extends Model {
   }> {
     const group = await GroupGroup.findByUUID(groupUUID);
     if (_.isNil(group)) {
-      throw '找不到团';
+      throw new Error('找不到团');
     }
 
     if (group.owner_uuid === userUUID) {
-      throw '作为团主持人你无法直接退出群';
+      throw new Error('作为团主持人你无法直接退出群');
     }
 
     const user = await PlayerUser.findByUUID(userUUID);
     if (_.isNil(user)) {
-      throw '找不到用户';
+      throw new Error('找不到用户');
     }
 
     if (_.isString(operatorUserUUID)) {
       // 有操作人, 进行权限校验
       if (!group.isManagerOrOwner(operatorUserUUID)) {
         // 操作人不是管理
-        throw '您没有该权限';
+        throw new Error('您没有该权限');
       } else if (
         group.isManagerOrOwner(userUUID) &&
         group.owner_uuid !== operatorUserUUID
       ) {
         // 被踢人是管理但操作人不是团所有人
-        throw '您没有该权限';
+        throw new Error('您没有该权限');
       }
     }
 
     if (!(await group.hasMember(user))) {
-      throw '该团没有该成员';
+      throw new Error('该团没有该成员');
     }
 
     await group.removeMember(user);

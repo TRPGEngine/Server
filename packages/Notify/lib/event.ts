@@ -16,16 +16,16 @@ export const bindJPushNotifyInfo: EventFunc<{
   const info = data.info;
   const { userUUID, registrationID } = info;
   if (!userUUID || !registrationID) {
-    throw '缺少必要字段';
+    throw new Error('缺少必要字段');
   }
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '尚未登录';
+    throw new Error('尚未登录');
   }
   const selfUUID = player.uuid;
   if (selfUUID !== userUUID) {
-    throw '非法操作, UUID不匹配';
+    throw new Error('非法操作, UUID不匹配');
   }
 
   const { id: userId } = await PlayerUser.findByUUID(selfUUID);
@@ -66,17 +66,17 @@ export const bindUPushNotifyInfo: EventFunc<{
   const { userUUID, registrationID } = data.info;
 
   if (!userUUID || !registrationID) {
-    throw '缺少必要字段';
+    throw new Error('缺少必要字段');
   }
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '尚未登录';
+    throw new Error('尚未登录');
   }
   const selfUUID = player.uuid;
 
   if (selfUUID !== userUUID) {
-    throw '非法操作, 用户UUID不匹配';
+    throw new Error('非法操作, 用户UUID不匹配');
   }
 
   const { id: userId } = await PlayerUser.findByUUID(selfUUID);
@@ -115,7 +115,7 @@ export const activeNofifyEvent: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const userUUID = player.uuid;
@@ -149,7 +149,7 @@ export const deactiveNofifyEvent: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const userUUID = player.uuid;

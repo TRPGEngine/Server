@@ -11,17 +11,17 @@ exports.get = async function get(data, cb, db) {
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   let { noteUUID } = data;
   if (!noteUUID) {
-    throw '缺少参数';
+    throw new Error('缺少参数');
   }
 
   let note = await db.models.note_note.findOne({ where: { uuid: noteUUID } });
   if (!note) {
-    throw '该笔记不存在';
+    throw new Error('该笔记不存在');
   }
 
   return {
@@ -42,12 +42,12 @@ exports.save = async function save(data, cb, db) {
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   let { noteUUID, noteTitle, noteContent } = data;
   if (!noteUUID || !noteTitle) {
-    throw '缺少参数';
+    throw new Error('缺少参数');
   }
 
   noteContent = xss(noteContent); // 进行防xss处理

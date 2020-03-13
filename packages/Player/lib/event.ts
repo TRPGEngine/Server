@@ -29,7 +29,7 @@ export const login: EventFunc<{
 
   if (!username || !password) {
     debug('login fail, miss necessary parameter: %o', data);
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const user = await PlayerUser.findByUsernameAndPassword(username, password);
@@ -115,7 +115,7 @@ export const loginWithToken: EventFunc<{
 
   if (!uuid || !token) {
     debug('login with token fail, miss necessary parameter: %o', data);
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let cond = { uuid };
@@ -190,7 +190,7 @@ export const getWebToken: EventFunc<{}> = async function getWebToken(
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '当前用户不存在';
+    throw new Error('当前用户不存在');
   }
 
   const jwt = await PlayerUser.signJWT(player.uuid);
@@ -209,12 +209,12 @@ export const register: EventFunc<{
   const password = data.password;
 
   if (username.length > 18) {
-    throw '注册失败!用户名过长';
+    throw new Error('注册失败!用户名过长');
   }
 
   if (!username || !password) {
     debug('register fail, miss necessary parameter: %o', data);
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const user = await PlayerUser.findOne({
@@ -223,7 +223,7 @@ export const register: EventFunc<{
 
   if (!!user) {
     debug('register failed!user %s has been existed', user.username);
-    throw '用户名已存在';
+    throw new Error('用户名已存在');
   }
 
   const salt = PlayerUser.genSalt();
@@ -246,7 +246,7 @@ export const getInfo: EventFunc<{
   const uuid = data.uuid;
 
   if (!type) {
-    throw '参数不全';
+    throw new Error('参数不全');
   }
 
   if (type === 'self') {
