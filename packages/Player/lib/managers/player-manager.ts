@@ -13,7 +13,7 @@ const debug = Debug('trpg:component:player:manager');
 const ONLINE_PLAYER_KEY = 'player:manager:online_player_uuid_list';
 const CHANNEL_KEY = 'player:manager:channel';
 const TICK_PLAYER_EVENTNAME = 'player::tick';
-const getRoomKey = (uuid: string) => `player:manager:room#${uuid}`;
+export const getRoomKey = (uuid: string) => `player:manager:room#${uuid}`;
 
 // 消息类型: 单播 房间广播 全体广播
 type PlayerMsgPayloadType = 'unicast' | 'listcast' | 'roomcast' | 'broadcast';
@@ -242,6 +242,8 @@ class PlayerManager extends EventEmitter {
 
   /**
    * 让某个用户远程离开房间
+   * NOTICE: 需要注意会不会出现同一用户有两个连接被踢的情况
+   * 这些方法只能用于离开房间的操作。不能用于断开连接
    * @param roomUUID 房间UUID
    * @param uuid 用户UUID
    */
