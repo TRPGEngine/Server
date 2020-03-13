@@ -12,6 +12,8 @@ import {
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import testExampleStack from 'test/utils/example';
+import { GroupDetail } from '../lib/models/detail';
+import { GroupChannel } from '../lib/models/channel';
 
 const context = buildAppContext();
 
@@ -20,19 +22,10 @@ testExampleStack.regAfterAll();
 describe('group model function', () => {
   let testActor: ActorActor;
   let testGroup: GroupGroup;
-  let testGroupActor: GroupActor;
 
   beforeAll(async () => {
     testActor = await createTestActor();
     testGroup = await createTestGroup();
-  });
-
-  beforeEach(async () => {
-    testGroupActor = await createTestGroupActor(testGroup.id);
-  });
-
-  afterEach(async () => {
-    testGroupActor = null;
   });
 
   describe('GroupGroup', () => {
@@ -42,22 +35,6 @@ describe('group model function', () => {
 
       // 获取时应当返回团人数
       expect(group.toJSON()).toHaveProperty('members_count');
-    });
-
-    test('GroupGroup.findGroupActorsByUUID should be ok', async () => {
-      const actors = await GroupGroup.findGroupActorsByUUID(testGroup.uuid);
-
-      expect(Array.isArray(actors)).toBe(true);
-      expect(actors.length).toBeGreaterThanOrEqual(1);
-      const checkedActor = actors.find((a) => a.id === testGroupActor.id);
-      expect(checkedActor).not.toBeNull();
-      expect(checkedActor.toJSON()).toMatchObject({
-        id: testGroupActor.id,
-        uuid: testGroupActor.uuid,
-      });
-      expect(checkedActor).toHaveProperty('owner'); // 需要有owner信息
-      expect(checkedActor.owner).not.toBeNull();
-      expect(checkedActor.owner.id).toBe(testGroupActor.ownerId);
     });
 
     describe('GroupGroup.searchGroup should be ok', () => {
@@ -130,7 +107,9 @@ describe('group model function', () => {
 
         const testTargetGroup = _.find(groups, ['uuid', testGroup.uuid]);
         expect(testTargetGroup).toHaveProperty('detail'); // 该数据应当有detail字段
+        expect(testTargetGroup).toHaveProperty('channels'); // 该数据应当有channels字段
         expect(testTargetGroup.detail).toBeNull();
+        expect(Array.isArray(testTargetGroup.channels)).toBe(true);
       });
       test('have detail', async () => {
         const testGroup = await createTestGroup();
@@ -144,14 +123,14 @@ describe('group model function', () => {
         const testTargetGroup = _.find(groups, ['uuid', testGroup.uuid]);
         expect(testTargetGroup).toHaveProperty('detail'); // 该数据应当有detail字段
         expect(testTargetGroup.detail).not.toBeNull();
-        expect(typeof testTargetGroup.detail.master_name === 'string').toBe(
-          true
+        expect(typeof testTargetGroup.detail.master_name).toBe('string');
+        expect(typeof testTargetGroup.detail.disable_quick_dice).toBe(
+          'boolean'
         );
-        expect(
-          typeof testTargetGroup.detail.allow_quick_dice === 'boolean'
-        ).toBe(true);
       });
     });
+
+    test.todo('GroupGroup.getGroupChatLog should be ok');
 
     test('GroupGroup.addGroupMember should be ok', async () => {
       const testUser = await getTestUser();
@@ -181,6 +160,38 @@ describe('group model function', () => {
       expect(
         (await testGroup.getMembers()).map<string>((x) => x.uuid)
       ).not.toContain(testUser9.uuid);
+    });
+
+    test('GroupGroup.getMemberCurrentGroupActorUUID should be ok', async () => {
+      const testUser = await getTestUser();
+      const testGroup = await createTestGroup();
+
+      await testGroup.addMember(testUser);
+
+      expect(
+        await GroupGroup.getMemberCurrentGroupActorUUID(
+          testGroup.uuid,
+          testUser.uuid
+        )
+      ).toBeNull();
+
+      const testSelectedGroupActorUUID = 'any';
+      const member = await testGroup.getMemberByUUID(testUser.uuid);
+      _.set(
+        member,
+        'group_group_members.selected_group_actor_uuid',
+        testSelectedGroupActorUUID
+      );
+      await member['group_group_members'].save();
+
+      expect(
+        await GroupGroup.getMemberCurrentGroupActorUUID(
+          testGroup.uuid,
+          testUser.uuid
+        )
+      ).toBe(testSelectedGroupActorUUID);
+
+      await testGroup.removeMember(testUser);
     });
 
     test('group.getMembersCount should be ok', async () => {
@@ -219,6 +230,32 @@ describe('group model function', () => {
   });
 
   describe('GroupActor', () => {
+    let testGroupActor: GroupActor;
+
+    beforeEach(async () => {
+      testGroupActor = await createTestGroupActor(testGroup.id);
+    });
+
+    afterEach(async () => {
+      testGroupActor = null;
+    });
+
+    test('GroupGroup.findGroupActorsByUUID should be ok', async () => {
+      const actors = await GroupGroup.findGroupActorsByUUID(testGroup.uuid);
+
+      expect(Array.isArray(actors)).toBe(true);
+      expect(actors.length).toBeGreaterThanOrEqual(1);
+      const checkedActor = actors.find((a) => a.id === testGroupActor.id);
+      expect(checkedActor).not.toBeNull();
+      expect(checkedActor.toJSON()).toMatchObject({
+        id: testGroupActor.id,
+        uuid: testGroupActor.uuid,
+      });
+      expect(checkedActor).toHaveProperty('owner'); // 需要有owner信息
+      expect(checkedActor.owner).not.toBeNull();
+      expect(checkedActor.owner.id).toBe(testGroupActor.ownerId);
+    });
+
     test('GroupActor.editActorInfo should be ok', async () => {
       const testUser = await getTestUser();
       const targetInfo = {
@@ -356,6 +393,53 @@ describe('group model function', () => {
       const owner: PlayerUser = await groupActor.getOwner();
 
       expect(owner.uuid).toBe(testUser9.uuid);
+    });
+  });
+
+  describe('GroupDetail', () => {
+    test('GroupDetail.saveGroupDetail should be ok', async () => {
+      const master_name = '地下城主';
+      const testUser = await getTestUser();
+      await GroupDetail.saveGroupDetail(testGroup.uuid, testUser.uuid, {
+        master_name,
+      });
+
+      const detail: GroupDetail = await GroupDetail.findOne({
+        where: {
+          groupId: testGroup.id,
+        },
+      });
+
+      expect(detail).not.toBeNull();
+      expect(detail.groupId).toBe(testGroup.id);
+      expect(detail.master_name).toBe(master_name);
+
+      await detail.destroy();
+    });
+  });
+
+  describe('GroupChannel', () => {
+    test('GroupChannel.createChannel should be ok', async () => {
+      const testUser = await getTestUser();
+      const name = 'test channel';
+      const desc = 'test channel desc';
+      const channel = await GroupChannel.createChannel(
+        testGroup.uuid,
+        testUser.uuid,
+        name,
+        desc
+      );
+
+      try {
+        expect(channel.groupId).toBe(testGroup.id);
+        expect(channel.name).toBe(name);
+        expect(channel.desc).toBe(desc);
+        expect(Array.isArray(channel.members)).toBe(true);
+        expect(channel.members.length).toBeGreaterThan(0);
+        expect(channel.members.includes(testUser.uuid)).toBe(true);
+      } finally {
+        await channel.destroy();
+      }
     });
   });
 });

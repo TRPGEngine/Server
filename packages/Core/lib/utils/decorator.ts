@@ -1,6 +1,5 @@
 import { getGlobalApplication } from 'lib/application';
 import _ from 'lodash';
-import { Model } from 'trpg/core';
 
 type HashFn = (uuid: string) => string;
 /**
@@ -40,7 +39,7 @@ export function buildFindByUUIDCache(hashFn: HashFn) {
           isNewRecord: false,
         });
       } else {
-        const data = await findByUUID(uuid);
+        const data = await findByUUID.call(target, uuid);
         if (!_.isNil(data)) {
           // 仅不为空的时候记录缓存
           await trpgapp.cache.set(cacheKey, data); // 设置缓存

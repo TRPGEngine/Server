@@ -4,6 +4,11 @@ import { buildAppContext } from 'test/utils/app';
 
 const context = buildAppContext();
 
+describe('ChatLog', () => {
+  test.todo('ChatLog.findDeepByUUID should be ok');
+  test.todo('ChatLog.updateByUUID should be ok');
+});
+
 describe('chatconverse model', () => {
   test('ChatConverse.createMultiConverse should be ok', async () => {
     const testUser1 = await getTestUser();

@@ -1,4 +1,4 @@
-import { Model, Orm, DBInstance } from 'trpg/core';
+import { Model, Orm, DBInstance, Op } from 'trpg/core';
 import {
   ChatMessageType,
   ChatMessagePayload,
@@ -8,6 +8,7 @@ import _ from 'lodash';
 import generateUUID from 'uuid/v4';
 import emoji from 'node-emoji';
 import Debug from 'debug';
+import { notifyUpdateMessage } from '../notify';
 const debug = Debug('trpg:component:chat:model:log');
 
 export class ChatLog extends Model implements ChatMessagePayload {
@@ -39,12 +40,101 @@ export class ChatLog extends Model implements ChatMessagePayload {
   }
 
   /**
+   * 在数据库或内存中查找消息
+   */
+  public static async findDeepByUUID(
+    uuid: string
+  ): Promise<{
+    msg: ChatMessagePartial;
+    inCache: boolean;
+  }> {
+    let msg: ChatMessagePartial = await ChatLog.findByUUID(uuid);
+    let inCache = false;
+    if (_.isNil(msg)) {
+      // 在数据库中没有找到，尝试在缓存中查找
+      msg = await ChatLog.getCachedChatLogByUUID(uuid);
+      if (_.isNil(msg)) {
+        throw new Error('找不到此信息');
+      }
+      inCache = true;
+    }
+
+    return {
+      msg,
+      inCache,
+    };
+  }
+
+  /**
+   * 获取一定范围内的所有会话内容
+   * @param converseUUID 会话UUID
+   * @param from 开始时间
+   * @param to 结束时间
+   */
+  public static async findRangeConverseLog(
+    converseUUID: string,
+    from: Date,
+    to: Date
+  ): Promise<ChatLog[]> {
+    return ChatLog.findAll({
+      where: {
+        converse_uuid: converseUUID,
+        revoke: false, // 获取范围聊天记录时不返回撤回的消息
+        date: { [Op.between]: [from, to] },
+      },
+    });
+  }
+
+  /**
+   * 更新消息内容
+   * @param uuid 消息UUID
+   * @param payload 要更新的消息内容, 可以为部分参数
+   */
+  public static async updateByUUID(
+    uuid: string,
+    payload: ChatMessagePartial
+  ): Promise<ChatMessagePayload> {
+    const app = ChatLog.getApplication();
+
+    let isSaved = false;
+
+    // 先在缓存中查找数据
+    let fullPayload: ChatMessagePayload;
+    await app.cache.lockScope(ChatLog.CACHE_DUMP_LOCK, async () => {
+      const list = await ChatLog.getCachedChatLog();
+      const index = list.findIndex((item) => item.uuid === uuid);
+      if (index >= 0) {
+        fullPayload = {
+          ...list[index],
+          ...payload,
+        };
+        await ChatLog.updateCachedChatLog(index, fullPayload);
+        isSaved = true;
+      }
+    });
+
+    if (!isSaved) {
+      // 如果没有则在数据库中查找并更新
+      const msg = await ChatLog.findByUUID(uuid);
+      _.merge(fullPayload, payload);
+      await msg.save();
+
+      fullPayload = msg.toJSON() as ChatMessagePayload;
+    }
+
+    // 更新完毕后通知相关用户更新消息
+    notifyUpdateMessage(uuid, fullPayload);
+
+    return fullPayload;
+  }
+
+  /**
    * 获取缓存的聊天记录
    */
-  public static async getCachedChatLog(): Promise<ChatMessagePartial[]> {
+  public static async getCachedChatLog(): Promise<ChatMessagePayload[]> {
     const trpgapp = ChatLog.getApplication();
     const cachedList = await trpgapp.cache.lget(ChatLog.CACHE_KEY);
-    return cachedList.filter<object>((i): i is object => _.isObject(i));
+    return cachedList.filter((i): i is ChatMessagePayload => _.isObject(i));
   }
 
   /**
@@ -52,7 +142,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
    */
   public static async getCachedChatLogByUUID(
     msgUUID: string
-  ): Promise<ChatMessagePartial> {
+  ): Promise<ChatMessagePayload> {
     const cachedList = await ChatLog.getCachedChatLog();
     return cachedList.find((msg) => msg.uuid === msgUUID);
   }
@@ -217,7 +307,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
    * @param userUUID 操作者UUID
    */
   public static async revokeMsg(msgUUID: string, userUUID: string) {
-    let msg: ChatMessagePartial = await ChatLog.findByUUID(msgUUID);
+    let msg: ChatMessagePayload = await ChatLog.findByUUID(msgUUID);
     let isCachedMsg = false;
     let isGroupManagerRevoke = false; // 是否为团管理员的撤回(没有时间限制)
     if (_.isNil(msg)) {
@@ -309,39 +399,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
     }
 
     // 通知所有用户可以看得到消息的人已撤回
-    const notifyPayload = {
-      ...updatedMsgPayload,
-      uuid: msgUUID,
-    };
-    if (!_.isEmpty(msg.to_uuid)) {
-      // 该消息是发送给个人的
-      app.player.manager.unicastSocketEvent(
-        msg.to_uuid,
-        'chat::updateMessage',
-        {
-          converseUUID: msg.sender_uuid,
-          payload: notifyPayload,
-        }
-      );
-      app.player.manager.unicastSocketEvent(
-        msg.sender_uuid,
-        'chat::updateMessage',
-        {
-          converseUUID: msg.to_uuid,
-          payload: notifyPayload,
-        }
-      );
-    } else if (!_.isEmpty(msg.converse_uuid)) {
-      // 该消息为团消息
-      app.player.manager.roomcastSocketEvent(
-        msg.converse_uuid,
-        'chat::updateMessage',
-        {
-          converseUUID: msg.converse_uuid,
-          payload: notifyPayload,
-        }
-      );
-    }
+    notifyUpdateMessage(msgUUID, { ...msg, ...updatedMsgPayload });
   }
 }
 

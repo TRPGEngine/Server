@@ -17,6 +17,7 @@ import SSORouter from './routers/sso';
 import registerRouter from './routers/register';
 import onlineRouter from './routers/online';
 import { isTestEnv } from 'lib/helper/utils';
+import { autoLeaveSockeRoom } from './managers/socketroom-manager';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -227,7 +228,9 @@ export default class Player extends BasePackage {
 
       if (player) {
         debug('user[%s] disconnect, remove it from list', player.uuid);
-        app.player.manager.removePlayer(player.uuid, player.platform);
+        autoLeaveSockeRoom(app, socket).then(() => {
+          app.player.manager.removePlayer(player.uuid, player.platform);
+        });
       }
     });
   }

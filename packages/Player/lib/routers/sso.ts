@@ -10,7 +10,7 @@ SSORouter.post('/sso/login', async (ctx) => {
 
   const player = await PlayerUser.findByUsernameAndPassword(username, password);
   if (_.isNil(player)) {
-    throw '用户不存在或密码错误';
+    throw new Error('用户不存在或密码错误');
   }
 
   const jwt = await PlayerUser.signJWT(player.uuid);

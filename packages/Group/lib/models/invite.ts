@@ -27,7 +27,7 @@ export class GroupInvite extends Model {
     targetUUIDs: string[]
   ): Promise<GroupInvite[]> {
     if (targetUUIDs.includes(fromUUID)) {
-      throw '你不能邀请你自己';
+      throw new Error('你不能邀请你自己');
     }
 
     const group: GroupGroup = await GroupGroup.findOne({
@@ -36,11 +36,11 @@ export class GroupInvite extends Model {
       },
     });
     if (_.isNil(group)) {
-      throw '该团不存在';
+      throw new Error('该团不存在');
     }
 
     if (!group.isManagerOrOwner(fromUUID)) {
-      throw '抱歉您不是该团管理员没有邀请权限';
+      throw new Error('抱歉您不是该团管理员没有邀请权限');
     }
 
     // TODO: 没有想好怎么处理重复发送的问题。先不处理

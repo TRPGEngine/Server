@@ -1,7 +1,7 @@
 const Raven = require('raven');
 import { getLogger } from './logger';
+const logger = getLogger();
 const appLogger = getLogger('application');
-const errorLogger = getLogger('error');
 
 interface ReportConfig {
   enable: boolean;
@@ -40,7 +40,12 @@ class ReportService {
     }
 
     if (setting.logger) {
-      errorLogger.error(err);
+      logger.error(
+        {
+          tags: ['app'],
+        },
+        err
+      );
     }
 
     if (this.installed) {

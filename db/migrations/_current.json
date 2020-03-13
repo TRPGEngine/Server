@@ -1951,6 +1951,14 @@
                     "field": "master_name",
                     "seqType": "Sequelize.STRING"
                 },
+                "disable_check_actor": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "comment": "是否禁止查看人物卡, 用于秘密团",
+                    "field": "disable_check_actor",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
                 "background_image_url": {
                     "field": "background_image_url",
                     "seqType": "Sequelize.STRING"
@@ -1959,11 +1967,11 @@
                     "field": "welcome_msg_payload",
                     "seqType": "Sequelize.JSON"
                 },
-                "allow_quick_dice": {
+                "disable_quick_dice": {
                     "defaultValue": {
-                        "value": true
+                        "value": false
                     },
-                    "field": "allow_quick_dice",
+                    "field": "disable_quick_dice",
                     "seqType": "Sequelize.BOOLEAN"
                 },
                 "createdAt": {
@@ -2016,6 +2024,14 @@
                     "field": "desc",
                     "seqType": "Sequelize.STRING"
                 },
+                "members": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.Array"
+                    },
+                    "field": "members",
+                    "seqType": "Sequelize.JSON"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -2046,44 +2062,6 @@
                     "onDelete": "SET NULL",
                     "onUpdate": "CASCADE",
                     "field": "ownerId",
-                    "seqType": "Sequelize.INTEGER"
-                }
-            },
-            "indexes": []
-        },
-        "group_channel_member": {
-            "tableName": "group_channel_member",
-            "schema": {
-                "createdAt": {
-                    "allowNull": false,
-                    "field": "createdAt",
-                    "seqType": "Sequelize.DATE"
-                },
-                "updatedAt": {
-                    "allowNull": false,
-                    "field": "updatedAt",
-                    "seqType": "Sequelize.DATE"
-                },
-                "groupChannelId": {
-                    "primaryKey": true,
-                    "references": {
-                        "model": "group_channel",
-                        "key": "id"
-                    },
-                    "onDelete": "CASCADE",
-                    "onUpdate": "CASCADE",
-                    "field": "groupChannelId",
-                    "seqType": "Sequelize.INTEGER"
-                },
-                "playerUserId": {
-                    "primaryKey": true,
-                    "references": {
-                        "model": "player_user",
-                        "key": "id"
-                    },
-                    "onDelete": "CASCADE",
-                    "onUpdate": "CASCADE",
-                    "field": "playerUserId",
                     "seqType": "Sequelize.INTEGER"
                 }
             },
@@ -3046,5 +3024,5 @@
             "indexes": []
         }
     },
-    "revision": 41
+    "revision": 44
 }

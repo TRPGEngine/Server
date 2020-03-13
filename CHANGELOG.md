@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/TRPGEngine/Server/compare/v1.13.1...v1.14.0) (2020-03-13)
+
+
+### Features
+
+* **dice:** 增加ra判定骰的消息指令 ([85bfe0d](https://github.com/TRPGEngine/Server/commit/85bfe0d1181ef5f1f00d9f24857bc65150bef15e))
+* **dice:** 增加判定骰的实现 ([82ac44c](https://github.com/TRPGEngine/Server/commit/82ac44cd22ee9d7725260a86fc5045e180efcce3))
+* **group:** 增加创建子频道的接口 ([1ab92df](https://github.com/TRPGEngine/Server/commit/1ab92df55e98f528100839f37847f09a4ce2e2a0))
+* **group:** 增加团详情的保存 ([b9c184c](https://github.com/TRPGEngine/Server/commit/b9c184ce3896bb37d30906a0a6a49d18746f4e2d))
+* **group:** 增加获取团范围聊天记录的操作 ([186efac](https://github.com/TRPGEngine/Server/commit/186efac114fc8d6254fadfc6da0aa5289f565f2f))
+* **group:** 频道的成员增加与移除 ([dcc946c](https://github.com/TRPGEngine/Server/commit/dcc946c46e17bdd562587d95a3a0f1da5fa9e58c))
+* **trpg:** 增加新包 ([7e3f57b](https://github.com/TRPGEngine/Server/commit/7e3f57beb5b0451405629ac9febadb43e632b1ac))
+
+
+### Bug Fixes
+
+* **playground:** 修复博物学初始值错误的bug ([d8330a1](https://github.com/TRPGEngine/Server/commit/d8330a1b0af164e71052ea222144e3b7fb74f11e))
+
 ### [1.13.1](https://github.com/TRPGEngine/Server/compare/v1.13.0...v1.13.1) (2020-03-09)
 
 

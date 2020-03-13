@@ -11,7 +11,7 @@ import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupGroup } from './group';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
-import { nofifyUpdateGroupActorInfo, nofifyUpdateGroupActor } from '../notify';
+import { notifyUpdateGroupActorInfo, notifyUpdateGroupActor } from '../notify';
 
 export class GroupActor extends Model {
   id: number;
@@ -105,7 +105,7 @@ export class GroupActor extends Model {
     await groupActor.save();
 
     // 通知房间所有用户更新团人物信息
-    nofifyUpdateGroupActorInfo(group.uuid, groupActor);
+    notifyUpdateGroupActorInfo(group.uuid, groupActor);
 
     return groupActor;
   }
@@ -259,7 +259,7 @@ export class GroupActor extends Model {
     await groupActor.save();
 
     // 通知房间所有用户更新团人物信息
-    nofifyUpdateGroupActor(group.uuid, groupActor);
+    notifyUpdateGroupActor(group.uuid, groupActor);
 
     return groupActor;
   }
@@ -292,7 +292,7 @@ export class GroupActor extends Model {
       throw new Error('找不到该人物所在团');
     }
     if (!group.isManagerOrOwner(playerUUID)) {
-      throw '没有操作权限';
+      throw new Error('没有操作权限');
     }
 
     await groupActor.destroy();

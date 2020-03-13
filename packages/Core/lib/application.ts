@@ -389,7 +389,6 @@ export class Application extends events.EventEmitter {
 
   // 记录错误
   error(err) {
-    console.error('Error', err);
     this.reportservice.reportError(err);
   }
 

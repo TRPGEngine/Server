@@ -8,6 +8,8 @@ import { GroupGroup } from './models/group';
 import { GroupActor } from './models/actor';
 import { GroupRequest } from './models/request';
 import { ChatLog } from 'packages/Chat/lib/models/log';
+import { GroupDetail } from './models/detail';
+import { GroupChannel } from './models/channel';
 
 export const create: EventFunc<{
   name: string;
@@ -26,14 +28,14 @@ export const create: EventFunc<{
 
   const { name, sub_name, desc, avatar } = data;
   if (!name) {
-    throw '缺少团名';
+    throw new Error('缺少团名');
   }
 
   const isExist = await GroupGroup.findOne({
     where: { name },
   });
   if (!!isExist) {
-    throw '该团名已存在';
+    throw new Error('该团名已存在');
   }
 
   const user = await PlayerUser.findByUUID(userUUID);
@@ -593,7 +595,7 @@ export const getGroupList: EventFunc<{}> = async function getGroupList(
     throw '用户不存在，请检查登录状态';
   }
 
-  const groups = await GroupGroup.getAllUserGroupList(player.uuid)
+  const groups = await GroupGroup.getAllUserGroupList(player.uuid);
 
   return { groups };
 };
@@ -1187,5 +1189,107 @@ export const setGroupStatus: EventFunc<{
     groupUUID,
     groupStatus,
   });
+  return true;
+};
+
+/**
+ * 保存团详情
+ */
+export const saveGroupDetail: EventFunc<{
+  groupUUID: string;
+  detailData: {};
+}> = async function(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户不存在，请检查登录状态';
+  }
+
+  const { groupUUID, detailData } = data;
+
+  await GroupDetail.saveGroupDetail(groupUUID, player.uuid, detailData);
+
+  return true;
+};
+
+/**
+ * 创建团子频道
+ */
+export const createGroupChannel: EventFunc<{
+  groupUUID: string;
+  name: string;
+  desc: string;
+}> = async function(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户不存在，请检查登录状态';
+  }
+
+  const { groupUUID, name, desc } = data;
+  if (_.isNil(groupUUID) || _.isNil(name)) {
+    throw new Error('缺少必要参数');
+  }
+
+  const channel = await GroupChannel.createChannel(
+    groupUUID,
+    player.uuid,
+    name,
+    desc
+  );
+
+  // 创建频道后创建者加入房间
+  app.player.manager.joinRoom(channel.uuid, socket);
+
+  return { channel };
+};
+
+/**
+ * 增加团频道的成员
+ */
+export const addGroupChannelMember: EventFunc<{
+  channelUUID: string;
+  memberUUIDs: string[];
+}> = async function(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户不存在，请检查登录状态';
+  }
+
+  const { channelUUID, memberUUIDs } = data;
+  if (_.isNil(channelUUID) || _.isNil(memberUUIDs)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await GroupChannel.addMember(channelUUID, player.uuid, memberUUIDs);
+
+  return true;
+};
+
+/**
+ * 移除团频道的成员
+ */
+export const removeGroupChannelMember: EventFunc<{
+  channelUUID: string;
+  memberUUIDs: string[];
+}> = async function(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw '用户不存在，请检查登录状态';
+  }
+
+  const { channelUUID, memberUUIDs } = data;
+  if (_.isNil(channelUUID) || _.isNil(memberUUIDs)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await GroupChannel.removeMember(channelUUID, player.uuid, memberUUIDs);
+
   return true;
 };

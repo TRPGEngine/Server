@@ -3,10 +3,11 @@ import {
   PlayerManagerCls,
   PlayerMsgPayload,
   PlayerManagerPlayerMap,
+  getRoomKey,
 } from '../lib/managers/player-manager';
 import Config from 'config';
 import { RedisCache } from 'packages/Core/lib/cache';
-import { sleep } from 'test/utils/utils';
+import { sleep, generateRandomStr } from 'test/utils/utils';
 import _ from 'lodash';
 import { Socket } from 'trpg/core';
 import { createFakeSocket } from 'test/utils/socket';
@@ -180,6 +181,42 @@ describe('player-manager class test', () => {
     expect(disconnectFn).toBeCalledTimes(1);
   });
 
+  it('joinRoom should be ok', async () => {
+    const socket = createFakeSocket();
+    const roomUUID = generateRandomStr();
+    await playerManager.addPlayer('test1', socket, 'web');
+    await playerManager.joinRoom(roomUUID, socket);
+
+    await sleep(500);
+
+    expect(playerManager.findPlayer(socket).rooms.has(roomUUID)).toBe(true);
+    expect(
+      (await playerManager.cache.smembers(getRoomKey(roomUUID))).includes(
+        socket.id
+      )
+    ).toBe(true);
+  });
+
+  it('leaveRoom should be ok', async () => {
+    const socket = createFakeSocket();
+    const roomUUID = generateRandomStr();
+    await playerManager.addPlayer('test1', socket, 'web');
+    await playerManager.joinRoom(roomUUID, socket);
+
+    await sleep(200);
+
+    await playerManager.leaveRoom(roomUUID, socket);
+
+    await sleep(200);
+
+    expect(playerManager.findPlayer(socket).rooms.has(roomUUID)).toBe(false);
+    expect(
+      (await playerManager.cache.smembers(getRoomKey(roomUUID))).includes(
+        socket.id
+      )
+    ).toBe(false);
+  });
+
   describe('single instance', () => {
     it('unicastSocketEvent should be ok', async () => {
       const socket1 = createFakeSocket();
@@ -240,7 +277,7 @@ describe('player-manager class test', () => {
       await sleep(500);
 
       const emit1 = socket1.emit as jest.Mock;
-      const emit2 = socket1.emit as jest.Mock;
+      const emit2 = socket2.emit as jest.Mock;
       expect(emit1).toBeCalled();
       expect(emit1).toBeCalledTimes(1);
       expect(emit2).toBeCalled();

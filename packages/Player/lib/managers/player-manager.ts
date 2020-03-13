@@ -13,7 +13,7 @@ const debug = Debug('trpg:component:player:manager');
 const ONLINE_PLAYER_KEY = 'player:manager:online_player_uuid_list';
 const CHANNEL_KEY = 'player:manager:channel';
 const TICK_PLAYER_EVENTNAME = 'player::tick';
-const getRoomKey = (uuid: string) => `player:manager:room#${uuid}`;
+export const getRoomKey = (uuid: string) => `player:manager:room#${uuid}`;
 
 // 消息类型: 单播 房间广播 全体广播
 type PlayerMsgPayloadType = 'unicast' | 'listcast' | 'roomcast' | 'broadcast';
@@ -213,8 +213,16 @@ class PlayerManager extends EventEmitter {
     }
   }
 
+  /**
+   * 让某个用户远程加入房间
+   * @param roomUUID 房间UUID
+   * @param uuid 用户UUID
+   */
   async joinRoomWithUUID(roomUUID: string, uuid: string): Promise<void> {
     await this.unicastSocketEvent(uuid, '_remoteJoinRoom', { roomUUID });
+  }
+  async joinRoomWithUUIDs(roomUUID: string, uuids: string[]): Promise<void> {
+    await this.listcastSocketEvent(uuids, '_remoteJoinRoom', { roomUUID });
   }
 
   /**
@@ -232,8 +240,18 @@ class PlayerManager extends EventEmitter {
     }
   }
 
+  /**
+   * 让某个用户远程离开房间
+   * NOTICE: 需要注意会不会出现同一用户有两个连接被踢的情况
+   * 这些方法只能用于离开房间的操作。不能用于断开连接
+   * @param roomUUID 房间UUID
+   * @param uuid 用户UUID
+   */
   async leaveRoomWithUUID(roomUUID: string, uuid: string): Promise<void> {
     await this.unicastSocketEvent(uuid, '_remoteLeaveRoom', { roomUUID });
+  }
+  async leaveRoomWithUUIDs(roomUUID: string, uuids: string[]): Promise<void> {
+    await this.listcastSocketEvent(uuids, '_remoteLeaveRoom', { roomUUID });
   }
 
   async getRoomAllSocketIds(roomUUID: string): Promise<string[]> {
@@ -419,7 +437,7 @@ class PlayerManager extends EventEmitter {
   }
 
   /**
-   * 移除玩家
+   * 从在线玩家列表移除玩家
    * @param uuid uuid
    * @param platform 平台
    * @param retainStatus 是否保留用户登录状态，用于用户自己踢自己
@@ -444,15 +462,9 @@ class PlayerManager extends EventEmitter {
     }
 
     if (!retainStatus) {
-      // 离开房间
-      await Promise.all([
-        this.cache.srem(ONLINE_PLAYER_KEY, uuidKey), // 如果不需要保留登录状态 则移除用户的登录状态
-        ...Array.from(player.rooms).map((roomUUID) =>
-          this.leaveRoom(roomUUID, socket)
-        ),
-      ]).then(() =>
-        debug(`[PlayerManager] 用户[${uuid}]已移除登录状态并已离开所有房间`)
-      );
+      await this.cache
+        .srem(ONLINE_PLAYER_KEY, uuidKey) // 如果不需要保留登录状态 则移除用户的登录状态
+        .then(() => debug(`[PlayerManager] 用户[${uuid}]已移除登录状态`));
     }
   }
 

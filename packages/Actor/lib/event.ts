@@ -47,12 +47,12 @@ export const findTemplate: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   let nameFragment = data.name;
   if (!nameFragment) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const templates = await ActorTemplate.findTemplateAsync(nameFragment);
@@ -82,7 +82,7 @@ export const createTemplate: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const name = data.name;

@@ -35,13 +35,13 @@ exports.bindMail = async function bindMail(data, cb, db) {
   }
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   let userUUID = player.uuid;
 
   let { address } = data;
   if (!address) {
-    throw '缺少参数';
+    throw new Error('缺少参数');
   }
 
   let isExists = await db.models.mail_list.existsAsync({
@@ -49,7 +49,7 @@ exports.bindMail = async function bindMail(data, cb, db) {
     enabled: true,
   });
   if (isExists) {
-    throw '已绑定邮箱, 如需绑定新邮箱请先解绑';
+    throw new Error('已绑定邮箱, 如需绑定新邮箱请先解绑');
   }
 
   // TODO: 需要增加限制处理，防止被识别为垃圾邮件
@@ -87,7 +87,7 @@ exports.bindMail = async function bindMail(data, cb, db) {
   );
   if (!res.is_success) {
     await mail.destroy(); // 如果邮件发送失败，则删除邮件列表里的记录
-    throw `邮件发送失败:${res.error}`;
+    throw new Error(`邮件发送失败:${res.error}`);
   }
 
   return true;

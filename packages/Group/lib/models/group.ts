@@ -18,6 +18,7 @@ import { ChatLog } from 'packages/Chat/lib/models/log';
 import { notifyUpdateGroupInfo } from '../notify';
 import Debug from 'debug';
 import { GroupDetail } from './detail';
+import { GroupChannel } from './channel';
 const debug = Debug('trpg:component:group:model:group');
 
 type GroupType = 'group' | 'channel' | 'test';
@@ -46,6 +47,7 @@ export class GroupGroup extends Model {
 
   members_count?: number;
   detail?: GroupDetail;
+  channels?: GroupChannel[];
 
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
@@ -158,13 +160,13 @@ export class GroupGroup extends Model {
   ) {
     const group = await GroupGroup.findByUUID(groupUUID);
     if (!group) {
-      throw '找不到团';
+      throw new Error('找不到团');
     }
     if (!group.isManagerOrOwner(playerUUID)) {
-      throw '没有修改权限';
+      throw new Error('没有修改权限');
     }
 
-    // IDEA: 为防止意外暂时只允许修改 EDITABLE_FIELDS 指定的字段
+    // IDEA: 为防止意外, 暂时只允许修改 EDITABLE_FIELDS 指定的字段
     for (const field of GroupGroup.EDITABLE_FIELDS) {
       if (!_.isNil(groupInfo[field])) {
         group[field] = groupInfo[field];
@@ -173,13 +175,14 @@ export class GroupGroup extends Model {
 
     await group.save();
 
-    notifyUpdateGroupInfo(group.uuid, group.toJSON());
+    notifyUpdateGroupInfo(group.uuid, group);
 
     return group;
   }
 
   /**
    * 获取用户所加入的所有团的列表
+   * 返回的信息包含团detail信息
    * @param userUUID 用户UUID
    */
   static async getAllUserGroupList(userUUID: string): Promise<GroupGroup[]> {
@@ -194,8 +197,42 @@ export class GroupGroup extends Model {
           model: GroupDetail,
           as: 'detail',
         },
+        {
+          model: GroupChannel,
+          as: 'channels',
+        },
       ],
     });
+  }
+
+  /**
+   * 获取团聊天记录
+   */
+  static async getGroupChatLog(
+    groupUUID: string,
+    playerUUID: string,
+    from: string,
+    to: string
+  ): Promise<ChatLog[]> {
+    const user = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(user)) {
+      throw new Error('用户不存在');
+    }
+
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(user)) {
+      throw new Error('团不存在');
+    }
+
+    if (!(await group.hasMember(user))) {
+      throw new Error('不是团成员');
+    }
+
+    return ChatLog.findRangeConverseLog(
+      groupUUID,
+      new Date(from),
+      new Date(to)
+    );
   }
 
   /**
@@ -279,34 +316,34 @@ export class GroupGroup extends Model {
   }> {
     const group = await GroupGroup.findByUUID(groupUUID);
     if (_.isNil(group)) {
-      throw '找不到团';
+      throw new Error('找不到团');
     }
 
     if (group.owner_uuid === userUUID) {
-      throw '作为团主持人你无法直接退出群';
+      throw new Error('作为团主持人你无法直接退出群');
     }
 
     const user = await PlayerUser.findByUUID(userUUID);
     if (_.isNil(user)) {
-      throw '找不到用户';
+      throw new Error('找不到用户');
     }
 
     if (_.isString(operatorUserUUID)) {
       // 有操作人, 进行权限校验
       if (!group.isManagerOrOwner(operatorUserUUID)) {
         // 操作人不是管理
-        throw '您没有该权限';
+        throw new Error('您没有该权限');
       } else if (
         group.isManagerOrOwner(userUUID) &&
         group.owner_uuid !== operatorUserUUID
       ) {
         // 被踢人是管理但操作人不是团所有人
-        throw '您没有该权限';
+        throw new Error('您没有该权限');
       }
     }
 
     if (!(await group.hasMember(user))) {
-      throw '该团没有该成员';
+      throw new Error('该团没有该成员');
     }
 
     await group.removeMember(user);
@@ -330,6 +367,26 @@ export class GroupGroup extends Model {
       user,
       group,
     };
+  }
+
+  /**
+   * 获取团成员当前选择的团人物卡UUID
+   * @param groupUUID 团UUID
+   * @param playerUUID 要查找的用户的UUID
+   */
+  static async getMemberCurrentGroupActorUUID(
+    groupUUID: string,
+    playerUUID: string
+  ): Promise<string | null> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    const member = await group.getMemberByUUID(playerUUID);
+
+    const selectedGroupActorUUID = _.get(member, [
+      'group_group_members',
+      'selected_group_actor_uuid',
+    ]);
+
+    return selectedGroupActorUUID;
   }
 
   /**
@@ -372,6 +429,22 @@ export class GroupGroup extends Model {
    */
   getManagerUUIDs(): string[] {
     return Array.from(new Set([this.owner_uuid].concat(this.managers_uuid)));
+  }
+
+  /**
+   * 获取在某个团中的用户信息
+   * 返回的信息中会包含关联模型关联信息
+   * @param playerUUID 用户UUID
+   */
+  async getMemberByUUID(playerUUID: string): Promise<PlayerUser | null> {
+    return _.first(
+      await this.getMembers({
+        where: {
+          uuid: playerUUID,
+        },
+        limit: 1,
+      })
+    );
   }
 
   /**

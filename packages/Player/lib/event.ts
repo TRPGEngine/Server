@@ -7,49 +7,7 @@ import { PlayerUser } from './models/user';
 import { TRPGApplication, Socket } from 'trpg/core';
 import { Platform } from '../types/player';
 import { PlayerInvite } from './models/invite';
-
-/**
- * 自动加入房间
- * @param socket 连接
- */
-const autoJoinSocketRoom = async function autoJoinSocketRoom(
-  this: TRPGApplication,
-  socket: Socket
-) {
-  if (!socket) {
-    debug('add room error. not find this socket');
-    return;
-  }
-
-  const app = this;
-  const player = app.player.manager.findPlayer(socket);
-  if (!player) {
-    debug('Add room error. not find this socket attach player');
-    return;
-  }
-
-  if (!app.group) {
-    debug('Add room error. need group component');
-    return;
-  }
-
-  const user = await PlayerUser.findByUUID(player.uuid);
-  if (!user) {
-    debug('Add room error. Not found user');
-    return;
-  }
-
-  const groups = await (user as any).getGroups();
-
-  // 团UUID就是房间号
-  await Promise.all(
-    groups
-      .map((group) => group.uuid)
-      .map((roomUUID: string) => app.player.manager.joinRoom(roomUUID, socket))
-  ).catch((err) => {
-    debug('auto join room error: %o', err);
-  });
-};
+import { autoJoinSocketRoom } from './managers/socketroom-manager';
 
 export const login: EventFunc<{
   username: string;
@@ -71,7 +29,7 @@ export const login: EventFunc<{
 
   if (!username || !password) {
     debug('login fail, miss necessary parameter: %o', data);
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const user = await PlayerUser.findByUsernameAndPassword(username, password);
@@ -106,7 +64,7 @@ export const login: EventFunc<{
     // 加入到列表中
     if (!!app.player) {
       await app.player.manager.addPlayer(user.uuid, socket, platform);
-      await autoJoinSocketRoom.call(app, socket);
+      await autoJoinSocketRoom(app, socket);
     }
 
     await socket.iosession.set('user', user.getInfo(true)); // 将用户信息加入到session中
@@ -157,7 +115,7 @@ export const loginWithToken: EventFunc<{
 
   if (!uuid || !token) {
     debug('login with token fail, miss necessary parameter: %o', data);
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let cond = { uuid };
@@ -190,7 +148,7 @@ export const loginWithToken: EventFunc<{
     // 加入到列表中
     if (!!app.player) {
       await app.player.manager.addPlayer(user.uuid, socket, platform);
-      await autoJoinSocketRoom.call(app, socket);
+      await autoJoinSocketRoom(app, socket);
     }
     await socket.iosession.set('user', user.getInfo(true)); // 将用户信息加入到session中
 
@@ -232,7 +190,7 @@ export const getWebToken: EventFunc<{}> = async function getWebToken(
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '当前用户不存在';
+    throw new Error('当前用户不存在');
   }
 
   const jwt = await PlayerUser.signJWT(player.uuid);
@@ -251,12 +209,12 @@ export const register: EventFunc<{
   const password = data.password;
 
   if (username.length > 18) {
-    throw '注册失败!用户名过长';
+    throw new Error('注册失败!用户名过长');
   }
 
   if (!username || !password) {
     debug('register fail, miss necessary parameter: %o', data);
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const user = await PlayerUser.findOne({
@@ -265,7 +223,7 @@ export const register: EventFunc<{
 
   if (!!user) {
     debug('register failed!user %s has been existed', user.username);
-    throw '用户名已存在';
+    throw new Error('用户名已存在');
   }
 
   const salt = PlayerUser.genSalt();
@@ -288,7 +246,7 @@ export const getInfo: EventFunc<{
   const uuid = data.uuid;
 
   if (!type) {
-    throw '参数不全';
+    throw new Error('参数不全');
   }
 
   if (type === 'self') {
