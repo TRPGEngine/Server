@@ -206,6 +206,36 @@ export class GroupGroup extends Model {
   }
 
   /**
+   * 获取团聊天记录
+   */
+  static async getGroupChatLog(
+    groupUUID: string,
+    playerUUID: string,
+    from: string,
+    to: string
+  ): Promise<ChatLog[]> {
+    const user = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(user)) {
+      throw new Error('用户不存在');
+    }
+
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(user)) {
+      throw new Error('团不存在');
+    }
+
+    if (!(await group.hasMember(user))) {
+      throw new Error('不是团成员');
+    }
+
+    return ChatLog.findRangeConverseLog(
+      groupUUID,
+      new Date(from),
+      new Date(to)
+    );
+  }
+
+  /**
    * 添加团成员
    * @param groupUUID 团UUID
    * @param userUUID 要加入的用户的UUID

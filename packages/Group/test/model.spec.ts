@@ -130,6 +130,8 @@ describe('group model function', () => {
       });
     });
 
+    test.todo('GroupGroup.getGroupChatLog should be ok');
+
     test('GroupGroup.addGroupMember should be ok', async () => {
       const testUser = await getTestUser();
       await GroupGroup.addGroupMember(

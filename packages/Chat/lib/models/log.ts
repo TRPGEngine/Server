@@ -1,4 +1,4 @@
-import { Model, Orm, DBInstance } from 'trpg/core';
+import { Model, Orm, DBInstance, Op } from 'trpg/core';
 import {
   ChatMessageType,
   ChatMessagePayload,
@@ -63,6 +63,25 @@ export class ChatLog extends Model implements ChatMessagePayload {
       msg,
       inCache,
     };
+  }
+
+  /**
+   * 获取一定范围内的所有会话内容
+   * @param converseUUID 会话UUID
+   * @param from 开始时间
+   * @param to 结束时间
+   */
+  public static async findRangeConverseLog(
+    converseUUID: string,
+    from: Date,
+    to: Date
+  ): Promise<ChatLog[]> {
+    return ChatLog.findAll({
+      where: {
+        converse_uuid: converseUUID,
+        date: { [Op.between]: [from, to] },
+      },
+    });
   }
 
   /**

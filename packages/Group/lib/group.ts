@@ -8,6 +8,7 @@ import GroupActorDefinition from './models/actor';
 import GroupRequestDefinition from './models/request';
 import GroupDetailDefinition from './models/detail';
 import actorRouter from './routers/actor';
+import groupRouter from './routers/group';
 import GroupChannelDefinition from './models/channel';
 import { regRoomGather } from 'packages/Player/lib/managers/socketroom-manager';
 
@@ -84,6 +85,7 @@ export default class Group extends BasePackage {
     );
 
     this.regRoute(actorRouter);
+    this.regRoute(groupRouter);
 
     this.regStatJob('groupCount', async () => {
       let res = await db.models.group_group.count();
