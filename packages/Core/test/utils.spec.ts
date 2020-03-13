@@ -7,7 +7,7 @@ const context = buildAppContext();
 describe('utils test', () => {
   describe('decorator', () => {
     test('buildFindByUUIDCache', async () => {
-      const hashFn = (uuid) => `test:${uuid}`;
+      const hashFn = (uuid: string) => `test:${uuid}`;
       const testUUID = 'any uuid';
       const cacheKey = hashFn(testUUID);
       await context.app.cache.remove(cacheKey); // 进入前先清理缓存

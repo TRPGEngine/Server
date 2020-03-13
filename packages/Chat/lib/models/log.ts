@@ -79,6 +79,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
     return ChatLog.findAll({
       where: {
         converse_uuid: converseUUID,
+        revoke: false, // 获取范围聊天记录时不返回撤回的消息
         date: { [Op.between]: [from, to] },
       },
     });
