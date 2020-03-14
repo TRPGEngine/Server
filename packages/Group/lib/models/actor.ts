@@ -5,6 +5,7 @@ import {
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
   ModelAccess,
+  HasManyGetAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
@@ -12,6 +13,12 @@ import { GroupGroup } from './group';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 import { notifyUpdateGroupActorInfo, notifyUpdateGroupActor } from '../notify';
+
+declare module './group' {
+  interface GroupGroup {
+    getGroupActors?: HasManyGetAssociationsMixin<GroupActor>;
+  }
+}
 
 export class GroupActor extends Model {
   id: number;
@@ -29,6 +36,7 @@ export class GroupActor extends Model {
 
   owner?: PlayerUser;
   ownerId?: number;
+  actor?: ActorActor;
   getActor?: BelongsToGetAssociationMixin<ActorActor>;
   getOwner?: BelongsToGetAssociationMixin<PlayerUser>;
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
@@ -165,6 +173,29 @@ export class GroupActor extends Model {
     });
 
     return groupActor;
+  }
+
+  /**
+   * 获取团所有的团角色
+   * 带上相对的用户信息
+   * @param groupUUID 团UUID
+   */
+  static async getAddGroupActors(groupUUID: string): Promise<GroupActor[]> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(group)) {
+      throw new Error('找不到团信息');
+    }
+
+    const groupActors = await group.getGroupActors({
+      include: [
+        {
+          model: ActorActor,
+          as: 'actor',
+        },
+      ],
+    });
+
+    return groupActors;
   }
 
   /**

@@ -644,19 +644,8 @@ export const getGroupActors: EventFunc<{
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团信息';
-  }
-  let groupActors = await group.getGroupActors();
-  let res = [];
-  for (let ga of groupActors) {
-    // TODO: 这个是个N+1问题。需要优化
-    res.push(await ga.getObjectAsync());
-  }
-  return { actors: res };
+  const groupActors = await GroupActor.getAddGroupActors(groupUUID);
+  return { actors: groupActors };
 };
 
 /**
