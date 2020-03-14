@@ -13,6 +13,9 @@ import { GroupGroup } from './group';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 import { notifyUpdateGroupActorInfo, notifyUpdateGroupActor } from '../notify';
+import { GroupChannel } from './channel';
+import Debug from 'debug';
+const debug = Debug('trpg:component:group:model:actor');
 
 declare module './group' {
   interface GroupGroup {
@@ -397,6 +400,71 @@ export class GroupActor extends Model {
     }
 
     return groupActor;
+  }
+
+  /**
+   * 根据会话UUID获取团信息
+   * TODO: 这是一个非常耗资源的操作。看看能不能优化
+   * @param converseUUID 会话UUID
+   */
+  static async getGroupActorDataFromConverse(
+    converseUUID: string,
+    playerUUID: string
+  ): Promise<{}> {
+    if (_.isEmpty(converseUUID)) {
+      debug('[getGroupActorDataFromConverse] converseUUID is empty');
+      return {};
+    }
+
+    let group = await GroupGroup.findByUUID(converseUUID);
+    if (_.isNil(group)) {
+      // 尝试在查看是不是channel uuid
+      const channel = await GroupChannel.findByUUID(converseUUID);
+
+      if (_.isNil(channel)) {
+        // 如果也不是channel则直接返回
+        debug('[getGroupActorDataFromConverse] not match any group or channel');
+        return {};
+      }
+
+      group = channel.getGroup();
+    }
+
+    const user = await PlayerUser.findByUUID(playerUUID);
+    const members: PlayerUser[] = await group.getMembers({
+      where: {
+        uuid: user.uuid,
+      },
+    });
+
+    const member = _.first(members);
+    if (_.isNil(member)) {
+      debug('[getGroupActorDataFromConverse] cannot find matched member');
+      return {};
+    }
+
+    const selectedGroupActorUUID = _.get(member, [
+      'group_group_members',
+      'selected_group_actor_uuid',
+    ]);
+    if (_.isEmpty(selectedGroupActorUUID)) {
+      debug('[getGroupActorDataFromConverse] selectedGroupActorUUID is empty');
+      return {};
+    }
+
+    const groupActor = await GroupActor.findOne({
+      where: {
+        uuid: selectedGroupActorUUID,
+      },
+      attributes: ['actor_info'],
+    });
+
+    if (_.isNil(groupActor)) {
+      debug('[getGroupActorDataFromConverse] cannot find groupactor');
+      return {};
+    }
+
+    return groupActor.actor_info ?? {};
   }
 
   async getObjectAsync() {

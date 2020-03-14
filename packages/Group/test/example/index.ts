@@ -25,6 +25,7 @@ export const createTestGroup = async (): Promise<GroupGroup> => {
  * 如果没有给团ID， 则创建一个新的团作为该团人物卡的所在团
  * @param groupId 团ID
  */
+export const testGroupActorInfo = { a: '1', b: '2' };
 export const createTestGroupActor = async (
   groupId?: number,
   actorId?: number
@@ -38,7 +39,7 @@ export const createTestGroupActor = async (
 
   const groupActor: GroupActor = await GroupActor.create({
     actor_uuid: 'test_actor',
-    actor_info: {},
+    actor_info: testGroupActorInfo,
     name: 'test',
     groupId,
     actorId,
