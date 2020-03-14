@@ -644,7 +644,7 @@ export const getGroupActors: EventFunc<{
     throw '缺少必要参数';
   }
 
-  const groupActors = await GroupActor.getAddGroupActors(groupUUID);
+  const groupActors = await GroupActor.getAllGroupActors(groupUUID);
   return { actors: groupActors };
 };
 
@@ -783,6 +783,9 @@ export const removeGroupActor: EventFunc<{
   return true;
 };
 
+/**
+ * 同意入团审批
+ */
 export const agreeGroupActor: EventFunc<{
   groupActorUUID: string;
 }> = async function agreeGroupActor(data, cb, db) {

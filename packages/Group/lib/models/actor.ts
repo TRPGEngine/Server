@@ -180,20 +180,13 @@ export class GroupActor extends Model {
    * 带上相对的用户信息
    * @param groupUUID 团UUID
    */
-  static async getAddGroupActors(groupUUID: string): Promise<GroupActor[]> {
+  static async getAllGroupActors(groupUUID: string): Promise<GroupActor[]> {
     const group = await GroupGroup.findByUUID(groupUUID);
     if (_.isNil(group)) {
       throw new Error('找不到团信息');
     }
 
-    const groupActors = await group.getGroupActors({
-      include: [
-        {
-          model: ActorActor,
-          as: 'actor',
-        },
-      ],
-    });
+    const groupActors = await group.getGroupActors();
 
     return groupActors;
   }
@@ -432,6 +425,20 @@ export default function GroupActorDefinition(Sequelize: Orm, db: DBInstance) {
     {
       tableName: 'group_actor',
       sequelize: db,
+      defaultScope: {
+        // 默认获取要包含这些参数
+        include: [
+          {
+            model: ActorActor,
+            as: 'actor',
+          },
+          {
+            model: PlayerUser,
+            as: 'owner',
+            attributes: ['uuid'],
+          },
+        ],
+      },
     }
   );
 
