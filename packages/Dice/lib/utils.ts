@@ -54,7 +54,13 @@ export function roll(requestStr: string): RollRes {
   }
 
   const result = eval(express);
-  const str = requestStr + '=' + express + '=' + result;
+  let str = '';
+  if (express !== result) {
+    str = requestStr + '=' + express + '=' + result;
+  } else {
+    str = requestStr + '=' + result;
+  }
+
   return {
     str,
     value: Number(result),

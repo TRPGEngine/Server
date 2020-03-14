@@ -57,7 +57,7 @@ export const initInterceptors = _.once(() => {
       const senderName = await getSenderName(payload);
       if (_.isNil(targetValue)) {
         // TODO: 也许需要改为私聊通知?
-        payload.message = `${senderName} 输入了错误的表达式: ${rest}`;
+        payload.message = `${senderName} 输入了错误的表达式或没有找到需要检定的数据: ${rest}`;
       } else {
         payload.message = `${senderName} 进行了${targetProps}检定: ${str}/${targetValue}, ${
           success ? '成功' : '失败'
