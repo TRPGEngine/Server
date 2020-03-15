@@ -118,6 +118,16 @@ export class GroupActor extends Model {
     // 通知房间所有用户更新团人物信息
     notifyUpdateGroupActorInfo(group.uuid, groupActor);
 
+    // 异步发送团消息更新角色信息
+    (async () => {
+      const user = await PlayerUser.findByUUID(playerUUID);
+      const operationName = user.getName();
+      ChatLog.sendConverseSystemMsg(
+        group.uuid,
+        `${operationName} 更新了人物卡 ${groupActor.name} 的信息`
+      );
+    })();
+
     return groupActor;
   }
 

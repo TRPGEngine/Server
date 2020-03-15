@@ -7,6 +7,7 @@ const context = buildAppContext();
 describe('ChatLog', () => {
   test.todo('ChatLog.findDeepByUUID should be ok');
   test.todo('ChatLog.updateByUUID should be ok');
+  test.todo('ChatLog.sendConverseSystemMsg should be ok');
 });
 
 describe('chatconverse model', () => {

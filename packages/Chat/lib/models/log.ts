@@ -241,7 +241,6 @@ export class ChatLog extends Model implements ChatMessagePayload {
         // 疑问: 什么情况下会出现公开的用户信息？
         await app.player.manager.broadcastSocketEvent('chat::message', log);
       } else {
-        // TODO: 需要校验
         await app.player.manager.roomcastSocketEvent(
           log.converse_uuid,
           'chat::message',
@@ -270,7 +269,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
       message,
       converse_uuid,
       // 如果有具体的发送对象，则为私有消息，否则则为公共消息
-      is_public: _.isNil(to_uuid) ? false : true,
+      is_public: _.isNil(to_uuid) ? true : false,
       is_group: false,
       type,
       data,
@@ -298,6 +297,29 @@ export class ChatLog extends Model implements ChatMessagePayload {
       // 如果是私人会话，则类型为normal
       type: _.isNil(converse_uuid) ? 'normal' : 'tip',
       data: null,
+    });
+  }
+
+  /**
+   * 往多人会话中发送系统消息
+   * 如果有to_uuid则为群聊中的私人会话
+   */
+  public static sendConverseSystemMsg(
+    converseUUID: string,
+    message: string,
+    to_uuid: string = null
+  ) {
+    return ChatLog.sendMsg({
+      uuid: generateUUID(),
+      sender_uuid: 'trpgsystem',
+      to_uuid,
+      converse_uuid: converseUUID,
+      message,
+      is_public: _.isNil(to_uuid) ? true : false,
+      is_group: true,
+      type: 'tip',
+      data: null,
+      date: new Date().toISOString(),
     });
   }
 
