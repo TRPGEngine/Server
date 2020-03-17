@@ -255,6 +255,13 @@ describe('group model function', () => {
       expect(checkedActor).toHaveProperty('owner'); // 需要有owner信息
       expect(checkedActor.owner).not.toBeNull();
       expect(checkedActor.owner.id).toBe(testGroupActor.ownerId);
+      expect(typeof checkedActor.owner.uuid).toBe('string');
+      expect(checkedActor.owner.uuid).toBe(
+        (await testGroupActor.getOwner()).uuid
+      );
+      expect(checkedActor.owner).not.toHaveProperty('password');
+      expect(checkedActor.owner).not.toHaveProperty('token');
+      expect(checkedActor.owner).not.toHaveProperty('app_token');
     });
 
     test('GroupActor.editActorInfo should be ok', async () => {

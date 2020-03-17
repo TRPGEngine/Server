@@ -83,7 +83,7 @@ export class GroupGroup extends Model {
       },
       include: [
         {
-          model: GroupActor,
+          model: GroupActor.scope(),
           as: 'groupActors',
           include: [
             {
