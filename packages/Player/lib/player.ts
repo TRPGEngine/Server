@@ -13,6 +13,7 @@ import * as event from './event';
 import { getPlayerManager, PlayerManagerCls } from './managers/player-manager';
 import { Socket } from 'trpg/core';
 import { AxiosResponse } from 'axios';
+import userRouter from './routers/user';
 import SSORouter from './routers/sso';
 import registerRouter from './routers/register';
 import onlineRouter from './routers/online';
@@ -244,6 +245,7 @@ export default class Player extends BasePackage {
     // });
     // router.use('/player/register', register.routes());
 
+    this.regRoute(userRouter);
     this.regRoute(registerRouter);
     this.regRoute(SSORouter);
     this.regRoute(onlineRouter);
