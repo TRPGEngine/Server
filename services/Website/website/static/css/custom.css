@@ -14,3 +14,18 @@
 
 @media only screen and (min-width: 1500px) {
 }
+
+article iframe {
+  margin: 0;
+}
+
+details summary {
+  outline: 0;
+}
+
+.actor-iframe {
+  width: 640px;
+  height: 300px;
+  border: 1px solid gainsboro;
+  border-radius: 3px;
+}

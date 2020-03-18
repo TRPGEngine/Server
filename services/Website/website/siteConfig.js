@@ -38,7 +38,7 @@ const siteConfig = {
 
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
-    { doc: 'getstart', label: '文档' },
+    { doc: 'introduce', label: '文档' },
     { doc: 'develop', label: '开发' },
     { page: 'help', label: '帮助' },
     { blog: true, label: '博客' },
