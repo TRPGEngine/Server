@@ -259,9 +259,9 @@ describe('group model function', () => {
       expect(checkedActor.owner.uuid).toBe(
         (await testGroupActor.getOwner()).uuid
       );
-      expect(checkedActor.owner).not.toHaveProperty('password');
-      expect(checkedActor.owner).not.toHaveProperty('token');
-      expect(checkedActor.owner).not.toHaveProperty('app_token');
+      expect(checkedActor.owner.password).toBeUndefined();
+      expect(checkedActor.owner.token).toBeUndefined();
+      expect(checkedActor.owner.app_token).toBeUndefined();
     });
 
     test('GroupActor.editActorInfo should be ok', async () => {
