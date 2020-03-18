@@ -4,7 +4,7 @@ import { DoutulaCrawler } from '../lib/utils/crawler/doutula';
 const context = buildAppContext();
 
 describe('crawler', () => {
-  test('doutula', async () => {
+  test.skip('doutula', async () => {
     const doutula = new DoutulaCrawler(context.app);
     const html = await doutula.searchEmotion('滑稽');
     const emotions = doutula.parseEmotion(html);
