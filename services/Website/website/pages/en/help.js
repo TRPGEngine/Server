@@ -21,18 +21,16 @@ function Help(props) {
 
   const supportLinks = [
     {
-      content: `Learn more using the [documentation on this site.](${docUrl(
-        'doc1.html'
-      )})`,
-      title: 'Browse Docs',
+      content: `查询 [文档](${docUrl('introduce.html')}) 来了解更多`,
+      title: '浏览文档',
     },
     {
-      content: 'Ask questions about the documentation and project',
-      title: 'Join the community',
+      content: 'QQ群: 892133280 欢迎你的加入, 不论你是什么规则的玩家',
+      title: '加入社群',
     },
     {
-      content: "Find out what's new with this project",
-      title: 'Stay up to date',
+      content: '时刻保证自己本地的客户端处于最新版本',
+      title: '保存最新',
     },
   ];
 
@@ -41,9 +39,15 @@ function Help(props) {
       <Container className="mainContainer documentContainer postContainer">
         <div className="post">
           <header className="postHeader">
-            <h1>Need help?</h1>
+            <h1>需要帮助?</h1>
           </header>
-          <p>This project is maintained by a dedicated group of people.</p>
+          <p>
+            这个项目由{' '}
+            <a href="https://github.com/moonrailgun" target="_blank">
+              moonrailgun
+            </a>{' '}
+            维护.
+          </p>
           <GridBlock contents={supportLinks} layout="threeColumn" />
         </div>
       </Container>

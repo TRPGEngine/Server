@@ -5,7 +5,9 @@ title: 从一个简单的人物卡开始
 
 从一个简单的人物卡开始
 
-首先我们建立一个最基本的人物卡, 如下:  
+> TRPG Engine 是基于XML语言来描述一张人物卡模板的。XML是一种标记语言。
+
+首先我们试图建立一个最基本的人物卡, 如下:  
 [简单人物卡](http://127.0.0.1:8191/preview#code/DwfgHgtgNgBAbgUwE4GcCWB7AdgXgEQCMAdAAx4wJYDGGAJmlgOb4CuALgGYC0AHOSAD4AUMAAqCCAAcoAQzYJhMGMABCMlAgCSWDhhgB6RcrUaAgmzZIjSsQjBtTSBDKFK3MWQCMEUfIC65QEsnQENlQEP5QHsDPFd3GCwZCAR8WjkZSOiYAC4Zdgx0AC8EvABvGAgGACUMAHcUdJgAFgAaEpkwCuranhgAX1S3QyjgfRMEc0thQfEpWXlhIA)
 
 一个最基本的人物卡有三个最基本的内建字段: 头像，名称，描述。
@@ -72,3 +74,6 @@ title: 从一个简单的人物卡开始
 TRPG Engine 提供了很多内置的标签用于构建人物卡模板
 
 同时还支持HTML标签。你可以在你的人物卡中插入任意的HTML元素，包括图片、音频、视频。。。但注意性能！你的每个无意义的布局都会为所有使用你人物卡模板的用户带来额外的负担!
+
+本节中的一些概念:
+- [xml](https://www.w3school.com.cn/xml/xml_intro.asp)
