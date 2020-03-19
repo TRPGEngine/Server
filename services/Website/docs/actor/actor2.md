@@ -10,6 +10,20 @@ title: 从一个简单的人物卡开始
 首先我们试图建立一个最基本的人物卡, 如下:  
 [简单人物卡](http://127.0.0.1:8191/preview#code/DwfgHgtgNgBAbgUwE4GcCWB7AdgXgEQCMAdAAx4wJYDGGAJmlgOb4CuALgGYC0AHOSAD4AUMAAqCCAAcoAQzYJhMGMABCMlAgCSWDhhgB6RcrUaAgmzZIjSsQjBtTSBDKFK3MWQCMEUfIC65QEsnQENlQEP5QHsDPFd3GCwZCAR8WjkZSOiYAC4Zdgx0AC8EvABvGAgGACUMAHcUdJgAFgAaEpkwCuranhgAX1S3QyjgfRMEc0thQfEpWXlhIA)
 
+```ActorTemplatePreviewer
+<?xml version="1.0" encoding="utf-8" ?>
+<Template>
+  <BaseInfo />
+  <BaseAttr>
+    <TextArea
+      label="人物卡信息"
+      name="data"
+      :autosize="{ minRows: 4, maxRows: 8 }"
+    />
+  </BaseAttr>
+</Template>
+```
+
 一个最基本的人物卡有三个最基本的内建字段: 头像，名称，描述。
 
 这三个字段会默认被显示在用户的预览上, 是不点开人物卡会显示的三个字段。对于每一张人物卡模板, 都应当内置这几个字段允许用户编辑。

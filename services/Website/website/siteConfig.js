@@ -8,6 +8,8 @@
 // See https://docusaurus.io/docs/site-config for all the possible
 // site configuration options.
 
+const RemarkablePlugins = require('./core/RemarkablePlugins');
+
 // List of projects/orgs using your project for the users page.
 const users = [
   {
@@ -98,6 +100,8 @@ const siteConfig = {
 
   // Show documentation's last contributor's name.
   // enableUpdateBy: true,
+
+  markdownPlugins: [RemarkablePlugins.ActorTemplatePreviewer],
 
   // Show documentation's last update time.
   // enableUpdateTime: true,
