@@ -923,35 +923,30 @@ export const getPlayerSelectedGroupActor: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let groupUUID = data.groupUUID;
-  let groupMemberUUID = data.groupMemberUUID;
+  const groupUUID = data.groupUUID;
+  const groupMemberUUID = data.groupMemberUUID;
   if (!groupUUID || !groupMemberUUID) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.findOne({
+  const group = await db.models.group_group.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
     throw '找不到团';
   }
-  let members = await group.getMembers();
-  let playerSelectedGroupActor;
-  for (let member of members) {
-    if (member.uuid === groupMemberUUID) {
-      playerSelectedGroupActor = {
-        groupMemberUUID,
-        selectedGroupActorUUID:
-          member.group_group_members.selected_group_actor_uuid,
-      };
-      break;
-    }
-  }
-  if (!playerSelectedGroupActor) {
-    throw '该用户不在团中';
-  }
 
-  return { playerSelectedGroupActor };
+  const selectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
+    group,
+    groupMemberUUID
+  );
+
+  return {
+    playerSelectedGroupActor: {
+      groupMemberUUID,
+      selectedGroupActorUUID,
+    },
+  };
 };
 
 // 退出团

@@ -413,6 +413,32 @@ export class GroupActor extends Model {
   }
 
   /**
+   * 获取当前选择的团角色的UUID
+   */
+  static async getSelectedGroupActorUUID(
+    group: GroupGroup,
+    userUUID: string
+  ): Promise<string> {
+    const members: PlayerUser[] = await group.getMembers({
+      where: {
+        uuid: userUUID,
+      },
+    });
+
+    const member = _.first(members);
+    if (_.isNil(member)) {
+      throw new Error('没有找到匹配的团队成员');
+    }
+
+    const selectedGroupActorUUID = _.get(member, [
+      'group_group_members',
+      'selected_group_actor_uuid',
+    ]);
+
+    return selectedGroupActorUUID;
+  }
+
+  /**
    * 根据会话UUID获取团信息
    * TODO: 这是一个非常耗资源的操作。看看能不能优化
    * @param converseUUID 会话UUID
@@ -440,23 +466,16 @@ export class GroupActor extends Model {
       group = channel.getGroup();
     }
 
-    const user = await PlayerUser.findByUUID(playerUUID);
-    const members: PlayerUser[] = await group.getMembers({
-      where: {
-        uuid: user.uuid,
-      },
-    });
-
-    const member = _.first(members);
-    if (_.isNil(member)) {
-      debug('[getGroupActorDataFromConverse] cannot find matched member');
+    let selectedGroupActorUUID: string;
+    try {
+      selectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
+        group,
+        playerUUID
+      );
+    } catch (e) {
+      debug('[getGroupActorDataFromConverse]', e);
       return {};
     }
-
-    const selectedGroupActorUUID = _.get(member, [
-      'group_group_members',
-      'selected_group_actor_uuid',
-    ]);
     if (_.isEmpty(selectedGroupActorUUID)) {
       debug('[getGroupActorDataFromConverse] selectedGroupActorUUID is empty');
       return {};
