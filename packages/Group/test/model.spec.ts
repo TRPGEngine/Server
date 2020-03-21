@@ -8,6 +8,7 @@ import {
   createTestGroup,
   createTestGroupActor,
   createTestGroupDetail,
+  testGroupActorInfo,
 } from './example';
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
@@ -254,6 +255,13 @@ describe('group model function', () => {
       expect(checkedActor).toHaveProperty('owner'); // 需要有owner信息
       expect(checkedActor.owner).not.toBeNull();
       expect(checkedActor.owner.id).toBe(testGroupActor.ownerId);
+      expect(typeof checkedActor.owner.uuid).toBe('string');
+      expect(checkedActor.owner.uuid).toBe(
+        (await testGroupActor.getOwner()).uuid
+      );
+      expect(checkedActor.owner.password).toBeUndefined();
+      expect(checkedActor.owner.token).toBeUndefined();
+      expect(checkedActor.owner.app_token).toBeUndefined();
     });
 
     test('GroupActor.editActorInfo should be ok', async () => {
@@ -393,6 +401,42 @@ describe('group model function', () => {
       const owner: PlayerUser = await groupActor.getOwner();
 
       expect(owner.uuid).toBe(testUser9.uuid);
+    });
+
+    test('GroupActor.getGroupActorDataFromConverse should be ok', async () => {
+      // 准备数据
+      const testUser = await getTestUser();
+      const testGroup = await createTestGroup();
+      const testActor = await createTestActor();
+      const testGroupActor = await createTestGroupActor(
+        testGroup.id,
+        testActor.id
+      );
+
+      try {
+        await testGroup.addMember(testUser, {
+          through: { selected_group_actor_uuid: testGroupActor.uuid },
+        });
+
+        const members = await testGroup.getMembers();
+        expect(
+          _.get(members, [
+            0,
+            'group_group_members',
+            'selected_group_actor_uuid',
+          ])
+        ).toBe(testGroupActor.uuid);
+
+        const data = await GroupActor.getGroupActorDataFromConverse(
+          testGroup.uuid,
+          testUser.uuid
+        );
+        expect(data).toMatchObject(testGroupActorInfo);
+      } finally {
+        await testGroup.destroy({ force: true });
+        await testActor.destroy({ force: true });
+        await testGroupActor.destroy({ force: true });
+      }
     });
   });
 

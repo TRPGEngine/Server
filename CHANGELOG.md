@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.15.0](https://github.com/TRPGEngine/Server/compare/v1.14.0...v1.15.0) (2020-03-21)
+
+
+### Features
+
+* 增加了判定骰可以获取人物卡属性数据进行检定的操作 ([053e236](https://github.com/TRPGEngine/Server/commit/053e23609170c6c32d54a0918ec63367637a7aac))
+* **group:** 增加了更新团人物卡信息时会发送系统消息通知的功能 ([2895de5](https://github.com/TRPGEngine/Server/commit/2895de5b59662eeb6fd263e1e438d2d50e5ab988))
+* **player:** 增加接口用于获取用户信息 ([d436453](https://github.com/TRPGEngine/Server/commit/d436453e5efba9cfc464cd822dc146cc54bcbbf0))
+
 ## [1.14.0](https://github.com/TRPGEngine/Server/compare/v1.13.1...v1.14.0) (2020-03-13)
 
 

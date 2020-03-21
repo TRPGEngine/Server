@@ -1,8 +1,7 @@
 {
   "docs": {
-    "开始": ["introduce", "getstart"],
-    "创建人物": ["doc2"],
-    "配置设置": ["doc3"]
+    "开始": ["introduce"],
+    "人物": ["actor/actor1", "actor/actor2"]
   },
   "develop": {
     "开发": ["develop", "config", "doc5"],

@@ -34,6 +34,7 @@ export class PlayerUser extends Model {
     'salt',
     'token',
     'app_token',
+    'last_ip',
   ];
 
   id: number;

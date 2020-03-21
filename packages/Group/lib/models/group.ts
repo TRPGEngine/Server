@@ -16,9 +16,9 @@ import { GroupActor } from './actor';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 import { notifyUpdateGroupInfo } from '../notify';
-import Debug from 'debug';
 import { GroupDetail } from './detail';
 import { GroupChannel } from './channel';
+import Debug from 'debug';
 const debug = Debug('trpg:component:group:model:group');
 
 type GroupType = 'group' | 'channel' | 'test';
@@ -83,7 +83,7 @@ export class GroupGroup extends Model {
       },
       include: [
         {
-          model: GroupActor,
+          model: GroupActor.scope(),
           as: 'groupActors',
           include: [
             {

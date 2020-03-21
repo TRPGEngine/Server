@@ -187,15 +187,15 @@ describe('group action', () => {
   });
 
   test('getGroupList should be ok', async () => {
-    let ret = await context.emitEvent('group::getGroupList');
+    const ret = await context.emitEvent('group::getGroupList');
     expect(ret.result).toBe(true);
     expect(ret).toHaveProperty('groups');
     expect(Array.isArray(ret.groups)).toBe(true);
   });
 
   test('getGroupMembers should be ok', async () => {
-    let group = await GroupGroup.findOne();
-    let ret = await context.emitEvent('group::getGroupMembers', {
+    const group = await GroupGroup.findOne();
+    const ret = await context.emitEvent('group::getGroupMembers', {
       groupUUID: group.uuid,
     });
 
@@ -208,8 +208,8 @@ describe('group action', () => {
   });
 
   test('getGroupActors should be ok', async () => {
-    let group = await GroupGroup.findOne();
-    let ret = await context.emitEvent('group::getGroupActors', {
+    const group = await GroupGroup.findOne();
+    const ret = await context.emitEvent('group::getGroupActors', {
       groupUUID: group.uuid,
     });
 

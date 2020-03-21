@@ -644,19 +644,8 @@ export const getGroupActors: EventFunc<{
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团信息';
-  }
-  let groupActors = await group.getGroupActors();
-  let res = [];
-  for (let ga of groupActors) {
-    // TODO: 这个是个N+1问题。需要优化
-    res.push(await ga.getObjectAsync());
-  }
-  return { actors: res };
+  const groupActors = await GroupActor.getAllGroupActors(groupUUID);
+  return { actors: groupActors };
 };
 
 /**
@@ -794,6 +783,9 @@ export const removeGroupActor: EventFunc<{
   return true;
 };
 
+/**
+ * 同意入团审批
+ */
 export const agreeGroupActor: EventFunc<{
   groupActorUUID: string;
 }> = async function agreeGroupActor(data, cb, db) {
@@ -931,35 +923,30 @@ export const getPlayerSelectedGroupActor: EventFunc<{
     throw '用户不存在，请检查登录状态';
   }
 
-  let groupUUID = data.groupUUID;
-  let groupMemberUUID = data.groupMemberUUID;
+  const groupUUID = data.groupUUID;
+  const groupMemberUUID = data.groupMemberUUID;
   if (!groupUUID || !groupMemberUUID) {
     throw '缺少必要参数';
   }
 
-  let group = await db.models.group_group.findOne({
+  const group = await db.models.group_group.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
     throw '找不到团';
   }
-  let members = await group.getMembers();
-  let playerSelectedGroupActor;
-  for (let member of members) {
-    if (member.uuid === groupMemberUUID) {
-      playerSelectedGroupActor = {
-        groupMemberUUID,
-        selectedGroupActorUUID:
-          member.group_group_members.selected_group_actor_uuid,
-      };
-      break;
-    }
-  }
-  if (!playerSelectedGroupActor) {
-    throw '该用户不在团中';
-  }
 
-  return { playerSelectedGroupActor };
+  const selectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
+    group,
+    groupMemberUUID
+  );
+
+  return {
+    playerSelectedGroupActor: {
+      groupMemberUUID,
+      selectedGroupActorUUID,
+    },
+  };
 };
 
 // 退出团

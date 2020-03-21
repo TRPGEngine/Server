@@ -5,6 +5,7 @@ import {
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
   ModelAccess,
+  HasManyGetAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
@@ -12,6 +13,15 @@ import { GroupGroup } from './group';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 import { notifyUpdateGroupActorInfo, notifyUpdateGroupActor } from '../notify';
+import { GroupChannel } from './channel';
+import Debug from 'debug';
+const debug = Debug('trpg:component:group:model:actor');
+
+declare module './group' {
+  interface GroupGroup {
+    getGroupActors?: HasManyGetAssociationsMixin<GroupActor>;
+  }
+}
 
 export class GroupActor extends Model {
   id: number;
@@ -29,6 +39,7 @@ export class GroupActor extends Model {
 
   owner?: PlayerUser;
   ownerId?: number;
+  actor?: ActorActor;
   getActor?: BelongsToGetAssociationMixin<ActorActor>;
   getOwner?: BelongsToGetAssociationMixin<PlayerUser>;
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
@@ -107,6 +118,16 @@ export class GroupActor extends Model {
     // 通知房间所有用户更新团人物信息
     notifyUpdateGroupActorInfo(group.uuid, groupActor);
 
+    // 异步发送团消息更新角色信息
+    (async () => {
+      const user = await PlayerUser.findByUUID(playerUUID);
+      const operationName = user.getName();
+      ChatLog.sendConverseSystemMsg(
+        group.uuid,
+        `${operationName} 更新了人物卡 ${groupActor.name} 的信息`
+      );
+    })();
+
     return groupActor;
   }
 
@@ -165,6 +186,22 @@ export class GroupActor extends Model {
     });
 
     return groupActor;
+  }
+
+  /**
+   * 获取团所有的团角色
+   * 带上相对的用户信息
+   * @param groupUUID 团UUID
+   */
+  static async getAllGroupActors(groupUUID: string): Promise<GroupActor[]> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(group)) {
+      throw new Error('找不到团信息');
+    }
+
+    const groupActors = await group.getGroupActors();
+
+    return groupActors;
   }
 
   /**
@@ -375,6 +412,90 @@ export class GroupActor extends Model {
     return groupActor;
   }
 
+  /**
+   * 获取当前选择的团角色的UUID
+   */
+  static async getSelectedGroupActorUUID(
+    group: GroupGroup,
+    userUUID: string
+  ): Promise<string> {
+    const members: PlayerUser[] = await group.getMembers({
+      where: {
+        uuid: userUUID,
+      },
+    });
+
+    const member = _.first(members);
+    if (_.isNil(member)) {
+      throw new Error('没有找到匹配的团队成员');
+    }
+
+    const selectedGroupActorUUID = _.get(member, [
+      'group_group_members',
+      'selected_group_actor_uuid',
+    ]);
+
+    return selectedGroupActorUUID;
+  }
+
+  /**
+   * 根据会话UUID获取团信息
+   * TODO: 这是一个非常耗资源的操作。看看能不能优化
+   * @param converseUUID 会话UUID
+   */
+  static async getGroupActorDataFromConverse(
+    converseUUID: string,
+    playerUUID: string
+  ): Promise<{}> {
+    if (_.isEmpty(converseUUID)) {
+      debug('[getGroupActorDataFromConverse] converseUUID is empty');
+      return {};
+    }
+
+    let group = await GroupGroup.findByUUID(converseUUID);
+    if (_.isNil(group)) {
+      // 尝试在查看是不是channel uuid
+      const channel = await GroupChannel.findByUUID(converseUUID);
+
+      if (_.isNil(channel)) {
+        // 如果也不是channel则直接返回
+        debug('[getGroupActorDataFromConverse] not match any group or channel');
+        return {};
+      }
+
+      group = channel.getGroup();
+    }
+
+    let selectedGroupActorUUID: string;
+    try {
+      selectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
+        group,
+        playerUUID
+      );
+    } catch (e) {
+      debug('[getGroupActorDataFromConverse]', e);
+      return {};
+    }
+    if (_.isEmpty(selectedGroupActorUUID)) {
+      debug('[getGroupActorDataFromConverse] selectedGroupActorUUID is empty');
+      return {};
+    }
+
+    const groupActor = await GroupActor.findOne({
+      where: {
+        uuid: selectedGroupActorUUID,
+      },
+      attributes: ['actor_info'],
+    });
+
+    if (_.isNil(groupActor)) {
+      debug('[getGroupActorDataFromConverse] cannot find groupactor');
+      return {};
+    }
+
+    return groupActor.actor_info ?? {};
+  }
+
   async getObjectAsync() {
     const actor = await this.getActor();
 
@@ -401,6 +522,20 @@ export default function GroupActorDefinition(Sequelize: Orm, db: DBInstance) {
     {
       tableName: 'group_actor',
       sequelize: db,
+      defaultScope: {
+        // 默认获取要包含这些参数
+        include: [
+          {
+            model: ActorActor,
+            as: 'actor',
+          },
+          {
+            model: PlayerUser,
+            as: 'owner',
+            attributes: ['uuid'],
+          },
+        ],
+      },
     }
   );
 
