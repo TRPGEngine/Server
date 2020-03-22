@@ -221,25 +221,24 @@ describe('group action', () => {
     }
   });
 
-  test('addGroupActor should be ok', async () => {
+  test.only('addGroupActor should be ok', async () => {
     const testActor = await createTestActor();
     const ret = await context.emitEvent('group::addGroupActor', {
       groupUUID: testGroup.uuid,
       actorUUID: testActor.uuid,
     });
 
-    expect(ret.result).toBe(true);
-    expect(ret).toHaveProperty('groupActor');
-    expect(ret).toHaveProperty('groupActor.actorId');
-    expect(ret).toHaveProperty('groupActor.groupId');
+    try {
+      expect(ret.result).toBe(true);
+    } finally {
+      await GroupActor.destroy({
+        where: {
+          actorId: testActor.id,
+        },
+      });
 
-    await GroupActor.destroy({
-      where: {
-        uuid: ret.groupActor.uuid,
-      },
-    });
-
-    await testActor.destroy();
+      await testActor.destroy();
+    }
   });
 
   test.todo('removeGroupActor should be ok');

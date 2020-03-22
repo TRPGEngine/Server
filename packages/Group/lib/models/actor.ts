@@ -12,7 +12,11 @@ import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupGroup } from './group';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
-import { notifyUpdateGroupActorInfo, notifyUpdateGroupActor } from '../notify';
+import {
+  notifyUpdateGroupActorInfo,
+  notifyUpdateGroupActor,
+  notifyAddGroupActor,
+} from '../notify';
 import { GroupChannel } from './channel';
 import Debug from 'debug';
 const debug = Debug('trpg:component:group:model:actor');
@@ -207,12 +211,13 @@ export class GroupActor extends Model {
   /**
    * 添加一个待审核的团人物
    * TODO: 需要增加一个用户是否在该团内的判断
+   * @returns 返回带actor数据的GroupActor数据对象
    */
   static async addApprovalGroupActor(
     groupUUID: string,
     actorUUID: string,
     playerUUID: string
-  ): Promise<GroupActor> {
+  ): Promise<object> {
     if (!groupUUID || !actorUUID) {
       throw new Error('缺少必要参数');
     }
@@ -247,10 +252,13 @@ export class GroupActor extends Model {
       groupId: group.id,
     });
 
-    _.set(groupActor, 'dataValues.actor', actor);
-    _.set(groupActor, 'dataValues.group', group);
+    const groupActorData = groupActor.toJSON();
+    groupActorData.actor = actor.toJSON();
 
-    return groupActor;
+    // 通知用户增加
+    notifyAddGroupActor(group.uuid, groupActorData);
+
+    return groupActorData;
   }
 
   /**
