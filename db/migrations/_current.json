@@ -245,6 +245,13 @@
                     "field": "alignment",
                     "seqType": "Sequelize.ENUM('LG', 'NG', 'CG', 'LN', 'TN', 'CN', 'LE', 'NE', 'CE')"
                 },
+                "banned": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "banned",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -3024,5 +3031,5 @@
             "indexes": []
         }
     },
-    "revision": 44
+    "revision": 45
 }

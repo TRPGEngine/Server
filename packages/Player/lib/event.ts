@@ -50,6 +50,10 @@ export const login: EventFunc<{
       is_success: false,
     });
   } else {
+    if (user.banned === true) {
+      throw new Error('您已被封禁');
+    }
+
     debug(
       'login success!user [%s(%s)] has been login',
       user.username,
@@ -143,6 +147,10 @@ export const loginWithToken: EventFunc<{
       is_success: false,
     });
   } else {
+    if (user.banned === true) {
+      throw new Error('您已被封禁');
+    }
+
     debug('login with token success!user %s has been login', user.uuid);
 
     // 加入到列表中
