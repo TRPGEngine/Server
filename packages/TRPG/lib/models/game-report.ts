@@ -10,6 +10,12 @@ export class TRPGGameReport extends Model {
   cast: string[];
   context: {};
 
+  static async findByUUID(uuid: string): Promise<TRPGGameReport> {
+    return TRPGGameReport.findOne({
+      where: { uuid },
+    });
+  }
+
   /**
    * 生成游戏战报
    * @param title 标题
@@ -33,8 +39,8 @@ export default function TRPGReportDefinition(Sequelize: Orm, db: DBInstance) {
   TRPGGameReport.init(
     {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
-      title: { type: Sequelize.STRING },
-      cast: { type: Sequelize.JSON },
+      title: { type: Sequelize.STRING, allowNull: false },
+      cast: { type: Sequelize.JSON, comment: '演员表' },
       content: { type: Sequelize.JSON, defaultValue: {} },
     },
     {

@@ -3029,7 +3029,56 @@
                 }
             },
             "indexes": []
+        },
+        "trpg_game_report": {
+            "tableName": "trpg_game_report",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "title": {
+                    "allowNull": false,
+                    "field": "title",
+                    "seqType": "Sequelize.STRING"
+                },
+                "cast": {
+                    "comment": "演员表",
+                    "field": "cast",
+                    "seqType": "Sequelize.JSON"
+                },
+                "content": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.Object"
+                    },
+                    "field": "content",
+                    "seqType": "Sequelize.JSON"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
         }
     },
-    "revision": 45
+    "revision": 46
 }

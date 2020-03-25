@@ -1,4 +1,5 @@
 const { getBinPath, exec } = require('../utils');
+const _ = require('lodash');
 
 exports.command = 'generate-migrate';
 exports.desc = 'generate a db migrate';
@@ -23,7 +24,7 @@ exports.handler = function(argv) {
     '--migrations-path',
     './db/migrations',
     '--name',
-    name,
+    _.snakeCase(name), // 强制为蛇形命名
     '--comment',
     comment,
   ]);
