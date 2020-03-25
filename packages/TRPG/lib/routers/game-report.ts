@@ -10,9 +10,9 @@ gameReportRouter.post('/game-report/create', async function(ctx) {
     throw new Error('缺少必要字段');
   }
 
-  await TRPGGameReport.generateGameReport(title, cast, content);
+  const report = await TRPGGameReport.generateGameReport(title, cast, content);
 
-  ctx.body = { result: true };
+  ctx.body = { uuid: report.uuid };
 });
 
 gameReportRouter.get('/game-report/:reportUUID', async (ctx) => {

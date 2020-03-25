@@ -25,12 +25,12 @@ export class TRPGGameReport extends Model {
   static async generateGameReport(
     title: string,
     cast: string[],
-    context: {}
+    content: {}
   ): Promise<TRPGGameReport> {
     return TRPGGameReport.create({
       title,
       cast,
-      context,
+      content,
     });
   }
 }
