@@ -1,8 +1,20 @@
-import { Model, Orm, DBInstance } from 'trpg/core';
+import {
+  Model,
+  Orm,
+  DBInstance,
+  BelongsToManyGetAssociationsMixin,
+} from 'trpg/core';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
 /**
  * 战报汇总
  */
+
+declare module 'packages/Player/lib/models/user' {
+  interface PlayerUser {
+    getReports: BelongsToManyGetAssociationsMixin<TRPGGameReport>;
+  }
+}
 
 export class TRPGGameReport extends Model {
   uuid: string;
@@ -18,20 +30,26 @@ export class TRPGGameReport extends Model {
 
   /**
    * 生成游戏战报
+   * @param playerUUID 创建者UUID
    * @param title 标题
    * @param cast 演员表
    * @param context 战报内容
    */
   static async generateGameReport(
+    playerUUID: string,
     title: string,
     cast: string[],
     content: {}
   ): Promise<TRPGGameReport> {
-    return TRPGGameReport.create({
+    const user = await PlayerUser.findByUUID(playerUUID);
+    const report = await TRPGGameReport.create({
       title,
       cast,
       content,
+      ownerId: user.id,
     });
+
+    return report;
   }
 }
 
@@ -48,6 +66,9 @@ export default function TRPGReportDefinition(Sequelize: Orm, db: DBInstance) {
       sequelize: db,
     }
   );
+
+  TRPGGameReport.belongsTo(PlayerUser, { as: 'owner', foreignKey: 'ownerId' });
+  PlayerUser.hasMany(TRPGGameReport, { as: 'reports', foreignKey: 'ownerId' });
 
   return TRPGGameReport;
 }
