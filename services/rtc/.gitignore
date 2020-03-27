@@ -1,0 +1,10 @@
+node_modules/
+
+server/config.*
+!server/config.example.js
+server/public/
+server/certs/*
+!server/certs/create_self-signed-cert.sh
+server/mediasoup_valgrind_*
+
+.vscode/
