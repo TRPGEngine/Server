@@ -1,5 +1,6 @@
 import BasePackage from 'lib/package';
 import TRPGReportDefinition from './models/game-report';
+import gameReportRouter from './routers/game-report';
 
 export default class TRPG extends BasePackage {
   public name: string = 'TRPG';
@@ -8,7 +9,8 @@ export default class TRPG extends BasePackage {
     'TRPG 专用包, 所有TRPG Engine独有内容都应当存放在这个包里';
 
   onInit(): void {
-    // TODO
-    // this.regModel(TRPGReportDefinition);
+    this.regModel(TRPGReportDefinition);
+
+    this.regRoute(gameReportRouter);
   }
 }

@@ -18,6 +18,25 @@ export async function notifyUpdateGroupInfo(
 }
 
 /**
+ * 通知客户端增加待审核的人物卡
+ * @param groupUUID 团UUID
+ * @param groupActorData 插入了actor和group信息的对象
+ */
+export async function notifyAddGroupActor(
+  groupUUID: string,
+  groupActorData: object
+) {
+  const trpgapp = getGlobalApplication();
+  await trpgapp.player.manager.roomcastSocketEvent(
+    groupUUID,
+    'group::addGroupActor',
+    {
+      groupUUID: groupUUID,
+      groupActor: groupActorData,
+    }
+  );
+}
+/**
  * 通知更新团人物信息数据
  */
 export async function notifyUpdateGroupActorInfo(

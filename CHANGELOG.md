@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.16.0](https://github.com/TRPGEngine/Server/compare/v1.15.0...v1.16.0) (2020-03-27)
+
+
+### Features
+
+* **group:** 增加人物卡新增的操作通知到所有成员 ([f01cb7a](https://github.com/TRPGEngine/Server/commit/f01cb7ab85493bfa940bce65d525f659d18f7b52))
+* **player:** 增加封禁字段 ([03d7fb6](https://github.com/TRPGEngine/Server/commit/03d7fb60d2b7a6be95eed59170cafadf54c3b010))
+* **rtc:** add basic rtc services by mediasoup ([853d24b](https://github.com/TRPGEngine/Server/commit/853d24b1e0764f30cde19511cbeb15c7e62cfcba))
+* **trpg:** 增加战报的获取用户战报列表的接口 ([42b6be3](https://github.com/TRPGEngine/Server/commit/42b6be3b188f4d98fc8f7c6eec18c346d73c4e80))
+* **trpg:** 增加跑团战报相关模型与路由 ([a3daace](https://github.com/TRPGEngine/Server/commit/a3daacef6ab5e9375372f3ef215a6ed0ac0b925c))
+
 ## [1.15.0](https://github.com/TRPGEngine/Server/compare/v1.14.0...v1.15.0) (2020-03-21)
 
 

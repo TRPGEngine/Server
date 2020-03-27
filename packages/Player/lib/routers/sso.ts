@@ -13,6 +13,10 @@ SSORouter.post('/sso/login', async (ctx) => {
     throw new Error('用户不存在或密码错误');
   }
 
+  if (player.banned === true) {
+    throw new Error('您已被封禁');
+  }
+
   const jwt = await PlayerUser.signJWT(player.uuid);
 
   ctx.body = {

@@ -713,13 +713,9 @@ export const addGroupActor: EventFunc<{
 
   const groupUUID = data.groupUUID;
   const actorUUID = data.actorUUID;
-  const groupActor = await GroupActor.addApprovalGroupActor(
-    groupUUID,
-    actorUUID,
-    player.uuid
-  );
+  await GroupActor.addApprovalGroupActor(groupUUID, actorUUID, player.uuid);
 
-  return { groupActor };
+  return true;
 };
 
 export const removeGroupActor: EventFunc<{

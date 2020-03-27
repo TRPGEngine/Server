@@ -306,22 +306,24 @@ describe('group model function', () => {
 
     test('GroupActor.addApprovalGroupActor should be ok', async () => {
       const testUser = await getTestUser();
-      const groupActor = await GroupActor.addApprovalGroupActor(
+      const groupActorData: any = await GroupActor.addApprovalGroupActor(
         testGroup.uuid,
         testActor.uuid,
         testUser.uuid
       );
 
       try {
-        expect(groupActor.toJSON()).toHaveProperty('actor');
-        expect(groupActor.toJSON()).toHaveProperty('group');
+        expect(groupActorData).toHaveProperty('id');
+        expect(groupActorData).toHaveProperty('actor');
 
         // 角色信息复制
-        expect(groupActor.name).toBe(testActor.name);
-        expect(groupActor.desc).toBe(testActor.desc);
-        expect(groupActor.avatar).toBe(testActor.avatar);
+        expect(groupActorData.name).toBe(testActor.name);
+        expect(groupActorData.desc).toBe(testActor.desc);
+        expect(groupActorData.avatar).toBe(testActor.avatar);
       } finally {
-        await groupActor.destroy();
+        await GroupActor.destroy({
+          where: { id: groupActorData.id },
+        });
       }
     });
 

@@ -52,6 +52,7 @@ export class PlayerUser extends Model {
   sex: '男' | '女' | '其他' | '保密';
   sign: string; // 个人签名
   alignment: Alignment;
+  banned: boolean; // 是否被封禁
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
@@ -262,6 +263,10 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
         ),
         comment:
           '阵营: LG守序善良 NG中立善良 CG混乱善良 LN守序中立 TN绝对中立 CN混乱中立 LE守序邪恶 NE中立邪恶 CE混乱邪恶',
+      },
+      banned: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
     },
     {

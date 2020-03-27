@@ -61,7 +61,6 @@ describe('Group router', () => {
       expect(actor).toHaveProperty('actor_info');
       expect(actor).toHaveProperty('passed');
       expect(actor).toHaveProperty('actor');
-      expect(actor).toHaveProperty('group');
       expect(actor.passed).toBe(false);
 
       await GroupActor.destroy({
