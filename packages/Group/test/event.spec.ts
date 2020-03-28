@@ -221,7 +221,7 @@ describe('group action', () => {
     }
   });
 
-  test.only('addGroupActor should be ok', async () => {
+  test('addGroupActor should be ok', async () => {
     const testActor = await createTestActor();
     const ret = await context.emitEvent('group::addGroupActor', {
       groupUUID: testGroup.uuid,
