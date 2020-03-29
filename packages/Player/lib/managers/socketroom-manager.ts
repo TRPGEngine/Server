@@ -55,6 +55,7 @@ export async function autoJoinSocketRoom(app: TRPGApplication, socket: Socket) {
 }
 
 /**
+ * @deprecated 已被SocketManager内置
  * 自动离开房间
  * @param socket 当前Socket连接
  */

@@ -5,11 +5,11 @@ import _ from 'lodash';
 import { Socket } from 'trpg/core';
 
 import { Platform } from 'packages/Player/types/player';
-import Debug from 'debug';
 import {
   SocketManager,
   SocketManagerOptions,
 } from 'packages/Core/lib/managers/socket-manager';
+import Debug from 'debug';
 const debug = Debug('trpg:component:player:manager');
 
 const ONLINE_PLAYER_KEY = 'player:manager:online_player_uuid_list';

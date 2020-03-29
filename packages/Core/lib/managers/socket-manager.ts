@@ -4,6 +4,8 @@ import _ from 'lodash';
 import { ICache } from '../cache';
 import { getLogger } from '../logger';
 import { Socket } from 'socket.io';
+import Debug from 'debug';
+const debug = Debug('trpg:component:trpg:mapManager');
 const logger = getLogger();
 
 export interface SocketManagerOptions {
@@ -36,6 +38,8 @@ export abstract class SocketManager<
   cache: ICache;
   pubClient: Redis.Redis;
   subClient: Redis.Redis;
+
+  sockets: Socket[] = []; // 记录管理的socket连接列表
 
   constructor(public channelKey: string, options: SocketManagerOptions) {
     super();
@@ -89,6 +93,23 @@ export abstract class SocketManager<
   protected abstract handleMessage(payload: SocketMsgPayload): Promise<void>;
 
   /**
+   * 增加Socket连接对象到sockets
+   */
+  addSocket(socket: Socket) {
+    this.sockets.push(socket);
+
+    socket.on('disconnect', () => {
+      // NOTICE: 如果连接多可能会有性能问题。也许需要优化
+      this.removeSocket(socket);
+      debug(`[SocketManager] socket ${socket.id} 断开连接`);
+    });
+  }
+
+  removeSocket(socket: Socket) {
+    _.pull(this.sockets, socket);
+  }
+
+  /**
    * 加入房间
    * 在Redis存储一个Set记录每个房间的成员
    * 值为socketId
@@ -99,6 +120,13 @@ export abstract class SocketManager<
     const roomKey = this.getRoomKey(roomUUID);
     const socketId = socket.id;
     await this.cache.sadd(roomKey, socketId);
+
+    this.addSocket(socket);
+    socket.on('disconnect', () => {
+      // NOTICE: 如果房间多可能会有性能问题。也许需要优化
+      this.leaveRoom(roomUUID, socket);
+      debug(`[SocketManager] socket ${socket.id} 离开房间 ${roomUUID}`);
+    });
   }
 
   /**
@@ -110,6 +138,7 @@ export abstract class SocketManager<
     const roomKey = this.getRoomKey(roomUUID);
     const socketId = socket.id;
     await this.cache.srem(roomKey, socketId);
+    logger.info(`socket [${socket.id}] leave room [${roomUUID}]`);
   }
 
   /**
