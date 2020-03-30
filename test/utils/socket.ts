@@ -6,10 +6,12 @@ import _ from 'lodash';
  */
 export const createFakeSocket = (): Socket => {
   const emit = jest.fn() as any;
+  const on = jest.fn() as any;
   const disconnect = jest.fn() as any;
   return {
     id: _.uniqueId('socket_'),
     emit,
+    on,
     connected: true,
     disconnect,
   } as Socket;

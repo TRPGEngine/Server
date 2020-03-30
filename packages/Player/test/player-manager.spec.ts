@@ -47,7 +47,7 @@ describe('player-manager class test', () => {
       uuid: 'test-uuid-key',
       platform: 'web',
     } as any;
-    playerManager.emitPlayerMsg(testMsgPayload);
+    playerManager.emitMessage(testMsgPayload);
 
     const { payload } = await new Promise((resolve, reject) => {
       playerManager.onMessage((payload) => {

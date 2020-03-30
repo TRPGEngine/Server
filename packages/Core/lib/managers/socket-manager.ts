@@ -66,10 +66,8 @@ export abstract class SocketManager<
     if (_.isEmpty(this.channelKey)) {
       throw new Error('[SocketManager] Channel Key is Empty!');
     }
-    console.log('this.channelKey', this.channelKey);
     this.subClient.subscribe(this.channelKey);
     this.subClient.on('message', (channel, message) => {
-      console.log('msss', channel, message);
       if (channel === this.channelKey) {
         try {
           const payload: SocketMsgPayload = JSON.parse(message);
@@ -133,6 +131,8 @@ export abstract class SocketManager<
    */
   addSocket(socket: Socket) {
     this.sockets.push(socket);
+
+    console.log('socket', socket);
 
     socket.on('disconnect', () => {
       // NOTICE: 如果连接多可能会有性能问题。也许需要优化
