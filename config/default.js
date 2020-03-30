@@ -115,4 +115,9 @@ module.exports = {
       mi_activity: 'com.moonrailgun.trpg.MipushActivity',
     },
   },
+  trpg: {
+    map: {
+      enable: true,
+    },
+  },
 };
