@@ -89,8 +89,44 @@ export abstract class SocketManager<
 
   /**
    * 处理接收到的事件
+   * target为socketId 或 房间号
    */
-  protected abstract handleMessage(payload: SocketMsgPayload): Promise<void>;
+  protected async handleMessage(payload: SocketMsgPayload): Promise<void> {
+    const { type, target, targets, eventName, data } = payload;
+    const waitToSendSockets: Socket[] = []; // 本地涉及到的Player列表
+
+    const unicastHandler = (_target: string) => {
+      const socket = _.find(this.sockets, ['id', _target]);
+      if (!_.isNil(socket)) {
+        waitToSendSockets.push(socket);
+      }
+    };
+
+    if (type === 'unicast') {
+      // 单播
+      unicastHandler(target);
+    } else if (type === 'listcast') {
+      // 列播
+      for (const t of targets) {
+        unicastHandler(t);
+      }
+    } else if (type === 'roomcast') {
+      // 房间广播
+      const roomUUID = target;
+      const allSocketIds = await this.getRoomAllSocketIds(roomUUID); // 待发送的所有socket的id
+      const localSockets = this.sockets.filter((socket) =>
+        allSocketIds.includes(socket.id)
+      );
+      waitToSendSockets.push(...localSockets);
+    } else if (type === 'broadcast') {
+      waitToSendSockets.push(...this.sockets);
+    }
+
+    for (const socket of waitToSendSockets) {
+      // 循环发送消息
+      socket.emit(eventName, data);
+    }
+  }
 
   /**
    * 增加Socket连接对象到sockets

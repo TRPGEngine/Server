@@ -68,6 +68,9 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
     },
   };
 
+  /**
+   * 基于Player的强关联重写了消息处理方式
+   */
   protected async handleMessage(payload: PlayerMsgPayload) {
     const { type, target, targets, eventName, data } = payload;
     let waitToSendPlayers: PlayerManagerPlayerMapItem[] = []; // 本地涉及到的Player列表
@@ -110,7 +113,6 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
       waitToSendPlayers.push(...Object.values(this.players));
     }
 
-    console.log('waitToSendPlayers', waitToSendPlayers);
     for (const player of waitToSendPlayers) {
       // 循环发送消息
       if (this.internalFn[eventName]) {
