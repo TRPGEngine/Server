@@ -132,8 +132,6 @@ export abstract class SocketManager<
   addSocket(socket: Socket) {
     this.sockets.push(socket);
 
-    console.log('socket', socket);
-
     socket.on('disconnect', () => {
       // NOTICE: 如果连接多可能会有性能问题。也许需要优化
       this.removeSocket(socket);
