@@ -5,7 +5,7 @@ import { ICache } from '../cache';
 import { getLogger } from '../logger';
 import { Socket } from 'socket.io';
 import Debug from 'debug';
-const debug = Debug('trpg:component:trpg:mapManager');
+const debug = Debug('trpg:socket-manager');
 const logger = getLogger();
 
 export interface SocketManagerOptions {
@@ -140,6 +140,9 @@ export abstract class SocketManager<
   }
 
   removeSocket(socket: Socket) {
+    if (socket.connected) {
+      socket.disconnect(true);
+    }
     _.pull(this.sockets, socket);
   }
 
@@ -269,10 +272,14 @@ export abstract class SocketManager<
    */
   async close() {
     try {
+      await Promise.all(
+        this.sockets.map((s) => s.connected && s.disconnect(true))
+      ).then(() => debug('所有连接关闭成功'));
+
       _.invoke(this.pubClient, 'disconnect');
       _.invoke(this.subClient, 'disconnect');
     } catch (err) {
-      console.error('[PlayerManager] 关闭失败', err);
+      console.error('[SocketManager] 关闭失败', err);
     }
   }
 }

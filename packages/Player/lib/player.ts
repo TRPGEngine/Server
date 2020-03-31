@@ -43,7 +43,6 @@ export default class Player extends BasePackage {
     this.initRouters();
     this.initTimer();
 
-    this.app.registerCloseTask('Player', () => this.app.player.manager.close());
     this.app.registerSocketDataMask('player::login', 'password');
     this.app.registerSocketDataMask('player::loginWithToken', 'token');
   }
@@ -74,6 +73,7 @@ export default class Player extends BasePackage {
       redisUrl: app.get('redisUrl'),
       cache: app.cache,
     });
+    this.regCloseTask(() => manager.close());
 
     app.player = {
       manager,

@@ -40,9 +40,8 @@ export default class TRPG extends BasePackage {
         redisUrl: app.get('redisUrl'),
         cache: app.cache,
       });
-      app.trpg = {
-        mapManager,
-      };
+      this.regValue('mapManager', mapManager);
+      this.regCloseTask(() => mapManager.close());
 
       this.regSocketEvent('joinMapRoom', joinMapRoom);
     }

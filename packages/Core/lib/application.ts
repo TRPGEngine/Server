@@ -27,7 +27,7 @@ type InternalEvents = {
   [eventName: string]: Array<InternalEventFunc>;
 };
 
-type CloseTaskFunc = () => Promise<void>;
+export type CloseTaskFunc = () => Promise<void>;
 type CloseTasks = {
   [packageName: string]: CloseTaskFunc;
 };
