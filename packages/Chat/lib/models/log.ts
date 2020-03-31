@@ -409,7 +409,6 @@ export class ChatLog extends Model implements ChatMessagePayload {
       // 如果没有成功撤回, 则再在数据库中处理一下
       await ChatLog.update(
         {
-          revoke: true,
           ...updatedMsgPayload,
         },
         {
