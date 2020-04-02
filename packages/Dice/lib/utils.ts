@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const isNumberStr = (str) => /^\d*$/.test(str);
+const isNumberStr = (str: string) => /^\d*$/.test(str);
 
 /**
  * 在一定范围内取随机值
@@ -75,7 +75,8 @@ interface RollJudgeRes extends RollRes {
 }
 /**
  * 投掷判定骰
- * @param requestStr 请求
+ * 用于coc
+ * @param requestStr 投骰表达式 如a 50, a 力量
  * @param contextData 数据上下文
  */
 export function rollJudge(requestStr: string, contextData: {}): RollJudgeRes {
@@ -133,4 +134,62 @@ export function rollJudge(requestStr: string, contextData: {}): RollJudgeRes {
     targetProps,
     isHidden: isHiddenDice,
   };
+}
+
+/**
+ * 迭代投骰
+ * 用于ww骰
+ * @param n 投骰数
+ * @param res 结果列表
+ * @param rerollNum 需要重骰的点数
+ */
+function rollIterate(
+  n: number,
+  rerollNum = 10,
+  res: Array<number[]> = []
+): number[][] {
+  const list: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const point = rollPoint(10); // roll10
+    list.push(point);
+  }
+  res.push(list);
+
+  const rerollList = list.filter((i) => i >= rerollNum);
+  if (rerollList.length > 0) {
+    // 重骰
+    rollIterate(rerollList.length, rerollNum, res);
+  }
+
+  return res;
+}
+/**
+ * 骰ww骰
+ * @param requestStr 投骰表达式 如ww5
+ * @param validPoint 有效骰 默认是8
+ */
+const wwRE = /(\d+)(a\d+)?/;
+export function rollWW(requestStr: string, validPoint = 8): RollRes {
+  if (!requestStr.startsWith('ww')) {
+    throw new Error('不正确的表达式:' + requestStr);
+  }
+
+  const numMatch = requestStr.match(wwRE);
+  if (_.isNil(numMatch)) {
+    throw new Error('不合法的表达式:' + requestStr);
+  }
+  const num = Number(numMatch[1]); // 初始骰数
+  const rerollPoint = _.isNil(numMatch[2])
+    ? undefined
+    : Number(numMatch[2].substr(1)); // 重骰点数
+
+  const rollPointList = rollIterate(num, rerollPoint);
+
+  const value = _.flatten(rollPointList).filter((p) => p >= validPoint).length;
+  const str = rollPointList
+    .map((sub) => sub.join(','))
+    .map((s) => `(${s})`)
+    .join('+');
+
+  return { value, str: `${str}=${value}` };
 }

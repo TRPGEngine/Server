@@ -1,16 +1,17 @@
 import _ from 'lodash';
 import { regMsgInterceptor } from 'packages/Chat/lib/interceptors';
-import { roll, rollJudge } from './utils';
+import { roll, rollJudge, rollWW } from './utils';
 import { DiceLog } from './models/log';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ChatMessagePartial } from 'packages/Chat/types/message';
 import { GroupActor } from 'packages/Group/lib/models/actor';
 
-// r指令
 const restPattern = /^\.r(.*)$/; // 用于获取.r后面的内容
+const dotRestPattern = /^\.(.*)$/; // 用于获取.后面的内容
 
 /**
  * 获取消息的发送者
+ * 优先获取消息数据包里的name
  */
 async function getSenderName(payload: ChatMessagePartial) {
   let senderName = '';
@@ -83,6 +84,20 @@ export const initInterceptors = _.once(() => {
       payload.message = `${senderName} ${
         _.isString(restStr) ? `因${restStr} ` : ''
       }骰出了: ${str}`;
+      payload.type = 'tip';
+
+      return;
+    }
+
+    // .ww指令
+    if (payload.message.startsWith('.ww') === true) {
+      const diceRequest = payload.message.match(dotRestPattern)[1];
+      const { str, value } = rollWW(diceRequest);
+
+      DiceLog.recordDiceLog(diceRequest, str, value, payload);
+
+      const senderName = await getSenderName(payload);
+      payload.message = `${senderName} 骰出了: ${diceRequest}=${str}`;
       payload.type = 'tip';
 
       return;

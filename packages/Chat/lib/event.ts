@@ -50,6 +50,10 @@ export const getUserChatLog: EventFunc = async function getUserChatLog(
   }
   let selfUUID = player.uuid;
   // IDEA: 定义: 获取用户间会话记录时无视掉自身发送的tip类型信息
+  // NOTICE:
+  // 这里会造成一个问题。就是如果使用消息拦截器进行投骰时因为是系统消息类型
+  // 因此会产生刷新后无法看见自己发送的投骰信息的问题
+  // TODO: 看看能不能想办法改造成允许查看自己的tip信息
   let where = {
     converse_uuid: null,
     [Op.or]: [
