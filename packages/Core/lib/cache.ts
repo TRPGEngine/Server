@@ -355,9 +355,20 @@ export class RedisCache implements ICache {
   }
 
   async keys(glob: string): Promise<string[]> {
-    // TODO: 需要使用scan来优化
     glob = this.genKey(glob);
-    return await this.redis.keys(glob);
+
+    const keys = [];
+    let cursor = 0;
+    do {
+      const [_cursor, _keys] = await this.redis.scan(cursor, 'MATCH', glob);
+      cursor = Number(_cursor);
+      if (isNaN(cursor)) {
+        cursor = 0;
+      }
+      keys.push(..._keys);
+    } while (cursor != 0);
+
+    return _.uniq(keys); // 返回结果去重
   }
 
   async get(key: string): Promise<CacheValue> {
