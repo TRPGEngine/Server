@@ -1,7 +1,8 @@
 import BasePackage from 'lib/package';
 import TRPGReportDefinition from './models/game-report';
+import TRPGMapDefinition from './models/game-map';
 import gameReportRouter from './routers/game-report';
-import { joinMapRoom } from './map-event';
+import { joinMapRoom, updateMapToken, updateMapLayer } from './map-event';
 import { getMapManager, MapManagerCls } from './managers/map-manager';
 
 // 注入方法声明
@@ -22,6 +23,7 @@ export default class TRPG extends BasePackage {
 
   onInit(): void {
     this.regModel(TRPGReportDefinition);
+    this.regModel(TRPGMapDefinition);
 
     this.regRoute(gameReportRouter);
 
@@ -44,6 +46,8 @@ export default class TRPG extends BasePackage {
       this.regCloseTask(() => mapManager.close());
 
       this.regSocketEvent('joinMapRoom', joinMapRoom);
+      this.regSocketEvent('updateMapToken', updateMapToken);
+      this.regSocketEvent('updateMapLayer', updateMapLayer);
     }
   }
 }

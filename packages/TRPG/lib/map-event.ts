@@ -1,6 +1,7 @@
 import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
 import { TRPGGameMap } from './models/game-map';
+import { MapUpdateType, UpdateTokenPayloadMap } from '../types/map';
 
 export const joinMapRoom: EventFunc<{
   mapUUID: string;
@@ -16,4 +17,43 @@ export const joinMapRoom: EventFunc<{
   await app.trpg.mapManager.joinRoom(mapUUID, socket);
 
   return true;
+};
+
+/**
+ * 更新棋子数据
+ */
+export const updateMapToken: EventFunc<{
+  mapUUID: string;
+  type: MapUpdateType;
+  payload: any;
+}> = async function updateMapToken(data, cb, db) {
+  const { app, socket } = this.app;
+  const { mapUUID, type, payload } = data;
+  if (_.isNil(mapUUID) || _.isNil(type) || _.isEmpty(payload)) {
+    throw new Error('缺少必要参数');
+  }
+
+  if (type === 'add') {
+    const p = payload as UpdateTokenPayloadMap['add'];
+    await TRPGGameMap.addToken(mapUUID, p.layerId, p.token);
+  } else if (type === 'update') {
+    const p = payload as UpdateTokenPayloadMap['update'];
+    await TRPGGameMap.updateToken(mapUUID, p.tokenId, p.tokenAttrs);
+  } else if (type === 'remove') {
+    await TRPGGameMap.removeToken(
+      mapUUID,
+      (payload as UpdateTokenPayloadMap['remove']).tokenId
+    );
+  }
+
+  return true;
+};
+
+export const updateMapLayer: EventFunc<{
+  mapUUID: string;
+  type: MapUpdateType;
+  payload: {};
+}> = async function updateMapLayer(data, cb, db) {
+  // TODO
+  return false;
 };

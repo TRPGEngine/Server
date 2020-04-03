@@ -20,7 +20,7 @@ describe('cache', () => {
   });
 
   describe(isRedis ? 'redis cache' : 'memory cache', () => {
-    describe.only('cache keys', () => {
+    describe('cache keys', () => {
       if (!isRedis) {
         console.warn('this test case require redis url');
         return;
