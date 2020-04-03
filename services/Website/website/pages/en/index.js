@@ -65,8 +65,10 @@ class HomeSplash extends React.Component {
           <ProjectTitle siteConfig={siteConfig} />
           <PromoSection>
             <Button href="https://trpg.moonrailgun.com">网页版</Button>
-            <Button href="/download">下载桌面版</Button>
-            <Button href={docUrl('doc2.html')}>下载移动版</Button>
+            {/* <Button href="/download">下载桌面版</Button> */}
+            <Button href="https://trpg.moonrailgun.com/portal/deploy">
+              下载移动版
+            </Button>
           </PromoSection>
         </div>
       </SplashContainer>
