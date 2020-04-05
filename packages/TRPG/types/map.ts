@@ -31,6 +31,8 @@ export interface UpdateTokenPayloadMap {
 
 type MapDataToken = TokenAttrs;
 export interface MapDataLayer {
+  _id: string;
+  name: string;
   tokens: MapDataToken[];
 }
 export interface MapData {

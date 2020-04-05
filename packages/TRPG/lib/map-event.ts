@@ -3,6 +3,41 @@ import _ from 'lodash';
 import { TRPGGameMap } from './models/game-map';
 import { MapUpdateType, UpdateTokenPayloadMap } from '../types/map';
 
+/**
+ * 创建团地图
+ */
+export const createGroupMap: EventFunc<{
+  groupUUID: string;
+  name: string;
+  width: number;
+  height: number;
+}> = async function createGroupMap(data) {
+  const { app, socket } = this;
+  const player = app.player.manager.findPlayer(socket);
+  if (_.isNil(player)) {
+    throw new Error('尚未登录');
+  }
+
+  const { groupUUID, name, width, height } = data;
+
+  if (
+    _.isNil(groupUUID) ||
+    _.isNil(name) ||
+    _.isNil(width) ||
+    _.isNil(height)
+  ) {
+    throw new Error('缺少必要参数');
+  }
+
+  return await TRPGGameMap.createGroupMap(
+    groupUUID,
+    player.uuid,
+    name,
+    width,
+    height
+  );
+};
+
 export const joinMapRoom: EventFunc<{
   mapUUID: string;
 }> = async function joinMapRoom(data, cb, db) {

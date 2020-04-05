@@ -1,6 +1,6 @@
 import BasePackage from 'lib/package';
 import TRPGReportDefinition from './models/game-report';
-import TRPGMapDefinition from './models/game-map';
+import TRPGMapDefinition, { TRPGGameMap } from './models/game-map';
 import gameReportRouter from './routers/game-report';
 import { joinMapRoom, updateMapToken, updateMapLayer } from './map-event';
 import { getMapManager, MapManagerCls } from './managers/map-manager';
@@ -48,6 +48,14 @@ export default class TRPG extends BasePackage {
       this.regSocketEvent('joinMapRoom', joinMapRoom);
       this.regSocketEvent('updateMapToken', updateMapToken);
       this.regSocketEvent('updateMapLayer', updateMapLayer);
+
+      this.regScheduleJob(
+        'dumpMapData',
+        TRPGGameMap.dumpCacheCron,
+        async () => {
+          await TRPGGameMap.dumpMapData();
+        }
+      );
     }
   }
 }

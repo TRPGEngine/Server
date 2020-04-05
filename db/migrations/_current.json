@@ -3138,6 +3138,10 @@
                     "field": "updatedAt",
                     "seqType": "Sequelize.DATE"
                 },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
                 "groupId": {
                     "allowNull": true,
                     "references": {
@@ -3153,5 +3157,5 @@
             "indexes": []
         }
     },
-    "revision": 48
+    "revision": 49
 }
