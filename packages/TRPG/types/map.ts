@@ -11,6 +11,7 @@ export interface Position {
 }
 
 export interface TokenAttrs {
+  _id: string;
   gridPosition: Position;
   gridAreaSize: Size;
 }

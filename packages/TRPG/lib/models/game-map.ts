@@ -79,6 +79,10 @@ export class TRPGGameMap extends Model {
   static async dumpMapData(): Promise<void> {
     const app = TRPGGameMap.getApplication();
     const maps = await app.cache.getWithGlob(TRPGGameMap.hashCacheKey('*'));
+    if (_.isEmpty(maps)) {
+      return;
+    }
+
     await Promise.all(
       Object.entries(maps).map(([mapUUID, mapData]) =>
         TRPGGameMap.update(

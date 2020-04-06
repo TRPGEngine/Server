@@ -38,6 +38,10 @@ export const createGroupMap: EventFunc<{
   );
 };
 
+/**
+ * 加入地图房间
+ * 并返回房间数据
+ */
 export const joinMapRoom: EventFunc<{
   mapUUID: string;
 }> = async function joinMapRoom(data, cb, db) {
@@ -51,7 +55,9 @@ export const joinMapRoom: EventFunc<{
 
   await app.trpg.mapManager.joinRoom(mapUUID, socket);
 
-  return true;
+  const mapData = await TRPGGameMap.getMapData(mapUUID);
+
+  return { mapData };
 };
 
 /**
