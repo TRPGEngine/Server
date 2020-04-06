@@ -84,7 +84,7 @@ export interface ICache {
    * @param key 键
    * @param value 值
    */
-  srem(key: string, value: CacheValue): Promise<void>;
+  srem(key: string, ...values: CacheValue[]): Promise<void>;
 
   /**
    * 返回集合中的所有的成员
@@ -232,10 +232,12 @@ export class Cache implements ICache {
     data.add(value);
   }
 
-  async srem(key: string, value: CacheValue): Promise<void> {
+  async srem(key: string, ...values: CacheValue[]): Promise<void> {
     const data: Set<CacheValue> = this.data[key];
     if (_.isSet(data)) {
-      data.delete(value);
+      values.forEach((value) => {
+        data.delete(value);
+      });
     }
   }
 
@@ -394,11 +396,14 @@ export class RedisCache implements ICache {
     debug('[redis]', `sadd ${key} with ${JSON.stringify(value)}`);
   }
 
-  async srem(key: string, value: CacheValue): Promise<void> {
+  async srem(key: string, ...values: CacheValue[]): Promise<void> {
     key = this.genKey(key);
 
-    await this.redis.srem(key, this.normalizeVal(value));
-    debug('[redis]', `srem ${key} with ${JSON.stringify(value)}`);
+    await this.redis.srem(key, ...values.map(this.normalizeVal));
+    debug(
+      '[redis]',
+      `srem ${key} with ${values.map((v) => JSON.stringify(v)).join(',')}`
+    );
   }
 
   async smembers(key: string): Promise<CacheValue[]> {

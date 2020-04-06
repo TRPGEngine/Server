@@ -40,6 +40,7 @@ export abstract class SocketManager<
   subClient: Redis.Redis;
 
   sockets: Socket[] = []; // 记录管理的socket连接列表
+  rooms: { [roomUUID: string]: string[] } = {}; // 当前实例管理的rooms列表
 
   constructor(public channelKey: string, options: SocketManagerOptions) {
     super();
@@ -159,10 +160,15 @@ export abstract class SocketManager<
     await this.cache.sadd(roomKey, socketId);
 
     this.addSocket(socket);
+    if (_.isNil(this.rooms[roomUUID])) {
+      this.rooms[roomUUID] = [];
+    }
+    this.rooms[roomUUID].push(socketId);
+
     socket.on('disconnect', () => {
       // NOTICE: 如果房间多可能会有性能问题。也许需要优化
       this.leaveRoom(roomUUID, socket);
-      debug(`[SocketManager] socket ${socket.id} 离开房间 ${roomUUID}`);
+      debug(`[SocketManager] socket ${socketId} 离开房间 ${roomUUID}`);
     });
   }
 
@@ -174,8 +180,27 @@ export abstract class SocketManager<
   async leaveRoom(roomUUID: string, socket: Socket): Promise<void> {
     const roomKey = this.getRoomKey(roomUUID);
     const socketId = socket.id;
+
     await this.cache.srem(roomKey, socketId);
-    logger.info(`socket [${socket.id}] leave room [${roomUUID}]`);
+    _.pull(this.rooms[roomUUID], socketId);
+
+    logger.info(`socket [${socketId}] leave room [${roomUUID}]`);
+  }
+
+  /**
+   * 清理当前实例管理的所有连接的房间
+   */
+  async clearRoom(): Promise<void> {
+    const roomUUIDs = Object.keys(this.rooms);
+
+    await Promise.all(
+      roomUUIDs.map((roomUUID) => {
+        const roomKey = this.getRoomKey(roomUUID);
+        const socketIds = this.rooms[roomUUID];
+
+        return this.cache.srem(roomKey, ...socketIds);
+      })
+    );
   }
 
   /**
@@ -269,12 +294,15 @@ export abstract class SocketManager<
 
   /**
    * 关闭所有的pubsub连接
+   * 并清理房间成员
    */
   async close() {
     try {
       await Promise.all(
         this.sockets.map((s) => s.connected && s.disconnect(true))
       ).then(() => debug('所有连接关闭成功'));
+
+      await this.clearRoom();
 
       _.invoke(this.pubClient, 'disconnect');
       _.invoke(this.subClient, 'disconnect');
