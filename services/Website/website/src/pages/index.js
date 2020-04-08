@@ -1,10 +1,12 @@
 import React from 'react';
+import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import Image from '@theme/IdealImage';
 import Layout from '@theme/Layout';
+import MDXComponents from '@theme/MDXComponents';
 
-const MarkdownBlock = (props) => (
-  <div>{props.children}</div>
-); /* Used to read markdown */
+const MarkdownBlock = MDXComponents; /* Used to read markdown */
 const Container = (props) => <div>{props.children}</div>;
 const GridBlock = (props) => <div>{props.children}</div>;
 
@@ -74,7 +76,7 @@ class HomeSplash extends React.Component {
 function Index() {
   const context = useDocusaurusContext();
   const { siteConfig } = context;
-  const { baseUrl, language } = siteConfig;
+  const { baseUrl, languag, tagline, customFields } = siteConfig;
 
   const Block = (props) => (
     <div
@@ -193,6 +195,157 @@ function Index() {
       </div>
     );
   };
+
+  return (
+    <Layout
+      permalink="/"
+      title={tagline}
+      description={customFields.description}
+    >
+      <main>
+        <div>
+          <div>
+            <h1>
+              <img
+                alt="Docusaurus with Keytar"
+                src={useBaseUrl('img/docusaurus_keytar.svg')}
+              />
+              Build <span>optimized</span> websites <span>quickly</span>, focus
+              on your <span>content</span>
+            </h1>
+            <div>
+              <Link to={useBaseUrl('docs/introduction')}>Get Started</Link>
+              <span>
+                <iframe
+                  src="https://ghbtns.com/github-btn.html?user=facebook&amp;repo=docusaurus&amp;type=star&amp;count=true&amp;size=large"
+                  width={160}
+                  height={30}
+                  title="GitHub Stars"
+                />
+              </span>
+            </div>
+          </div>
+        </div>
+        <div
+          className={classnames(styles.announcement, styles.announcementDark)}
+        >
+          <div>
+            Coming from v1? Check out our{' '}
+            <Link to={useBaseUrl('/docs/migrating-from-v1-to-v2')}>
+              v1 to v2 migration guide
+            </Link>
+            .
+          </div>
+        </div>
+        <div>
+          <div className="container text--center margin-bottom--xl">
+            <div className="row">
+              <div className="col">
+                <img
+                  alt="Powered by MDX"
+                  src={useBaseUrl('img/undraw_typewriter.svg')}
+                />
+                <h2 className={classnames(styles.featureHeading)}>
+                  Powered by Markdown
+                </h2>
+                <p className="padding-horiz--md">
+                  Save time and focus on your project's documentation. Simply
+                  write docs and blog posts with Markdown/MDX and Docusaurus
+                  will publish a set of static HTML files ready to serve. You
+                  can even embed JSX components into your Markdown thanks to
+                  MDX.
+                </p>
+              </div>
+              <div className="col">
+                <img
+                  alt="Built Using React"
+                  src={useBaseUrl('img/undraw_react.svg')}
+                />
+                <h2 className={classnames(styles.featureHeading)}>
+                  Built Using React
+                </h2>
+                <p className="padding-horiz--md">
+                  Extend or customize your project's layout by reusing React.
+                  Docusaurus can be extended while reusing the same header and
+                  footer.
+                </p>
+              </div>
+              <div className="col">
+                <img
+                  alt="Ready for Translations"
+                  src={useBaseUrl('img/undraw_around_the_world.svg')}
+                />
+                <h2 className={classnames(styles.featureHeading)}>
+                  Ready for Translations
+                </h2>
+                <p className="padding-horiz--md">
+                  Localization comes pre-configured. Use Crowdin to translate
+                  your docs into over 70 languages.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="container text--center">
+            <div className="row">
+              <div className="col col--4 col--offset-2">
+                <img
+                  alt="Document Versioning"
+                  src={useBaseUrl('img/undraw_version_control.svg')}
+                />
+                <h2 className={classnames(styles.featureHeading)}>
+                  Document Versioning
+                </h2>
+                <p className="padding-horiz--md">
+                  Support users on all versions of your project. Document
+                  versioning helps you keep documentation in sync with project
+                  releases.
+                </p>
+              </div>
+              <div className="col col--4">
+                <img
+                  alt="Document Search"
+                  src={useBaseUrl('img/undraw_algolia.svg')}
+                />
+                <h2 className={classnames(styles.featureHeading)}>
+                  Content Search
+                </h2>
+                <p className="padding-horiz--md">
+                  Make it easy for your community to find what they need in your
+                  documentation. We proudly support Algolia documentation
+                  search.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={classnames(styles.section, styles.sectionAlt)}>
+          <div className="container">
+            <div className="row">
+              {QUOTES.map((quote) => (
+                <div className="col" key={quote.name}>
+                  <div className="avatar avatar--vertical margin-bottom--sm">
+                    <Image
+                      alt={quote.name}
+                      className="avatar__photo avatar__photo--xl"
+                      img={quote.thumbnail}
+                      style={{ overflow: 'hidden' }}
+                    />
+                    <div className="avatar__intro padding-top--sm">
+                      <h4 className="avatar__name">{quote.name}</h4>
+                      <small className="avatar__subtitle">{quote.title}</small>
+                    </div>
+                  </div>
+                  <p className="text--center text--italic padding-horiz--md">
+                    {quote.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
+    </Layout>
+  );
 
   return (
     <Layout>
