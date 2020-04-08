@@ -1,6 +1,6 @@
 ---
 id: tags/tabs
-title: <BaseAttr />
+title: <Tabs />
 ---
 
 ```xml
