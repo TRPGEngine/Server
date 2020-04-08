@@ -5,12 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const React = require('react');
+import React from 'react';
 
-const CompLibrary = require('../../core/CompLibrary.js');
-
-const Container = CompLibrary.Container;
-const GridBlock = CompLibrary.GridBlock;
+const Container = (props) => <div>{props.children}</div>;
+const GridBlock = (props) => <div>{props.children}</div>;
 
 function Help(props) {
   const { config: siteConfig, language = '' } = props;
@@ -55,4 +53,4 @@ function Help(props) {
   );
 }
 
-module.exports = Help;
+export default Help;

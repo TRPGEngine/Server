@@ -23,7 +23,7 @@ const users = [
 ];
 
 const siteConfig = {
-  title: 'TRPG Engine', // Title for your website.
+  title: 'TRPG Engine',
   tagline: '为跑团而生的即时通讯应用',
   url: 'https://trpg.moonrailgun.com', // Your website URL
   baseUrl: '/', // Base URL for your project */
@@ -38,31 +38,42 @@ const siteConfig = {
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
 
-  // For no header links in the top nav bar -> headerLinks: [],
-  headerLinks: [
-    { doc: 'introduce', label: '文档' },
-    { doc: 'develop', label: '开发' },
-    { page: 'help', label: '帮助' },
-    { blog: true, label: '博客' },
-    { href: 'https://github.com/orgs/TRPGEngine/', label: 'Github' },
-    { languages: false },
-    { search: false },
-    { href: 'http://moonrailgun.com', label: '关于作者' },
-  ],
-
-  // If you have users set above, you add it here:
-  users,
-
-  /* path to images for header/footer */
-  headerIcon: 'img/trpg_logo.png',
-  footerIcon: 'img/trpg_logo.png',
-  favicon: 'img/favicon.ico',
-
-  /* Colors for website */
-  colors: {
-    primaryColor: '#8C6244',
-    secondaryColor: '#462b18',
+  themeConfig: {
+    navbar: {
+      title: 'TRPG Engine',
+      logo: {
+        alt: 'TRPGEngine Logo',
+        src: 'img/trpg_logo.png',
+      },
+      links: [
+        { to: 'docs/introduce', label: '文档', position: 'left' },
+        { to: 'develop/develop', label: '开发', position: 'left' },
+        { to: 'help', label: '帮助', position: 'left' },
+        { to: 'blog', label: '博客', position: 'left' },
+        {
+          href: 'https://github.com/orgs/TRPGEngine/',
+          label: 'Github',
+          position: 'left',
+        },
+        { languages: false },
+        { search: false },
+        { href: 'http://moonrailgun.com', label: '关于作者', position: 'left' },
+      ],
+    },
+    footer: {
+      logo: {
+        alt: 'TRPGEngine Logo',
+        src: 'img/trpg_logo.png',
+      },
+      copyright: `Copyright © ${new Date().getFullYear()} moonrailgun`,
+      ogImage: 'img/trpg_logo.png',
+      twitterImage: 'img/trpg_logo.png',
+    },
   },
+
+  // users,
+
+  favicon: 'img/favicon.ico',
 
   /* Custom fonts for website */
   /*
@@ -78,39 +89,31 @@ const siteConfig = {
   },
   */
 
-  // This copyright info is used in /core/Footer.js and blog RSS/Atom feeds.
-  copyright: `Copyright © ${new Date().getFullYear()} moonrailgun`,
-
-  highlight: {
-    // Highlight.js theme to use for syntax highlighting in code blocks.
-    theme: 'default',
-  },
-
   // Add custom scripts here that would be placed in <script> tags.
   scripts: [
     // 'https://buttons.github.io/buttons.js'
   ],
 
-  // On page navigation for the current documentation page.
-  onPageNav: 'separate',
-  // No .html extensions for paths.
-  cleanUrl: true,
+  // markdownPlugins: [RemarkablePlugins.ActorTemplatePreviewer], // TODO
 
-  // Open Graph and Twitter card images.
-  ogImage: 'img/undraw_online.svg',
-  twitterImage: 'img/undraw_tweetstorm.svg',
+  // repoUrl: 'https://github.com/TRPGEngine/Client',
 
-  // Show documentation's last contributor's name.
-  // enableUpdateBy: true,
-
-  markdownPlugins: [RemarkablePlugins.ActorTemplatePreviewer],
-
-  // Show documentation's last update time.
-  // enableUpdateTime: true,
-
-  // You may provide arbitrary config keys to be used as needed by your
-  // template. For example, if you need your repo's URL...
-  repoUrl: 'https://github.com/TRPGEngine/Client',
+  presets: [
+    [
+      '@docusaurus/preset-classic',
+      {
+        docs: {
+          // docs folder path relative to website dir.
+          path: '../docs',
+          // sidebars file relative to website dir.
+          sidebarPath: require.resolve('./sidebars.json'),
+        },
+        theme: {
+          customCss: require.resolve('./src/css/custom.css'),
+        },
+      },
+    ],
+  ],
 };
 
 module.exports = siteConfig;
