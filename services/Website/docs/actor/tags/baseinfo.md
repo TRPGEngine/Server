@@ -1,5 +1,5 @@
 ---
-id: tags/baseinfo
+id: baseinfo
 title: <BaseInfo />
 ---
 

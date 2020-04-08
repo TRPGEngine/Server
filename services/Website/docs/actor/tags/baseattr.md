@@ -1,5 +1,5 @@
 ---
-id: tags/baseattr
+id: baseattr
 title: <BaseAttr />
 ---
 

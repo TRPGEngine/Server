@@ -1,5 +1,5 @@
 ---
-id: tags/row
+id: row
 title: <Row />
 ---
 

@@ -1,5 +1,5 @@
 ---
-id: tags/col
+id: col
 title: <Col />
 ---
 

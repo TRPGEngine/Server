@@ -1,5 +1,5 @@
 ---
-id: tags/template
+id: template
 title: <Template />
 ---
 

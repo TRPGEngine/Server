@@ -1,5 +1,5 @@
 ---
-id: tags/tabs
+id: tabs
 title: <Tabs />
 ---
 
