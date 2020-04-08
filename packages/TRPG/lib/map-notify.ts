@@ -21,3 +21,19 @@ export async function notifyUpdateToken(
     payload,
   });
 }
+
+/**
+ * 通知添加团地图
+ */
+export async function notifyAddGroupMap(
+  groupUUID: string,
+  mapUUID: string,
+  mapName: string
+) {
+  const trpgapp = getGlobalApplication();
+  await trpgapp.player.manager.roomcastSocketEvent(
+    groupUUID,
+    'trpg::addGroupMap',
+    { groupUUID, mapUUID, mapName }
+  );
+}

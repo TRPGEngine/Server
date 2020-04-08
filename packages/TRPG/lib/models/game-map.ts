@@ -7,7 +7,7 @@ import {
 import { GroupGroup } from 'packages/Group/lib/models/group';
 import { TokenAttrs, MapData } from 'packages/TRPG/types/map';
 import _ from 'lodash';
-import { notifyUpdateToken } from '../map-notify';
+import { notifyUpdateToken, notifyAddGroupMap } from '../map-notify';
 
 /**
  * 游戏地图
@@ -65,12 +65,16 @@ export class TRPGGameMap extends Model {
       throw new Error('没有创建地图的权限');
     }
 
-    return TRPGGameMap.create({
+    const map = await TRPGGameMap.create({
       name,
       width,
       height,
       groupId: group.id,
     });
+
+    notifyAddGroupMap(groupUUID, map.uuid, map.name);
+
+    return map;
   }
 
   /**

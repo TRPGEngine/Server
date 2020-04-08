@@ -29,13 +29,15 @@ export const createGroupMap: EventFunc<{
     throw new Error('缺少必要参数');
   }
 
-  return await TRPGGameMap.createGroupMap(
+  const newGameMap = await TRPGGameMap.createGroupMap(
     groupUUID,
     player.uuid,
     name,
     width,
     height
   );
+
+  return { mapData: newGameMap };
 };
 
 /**
