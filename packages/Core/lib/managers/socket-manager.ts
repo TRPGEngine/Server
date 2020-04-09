@@ -193,14 +193,14 @@ export abstract class SocketManager<
   async clearRoom(): Promise<void> {
     const roomUUIDs = Object.keys(this.rooms);
 
-    await Promise.all(
-      roomUUIDs.map((roomUUID) => {
-        const roomKey = this.getRoomKey(roomUUID);
-        const socketIds = this.rooms[roomUUID];
+    const pList = roomUUIDs.map((roomUUID) => {
+      const roomKey = this.getRoomKey(roomUUID);
+      const socketIds = this.rooms[roomUUID];
 
-        return this.cache.srem(roomKey, ...socketIds);
-      })
-    );
+      return this.cache.srem(roomKey, ...socketIds);
+    });
+
+    return Promise.all(pList).then(_.noop);
   }
 
   /**
@@ -300,12 +300,18 @@ export abstract class SocketManager<
     try {
       await Promise.all(
         this.sockets.map((s) => s.connected && s.disconnect(true))
-      ).then(() => debug('所有连接关闭成功'));
+      ).then(() => debug('所有Socket连接关闭成功'));
 
-      await this.clearRoom();
+      await this.clearRoom().catch((e) => {
+        console.error('清理Socket房间失败', e);
+        throw e;
+      });
+      debug('清理Socket房间记录成功');
 
-      _.invoke(this.pubClient, 'disconnect');
+      debug('正在关闭订阅服务..');
       _.invoke(this.subClient, 'disconnect');
+      debug('正在关闭发布服务');
+      _.invoke(this.pubClient, 'disconnect');
     } catch (err) {
       console.error('[SocketManager] 关闭失败', err);
     }

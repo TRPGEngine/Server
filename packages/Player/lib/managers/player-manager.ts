@@ -205,7 +205,7 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
         )
       ).then(() => debug('[PlayerManager] 移除所有用户成功'));
 
-      super.close();
+      await super.close();
     } catch (err) {
       console.error('[PlayerManager] 关闭失败', err);
     }

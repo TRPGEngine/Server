@@ -399,6 +399,10 @@ export class RedisCache implements ICache {
   async srem(key: string, ...values: CacheValue[]): Promise<void> {
     key = this.genKey(key);
 
+    if (_.isEmpty(values)) {
+      return;
+    }
+
     await this.redis.srem(key, ...values.map(this.normalizeVal));
     debug(
       '[redis]',

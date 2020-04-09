@@ -156,12 +156,12 @@ export const buildAppContext = (): TRPGAppInstanceContext => {
   }, 20000);
 
   afterAll(async () => {
-    debug('afterAll');
+    debug('afterAll: app close');
 
     await _.invoke(context, 'app.close');
     _.invoke(context, 'socket.close');
 
-    debug('app close success');
+    debug('afterAll: app close success');
   });
 
   return context;
