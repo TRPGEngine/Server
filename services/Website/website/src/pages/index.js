@@ -68,14 +68,14 @@ function HomeSplash(props) {
   const docUrl = (doc) => `${baseUrl}${docsPart}${langPart}${doc}`;
 
   return (
-    <header className={classnames('hero hero--primary', styles.heroBanner)}>
+    <header className={classnames('hero', styles.heroBanner)}>
       <div className="container">
         <h1 className="hero__title">{siteConfig.title}</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
           <Link
             className={classnames(
-              'button button--secondary button--lg margin-right--sm',
+              'button button--outline button--primary button--lg margin-right--sm',
               styles.getStarted
             )}
             to="https://trpg.moonrailgun.com"
@@ -85,7 +85,7 @@ function HomeSplash(props) {
           {/* <Button href={useBaseUrl('/download')}>下载桌面版</Button> */}
           <Link
             className={classnames(
-              'button button--secondary button--lg',
+              'button button--outline button--primary button--lg',
               styles.getStarted
             )}
             to="https://trpg.moonrailgun.com/portal/deploy"

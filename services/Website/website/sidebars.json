@@ -12,7 +12,7 @@
     ]
   },
   "develop": {
-    "开发": ["develop", "config", "doc5"],
+    "开发": ["develop", "config"],
     "包": ["package-core"]
   }
 }
