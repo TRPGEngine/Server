@@ -85,6 +85,9 @@ const siteConfig = {
         },
       ],
     },
+    googleAnalytics: {
+      trackingID: 'UA-121610011-2',
+    },
   },
 
   favicon: 'img/favicon.ico',
@@ -108,6 +111,7 @@ const siteConfig = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
+        googleAnalytics: true,
       },
     ],
   ],

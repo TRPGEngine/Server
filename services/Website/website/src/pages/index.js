@@ -103,35 +103,6 @@ function Index() {
   const { siteConfig } = context;
   const { baseUrl, language, tagline, customFields } = siteConfig;
 
-  // const Showcase = () => {
-  //   if ((siteConfig.users || []).length === 0) {
-  //     return null;
-  //   }
-
-  //   const showcase = siteConfig.users
-  //     .filter((user) => user.pinned)
-  //     .map((user) => (
-  //       <a href={user.infoLink} key={user.infoLink}>
-  //         <img src={user.image} alt={user.caption} title={user.caption} />
-  //       </a>
-  //     ));
-
-  //   const pageUrl = (page) => baseUrl + (language ? `${language}/` : '') + page;
-
-  //   return (
-  //     <div className="productShowcaseSection paddingBottom">
-  //       <h2>谁在使用?</h2>
-  //       <p>这个项目正在被这些人使用</p>
-  //       <div className="logos">{showcase}</div>
-  //       <div className="more-users">
-  //         <a className="button" href={pageUrl('users.html')}>
-  //           更多 {siteConfig.title} 用户
-  //         </a>
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
   return (
     <Layout>
       <div>

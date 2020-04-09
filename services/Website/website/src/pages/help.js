@@ -6,13 +6,14 @@
  */
 
 import React from 'react';
+import Container from '../components/Container';
+import GridBlock from '../components/GridBlock';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
-const Container = (props) => <div>{props.children}</div>;
-const GridBlock = (props) => <div>{props.children}</div>;
-
-function Help(props) {
-  const { config: siteConfig, language = '' } = props;
-  const { baseUrl, docsUrl } = siteConfig;
+function Help() {
+  const context = useDocusaurusContext();
+  const { siteConfig } = context;
+  const { baseUrl, docsUrl, language } = siteConfig;
   const docsPart = `${docsUrl ? `${docsUrl}/` : ''}`;
   const langPart = `${language ? `${language}/` : ''}`;
   const docUrl = (doc) => `${baseUrl}${docsPart}${langPart}${doc}`;
