@@ -25,18 +25,10 @@ const users = [
 const siteConfig = {
   title: 'TRPG Engine',
   tagline: '为跑团而生的即时通讯应用',
-  url: 'https://trpg.moonrailgun.com', // Your website URL
-  baseUrl: '/', // Base URL for your project */
-  // For github.io type URLs, you would set the url and baseUrl like:
-  //   url: 'https://facebook.github.io',
-  //   baseUrl: '/test-site/',
-
-  // Used for publishing and more
+  url: 'https://trpg.moonrailgun.com',
+  baseUrl: '/',
   projectName: 'Server',
   organizationName: 'TRPGEngine',
-  // For top-level user or org sites, the organization is still the same.
-  // e.g., for the https://JoelMarcey.github.io site, it would be set like...
-  //   organizationName: 'JoelMarcey'
 
   themeConfig: {
     navbar: {
@@ -48,16 +40,20 @@ const siteConfig = {
       links: [
         { to: 'docs/introduce', label: '文档', position: 'left' },
         { to: 'develop/develop', label: '开发', position: 'left' },
-        { to: 'help', label: '帮助', position: 'left' },
-        { to: 'blog', label: '博客', position: 'left' },
+        // { to: 'help', label: '帮助', position: 'left' },
+        { to: 'blog', label: '博客', position: 'right' },
         {
           href: 'https://github.com/orgs/TRPGEngine/',
           label: 'Github',
-          position: 'left',
+          position: 'right',
         },
         { languages: false },
         { search: false },
-        { href: 'http://moonrailgun.com', label: '关于作者', position: 'left' },
+        {
+          href: 'http://moonrailgun.com',
+          label: '关于作者',
+          position: 'right',
+        },
       ],
     },
     footer: {
@@ -68,26 +64,47 @@ const siteConfig = {
       copyright: `Copyright © ${new Date().getFullYear()} moonrailgun`,
       ogImage: 'img/trpg_logo.png',
       twitterImage: 'img/trpg_logo.png',
+      style: 'dark',
+      links: [
+        {
+          title: '文档',
+          items: [
+            {
+              label: '普通用户',
+              to: 'docs/introduce',
+            },
+            {
+              label: '开发者',
+              to: 'docs/develop',
+            },
+          ],
+        },
+        {
+          title: '更多',
+          items: [
+            {
+              label: 'TRPG Engine 网页版',
+              href: 'https://trpg.moonrailgun.com',
+            },
+            {
+              label: 'TRPGEngine博客',
+              to: 'blog',
+            },
+            {
+              label: 'Github',
+              to: 'https://github.com/TRPGEngine',
+            },
+            {
+              label: '开发者博客',
+              href: 'http://moonrailgun.com',
+            },
+          ],
+        },
+      ],
     },
   },
 
-  // users,
-
   favicon: 'img/favicon.ico',
-
-  /* Custom fonts for website */
-  /*
-  fonts: {
-    myFont: [
-      "Times New Roman",
-      "Serif"
-    ],
-    myOtherFont: [
-      "-apple-system",
-      "system-ui"
-    ]
-  },
-  */
 
   // Add custom scripts here that would be placed in <script> tags.
   scripts: [
