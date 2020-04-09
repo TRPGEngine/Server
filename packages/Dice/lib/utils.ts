@@ -35,8 +35,8 @@ export function roll(requestStr: string): RollRes {
 
   requestStr = requestStr.replace(/[^\dd\+-\/\*\(\)]+/gi, ''); //去除无效或危险字符
   const express = requestStr.replace(pattern, function(tag, num, dice) {
-    num = num || 1;
-    dice = dice || 100;
+    num = _.clamp(num || 1, 1, 100); // 个数
+    dice = _.clamp(dice || 100, 1, 1000); // 面数
     const res = [];
     for (var i = 0; i < num; i++) {
       res.push(rollPoint(dice));
@@ -181,7 +181,7 @@ export function rollWW(requestStr: string, validPoint = 8): RollRes {
   const num = Number(numMatch[1]); // 初始骰数
   const rerollPoint = _.isNil(numMatch[2])
     ? undefined
-    : Number(numMatch[2].substr(1)); // 重骰点数
+    : _.clamp(Number(numMatch[2].substr(1)), 5, 10); // 重骰点数
 
   const rollPointList = rollIterate(num, rerollPoint);
 
