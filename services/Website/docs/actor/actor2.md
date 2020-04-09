@@ -10,7 +10,7 @@ title: 从一个简单的人物卡开始
 首先我们试图建立一个最基本的人物卡, 如下:  
 [简单人物卡](http://127.0.0.1:8191/preview#code/DwfgHgtgNgBAbgUwE4GcCWB7AdgXgEQCMAdAAx4wJYDGGAJmlgOb4CuALgGYC0AHOSAD4AUMAAqCCAAcoAQzYJhMGMABCMlAgCSWDhhgB6RcrUaAgmzZIjSsQjBtTSBDKFK3MWQCMEUfIC65QEsnQENlQEP5QHsDPFd3GCwZCAR8WjkZSOiYAC4Zdgx0AC8EvABvGAgGACUMAHcUdJgAFgAaEpkwCuranhgAX1S3QyjgfRMEc0thQfEpWXlhIA)
 
-```ActorTemplatePreviewer
+```xml layoutTemplate
 <?xml version="1.0" encoding="utf-8" ?>
 <Template>
   <BaseInfo />

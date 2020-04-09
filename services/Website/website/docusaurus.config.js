@@ -5,23 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-// See https://docusaurus.io/docs/site-config for all the possible
-// site configuration options.
-
-const RemarkablePlugins = require('./core/RemarkablePlugins');
-
-// List of projects/orgs using your project for the users page.
-const users = [
-  {
-    caption: 'User1',
-    // You will need to prepend the image path with your baseUrl
-    // if it is not '/', like: '/test-site/img/image.jpg'.
-    image: '/img/undraw_open_source.svg',
-    infoLink: 'https://www.facebook.com',
-    pinned: true,
-  },
-];
-
 const siteConfig = {
   title: 'TRPG Engine',
   tagline: '为跑团而生的即时通讯应用',
@@ -111,10 +94,6 @@ const siteConfig = {
     // 'https://buttons.github.io/buttons.js'
   ],
 
-  // markdownPlugins: [RemarkablePlugins.ActorTemplatePreviewer], // TODO
-
-  // repoUrl: 'https://github.com/TRPGEngine/Client',
-
   presets: [
     [
       '@docusaurus/preset-classic',
@@ -124,6 +103,7 @@ const siteConfig = {
           path: '../docs',
           // sidebars file relative to website dir.
           sidebarPath: require.resolve('./sidebars.json'),
+          remarkPlugins: [require('./src/plugins/remark-template-previewer')],
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
