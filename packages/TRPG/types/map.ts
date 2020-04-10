@@ -22,10 +22,12 @@ export interface UpdateTokenPayloadMap {
     token: TokenAttrs;
   };
   update: {
+    layerId: string;
     tokenId: string;
     tokenAttrs: Partial<TokenAttrs>;
   };
   remove: {
+    layerId: string;
     tokenId: string;
   };
 }

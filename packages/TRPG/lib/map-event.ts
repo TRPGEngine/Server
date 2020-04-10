@@ -81,12 +81,10 @@ export const updateMapToken: EventFunc<{
     await TRPGGameMap.addToken(mapUUID, p.layerId, p.token);
   } else if (type === 'update') {
     const p = payload as UpdateTokenPayloadMap['update'];
-    await TRPGGameMap.updateToken(mapUUID, p.tokenId, p.tokenAttrs);
+    await TRPGGameMap.updateToken(mapUUID, p.layerId, p.tokenId, p.tokenAttrs);
   } else if (type === 'remove') {
-    await TRPGGameMap.removeToken(
-      mapUUID,
-      (payload as UpdateTokenPayloadMap['remove']).tokenId
-    );
+    const p = payload as UpdateTokenPayloadMap['remove'];
+    await TRPGGameMap.removeToken(mapUUID, p.layerId, p.tokenId);
   }
 
   return true;

@@ -180,13 +180,40 @@ export class TRPGGameMap extends Model {
   }
   static async updateToken(
     mapUUID: string,
+    layerId: string,
     tokenId: string,
     tokenAttrs: Partial<TokenAttrs>
   ) {
-    // TODO
+    const mapData = await TRPGGameMap.getMapData(mapUUID);
+    const layer = _.find(mapData.layers, ['_id', layerId]);
+    if (_.isNil(layer)) {
+      throw new Error('地图层不存在: ' + layerId);
+    }
+
+    const token = _.find(layer.tokens, ['_id', tokenId]);
+    Object.assign(token, tokenAttrs);
+    await TRPGGameMap.saveMapData(mapUUID, mapData);
+
+    notifyUpdateToken(mapUUID, 'update', {
+      layerId,
+      tokenId,
+      tokenAttrs,
+    });
   }
-  static async removeToken(mapUUID: string, tokenId: string) {
-    // TODO
+  static async removeToken(mapUUID: string, layerId: string, tokenId: string) {
+    const mapData = await TRPGGameMap.getMapData(mapUUID);
+    const layer = _.find(mapData.layers, ['_id', layerId]);
+    if (_.isNil(layer)) {
+      throw new Error('地图层不存在: ' + layerId);
+    }
+
+    _.remove(layer.tokens, ['_id', tokenId]);
+    await TRPGGameMap.saveMapData(mapUUID, mapData);
+
+    notifyUpdateToken(mapUUID, 'remove', {
+      layerId,
+      tokenId,
+    });
   }
 }
 

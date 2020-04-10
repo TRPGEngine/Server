@@ -1,5 +1,6 @@
 import { getGlobalApplication } from 'lib/application';
 import _ from 'lodash';
+import { UpdateTokenPayloadMap } from '../types/map';
 
 function getMapManager() {
   return getGlobalApplication().trpg.mapManager;
@@ -9,7 +10,7 @@ type UpdateType = 'add' | 'update' | 'remove';
 export async function notifyUpdateToken(
   mapUUID: string,
   type: UpdateType,
-  payload: {}
+  payload: UpdateTokenPayloadMap[UpdateType]
 ) {
   const mapManager = getMapManager();
   if (_.isNil(mapManager)) {
