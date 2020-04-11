@@ -22,7 +22,7 @@ const siteConfig = {
       },
       links: [
         { to: 'docs/introduce', label: '文档', position: 'left' },
-        { to: 'docs/develop', label: '开发', position: 'left' },
+        // { to: 'docs/develop', label: '开发', position: 'left' },
         // { to: 'help', label: '帮助', position: 'left' },
         { to: 'blog', label: '博客', position: 'right' },
         {

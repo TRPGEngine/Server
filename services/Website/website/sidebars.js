@@ -1,6 +1,6 @@
 module.exports = {
   docs: {
-    开始: ['introduce', 'chat-interceptor'],
+    开始: ['introduce', 'chat-interceptor', 'shortcuts'],
     人物: [
       'actor/actor1',
       'actor/actor2',
