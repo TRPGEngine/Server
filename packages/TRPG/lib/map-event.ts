@@ -70,21 +70,38 @@ export const updateMapToken: EventFunc<{
   type: MapUpdateType;
   payload: any;
 }> = async function updateMapToken(data, cb, db) {
-  const { app, socket } = this.app;
+  const { app, socket } = this;
   const { mapUUID, type, payload } = data;
+
   if (_.isNil(mapUUID) || _.isNil(type) || _.isEmpty(payload)) {
     throw new Error('缺少必要参数');
   }
 
+  // 简单鉴权
+  const jwt = _.get(payload, 'jwt');
+  let playerUUID: string;
+  try {
+    const d = await app.jwtVerify(jwt);
+    playerUUID = _.get(d, 'uuid');
+  } catch (e) {
+    throw new Error('鉴权失败, 请检查授权');
+  }
+
   if (type === 'add') {
     const p = payload as UpdateTokenPayloadMap['add'];
-    await TRPGGameMap.addToken(mapUUID, p.layerId, p.token);
+    await TRPGGameMap.addToken(mapUUID, playerUUID, p.layerId, p.token);
   } else if (type === 'update') {
     const p = payload as UpdateTokenPayloadMap['update'];
-    await TRPGGameMap.updateToken(mapUUID, p.layerId, p.tokenId, p.tokenAttrs);
+    await TRPGGameMap.updateToken(
+      mapUUID,
+      playerUUID,
+      p.layerId,
+      p.tokenId,
+      p.tokenAttrs
+    );
   } else if (type === 'remove') {
     const p = payload as UpdateTokenPayloadMap['remove'];
-    await TRPGGameMap.removeToken(mapUUID, p.layerId, p.tokenId);
+    await TRPGGameMap.removeToken(mapUUID, playerUUID, p.layerId, p.tokenId);
   }
 
   return true;

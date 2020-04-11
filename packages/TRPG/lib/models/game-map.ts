@@ -2,12 +2,14 @@ import {
   Model,
   Orm,
   DBInstance,
-  BelongsToManyGetAssociationsMixin,
+  HasManyGetAssociationsMixin,
+  BelongsToGetAssociationMixin,
 } from 'trpg/core';
 import { GroupGroup } from 'packages/Group/lib/models/group';
 import { TokenAttrs, MapData } from 'packages/TRPG/types/map';
 import _ from 'lodash';
 import { notifyUpdateToken, notifyAddGroupMap } from '../map-notify';
+import { checkAllowEditMap } from '../utils/map-data';
 
 /**
  * 游戏地图
@@ -15,7 +17,7 @@ import { notifyUpdateToken, notifyAddGroupMap } from '../map-notify';
 
 declare module 'packages/Group/lib/models/group' {
   interface GroupGroup {
-    getMaps: BelongsToManyGetAssociationsMixin<TRPGGameMap>;
+    getMaps: HasManyGetAssociationsMixin<TRPGGameMap>;
   }
 }
 
@@ -27,6 +29,8 @@ export class TRPGGameMap extends Model {
   data: MapData;
 
   groupId?: number;
+
+  getGroup?: BelongsToGetAssociationMixin<GroupGroup>;
 
   static hashCacheKey = (mapUUID: string) => `trpg:map:${mapUUID}:data`;
   static dumpCacheCron = '0 0,10,20,30,40,50 * * * *'; // dump到数据库的计划任务字符串
@@ -105,9 +109,11 @@ export class TRPGGameMap extends Model {
 
   /**
    * 创建一个空白的地图数据
+   * @param playerUUIDs 拥有编辑权限的玩家的UUID 用于制作一个简单的权限系统
    */
-  static createBlankMapData(): MapData {
+  static createBlankMapData(playerUUIDs: string[]): MapData {
     return {
+      editablePlayer: playerUUIDs,
       layers: [
         {
           _id: 'default',
@@ -163,8 +169,16 @@ export class TRPGGameMap extends Model {
   /**
    * 棋子操作
    */
-  static async addToken(mapUUID: string, layerId: string, token: TokenAttrs) {
+  static async addToken(
+    mapUUID: string,
+    playerUUID: string,
+    layerId: string,
+    token: TokenAttrs
+  ) {
     const mapData = await TRPGGameMap.getMapData(mapUUID);
+
+    checkAllowEditMap(mapData, playerUUID); // 简单鉴权
+
     const layer = _.find(mapData.layers, ['_id', layerId]);
     if (_.isNil(layer)) {
       throw new Error('地图层不存在: ' + layerId);
@@ -180,11 +194,15 @@ export class TRPGGameMap extends Model {
   }
   static async updateToken(
     mapUUID: string,
+    playerUUID: string,
     layerId: string,
     tokenId: string,
     tokenAttrs: Partial<TokenAttrs>
   ) {
     const mapData = await TRPGGameMap.getMapData(mapUUID);
+
+    checkAllowEditMap(mapData, playerUUID); // 简单鉴权
+
     const layer = _.find(mapData.layers, ['_id', layerId]);
     if (_.isNil(layer)) {
       throw new Error('地图层不存在: ' + layerId);
@@ -200,8 +218,16 @@ export class TRPGGameMap extends Model {
       tokenAttrs,
     });
   }
-  static async removeToken(mapUUID: string, layerId: string, tokenId: string) {
+  static async removeToken(
+    mapUUID: string,
+    playerUUID: string,
+    layerId: string,
+    tokenId: string
+  ) {
     const mapData = await TRPGGameMap.getMapData(mapUUID);
+
+    checkAllowEditMap(mapData, playerUUID); // 简单鉴权
+
     const layer = _.find(mapData.layers, ['_id', layerId]);
     if (_.isNil(layer)) {
       throw new Error('地图层不存在: ' + layerId);
@@ -231,9 +257,11 @@ export default function TRPGMapDefinition(Sequelize: Orm, db: DBInstance) {
       sequelize: db,
       paranoid: true,
       hooks: {
-        beforeCreate(map) {
+        async beforeCreate(map) {
           if (_.isEmpty(map.data)) {
-            map.data = TRPGGameMap.createBlankMapData();
+            const group: GroupGroup = await map.getGroup();
+            const playerUUIDs = group.getManagerUUIDs();
+            map.data = TRPGGameMap.createBlankMapData(playerUUIDs);
           }
         },
       },

@@ -39,5 +39,6 @@ export interface MapDataLayer {
   tokens: MapDataToken[];
 }
 export interface MapData {
+  editablePlayer: string[]; // 拥有编辑权限的玩家的UUID
   layers: MapDataLayer[];
 }
