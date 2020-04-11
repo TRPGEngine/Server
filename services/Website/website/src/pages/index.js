@@ -80,7 +80,7 @@ function HomeSplash(props) {
             )}
             to="https://trpg.moonrailgun.com"
           >
-            网页版
+            网页版
           </Link>
           {/* <Button href={useBaseUrl('/download')}>下载桌面版</Button> */}
           <Link
@@ -111,7 +111,7 @@ function Index() {
           {features && features.length && (
             <section className={styles.features}>
               <div className="container">
-                <div className="row">
+                <div className="row" style={{ justifyContent: 'center' }}>
                   {features.map((props, idx) => (
                     <Feature key={idx} {...props} />
                   ))}

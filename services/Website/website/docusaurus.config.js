@@ -5,15 +5,39 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+const copyright = `Copyright © 2017 - ${new Date().getFullYear()} moonrailgun`;
+
+// 用于内部渲染的用户
+const users = [
+  {
+    name: 'moonrailgun',
+    desc: 'TRPG Engine 项目负责人',
+    url: 'https://github.com/moonrailgun',
+    imageUrl: 'img/moonrailgun.png',
+  },
+];
+
 const siteConfig = {
   title: 'TRPG Engine',
   tagline: '为跑团而生的即时通讯应用',
-  url: 'https://trpg.moonrailgun.com',
+  url: 'https://trpgdoc.moonrailgun.com',
   baseUrl: '/',
   projectName: 'Server',
   organizationName: 'TRPGEngine',
 
+  // 自定义内部使用的字段
+  customFields: {
+    users,
+  },
+
   themeConfig: {
+    // announcementBar: {
+    //   id: 'support_us', // Any value that will identify this message
+    //   content:
+    //     '如果觉得 TRPG Engine 还不错, 或者有什么好的建议或意见反馈, 加入QQ群: 892133280',
+    //   backgroundColor: '#fafbfc', // Defaults to `#fff`
+    //   textColor: '#091E42', // Defaults to `#000`
+    // },
     navbar: {
       title: 'TRPG Engine',
       logo: {
@@ -24,7 +48,7 @@ const siteConfig = {
         { to: 'docs/introduce', label: '文档', position: 'left' },
         // { to: 'docs/develop', label: '开发', position: 'left' },
         // { to: 'help', label: '帮助', position: 'left' },
-        { to: 'blog', label: '博客', position: 'right' },
+        { to: 'blog', label: '博客', position: 'left' },
         {
           href: 'https://github.com/orgs/TRPGEngine/',
           label: 'Github',
@@ -44,7 +68,7 @@ const siteConfig = {
         alt: 'TRPGEngine Logo',
         src: 'img/trpg_logo.png',
       },
-      copyright: `Copyright © ${new Date().getFullYear()} moonrailgun`,
+      copyright,
       ogImage: 'img/trpg_logo.png',
       twitterImage: 'img/trpg_logo.png',
       style: 'dark',
@@ -56,10 +80,10 @@ const siteConfig = {
               label: '普通用户',
               to: 'docs/introduce',
             },
-            {
-              label: '开发者',
-              to: 'docs/develop',
-            },
+            // {
+            //   label: '开发者',
+            //   to: 'docs/develop',
+            // },
           ],
         },
         {
@@ -107,6 +131,12 @@ const siteConfig = {
           // sidebars file relative to website dir.
           sidebarPath: require.resolve('./sidebars'),
           remarkPlugins: [require('./src/plugins/remark-template-previewer')],
+        },
+        blog: {
+          feedOptions: {
+            type: 'all',
+            copyright,
+          },
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

@@ -1,7 +1,7 @@
 ---
 title: 版本发布0.2.26
 author: moonrailgun
-authorURL: https://github.com/moonrailgun
+tags: [版本发布]
 # authorFBID: 661277173
 ---
 
