@@ -1,4 +1,5 @@
-import { rollJudge } from '../lib/utils';
+import _ from 'lodash';
+import { rollJudge, rollWW } from '../lib/utils';
 
 describe('roll express parse', () => {
   describe('rollJudge', () => {
@@ -12,7 +13,7 @@ describe('roll express parse', () => {
       '%s',
       (exp: string, context: {}, target: number, isHidden: boolean = false) => {
         for (let i = 0; i < 10; i++) {
-          // 每个testcase循环10此
+          // 每个testcase循环10次
           const res = rollJudge(exp, context);
           expect(typeof res.str).toBe('string');
           expect(typeof res.value).toBe('number');
@@ -21,5 +22,41 @@ describe('roll express parse', () => {
         }
       }
     );
+  });
+
+  describe('rollWW', () => {
+    test.each([
+      [10, null],
+      [10, 8],
+      [10, 6],
+    ])('ww%da%d', (rollNum, validPoint) => {
+      for (let i = 0; i < 10; i++) {
+        // 每个testcase循环10次
+        const res = rollWW(
+          _.isNil(validPoint) ? `ww${rollNum}` : `ww${rollNum}a${validPoint}`
+        );
+        expect(typeof res.str).toBe('string');
+        expect(typeof res.value).toBe('number');
+
+        // 将数据拆分成数组
+        const resList = _.head(res.str.split('='))
+          .split('+')
+          .map((s) =>
+            s
+              .slice(1, -1)
+              .split(',')
+              .map(Number)
+          );
+        expect(res.value).toBe(_.flatten(resList).filter((x) => x >= 8).length); // 计算有效值
+        resList.forEach((val, i, arr) => {
+          if (i >= 1) {
+            // 从第二个组开始校验
+            expect(val.length).toBe(
+              arr[i - 1].filter((x) => x >= (validPoint ?? 10)).length
+            );
+          }
+        });
+      }
+    });
   });
 });

@@ -84,7 +84,7 @@ export interface ICache {
    * @param key 键
    * @param value 值
    */
-  srem(key: string, value: CacheValue): Promise<void>;
+  srem(key: string, ...values: CacheValue[]): Promise<void>;
 
   /**
    * 返回集合中的所有的成员
@@ -232,10 +232,12 @@ export class Cache implements ICache {
     data.add(value);
   }
 
-  async srem(key: string, value: CacheValue): Promise<void> {
+  async srem(key: string, ...values: CacheValue[]): Promise<void> {
     const data: Set<CacheValue> = this.data[key];
     if (_.isSet(data)) {
-      data.delete(value);
+      values.forEach((value) => {
+        data.delete(value);
+      });
     }
   }
 
@@ -355,9 +357,20 @@ export class RedisCache implements ICache {
   }
 
   async keys(glob: string): Promise<string[]> {
-    // TODO: 需要使用scan来优化
     glob = this.genKey(glob);
-    return await this.redis.keys(glob);
+
+    const keys = [];
+    let cursor = 0;
+    do {
+      const [_cursor, _keys] = await this.redis.scan(cursor, 'MATCH', glob);
+      cursor = Number(_cursor);
+      if (isNaN(cursor)) {
+        cursor = 0;
+      }
+      keys.push(..._keys);
+    } while (cursor != 0);
+
+    return _.uniq(keys); // 返回结果去重
   }
 
   async get(key: string): Promise<CacheValue> {
@@ -383,11 +396,18 @@ export class RedisCache implements ICache {
     debug('[redis]', `sadd ${key} with ${JSON.stringify(value)}`);
   }
 
-  async srem(key: string, value: CacheValue): Promise<void> {
+  async srem(key: string, ...values: CacheValue[]): Promise<void> {
     key = this.genKey(key);
 
-    await this.redis.srem(key, this.normalizeVal(value));
-    debug('[redis]', `srem ${key} with ${JSON.stringify(value)}`);
+    if (_.isEmpty(values)) {
+      return;
+    }
+
+    await this.redis.srem(key, ...values.map(this.normalizeVal));
+    debug(
+      '[redis]',
+      `srem ${key} with ${values.map((v) => JSON.stringify(v)).join(',')}`
+    );
   }
 
   async smembers(key: string): Promise<CacheValue[]> {

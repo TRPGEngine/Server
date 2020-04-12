@@ -47,7 +47,7 @@ interface UploadFileField {
  * 创建一个APP测试上下文
  * Usage: const context = buildAppContext();
  * context.xxx
- * NOTICE: 不要结构这个对象。因为他初始值是没有数据的，是通过beforeAll的方式加载进来的
+ * NOTICE: 不要解构这个对象。因为他初始值是没有数据的，是通过beforeAll的方式加载进来的
  */
 export const buildAppContext = (): TRPGAppInstanceContext => {
   const context: TRPGAppInstanceContext = {
@@ -156,12 +156,12 @@ export const buildAppContext = (): TRPGAppInstanceContext => {
   }, 20000);
 
   afterAll(async () => {
-    debug('afterAll');
+    debug('afterAll: app close');
 
     await _.invoke(context, 'app.close');
     _.invoke(context, 'socket.close');
 
-    debug('app close success');
+    debug('afterAll: app close success');
   });
 
   return context;

@@ -36,7 +36,7 @@ export const login: EventFunc<{
 
   if (!user) {
     debug('login fail, try to login [%s] and password error', username);
-    cb({ result: false, msg: '账户或密码错误' });
+    cb({ result: false, msg: '用户不存在或密码错误' });
     await db.models.player_login_log.create({
       user_name: username,
       type: isApp ? 'app_standard' : 'standard',

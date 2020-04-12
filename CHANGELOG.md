@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.17.0](https://github.com/TRPGEngine/Server/compare/v1.16.0...v1.17.0) (2020-04-12)
+
+
+### Features
+
+* **dice:** 增加ww骰 ([12f7658](https://github.com/TRPGEngine/Server/commit/12f76580e4f10b661ca44251ea1be0c7dfa5e095))
+* **trpg:** 增加一个简单的鉴权 ([b90da2f](https://github.com/TRPGEngine/Server/commit/b90da2f770b94528b7eec4fc46813e458301452a))
+* **trpg:** 增加地图数据的初步处理与数据缓存与获取 ([bd6071d](https://github.com/TRPGEngine/Server/commit/bd6071deb7e53468b2c15b32f9f1d5b17fdd0ede))
+* **trpg:** 增加基础的地图房间管理 ([eaeb7f8](https://github.com/TRPGEngine/Server/commit/eaeb7f8104cfa21c4569d12644aac07a1568a040))
+* **trpg:** 增加更新与删除的代码的处理 ([56fd235](https://github.com/TRPGEngine/Server/commit/56fd235f863d19a9c67546deb1ffaf127284bba1))
+* **trpg:** 增加获取地图列表的接口，并在地图增加时通知更新地图列表 ([0f5849a](https://github.com/TRPGEngine/Server/commit/0f5849ae866f215888c334d085c921edfbf2db5b))
+
+
+### Bug Fixes
+
+* 修复测试用例因为有长连接无法正常关闭的bug ([2e75c09](https://github.com/TRPGEngine/Server/commit/2e75c0939462b1a9c3202c22367e0b729b1a2723))
+
 ## [1.16.0](https://github.com/TRPGEngine/Server/compare/v1.15.0...v1.16.0) (2020-03-27)
 
 

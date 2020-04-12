@@ -27,7 +27,7 @@ type InternalEvents = {
   [eventName: string]: Array<InternalEventFunc>;
 };
 
-type CloseTaskFunc = () => Promise<void>;
+export type CloseTaskFunc = () => Promise<void>;
 type CloseTasks = {
   [packageName: string]: CloseTaskFunc;
 };
@@ -428,10 +428,6 @@ export class Application extends events.EventEmitter {
     await closeLogger(); // 关闭日志
     debug('shutdown all logger');
 
-    if (!_.isNil(this.cache)) {
-      // 关闭redis连接
-      this.cache.close();
-    }
     // 执行关闭事件
     await Promise.all(
       Object.entries(this.closeTasks).map(([packageName, fn]) =>
@@ -441,6 +437,11 @@ export class Application extends events.EventEmitter {
       )
     ).then(() => debug('completed all close task'));
     this.emit('close');
+
+    if (!_.isNil(this.cache)) {
+      // 关闭redis连接
+      this.cache.close();
+    }
 
     if (!_.isNil(this.storage)) {
       // 关闭存储服务

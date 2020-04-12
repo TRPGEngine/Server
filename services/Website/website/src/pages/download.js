@@ -1,4 +1,4 @@
-const React = require('react');
+import React from 'react';
 
 class Download extends React.Component {
   render() {
@@ -6,4 +6,4 @@ class Download extends React.Component {
   }
 }
 
-module.exports = Download;
+export default Download;

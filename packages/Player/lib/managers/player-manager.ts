@@ -3,10 +3,12 @@
  */
 import _ from 'lodash';
 import { Socket } from 'trpg/core';
-import Redis from 'ioredis';
+
 import { Platform } from 'packages/Player/types/player';
-import { ICache } from 'packages/Core/lib/cache';
-import { EventEmitter } from 'events';
+import {
+  SocketManager,
+  SocketManagerOptions,
+} from 'packages/Core/lib/managers/socket-manager';
 import Debug from 'debug';
 const debug = Debug('trpg:component:player:manager');
 
@@ -36,56 +38,19 @@ export interface PlayerManagerPlayerMap {
   [socketId: string]: PlayerManagerPlayerMapItem;
 }
 
-interface PlayerManagerOptions {
-  redisUrl: string;
-  cache: ICache;
-}
+class PlayerManager extends SocketManager<PlayerMsgPayload> {
+  getRoomKey = getRoomKey;
 
-class PlayerManager extends EventEmitter {
   players: PlayerManagerPlayerMap = {}; // 玩家列表Map, 此处保存本地的映射
   onlinePlayerUUIDList: string[] = []; // 仅用于无redis环境
-  cache: ICache;
 
-  pubClient: Redis.Redis;
-  subClient: Redis.Redis;
-
-  constructor(options: PlayerManagerOptions) {
-    super();
-
-    const redisUrl = options.redisUrl;
-    if (!redisUrl) {
-      throw new Error(
-        '[PlayerManager] require redisUrl to build pub/sub service'
-      );
-    }
-
-    this.cache = options.cache;
-    this.pubClient = new Redis(redisUrl);
-    this.subClient = new Redis(redisUrl);
-
-    this.initListener();
+  constructor(options: SocketManagerOptions) {
+    super(CHANNEL_KEY, options);
   }
 
   /**
-   * 初始化监听器
-   * 通过redis作为一个MQ系统来获取分布式通信
+   * 内部方法
    */
-  initListener() {
-    this.subClient.subscribe(CHANNEL_KEY);
-    this.subClient.on('message', (channel, message) => {
-      if (channel === CHANNEL_KEY) {
-        try {
-          const payload: PlayerMsgPayload = JSON.parse(message);
-          this.handleMessage(payload);
-
-          this.emit('message', payload); // 将所有接受到的payload都转发到监听
-        } catch (e) {
-          debug('receive redis sub message error with %s :%o', message, e);
-        }
-      }
-    });
-  }
-
   private internalFn = {
     _remoteJoinRoom(
       this: PlayerManager,
@@ -103,7 +68,10 @@ class PlayerManager extends EventEmitter {
     },
   };
 
-  private async handleMessage(payload: PlayerMsgPayload) {
+  /**
+   * 基于Player的强关联重写了消息处理方式
+   */
+  protected async handleMessage(payload: PlayerMsgPayload) {
     const { type, target, targets, eventName, data } = payload;
     let waitToSendPlayers: PlayerManagerPlayerMapItem[] = []; // 本地涉及到的Player列表
 
@@ -177,36 +145,12 @@ class PlayerManager extends EventEmitter {
     }
   }
 
-  /**
-   * 接受到远程消息的回调
-   * @param listener 监听器
-   */
-  onMessage(listener: (payload: PlayerMsgPayload) => void) {
-    this.on('message', listener);
-  }
-
-  /**
-   * 向公用通道发送用户消息
-   * @param payload 消息体
-   */
-  async emitPlayerMsg(payload: PlayerMsgPayload): Promise<void> {
-    await this.pubClient.publish(CHANNEL_KEY, JSON.stringify(payload));
-  }
-
-  /**
-   * 加入房间
-   * 在Redis存储一个Set记录每个房间的成员
-   * 值为socketId
-   * @param roomUUID 房间UUID
-   * @param socket socket连接
-   */
   async joinRoom(roomUUID: string, socket: Socket): Promise<void> {
-    const roomKey = getRoomKey(roomUUID);
     const socketId = socket.id;
     const player = this.players[socketId];
     if (player) {
       // 只有在用户有记录的情况下才能加入房间。离开的时候不用关心
-      await this.cache.sadd(roomKey, socketId);
+      await super.joinRoom(roomUUID, socket);
       player.rooms.add(roomUUID);
     } else {
       debug('join room fail, not found player in local %s', socketId);
@@ -225,15 +169,10 @@ class PlayerManager extends EventEmitter {
     await this.listcastSocketEvent(uuids, '_remoteJoinRoom', { roomUUID });
   }
 
-  /**
-   * 离开房间
-   * @param roomUUID 房间UUID
-   * @param socket socket连接
-   */
   async leaveRoom(roomUUID: string, socket: Socket): Promise<void> {
-    const roomKey = getRoomKey(roomUUID);
+    await super.leaveRoom(roomUUID, socket);
+
     const socketId = socket.id;
-    await this.cache.srem(roomKey, socketId);
     const player = this.players[socketId];
     if (player && _.isSet(player.rooms)) {
       player.rooms.delete(roomUUID);
@@ -254,77 +193,7 @@ class PlayerManager extends EventEmitter {
     await this.listcastSocketEvent(uuids, '_remoteLeaveRoom', { roomUUID });
   }
 
-  async getRoomAllSocketIds(roomUUID: string): Promise<string[]> {
-    return (await this.cache.smembers(getRoomKey(roomUUID))) as string[];
-  }
-
   /**
-   * 向指定用户发送socket事件(全平台)
-   * @param uuid 用户UUID
-   * @param eventName 事件名
-   * @param data 数据
-   */
-  async unicastSocketEvent(uuid: string, eventName: string, data: {}) {
-    const payload: PlayerMsgPayload = {
-      type: 'unicast',
-      target: uuid,
-      eventName,
-      data,
-    };
-
-    await this.emitPlayerMsg(payload);
-  }
-
-  /**
-   * 向一批用户发送列播事件
-   * @param uuids 用户uuid列表
-   * @param eventName 事件名
-   * @param data 数据
-   */
-  async listcastSocketEvent(uuids: string[], eventName: string, data: {}) {
-    const payload: PlayerMsgPayload = {
-      type: 'listcast',
-      targets: uuids,
-      eventName,
-      data,
-    };
-
-    await this.emitPlayerMsg(payload);
-  }
-
-  /**
-   * 向房间中所有的用户发送socket事件
-   * @param roomUUID 房间UUID
-   * @param eventName 事件名
-   * @param data 数据
-   */
-  async roomcastSocketEvent(roomUUID: string, eventName: string, data: {}) {
-    const payload: PlayerMsgPayload = {
-      type: 'roomcast',
-      target: roomUUID,
-      eventName,
-      data,
-    };
-
-    await this.emitPlayerMsg(payload);
-  }
-  /**
-   * 向所有连接发送广播socket事件
-   * @param eventName 事件名
-   * @param data 数据
-   */
-  async broadcastSocketEvent(eventName: string, data: {}) {
-    const payload: PlayerMsgPayload = {
-      type: 'broadcast',
-      eventName,
-      data,
-    };
-
-    await this.emitPlayerMsg(payload);
-  }
-
-  /**
-   * 关闭所有的pubsub连接
    * 移除所有的用户数据
    */
   async close() {
@@ -336,8 +205,7 @@ class PlayerManager extends EventEmitter {
         )
       ).then(() => debug('[PlayerManager] 移除所有用户成功'));
 
-      _.invoke(this.pubClient, 'disconnect');
-      _.invoke(this.subClient, 'disconnect');
+      await super.close();
     } catch (err) {
       console.error('[PlayerManager] 关闭失败', err);
     }
@@ -516,7 +384,7 @@ let playerManager: PlayerManager;
  * 获取玩家状态管理器
  * @param options 配置项，仅在第一次获取时有效
  */
-export const getPlayerManager = (options: PlayerManagerOptions) => {
+export const getPlayerManager = (options: SocketManagerOptions) => {
   if (!playerManager) {
     playerManager = new PlayerManager(options);
   }

@@ -63,6 +63,12 @@ module.exports = {
         secretKey: '',
         bucket: '',
       },
+      maoyun: {
+        domain: '', // 外链站点 http://example.com/
+        appId: '',
+        appSecret: '',
+        bucketId: '', // 猫云控制台地址栏的id
+      },
     },
     forward: {
       chatimg: {
@@ -113,6 +119,11 @@ module.exports = {
       masterSecret: '',
       mipush: true,
       mi_activity: 'com.moonrailgun.trpg.MipushActivity',
+    },
+  },
+  trpg: {
+    map: {
+      enable: true,
     },
   },
 };

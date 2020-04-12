@@ -16,6 +16,16 @@ export class InfoWebsite extends Model {
   icon: string;
 
   /**
+   * 移除某个网址的网站信息
+   * @param url 网址
+   */
+  static async removeWebsiteInfo(url: string): Promise<void> {
+    await InfoWebsite.destroy({
+      where: { url },
+    });
+  }
+
+  /**
    * 获取网站标准信息
    * 以og标准为优先
    * @param url 网址

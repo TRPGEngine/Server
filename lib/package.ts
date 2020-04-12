@@ -7,6 +7,8 @@ import {
   TRPGRouter,
 } from 'trpg/core';
 import Debug, { Debugger } from 'debug';
+import _ from 'lodash';
+import { CloseTaskFunc } from 'packages/Core/lib/application';
 
 export interface PackageMethodsType {
   [methodName: string]: Function;
@@ -18,7 +20,7 @@ export default abstract class BasePackage {
   public abstract desc: string; // 包信息描述
   private _debug: Debugger;
   private _app: TRPGApplication;
-  private _models: (typeof Model)[] = []; // 该包注册的数据库模型列表
+  private _models: typeof Model[] = []; // 该包注册的数据库模型列表
   private _router: TRPGRouter; // 该包独有的Router
 
   constructor(app: TRPGApplication) {
@@ -142,6 +144,25 @@ export default abstract class BasePackage {
   }
 
   /**
+   * 注册一个变量到app上的相关位置
+   * @param name 变量名
+   * @param value 变量值
+   */
+  regValue(name: string, value: any) {
+    const packageName = this.getPackageName();
+    _.set(this.app, [packageName, name], value);
+  }
+
+  private _closeTasks: CloseTaskFunc[] = [];
+  /**
+   * 注册包的关闭任务
+   * @param task 关闭任务
+   */
+  regCloseTask(task: CloseTaskFunc) {
+    this._closeTasks.push(task);
+  }
+
+  /**
    * 初始化完毕后的回调
    */
   onInitCompleted() {
@@ -153,6 +174,12 @@ export default abstract class BasePackage {
       webservice.use(this._router.routes());
     }
 
+    if (this._closeTasks.length > 0) {
+      this.app.registerCloseTask(this.getPackageName(), async () => {
+        await Promise.all(this._closeTasks.map((t) => _.isFunction(t) && t()));
+      });
+    }
+
     this.debug(
       'Init package %s completed! [Required: %s, Model: %d]',
       this.getPackageName(),
@@ -160,9 +187,6 @@ export default abstract class BasePackage {
       this._models.length
     );
   }
-
-  // TODO
-  regValue(value: {}) {}
 
   /**
    * 输出调试信息

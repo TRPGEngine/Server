@@ -1,8 +1,7 @@
 ---
 title: 版本发布0.2.26
 author: moonrailgun
-authorURL: https://github.com/moonrailgun
-# authorFBID: 661277173
+tags: [版本发布]
 ---
 
 ### [0.2.26](https://github.com/TRPGEngine/Client/compare/v0.2.25...v0.2.26) (2020-03-13)
