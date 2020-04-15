@@ -15,6 +15,10 @@
 @media only screen and (min-width: 1500px) {
 }
 
+iframe {
+  margin: 1px solid #ccc;
+}
+
 article iframe {
   margin: 0;
 }
