@@ -61,11 +61,11 @@ required.forEach((r) => {
     const fp = path.resolve(docDir, './', filename);
     if (!fs.pathExistsSync(fp)) {
       fs.createFileSync(fp);
-      fs.writeFileSync(fp, newDocTemplate(_.last(id)), { encoding: 'utf8' });
-      console.log('文件生成完毕,id:', id);
+      fs.writeFileSync(fp, newDocTemplate(id), { encoding: 'utf8' });
+      console.log('- 文件生成完毕,id:', id);
       count++;
     } else {
-      console.log('异常: 文件已存在');
+      console.log('- 异常: 文件已存在');
     }
   }
 });
