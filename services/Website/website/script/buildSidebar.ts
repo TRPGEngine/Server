@@ -62,7 +62,7 @@ required.forEach((r) => {
     if (!fs.pathExistsSync(fp)) {
       fs.createFileSync(fp);
       fs.writeFileSync(fp, newDocTemplate(id), { encoding: 'utf8' });
-      console.log('- 文件生成完毕,id:', id);
+      console.log('- 文件生成完毕, id:', id);
       count++;
     } else {
       console.log('- 异常: 文件已存在');

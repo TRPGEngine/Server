@@ -16,6 +16,10 @@ title: <DataTable>
 | size | "small" \| "middle" \| "large" | 表格大小类型 | "middle" |
 | height | number | 表格内容高度，如果填了的话则会限制高度 | |
 
+:::note
+如果rows传入的数据不是一个数组的话。会视为空数组
+:::
+
 ## 示例
 
 ### 紧凑表格
