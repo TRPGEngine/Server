@@ -206,9 +206,9 @@ export class GroupGroup extends Model {
   }
 
   /**
-   * 获取团聊天记录
+   * 获取一定时间范围内所有的团聊天记录
    */
-  static async getGroupChatLog(
+  static async getGroupRangeChatLog(
     groupUUID: string,
     playerUUID: string,
     from: string,

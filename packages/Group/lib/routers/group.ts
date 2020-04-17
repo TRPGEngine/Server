@@ -31,7 +31,7 @@ groupRouter.get('/list/own', ssoAuth(), async (ctx) => {
 /**
  * 获取团队会话记录
  */
-groupRouter.get('/log/:groupUUID', ssoAuth(), async (ctx) => {
+groupRouter.get('/log/:groupUUID/range', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
   const playerUUID = ctx.state.player.uuid;
   const { from, to } = ctx.request.query;
@@ -39,7 +39,7 @@ groupRouter.get('/log/:groupUUID', ssoAuth(), async (ctx) => {
     throw new Error('缺少必要参数');
   }
 
-  const logs = await GroupGroup.getGroupChatLog(
+  const logs = await GroupGroup.getGroupRangeChatLog(
     groupUUID,
     playerUUID,
     from,
