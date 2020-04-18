@@ -236,6 +236,49 @@ export class GroupGroup extends Model {
   }
 
   /**
+   * 倒序获取团聊天记录
+   * @param groupUUID
+   * @param playerUUID
+   * @param page
+   * @param size
+   */
+  static async getGroupChatLog(
+    groupUUID: string,
+    playerUUID: string,
+    page = 1,
+    size = 10
+  ): Promise<{ logs: ChatLog[]; count: number }> {
+    const user = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(user)) {
+      throw new Error('用户不存在');
+    }
+
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(user)) {
+      throw new Error('团不存在');
+    }
+
+    if (!(await group.hasMember(user))) {
+      throw new Error('不是团成员');
+    }
+
+    const {
+      rows,
+      count,
+    }: { rows: ChatLog[]; count: number } = await ChatLog.findAndCountAll({
+      where: {
+        converse_uuid: groupUUID,
+        revoke: false, // 获取范围聊天记录时不返回撤回的消息
+      },
+      offset: (page - 1) * size,
+      limit: size,
+      order: [['id', 'DESC']],
+    });
+
+    return { logs: rows.reverse(), count };
+  }
+
+  /**
    * 添加团成员
    * @param groupUUID 团UUID
    * @param userUUID 要加入的用户的UUID

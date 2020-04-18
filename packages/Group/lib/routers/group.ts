@@ -29,7 +29,7 @@ groupRouter.get('/list/own', ssoAuth(), async (ctx) => {
 });
 
 /**
- * 获取团队会话记录
+ * 获取团队一定时间范围内所有的会话记录
  */
 groupRouter.get('/log/:groupUUID/range', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
@@ -47,6 +47,24 @@ groupRouter.get('/log/:groupUUID/range', ssoAuth(), async (ctx) => {
   );
 
   ctx.body = { logs };
+});
+
+/**
+ * 获取团队会话记录
+ */
+groupRouter.get('/log/:groupUUID', ssoAuth(), async (ctx) => {
+  const groupUUID = ctx.params.groupUUID;
+  const playerUUID = ctx.state.player.uuid;
+  const { page = 1, size = 10 } = ctx.request.query;
+
+  const { logs, count } = await GroupGroup.getGroupChatLog(
+    groupUUID,
+    playerUUID,
+    Number(page),
+    Number(size)
+  );
+
+  ctx.body = { logs, count };
 });
 
 export default groupRouter;
