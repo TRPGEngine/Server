@@ -355,11 +355,19 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
   }
 
   /**
+   * 获取在线玩家列表
+   * 格式: <platform>#<uuid>
+   */
+  async getOnlinePlayerList(): Promise<string[]> {
+    return (await this.cache.smembers(ONLINE_PLAYER_KEY)) as string[];
+  }
+
+  /**
    * 获取在线用户数
    * @param uniq 是否将各个平台的连接视为一个用户
    */
   async getOnlinePlayerCount(uniq = false): Promise<number> {
-    const members = await this.cache.smembers(ONLINE_PLAYER_KEY);
+    const members = await this.getOnlinePlayerList();
 
     if (uniq === false) {
       return members.length;
@@ -373,7 +381,7 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
    * @param uuid 用户UUID
    */
   async checkPlayerOnline(uuid: string): Promise<boolean> {
-    const members = await this.cache.smembers(ONLINE_PLAYER_KEY);
+    const members = await this.getOnlinePlayerList();
     return members.map(this.getUUIDFromKey).includes(uuid);
   }
 }

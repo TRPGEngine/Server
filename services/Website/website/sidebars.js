@@ -12,6 +12,9 @@ module.exports = {
           'actor/tags/baseinfo',
           'actor/tags/baseattr',
           'actor/tags/tabs',
+          'actor/tags/select',
+          'actor/tags/datatable',
+          'actor/tags/divider',
         ],
       },
       {

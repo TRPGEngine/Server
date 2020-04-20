@@ -15,4 +15,11 @@ onlineRouter.get('/online/count/device', async (ctx) => {
   ctx.body = { count };
 });
 
+onlineRouter.get('/online/detail', async (ctx) => {
+  const trpgapp = ctx.trpgapp;
+  const list = await trpgapp.player.manager.getOnlinePlayerList();
+
+  ctx.body = { list };
+});
+
 export default onlineRouter;

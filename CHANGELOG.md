@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.18.0](https://github.com/TRPGEngine/Server/compare/v1.17.0...v1.18.0) (2020-04-20)
+
+
+### Features
+
+* **group:** 增加获取团历史记录的功能 ([b44b01d](https://github.com/TRPGEngine/Server/commit/b44b01d5a9d6daec9a92b635dd6f87906b1da816))
+* **player:** 增加新的接口用于查看当前在线用户的详情列表 ([05395b9](https://github.com/TRPGEngine/Server/commit/05395b9d5f641c80d333c05e00b4cdf6a8eca8d5))
+
 ## [1.17.0](https://github.com/TRPGEngine/Server/compare/v1.16.0...v1.17.0) (2020-04-12)
 
 

@@ -54,6 +54,11 @@ const siteConfig = {
           label: 'Github',
           position: 'right',
         },
+        {
+          href: 'https://trpgstatus.moonrailgun.com/',
+          label: '服务状态',
+          position: 'right',
+        },
         { languages: false },
         { search: false },
         {
