@@ -111,9 +111,9 @@ function BlogPostItem(props) {
             <div className="col text--right">
               <Link
                 to={metadata.permalink}
-                aria-label={`Read more about ${title}`}
+                aria-label={`查看 ${title} 更多信息`}
               >
-                <strong>Read More</strong>
+                <strong>查看详情</strong>
               </Link>
             </div>
           )}
