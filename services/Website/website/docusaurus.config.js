@@ -60,7 +60,7 @@ const siteConfig = {
           position: 'right',
         },
         { languages: false },
-        { search: false },
+        { search: true },
         {
           href: 'http://moonrailgun.com',
           label: '关于作者',
@@ -116,6 +116,11 @@ const siteConfig = {
     },
     googleAnalytics: {
       trackingID: 'UA-121610011-2',
+    },
+    algolia: {
+      apiKey: '58b556e73444444d2e33fbae8966188c',
+      indexName: 'moonrailgun_trpgdoc',
+      algoliaOptions: {}, // Optional, if provided by Algolia
     },
   },
 
