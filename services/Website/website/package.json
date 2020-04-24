@@ -4,7 +4,8 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
-    "sidebar": "ts-node ./script/buildSidebar.ts"
+    "sidebar": "ts-node ./script/buildSidebar.ts",
+    "wiki": "ts-node ./script/buildWiki.ts"
   },
   "devDependencies": {},
   "dependencies": {

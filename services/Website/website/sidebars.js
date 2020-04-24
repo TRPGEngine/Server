@@ -1,3 +1,5 @@
+const wiki = require('../docs/wiki/_list.json');
+
 module.exports = {
   docs: {
     开始: ['introduce', 'chat-interceptor', 'shortcuts'],
@@ -28,4 +30,5 @@ module.exports = {
     开发: ['develop', 'config'],
     包: ['package-core'],
   },
+  wiki: ['wiki/index', wiki],
 };
