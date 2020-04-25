@@ -30,5 +30,5 @@ module.exports = {
     开发: ['develop', 'config'],
     包: ['package-core'],
   },
-  wiki: ['wiki/index', wiki],
+  wiki: ['wiki/index', ...wiki],
 };

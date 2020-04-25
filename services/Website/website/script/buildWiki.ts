@@ -20,19 +20,38 @@ const fileList = glob
  * 最上级的视为分类，其他的则是id
  */
 const list = fileList.map((name) => {
-  const [catalog] = name.split(path.sep);
+  const catalog = name.split(path.sep);
+  catalog.pop(); // 移除最后的文件名。前面都是分类
 
   return { name, catalog };
 });
-const info = _.mapValues(
-  _.groupBy(list, (item) => item.catalog),
-  (x) =>
-    _.map(x, 'name')
-      .map((n) => `wiki/${n}`)
-      .map((n) => n.replace(path.sep, '/')) // 强制转换window下的\\
-);
+
+const info = { items: [] };
+function setInfo(target: any, catalogs: string[], item: string) {
+  const [currentCatalog, ...restCatalog] = catalogs;
+  let c = _.find(target.items, ['label', currentCatalog]);
+  if (_.isNil(c)) {
+    c = {
+      type: 'category',
+      label: currentCatalog,
+      items: [],
+    };
+    target.items.push(c);
+  }
+
+  if (restCatalog.length > 0) {
+    setInfo(c, restCatalog, item);
+  } else {
+    c.items.push(item);
+  }
+}
+list.forEach((item) => {
+  const name = `wiki/${item.name}`.replace(new RegExp('\\\\', 'g'), '/'); // 强制转换window下的\\
+
+  setInfo(info, item.catalog, name);
+});
 
 console.log('生成完毕, 正在写入JSON');
 const targetPath = path.resolve(wikiDir, '_list.json');
-fs.writeJSONSync(targetPath, info);
+fs.writeJSONSync(targetPath, info.items);
 console.log('写入完毕:', targetPath);
