@@ -49,6 +49,7 @@ const siteConfig = {
         // { to: 'docs/develop', label: '开发', position: 'left' },
         // { to: 'help', label: '帮助', position: 'left' },
         { to: 'blog', label: '博客', position: 'left' },
+        { to: 'docs/wiki/index', label: 'Wiki', position: 'left' },
         {
           href: 'https://github.com/orgs/TRPGEngine/',
           label: 'Github',

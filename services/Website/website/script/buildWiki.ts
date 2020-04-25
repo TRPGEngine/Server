@@ -26,7 +26,10 @@ const list = fileList.map((name) => {
 });
 const info = _.mapValues(
   _.groupBy(list, (item) => item.catalog),
-  (x) => _.map(x, 'name').map((n) => `wiki/${n}`)
+  (x) =>
+    _.map(x, 'name')
+      .map((n) => `wiki/${n}`)
+      .map((n) => n.replace(path.sep, '/')) // 强制转换window下的\\
 );
 
 console.log('生成完毕, 正在写入JSON');
