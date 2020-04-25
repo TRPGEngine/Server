@@ -4,3 +4,5 @@ title: DND 5e 魔法目录
 ---
 
 数据基于`5eDnD_玩家手册PHB_中译v1.72版`
+
+- 法术详述 Spell Descriptions
