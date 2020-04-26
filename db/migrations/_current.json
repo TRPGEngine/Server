@@ -3155,7 +3155,71 @@
                 }
             },
             "indexes": []
+        },
+        "trpg_recruit": {
+            "tableName": "trpg_recruit",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "title": {
+                    "allowNull": false,
+                    "field": "title",
+                    "seqType": "Sequelize.STRING"
+                },
+                "author": {
+                    "allowNull": false,
+                    "field": "author",
+                    "seqType": "Sequelize.STRING"
+                },
+                "content": {
+                    "allowNull": false,
+                    "field": "content",
+                    "seqType": "Sequelize.TEXT"
+                },
+                "completed": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "completed",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
         }
     },
-    "revision": 49
+    "revision": 50
 }
