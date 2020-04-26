@@ -69,10 +69,28 @@ export const getOtherTestUser = memoizeOne(
 /**
  * 生成测试用户的JWT
  */
-export const genTestPlayerJWT = async (): Promise<string> => {
-  const player = await getTestUser();
+export const genTestPlayerJWT = async (
+  username = testUserInfo.username
+): Promise<string> => {
+  const player = await getOtherTestUser(username);
   const playerUUID = player.uuid;
   const jwt = await PlayerUser.signJWT(playerUUID);
 
   return jwt;
 };
+
+/**
+ * 发送post请求时自动带上x-token的header
+ */
+export function sendPostWithToken<T extends object = any>(
+  context: TRPGAppInstanceContext,
+  username?: string
+) {
+  return async (url: string, data: {}, headers?: {}) => {
+    const jwt = await genTestPlayerJWT(username);
+    return context.request.post<T>(url, data, {
+      'X-Token': jwt,
+      ...headers,
+    });
+  };
+}

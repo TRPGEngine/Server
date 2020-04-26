@@ -1,8 +1,14 @@
-import { Model, Orm, DBInstance } from 'trpg/core';
+import { Model, Orm, DBInstance, HasManyGetAssociationsMixin } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { Feed } from 'feed';
 import _ from 'lodash';
 import moment from 'moment';
+
+declare module 'packages/Player/lib/models/user' {
+  interface PlayerUser {
+    getRecruits: HasManyGetAssociationsMixin<TRPGRecruit>;
+  }
+}
 
 export class TRPGRecruit extends Model {
   uuid: string;
@@ -13,8 +19,11 @@ export class TRPGRecruit extends Model {
   createdAt: Date;
   updatedAt: Date;
 
+  ownerId?: number;
+
   static FEED_CACHE_KEY = 'trpg:recruit:feed';
-  static expireCacheFrequency = 30 * 60 * 1000; // 30分钟
+  static CACHE_EXPIRE = 30 * 60 * 1000; // 30分钟 缓存过期时间
+  static EDITABLE_FIELD = ['title', 'content'] as const; // 用户更新时可编辑字段
 
   /**
    * 获取招募的Feed
@@ -42,6 +51,7 @@ export class TRPGRecruit extends Model {
       copyright: 'TRPG Engine',
       link: '',
       description: '',
+      generator: 'TRPG Engine',
     });
     recruits.forEach((r) => {
       feed.addItem({
@@ -55,7 +65,7 @@ export class TRPGRecruit extends Model {
 
     const ret = feed.rss2();
     await trpgapp.cache.set(TRPGRecruit.FEED_CACHE_KEY, ret, {
-      expires: TRPGRecruit.expireCacheFrequency,
+      expires: TRPGRecruit.CACHE_EXPIRE,
     });
 
     return ret;
@@ -101,6 +111,62 @@ export class TRPGRecruit extends Model {
 
     return recruit;
   }
+
+  /**
+   * 更新招募信息
+   */
+  static async updateTRPGRecruit(
+    playerUUID: string,
+    recruitUUID: string,
+    info: Partial<Pick<TRPGRecruit, typeof TRPGRecruit.EDITABLE_FIELD[number]>>
+  ): Promise<TRPGRecruit> {
+    const player = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(player)) {
+      throw new Error('用户不存在');
+    }
+
+    const [recruit] = (await player.getRecruits({
+      where: {
+        uuid: recruitUUID,
+      },
+      limit: 1,
+    })) as TRPGRecruit[];
+    if (_.isNil(recruit)) {
+      throw new Error('找不到该条招募信息');
+    }
+
+    Object.assign(recruit, info);
+
+    await recruit.save();
+
+    return recruit;
+  }
+
+  /**
+   * 完成招募
+   */
+  static async completeTRPGRecruit(
+    playerUUID: string,
+    recruitUUID: string
+  ): Promise<void> {
+    const player = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(player)) {
+      throw new Error('用户不存在');
+    }
+
+    const [recruit] = (await player.getRecruits({
+      where: {
+        uuid: recruitUUID,
+      },
+      limit: 1,
+    })) as TRPGRecruit[];
+    if (_.isNil(recruit)) {
+      throw new Error('找不到该条招募信息');
+    }
+
+    recruit.completed = true;
+    await recruit.save();
+  }
 }
 
 export default function TRPGRecruitDefinition(Sequelize: Orm, db: DBInstance) {
@@ -119,6 +185,7 @@ export default function TRPGRecruitDefinition(Sequelize: Orm, db: DBInstance) {
   );
 
   TRPGRecruit.belongsTo(PlayerUser, { as: 'owner', foreignKey: 'ownerId' });
+  PlayerUser.hasMany(TRPGRecruit, { as: 'recruits', foreignKey: 'ownerId' });
 
   return TRPGRecruit;
 }
