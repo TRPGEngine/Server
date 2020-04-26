@@ -40,6 +40,8 @@ export class TRPGRecruit extends Model {
       id: trpgapp.get('apihost'),
       title: 'TRPG Engine Recruit',
       copyright: 'TRPG Engine',
+      link: '',
+      description: '',
     });
     recruits.forEach((r) => {
       feed.addItem({

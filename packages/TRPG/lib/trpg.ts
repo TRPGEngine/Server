@@ -11,6 +11,7 @@ import {
 import { getMapManager, MapManagerCls } from './managers/map-manager';
 import { getGroupMapList } from './event';
 import TRPGRecruitDefinition from './models/recruit';
+import recruitRouter from './routers/recruit';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -34,6 +35,7 @@ export default class TRPG extends BasePackage {
     this.regModel(TRPGRecruitDefinition);
 
     this.regRoute(gameReportRouter);
+    this.regRoute(recruitRouter);
 
     this.initSocket();
     this.initMapService();
