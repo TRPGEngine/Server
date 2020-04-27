@@ -17,6 +17,7 @@ module.exports = {
           'actor/tags/select',
           'actor/tags/datatable',
           'actor/tags/divider',
+          'actor/tags/bar',
         ],
       },
       {
