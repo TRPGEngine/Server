@@ -12,3 +12,4 @@ dist/
 test/coverage
 test/reports
 .idea/
+.DS_Store
