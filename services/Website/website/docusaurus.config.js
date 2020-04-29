@@ -49,6 +49,7 @@ const siteConfig = {
         // { to: 'docs/develop', label: '开发', position: 'left' },
         // { to: 'help', label: '帮助', position: 'left' },
         { to: 'blog', label: '博客', position: 'left' },
+        { to: 'docs/wiki/index', label: 'Wiki', position: 'left' },
         {
           href: 'https://github.com/orgs/TRPGEngine/',
           label: 'Github',
@@ -60,7 +61,7 @@ const siteConfig = {
           position: 'right',
         },
         { languages: false },
-        { search: false },
+        { search: true },
         {
           href: 'http://moonrailgun.com',
           label: '关于作者',
@@ -116,6 +117,11 @@ const siteConfig = {
     },
     googleAnalytics: {
       trackingID: 'UA-121610011-2',
+    },
+    algolia: {
+      apiKey: '58b556e73444444d2e33fbae8966188c',
+      indexName: 'moonrailgun_trpgdoc',
+      algoliaOptions: {}, // Optional, if provided by Algolia
     },
   },
 

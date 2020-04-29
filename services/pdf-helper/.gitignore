@@ -1,0 +1,4 @@
+origin/*
+!origin/.gitkeep
+output/*
+!output/.gitkeep
