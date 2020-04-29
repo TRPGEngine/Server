@@ -54,7 +54,7 @@ console.log('开始比较并生成需要文件...');
 let count = 0;
 required.forEach((r) => {
   const filename = r + '.md';
-  console.log('检查文件:', filename);
+  // console.log('检查文件:', filename);
 
   if (!fileList.includes(r)) {
     const id = _.last(r.split(path.sep));
@@ -65,7 +65,7 @@ required.forEach((r) => {
       console.log('- 文件生成完毕, id:', id);
       count++;
     } else {
-      console.log('- 异常: 文件已存在');
+      console.log('- 异常: 文件已存在', id);
     }
   }
 });
