@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.19.0](https://github.com/TRPGEngine/Server/compare/v1.18.0...v1.19.0) (2020-04-29)
+
+
+### Features
+
+* **pdf:** 增加pdf解析的服务 ([e131793](https://github.com/TRPGEngine/Server/commit/e131793d99c3aa06e4b07bf6a44223c741f9c529))
+* **trpg:** 增加模型trpg_recruit用于管理招募信息 ([f7e1032](https://github.com/TRPGEngine/Server/commit/f7e1032fc1e52e4b97b857895eb24b158b981dea))
+* **trpg:** 增加获取feed的路由 ([a701a22](https://github.com/TRPGEngine/Server/commit/a701a22979b5e9b69f3bf2e58a13f52b78277171))
+* **trpg:** 招募信息的创建、更新、完成与其相关逻辑 ([c894a6c](https://github.com/TRPGEngine/Server/commit/c894a6c845da94eacd187370363304ff1814e798))
+
 ## [1.18.0](https://github.com/TRPGEngine/Server/compare/v1.17.0...v1.18.0) (2020-04-20)
 
 
