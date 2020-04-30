@@ -52,7 +52,7 @@ tags: [版本发布]
 #### 构建系统
 
 - 生产环境编译增加最小文件限制，减少细碎文件。防止太多并发请求创建太多TCP连接
-- 移除@babel/plugin-transform-modules-commonjs以应用摇树优化(减少@ant-design/icons的大小)
+- ~~移除@babel/plugin-transform-modules-commonjs以应用摇树优化(减少@ant-design/icons的大小)~~
 
 
 ## 服务端
