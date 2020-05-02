@@ -280,6 +280,8 @@ export class Cache implements ICache {
 }
 
 export class RedisCache implements ICache {
+  static PREFIX = 'trpg:';
+
   url: string;
   redis: Redis.Redis;
 
@@ -288,10 +290,24 @@ export class RedisCache implements ICache {
     this.redis = new Redis(this.url);
   }
 
+  /**
+   * 增加前缀
+   */
   private genKey(key: string): string {
-    if (!key.startsWith('trpg:')) {
-      return `trpg:${key}`;
+    if (!key.startsWith(RedisCache.PREFIX)) {
+      return RedisCache.PREFIX + key;
     }
+    return key;
+  }
+
+  /**
+   * 清理前缀
+   */
+  private purgeKey(key: string): string {
+    if (key.startsWith(RedisCache.PREFIX)) {
+      return key.substr(RedisCache.PREFIX.length);
+    }
+
     return key;
   }
 
@@ -359,7 +375,7 @@ export class RedisCache implements ICache {
   async keys(glob: string): Promise<string[]> {
     glob = this.genKey(glob);
 
-    const keys = [];
+    const keys: string[] = [];
     let cursor = 0;
     do {
       const [_cursor, _keys] = await this.redis.scan(cursor, 'MATCH', glob);
@@ -370,7 +386,7 @@ export class RedisCache implements ICache {
       keys.push(..._keys);
     } while (cursor != 0);
 
-    return _.uniq(keys); // 返回结果去重
+    return _.uniq(keys).map(this.purgeKey); // 返回结果去重 并移除前缀
   }
 
   async get(key: string): Promise<CacheValue> {

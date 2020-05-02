@@ -21,6 +21,7 @@ module.exports = {
           'actor/tags/space',
         ],
       },
+      'actor/reserved-word',
       {
         type: 'link',
         href: 'https://trpg.moonrailgun.com/playground',

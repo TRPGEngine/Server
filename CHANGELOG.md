@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.19.1](https://github.com/TRPGEngine/Server/compare/v1.19.0...v1.19.1) (2020-05-02)
+
+
+### Bug Fixes
+
+* 修复cache redis keys操作返回结果不是预期结果的问题 ([d68841f](https://github.com/TRPGEngine/Server/commit/d68841f9db6729a23490ba0ac884ca646411e72d))
+* 修复一个使用保留字段导致的错误问题 ([b7691f3](https://github.com/TRPGEngine/Server/commit/b7691f3045ebfcdea367efe51d95852fd8184929))
+
 ## [1.19.0](https://github.com/TRPGEngine/Server/compare/v1.18.0...v1.19.0) (2020-04-29)
 
 

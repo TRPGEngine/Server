@@ -35,7 +35,12 @@ describe('cache', () => {
           cache.keys('*'),
         ]);
 
-        expect(keys1.sort()).toMatchObject(keys2.sort()); // 排序后再比较。因为使用scan出来的字段可能有空
+        expect(
+          keys1.sort().map((s) => {
+            // 移除前面的 trpg: 前缀
+            return s.substr('trpg:'.length);
+          })
+        ).toMatchObject(keys2.sort()); // 排序后再比较。因为使用scan出来的字段可能有空
       });
     });
 
