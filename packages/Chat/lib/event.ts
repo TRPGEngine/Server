@@ -562,7 +562,7 @@ export const stopWriting: EventFunc = async function stopWriting(data, cb, db) {
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
 
-  const { type = 'user', uuid, currentText } = data;
+  const { type = 'user', uuid } = data;
 
   const from_uuid = player.uuid;
   const to_uuid = uuid;
@@ -579,7 +579,6 @@ export const stopWriting: EventFunc = async function stopWriting(data, cb, db) {
       type,
       from: from_uuid,
       groupUUID: to_uuid,
-      currentText,
     });
   }
 };
