@@ -575,7 +575,7 @@ export const stopWriting: EventFunc = async function stopWriting(data, cb, db) {
     });
   } else if (type === 'group') {
     // 对group群发消息
-    app.player.manager.roomcastSocketEvent(to_uuid, 'chat::startWriting', {
+    app.player.manager.roomcastSocketEvent(to_uuid, 'chat::stopWriting', {
       type,
       from: from_uuid,
       groupUUID: to_uuid,
