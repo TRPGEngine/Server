@@ -529,7 +529,7 @@ export const startWriting: EventFunc = async function startWriting(
     throw '发生异常，无法获取到用户信息，请检查您的登录状态';
   }
 
-  const { type = 'user', uuid } = data;
+  const { type = 'user', uuid, currentText } = data;
 
   const from_uuid = player.uuid;
   const to_uuid = uuid;
@@ -539,6 +539,14 @@ export const startWriting: EventFunc = async function startWriting(
     app.player.manager.unicastSocketEvent(to_uuid, 'chat::startWriting', {
       type,
       from: from_uuid,
+    });
+  } else if (type === 'group') {
+    // 对group群发消息
+    app.player.manager.roomcastSocketEvent(to_uuid, 'chat::startWriting', {
+      type,
+      from: from_uuid,
+      groupUUID: to_uuid,
+      currentText,
     });
   }
 };
@@ -564,6 +572,13 @@ export const stopWriting: EventFunc = async function stopWriting(data, cb, db) {
     app.player.manager.unicastSocketEvent(to_uuid, 'chat::stopWriting', {
       type,
       from: from_uuid,
+    });
+  } else if (type === 'group') {
+    // 对group群发消息
+    app.player.manager.roomcastSocketEvent(to_uuid, 'chat::stopWriting', {
+      type,
+      from: from_uuid,
+      groupUUID: to_uuid,
     });
   }
 };

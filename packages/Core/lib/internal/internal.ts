@@ -14,6 +14,12 @@ import { getGlobalConfig } from './event';
 const SOCKET_PREFIX = 'metrics:socket:event:';
 const WEBSERVICE_PREFIX = 'metrics:webservice:route:';
 
+function calcAvg(nums: number[]) {
+  const sum = nums.reduce((prev, cur) => prev + cur, 0);
+  const count = nums.length;
+  return Number((sum / count).toFixed(2));
+}
+
 export default class Core extends BasePackage {
   public name: string = 'Core';
   public require: string[] = [];
@@ -56,7 +62,7 @@ export default class Core extends BasePackage {
           }
 
           // 计算平均值与最大最小值
-          const avg = arr.reduce((prev, cur) => prev + cur, 0);
+          const avg = calcAvg(arr);
           const max = Math.max(...arr);
           const min = Math.min(...arr);
           const count = arr.length;
@@ -89,7 +95,7 @@ export default class Core extends BasePackage {
           }
 
           // 计算平均值与最大最小值
-          const avg = arr.reduce((prev, cur) => prev + cur, 0);
+          const avg = calcAvg(arr);
           const max = Math.max(...arr);
           const min = Math.min(...arr);
           const count = arr.length;

@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.20.0](https://github.com/TRPGEngine/Server/compare/v1.19.2...v1.20.0) (2020-05-10)
+
+
+### Features
+
+* **chat:** 正在输入状态增加对group类型的支持 ([e09c1db](https://github.com/TRPGEngine/Server/commit/e09c1db77db8e904fd824fe40122d1d67aa8f2eb))
+
+
+### Bug Fixes
+
+* **chat:** 修复一个拼写问题 ([7018537](https://github.com/TRPGEngine/Server/commit/70185373fa870d0273149dd02e161ab53824fdba))
+* **core:** 修复平均值计算错误的bug ([36af935](https://github.com/TRPGEngine/Server/commit/36af935c099f642344ff826218e1fc2de2b07f70))
+
 ### [1.19.2](https://github.com/TRPGEngine/Server/compare/v1.19.1...v1.19.2) (2020-05-06)
 
 ### 1.2.7 (2019-10-12)

@@ -8,6 +8,7 @@ interface MetricsStatisCellInfo {
   avg_usage: number;
   max_usage: number;
   min_usage: number;
+  sum_usage?: number;
 }
 interface MetricsStatisInfo {
   [name: string]: {
@@ -30,7 +31,11 @@ export class CoreMetrics extends Model {
   min_usage?: number;
   count: number;
 
-  // 返回时间段内数据统计情况
+  /**
+   * 返回时间段内数据统计情况
+   * @param startDate 起始时间
+   * @param endDate 结束时间
+   */
   static async getStatisInfo(
     startDate: MomentInput,
     endDate: MomentInput
@@ -38,7 +43,7 @@ export class CoreMetrics extends Model {
     startDate = getDate(startDate);
     endDate = getDate(endDate);
 
-    const list = await CoreMetrics.findAll({
+    const list: CoreMetrics[] = await CoreMetrics.findAll({
       where: {
         date: {
           [Op.between]: [startDate, endDate],
@@ -52,15 +57,14 @@ export class CoreMetrics extends Model {
         _(t)
           .groupBy('name')
           .mapValues((n) => {
-            const size = n.length;
-
             const cellInfo: MetricsStatisCellInfo = n.reduce(
               (prev, curr) => {
                 return {
                   count: prev.count + curr.count,
                   max_usage: Math.max(prev.max_usage, curr.max_usage),
                   min_usage: Math.min(prev.min_usage, curr.min_usage),
-                  avg_usage: prev.avg_usage + curr.avg_usage,
+                  avg_usage: 0,
+                  sum_usage: prev.sum_usage + curr.avg_usage * curr.count,
                 };
               },
               {
@@ -68,18 +72,19 @@ export class CoreMetrics extends Model {
                 avg_usage: 0,
                 max_usage: 0,
                 min_usage: 0,
+                sum_usage: 0,
               }
             );
 
             // 计算平均值
-            cellInfo.avg_usage = cellInfo.avg_usage / size;
+            cellInfo.avg_usage = Math.round(
+              cellInfo.sum_usage / cellInfo.count
+            );
 
             return cellInfo;
           })
       )
       .value() as any;
-
-    // TODO
 
     return { info, startDate, endDate };
   }

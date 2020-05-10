@@ -42,7 +42,7 @@ function BlogPostItem(props) {
     const TitleHeading = isBlogPostPage ? 'h1' : 'h2';
     const match = date.substring(0, 10).split('-');
     const year = match[0];
-    const month = parseInt(match[1], 10) - 1;
+    const month = parseInt(match[1], 10);
     const day = parseInt(match[2], 10);
 
     return (
