@@ -25,11 +25,11 @@ tags: [版本发布]
   - Space
 - 移除了部分不必要的文档
 
+<!--truncate-->
+
 ## Playground
 
 - 增加了DND5e的人物卡模板源码
-
-<!--truncate-->
 
 ## 人物卡布局系统
 
