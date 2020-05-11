@@ -1,4 +1,4 @@
-const wiki = require('../docs/wiki/_list.json');
+const wiki = require('./docs/wiki/_list.json');
 
 module.exports = {
   docs: {

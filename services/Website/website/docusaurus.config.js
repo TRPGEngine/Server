@@ -138,7 +138,7 @@ const siteConfig = {
       {
         docs: {
           // docs folder path relative to website dir.
-          path: '../docs',
+          path: './docs',
           // sidebars file relative to website dir.
           sidebarPath: require.resolve('./sidebars'),
           remarkPlugins: [require('./src/plugins/remark-template-previewer')],
