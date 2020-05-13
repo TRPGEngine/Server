@@ -71,6 +71,14 @@ export class GroupActor extends Model {
     }
   }
 
+  static async findByUUID(uuid: string): Promise<GroupActor> {
+    return GroupActor.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
+
   /**
    * 编辑团成员信息
    * @param playerUUID 操作人UUID
@@ -426,7 +434,7 @@ export class GroupActor extends Model {
   static async getSelectedGroupActorUUID(
     group: GroupGroup,
     userUUID: string
-  ): Promise<string> {
+  ): Promise<string | null> {
     const members: PlayerUser[] = await group.getMembers({
       where: {
         uuid: userUUID,
@@ -443,35 +451,41 @@ export class GroupActor extends Model {
       'selected_group_actor_uuid',
     ]);
 
-    return selectedGroupActorUUID;
+    return selectedGroupActorUUID ?? null;
   }
 
   /**
    * 设置用户选择的团角色
    * @param groupUUID 团UUID
    * @param groupActorUUID 操作目标角色UUID | null
-   * @param playerUUID 操作人UUID
+   * @param userUUID 用户UUID
+   * @param operatorUUID 操作人员UUID
    */
   static async setPlayerSelectedGroupActor(
     groupUUID: string,
     groupActorUUID: string | null,
-    playerUUID: string
+    userUUID: string,
+    operatorUUID: string
   ) {
-    if (_.isNil(groupUUID) || _.isNil(playerUUID)) {
-      throw '缺少必要参数';
+    if (_.isNil(groupUUID) || _.isNil(userUUID)) {
+      throw new Error('缺少必要参数');
     }
 
     const group = await GroupGroup.findByUUID(groupUUID);
     if (!group) {
-      throw '找不到团';
+      throw new Error('找不到团');
     }
 
-    // TODO: 增加设置权限
+    // 权限检测
+    if (userUUID !== operatorUUID && !group.isManagerOrOwner(operatorUUID)) {
+      // 如果操作人员不是自己 且 不是所在团的管理人员。则抛出异常
+      throw new Error('设置选择团角色失败: 没有权限');
+    }
 
     const members = await group.getMembers();
     let isSaved = false;
     for (let member of members) {
-      if (member.uuid === playerUUID) {
+      if (member.uuid === userUUID) {
         member.group_group_members.selected_group_actor_uuid = groupActorUUID;
         await member.group_group_members.save();
         isSaved = true;
@@ -479,7 +493,7 @@ export class GroupActor extends Model {
       }
     }
     if (!isSaved) {
-      throw '当前用户不在团列表中';
+      throw new Error('当前用户不在团列表中');
     }
 
     // 通知团其他人
@@ -488,7 +502,7 @@ export class GroupActor extends Model {
       groupUUID,
       'group::updatePlayerSelectedGroupActor',
       {
-        playerUUID,
+        userUUID,
         groupUUID,
         groupActorUUID,
       }

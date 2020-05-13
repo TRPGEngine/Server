@@ -124,6 +124,7 @@ describe('group action', () => {
   test.todo('refuseGroupInvite should be ok');
 
   test('agreeGroupInvite should be ok', async () => {
+    const testGroup = await createTestGroup();
     const invite = await GroupInvite.create({
       group_uuid: testGroup.uuid,
       from_uuid: 'test_uuid',

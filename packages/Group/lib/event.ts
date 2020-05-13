@@ -487,14 +487,14 @@ export const agreeGroupInvite: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const playerUUID = player.uuid;
   const inviteUUID = data.uuid;
 
   if (!inviteUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const invite: GroupInvite = await GroupInvite.findOne({
@@ -878,6 +878,7 @@ export const setPlayerSelectedGroupActor: EventFunc<{
   await GroupActor.setPlayerSelectedGroupActor(
     groupUUID,
     groupActorUUID,
+    userUUID,
     userUUID
   );
 
