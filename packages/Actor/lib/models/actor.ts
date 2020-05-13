@@ -4,10 +4,17 @@ import {
   DBInstance,
   BelongsToSetAssociationMixin,
   BelongsToGetAssociationMixin,
+  HasManyGetAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
 import { Pagination } from 'trpg/query';
+
+declare module 'packages/Player/lib/models/user' {
+  interface PlayerUser {
+    getActors?: HasManyGetAssociationsMixin<ActorActor>;
+  }
+}
 
 export class ActorActor extends Model {
   id: number;
