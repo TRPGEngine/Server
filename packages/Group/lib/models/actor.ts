@@ -447,6 +447,55 @@ export class GroupActor extends Model {
   }
 
   /**
+   * 设置用户选择的团角色
+   * @param groupUUID 团UUID
+   * @param groupActorUUID 操作目标角色UUID | null
+   * @param playerUUID 操作人UUID
+   */
+  static async setPlayerSelectedGroupActor(
+    groupUUID: string,
+    groupActorUUID: string | null,
+    playerUUID: string
+  ) {
+    if (_.isNil(groupUUID) || _.isNil(playerUUID)) {
+      throw '缺少必要参数';
+    }
+
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (!group) {
+      throw '找不到团';
+    }
+
+    // TODO: 增加设置权限
+
+    const members = await group.getMembers();
+    let isSaved = false;
+    for (let member of members) {
+      if (member.uuid === playerUUID) {
+        member.group_group_members.selected_group_actor_uuid = groupActorUUID;
+        await member.group_group_members.save();
+        isSaved = true;
+        break;
+      }
+    }
+    if (!isSaved) {
+      throw '当前用户不在团列表中';
+    }
+
+    // 通知团其他人
+    const app = GroupActor.getApplication();
+    app.player.manager.roomcastSocketEvent(
+      groupUUID,
+      'group::updatePlayerSelectedGroupActor',
+      {
+        playerUUID,
+        groupUUID,
+        groupActorUUID,
+      }
+    );
+  }
+
+  /**
    * 根据会话UUID获取团信息
    * TODO: 这是一个非常耗资源的操作。看看能不能优化
    * @param converseUUID 会话UUID

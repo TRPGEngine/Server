@@ -1,5 +1,9 @@
 import { buildAppContext } from 'test/utils/app';
-import { handleLogin, handleLogout } from 'packages/Player/test/example';
+import {
+  handleLogin,
+  handleLogout,
+  getTestUser,
+} from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { generateRandomStr } from 'test/utils/utils';
 import { GroupGroup } from '../lib/models/group';
@@ -29,11 +33,8 @@ describe('group action', () => {
 
   beforeAll(async () => {
     testGroup = await createTestGroup();
-    // await testGroup.addMember(testUser, {
-    //   through: {
-    //     selected_group_actor_uuid: 'test selected_group_actor_uuid',
-    //   },
-    // });
+    const testUser = await getTestUser();
+    await testGroup.addMember(testUser);
   });
 
   test('create should be ok', async () => {
@@ -301,6 +302,12 @@ describe('group action', () => {
       expect(ret).toHaveProperty('data');
       expect(ret).toHaveProperty('data.groupUUID', testGroup.uuid);
       expect(ret).toHaveProperty('data.groupActorUUID', testGroupActor.uuid);
+
+      const selectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
+        testGroup,
+        testUser.uuid
+      );
+      expect(selectedGroupActorUUID).toBe(testGroupActor.uuid);
     });
 
     test('getPlayerSelectedGroupActor should be ok', async () => {
