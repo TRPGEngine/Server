@@ -10,6 +10,7 @@ import {
   BelongsToManyRemoveAssociationMixin,
   BelongsToManyHasAssociationMixin,
   BelongsToManyCountAssociationsMixin,
+  BelongsToManyAddAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
@@ -51,6 +52,7 @@ export class GroupGroup extends Model {
 
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
+  addMembers?: BelongsToManyAddAssociationsMixin<PlayerUser, number>;
   getMembers?: BelongsToManyGetAssociationsMixin<PlayerUser>;
   hasMember?: BelongsToManyHasAssociationMixin<PlayerUser, number>;
   hasMembers?: BelongsToManyHasAssociationsMixin<PlayerUser, number>;

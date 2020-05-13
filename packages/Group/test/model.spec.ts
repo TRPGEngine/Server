@@ -382,27 +382,74 @@ describe('group model function', () => {
       });
     });
 
-    test('GroupActor.assignGroupActor should be ok', async () => {
-      const testUser = await getTestUser();
-      const testUser9 = await getOtherTestUser('admin9');
-      testGroupActor.passed = true;
-      await testGroupActor.save();
+    describe.only('GroupActor.assignGroupActor should be ok', () => {
+      test('with new actor', async () => {
+        const testGroup = await createTestGroup();
+        const testUser = await getTestUser();
+        const testUser9 = await getOtherTestUser('admin9');
+        await testGroup.addMembers([testUser, testUser9]);
+        const testGroupActor = await createTestGroupActor(testGroup.id);
+        testGroupActor.passed = true;
+        await testGroupActor.save();
 
-      await GroupActor.assignGroupActor(
-        testGroup.uuid,
-        testGroupActor.uuid,
-        testUser.uuid,
-        testUser9.uuid
-      );
+        await GroupActor.assignGroupActor(
+          testGroup.uuid,
+          testGroupActor.uuid,
+          testUser.uuid,
+          testUser9.uuid
+        );
 
-      const groupActor: GroupActor = await GroupActor.findOne({
-        where: {
-          uuid: testGroupActor.uuid,
-        },
+        const groupActor: GroupActor = await GroupActor.findOne({
+          where: {
+            uuid: testGroupActor.uuid,
+          },
+        });
+        const owner: PlayerUser = await groupActor.getOwner();
+
+        expect(owner.uuid).toBe(testUser9.uuid);
       });
-      const owner: PlayerUser = await groupActor.getOwner();
 
-      expect(owner.uuid).toBe(testUser9.uuid);
+      test('with selected actor', async () => {
+        const testGroup = await createTestGroup();
+        const testUser = await getTestUser();
+        const testUser8 = await getOtherTestUser('admin8');
+        await testGroup.addMembers([testUser, testUser8]);
+        const testGroupActor = await createTestGroupActor(testGroup.id);
+        testGroupActor.passed = true;
+        await testGroupActor.save();
+        await GroupActor.setPlayerSelectedGroupActor(
+          testGroup.uuid,
+          testGroupActor.uuid,
+          testUser.uuid,
+          testUser.uuid
+        );
+        expect(
+          await GroupActor.getSelectedGroupActorUUID(testGroup, testUser.uuid)
+        ).toBe(testGroupActor.uuid); // 期望数据库中已写入选择角色
+
+        await GroupActor.assignGroupActor(
+          testGroup.uuid,
+          testGroupActor.uuid,
+          testUser.uuid,
+          testUser8.uuid
+        );
+
+        const groupActor: GroupActor = await GroupActor.findOne({
+          where: {
+            uuid: testGroupActor.uuid,
+          },
+        });
+        // 新所有者已被分配
+        const owner: PlayerUser = await groupActor.getOwner();
+        expect(owner.uuid).toBe(testUser8.uuid);
+
+        // 旧所有者当前选择清空
+        const selectedUUID = await GroupActor.getSelectedGroupActorUUID(
+          testGroup,
+          testUser.uuid
+        );
+        expect(selectedUUID).toBe(null);
+      });
     });
 
     test('GroupActor.getGroupActorDataFromConverse should be ok', async () => {

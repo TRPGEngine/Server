@@ -352,7 +352,7 @@ export class GroupActor extends Model {
   }
 
   /**
-   * 分配团角色到团
+   * 分配团角色到团成员
    * @param groupUUID 团UUID
    * @param groupActorUUID 团角色UUID
    * @param playerUUID 操作人UUID
@@ -370,7 +370,7 @@ export class GroupActor extends Model {
     }
 
     if (!group.isManagerOrOwner(playerUUID)) {
-      throw new Error('该操作没有权限');
+      throw new Error('无法分配团人物: 没有权限');
     }
 
     const user = await PlayerUser.findByUUID(playerUUID);
@@ -405,6 +405,8 @@ export class GroupActor extends Model {
       throw new Error('目标用户不存在');
     }
 
+    const originOwner = groupActor.owner; // 原拥有者
+
     await groupActor.setOwner(target);
 
     // notify
@@ -414,8 +416,22 @@ export class GroupActor extends Model {
       `您被分配角色卡${group.name} - ${groupActor.name}`
     );
 
-    if (!_.isNil(groupActor.owner)) {
-      // 如果有原拥有者的话
+    if (!_.isNil(originOwner)) {
+      // 如果有原拥有者的话则通知
+      // 则清理用户选择的团人物卡
+      const originOwnerSelectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
+        group,
+        originOwner.uuid
+      );
+      if (originOwnerSelectedGroupActorUUID === groupActorUUID) {
+        // 如果原拥有者选择的人物卡是被重新分配的人物卡，则清除
+        await GroupActor.setPlayerSelectedGroupActor(
+          groupUUID,
+          null,
+          originOwner.uuid,
+          playerUUID
+        );
+      }
       ChatLog.sendSimpleSystemMsg(
         groupActor.owner.uuid,
         null,
