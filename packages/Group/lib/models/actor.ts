@@ -71,6 +71,14 @@ export class GroupActor extends Model {
     }
   }
 
+  static async findByUUID(uuid: string): Promise<GroupActor> {
+    return GroupActor.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
+
   /**
    * 编辑团成员信息
    * @param playerUUID 操作人UUID
@@ -344,7 +352,7 @@ export class GroupActor extends Model {
   }
 
   /**
-   * 分配团角色到团
+   * 分配团角色到团成员
    * @param groupUUID 团UUID
    * @param groupActorUUID 团角色UUID
    * @param playerUUID 操作人UUID
@@ -362,7 +370,7 @@ export class GroupActor extends Model {
     }
 
     if (!group.isManagerOrOwner(playerUUID)) {
-      throw new Error('该操作没有权限');
+      throw new Error('无法分配团人物: 没有权限');
     }
 
     const user = await PlayerUser.findByUUID(playerUUID);
@@ -397,6 +405,8 @@ export class GroupActor extends Model {
       throw new Error('目标用户不存在');
     }
 
+    const originOwner = groupActor.owner; // 原拥有者
+
     await groupActor.setOwner(target);
 
     // notify
@@ -406,8 +416,22 @@ export class GroupActor extends Model {
       `您被分配角色卡${group.name} - ${groupActor.name}`
     );
 
-    if (!_.isNil(groupActor.owner)) {
-      // 如果有原拥有者的话
+    if (!_.isNil(originOwner)) {
+      // 如果有原拥有者的话则通知
+      // 则清理用户选择的团人物卡
+      const originOwnerSelectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
+        group,
+        originOwner.uuid
+      );
+      if (originOwnerSelectedGroupActorUUID === groupActorUUID) {
+        // 如果原拥有者选择的人物卡是被重新分配的人物卡，则清除
+        await GroupActor.setPlayerSelectedGroupActor(
+          groupUUID,
+          null,
+          originOwner.uuid,
+          playerUUID
+        );
+      }
       ChatLog.sendSimpleSystemMsg(
         groupActor.owner.uuid,
         null,
@@ -426,7 +450,7 @@ export class GroupActor extends Model {
   static async getSelectedGroupActorUUID(
     group: GroupGroup,
     userUUID: string
-  ): Promise<string> {
+  ): Promise<string | null> {
     const members: PlayerUser[] = await group.getMembers({
       where: {
         uuid: userUUID,
@@ -443,7 +467,62 @@ export class GroupActor extends Model {
       'selected_group_actor_uuid',
     ]);
 
-    return selectedGroupActorUUID;
+    return selectedGroupActorUUID ?? null;
+  }
+
+  /**
+   * 设置用户选择的团角色
+   * @param groupUUID 团UUID
+   * @param groupActorUUID 操作目标角色UUID | null
+   * @param userUUID 用户UUID
+   * @param operatorUUID 操作人员UUID
+   */
+  static async setPlayerSelectedGroupActor(
+    groupUUID: string,
+    groupActorUUID: string | null,
+    userUUID: string,
+    operatorUUID: string
+  ) {
+    if (_.isNil(groupUUID) || _.isNil(userUUID)) {
+      throw new Error('缺少必要参数');
+    }
+
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (!group) {
+      throw new Error('找不到团');
+    }
+
+    // 权限检测
+    if (userUUID !== operatorUUID && !group.isManagerOrOwner(operatorUUID)) {
+      // 如果操作人员不是自己 且 不是所在团的管理人员。则抛出异常
+      throw new Error('设置选择团角色失败: 没有权限');
+    }
+
+    const members = await group.getMembers();
+    let isSaved = false;
+    for (let member of members) {
+      if (member.uuid === userUUID) {
+        member.group_group_members.selected_group_actor_uuid = groupActorUUID;
+        await member.group_group_members.save();
+        isSaved = true;
+        break;
+      }
+    }
+    if (!isSaved) {
+      throw new Error('当前用户不在团列表中');
+    }
+
+    // 通知团其他人
+    const app = GroupActor.getApplication();
+    app.player.manager.roomcastSocketEvent(
+      groupUUID,
+      'group::updatePlayerSelectedGroupActor',
+      {
+        userUUID,
+        groupUUID,
+        groupActorUUID,
+      }
+    );
   }
 
   /**

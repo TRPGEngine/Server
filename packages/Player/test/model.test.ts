@@ -17,6 +17,10 @@ describe('PlayerUser', () => {
       testUser = await getTestUser();
     });
 
+    beforeEach(async () => {
+      await context.app.cache.remove(getPlayerUserCacheKey(testUser.uuid));
+    });
+
     afterEach(async () => {
       await context.app.cache.remove(getPlayerUserCacheKey(testUser.uuid));
     });

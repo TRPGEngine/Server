@@ -4,9 +4,6 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import classnames from 'classnames';
-import Container from '../components/Container';
-import GridBlock from '../components/GridBlock';
-import MarkdownBlock from '../components/MarkdownBlock';
 import styles from './index.module.css';
 
 const features = [

@@ -246,14 +246,12 @@ export const getActor: EventFunc<{
   const uuid = data.uuid;
   if (uuid) {
     // 返回指定的actor
-    let actor = await db.models.actor_actor.findOne({ where: { uuid } });
+    const actor = await ActorActor.findByUUID(uuid);
     return { actor };
   } else {
     // 返回当前用户所有的actor
-    let user = await db.models.player_user.findOne({
-      where: { uuid: player.uuid },
-    });
-    let actors = await user.getActors();
+    const user = await PlayerUser.findByUUID(player.uuid);
+    const actors = await user.getActors();
     return { actors };
   }
 };

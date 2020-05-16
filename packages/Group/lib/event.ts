@@ -487,14 +487,14 @@ export const agreeGroupInvite: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const playerUUID = player.uuid;
   const inviteUUID = data.uuid;
 
   if (!inviteUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const invite: GroupInvite = await GroupInvite.findOne({
@@ -875,32 +875,12 @@ export const setPlayerSelectedGroupActor: EventFunc<{
     throw '缺少必要参数';
   }
 
-  const group = await (db.models.group_group as any).findOne({
-    where: { uuid: groupUUID },
-  });
-  if (!group) {
-    throw '找不到团';
-  }
-  const members = await group.getMembers();
-  let isSaved = false;
-  for (let member of members) {
-    if (member.uuid === userUUID) {
-      member.group_group_members.selected_group_actor_uuid = groupActorUUID;
-      await member.group_group_members.save();
-      isSaved = true;
-      break;
-    }
-  }
-  if (!isSaved) {
-    throw '当前用户不在团列表中';
-  }
-
-  // 通知团其他人
-  socket.broadcast.to(groupUUID).emit('group::updatePlayerSelectedGroupActor', {
-    userUUID,
+  await GroupActor.setPlayerSelectedGroupActor(
     groupUUID,
     groupActorUUID,
-  });
+    userUUID,
+    userUUID
+  );
 
   return {
     data: { groupUUID, groupActorUUID },
