@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.21.0](https://github.com/TRPGEngine/Server/compare/v1.20.0...v1.21.0) (2020-05-16)
+
+
+### Features
+
+* **group:** 分配角色增加对原拥有者的处理 ([4ec7dd9](https://github.com/TRPGEngine/Server/commit/4ec7dd9d360a1b2a4156da1f073d287b6d46e3fa))
+
 ## [1.20.0](https://github.com/TRPGEngine/Server/compare/v1.19.2...v1.20.0) (2020-05-10)
 
 
