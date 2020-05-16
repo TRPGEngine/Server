@@ -382,7 +382,7 @@ describe('group model function', () => {
       });
     });
 
-    describe.only('GroupActor.assignGroupActor should be ok', () => {
+    describe('GroupActor.assignGroupActor should be ok', () => {
       test('with new actor', async () => {
         const testGroup = await createTestGroup();
         const testUser = await getTestUser();
