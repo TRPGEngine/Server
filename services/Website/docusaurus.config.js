@@ -12,7 +12,7 @@ const users = [
   {
     name: 'moonrailgun',
     desc: 'TRPG Engine 项目负责人',
-    url: 'https://github.com/moonrailgun',
+    url: 'http://moonrailgun.com/',
     imageUrl: 'img/moonrailgun.png',
   },
 ];
