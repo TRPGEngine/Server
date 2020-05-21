@@ -11,7 +11,7 @@
     "start": "DEBUG=${DEBUG:='*mediasoup* *INFO* *WARN* *ERROR*'} INTERACTIVE=${INTERACTIVE:='true'} node server.js",
     "connect": "node connect.js",
     "docker:build": "sh ./docker/build.sh",
-    "docker:run": "sh ./docker/run.sh"
+    "docker:run": "MEDIASOUP_ANNOUNCED_IP=10.0.2.25 sh ./docker/run.sh"
   },
   "dependencies": {
     "@sitespeed.io/throttle": "^0.5.4",
