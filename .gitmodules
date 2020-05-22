@@ -1,0 +1,3 @@
+[submodule "services/whiteboard/whitebophir"]
+	path = services/whiteboard/whitebophir
+	url = https://github.com/lovasoa/whitebophir
