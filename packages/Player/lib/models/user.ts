@@ -6,6 +6,8 @@ import config from 'config';
 import _ from 'lodash';
 import { fn, col } from 'sequelize';
 import { PlayerJWTPayload } from 'packages/Player/types/player';
+import Debug from 'debug';
+const debug = Debug('trpg:component:player:model');
 
 // 阵营九宫格
 export type Alignment =
@@ -143,6 +145,36 @@ export class PlayerUser extends Model {
         username,
         password: fn('SHA1', fn('CONCAT', fn('MD5', password), col('salt'))),
       },
+    });
+  }
+
+  /**
+   * 注册新用户
+   * @param username 用户名
+   * @param password md5后的密码
+   */
+  static async registerUser(
+    username: string,
+    password: string
+  ): Promise<PlayerUser> {
+    if (username.length > 18) {
+      throw new Error('注册失败!用户名过长');
+    }
+
+    const user = await PlayerUser.findOne({
+      where: { username },
+      limit: 1,
+    });
+    if (!!user) {
+      debug(`register failed!user ${user.username} has been existed`);
+      throw new Error('用户名已存在');
+    }
+
+    const salt = PlayerUser.genSalt();
+    return PlayerUser.create({
+      username,
+      password: PlayerUser.genPassword(password, salt), // 存储密码为sha1(md5(md5(realpass)) + salt)
+      salt,
     });
   }
 
