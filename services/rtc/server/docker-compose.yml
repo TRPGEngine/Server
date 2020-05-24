@@ -26,4 +26,3 @@ services:
       - "${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}:${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}/udp"
     volumes:
       - ${PWD}:/storage
-      - ${MEDIASOUP_SRC}:/mediasoup-src
