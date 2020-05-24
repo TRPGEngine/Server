@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  rtc-service:
+    image: trpg-rtc:latest
+    build: ./
+    environment:
+      NODE_ENV: production
