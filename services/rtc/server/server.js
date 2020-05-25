@@ -133,6 +133,14 @@ async function createExpressApp() {
 
   expressApp.use(bodyParser.json());
 
+  expressApp.get('/health', async (req, res) => {
+    const usages = await Promise.all(
+      mediasoupWorkers.map((worker) => worker.getResourceUsage())
+    );
+
+    res.status(200).json({ usages });
+  });
+
   /**
    * For every API request, verify that the roomId in the path matches and
    * existing room.
