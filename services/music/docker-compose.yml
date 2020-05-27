@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  trpg-music:
+    image: trpg-music:latest
+    build: ./api/
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3445:3000"
