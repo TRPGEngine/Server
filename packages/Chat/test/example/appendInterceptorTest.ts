@@ -12,11 +12,18 @@ import { createTestChatlogPayload } from './index';
 export function appendInterceptorTest(
   name: string,
   input: ChatMessagePartial,
-  output: ChatMessagePartial
+  output: ChatMessagePartial,
+  debug = false
 ) {
-  test(`interceptor: ${name}`, () => {
-    expect(applyMsgInterceptors(createTestChatlogPayload(input))).toMatchObject(
-      createTestChatlogPayload(output)
-    );
+  test(`interceptor: ${name}`, async () => {
+    const basicPayload = await createTestChatlogPayload(input);
+
+    const res = await applyMsgInterceptors(basicPayload);
+
+    if (debug) {
+      console.log('DEBUG', `[${name}]`, '\n', basicPayload, '=>\n', res);
+    }
+
+    expect(res).toMatchObject({ ...basicPayload, ...output });
   });
 }
