@@ -27,8 +27,7 @@ describe('interceptors', () => {
     {
       message: expect.stringContaining('骰出了'),
       type: 'tip',
-    },
-    true
+    }
   );
 
   // TODO: test ra
