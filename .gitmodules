@@ -4,3 +4,6 @@
 [submodule "services/music/api"]
 	path = services/music/api
 	url = https://github.com/Binaryify/NeteaseCloudMusicApi
+[submodule "services/file-preview/kkFileView"]
+	path = services/file-preview/kkFileView
+	url = https://github.com/kekingcn/kkFileView.git
