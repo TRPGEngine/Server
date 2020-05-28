@@ -1,4 +1,4 @@
-const Raven = require('raven');
+import * as Sentry from '@sentry/node';
 import { getLogger } from './logger';
 const logger = getLogger();
 const appLogger = getLogger('application');
@@ -6,7 +6,7 @@ const appLogger = getLogger('application');
 interface ReportConfig {
   enable: boolean;
   logger: boolean;
-  sentry: boolean | string;
+  sentry: false | string;
 }
 
 type ReportErrorType = Error | string;
@@ -25,7 +25,7 @@ class ReportService {
   constructor(reportSetting: ReportConfig) {
     this._setting = Object.assign({}, defaultConfig, reportSetting);
     if (this._setting.sentry) {
-      Raven.config(this._setting.sentry).install();
+      Sentry.init({ dsn: this._setting.sentry });
       this.installed = true;
     }
   }
@@ -52,9 +52,9 @@ class ReportService {
       let errorFn;
       if (typeof err === 'string') {
         // 如果不是一个错误类型的。提交错误文本信息到sentry
-        errorFn = Raven.captureMessage.bind(Raven);
+        errorFn = Sentry.captureMessage.bind(Sentry);
       } else {
-        errorFn = Raven.captureException.bind(Raven);
+        errorFn = Sentry.captureException.bind(Sentry);
       }
       errorFn(err, options, function(err, eventId) {
         console.log('[Sentry] Reported error: ' + eventId);
@@ -68,8 +68,8 @@ class ReportService {
       return;
     }
 
-    Raven.context(() => {
-      Raven.setContext(context);
+    Sentry.configureScope((scope) => {
+      scope.setContext('context', context);
       this.reportError(err);
     });
   }
