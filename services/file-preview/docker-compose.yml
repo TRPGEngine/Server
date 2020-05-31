@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  trpg-filepreview:
+    image: trpg-filepreview:latest
+    build: ./kkFileView/
+    environment:
+      NODE_ENV: production
+    ports:
+      - "8012:8012"

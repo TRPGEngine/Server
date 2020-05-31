@@ -17,6 +17,7 @@ const info = require('../packages/Info');
 const oauth = require('../packages/OAuth');
 const trpg = require('../packages/TRPG');
 
+// TODO: 使用dependency-helper的方法进行排序
 module.exports = function loadModules(app) {
   app.load(player);
   app.load(file);

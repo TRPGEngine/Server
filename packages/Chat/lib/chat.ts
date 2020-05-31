@@ -5,6 +5,7 @@ import LogDefinition, { ChatLog } from './models/log';
 import ChatConverseDefinition from './models/converse';
 import { ChatMessagePartial } from '../types/message';
 import BasePackage from 'lib/package';
+import { initInterceptors } from './interceptors';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -41,6 +42,8 @@ export default class Chat extends BasePackage {
 
     this.initTimer();
     this.initData();
+
+    initInterceptors();
   }
 
   initMethods() {

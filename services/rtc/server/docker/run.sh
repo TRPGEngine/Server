@@ -13,6 +13,11 @@ export MEDIASOUP_MAX_PORT=${MEDIASOUP_MAX_PORT:="2020"}
 export MEDIASOUP_USE_VALGRIND=${MEDIASOUP_USE_VALGRIND:="false"}
 export MEDIASOUP_VALGRIND_OPTIONS=${MEDIASOUP_VALGRIND_OPTIONS:="--leak-check=full --track-fds=yes --log-file=/storage/mediasoup_valgrind_%p.log"}
 
+#!/bin/bash
+if [ 0"$MEDIASOUP_ANNOUNCED_IP" = "0" ]; then
+    echo "WARN: env var MEDIASOUP_ANNOUNCED_IP is not set, maybe you should set it in docker envirnment"
+fi
+
 docker run \
 	--name=mediasoup-demo \
 	-p ${PROTOO_LISTEN_PORT}:${PROTOO_LISTEN_PORT}/tcp \

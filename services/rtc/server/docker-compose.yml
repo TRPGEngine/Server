@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  rtc-service:
+    image: trpg-rtc:latest
+    build: ./
+    init: true
+    environment:
+      NODE_ENV: production
+      MEDIASOUP_ANNOUNCED_IP: ${MEDIASOUP_ANNOUNCED_IP}
+      DEBUG:
+      INTERACTIVE:
+      DOMAIN:
+      PROTOO_LISTEN_PORT:
+      HTTPS_CERT_FULLCHAIN:
+      HTTPS_CERT_PRIVKEY:
+      MEDIASOUP_LISTEN_IP:
+      MEDIASOUP_MIN_PORT:
+      MEDIASOUP_MAX_PORT:
+      MEDIASOUP_USE_VALGRIND:
+      MEDIASOUP_VALGRIND_OPTIONS:
+      MEDIASOUP_WORKER_BIN:
+    ports:
+      - "${PROTOO_LISTEN_PORT}:${PROTOO_LISTEN_PORT}"
+      - "${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}:${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}"
+      - "${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}:${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}/udp"
+    volumes:
+      - ${PWD}:/storage

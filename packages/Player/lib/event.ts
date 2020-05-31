@@ -210,36 +210,14 @@ export const register: EventFunc<{
   username: string;
   password: string;
 }> = async function register(data, cb, db) {
-  const app = this.app;
-  const socket = this.socket;
-
   const username = data.username;
   const password = data.password;
-
-  if (username.length > 18) {
-    throw new Error('注册失败!用户名过长');
-  }
-
   if (!username || !password) {
     debug('register fail, miss necessary parameter: %o', data);
     throw new Error('缺少必要参数');
   }
 
-  const user = await PlayerUser.findOne({
-    where: { username },
-  });
-
-  if (!!user) {
-    debug('register failed!user %s has been existed', user.username);
-    throw new Error('用户名已存在');
-  }
-
-  const salt = PlayerUser.genSalt();
-  const results = await PlayerUser.create({
-    username,
-    password: PlayerUser.genPassword(password, salt), // 存储密码为sha1(md5(md5(realpass)) + salt)
-    salt,
-  });
+  const results = await PlayerUser.registerUser(username, password);
   debug('register success: %o', results);
   return { results };
 };

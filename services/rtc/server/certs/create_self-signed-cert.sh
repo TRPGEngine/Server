@@ -2,7 +2,9 @@
 
 # * 为必改项
 # * 更换为你自己的域名
-CN='' # 例如: demo.rancher.com
+echo 'Please input your cert domain (e.g.demo.rancher.com)'
+read CN
+# CN='' # 例如: demo.rancher.com
 
 # 扩展信任IP或域名
 ## 一般ssl证书只信任域名的访问请求，有时候需要使用ip去访问server，那么需要给ssl证书添加扩展IP，
@@ -166,8 +168,12 @@ fi
 echo "4. 重命名服务证书"
 mv ${CN}.key tls.key
 mv ${CN}.crt tls.crt
+echo "成功"
 
 # 以下为项目专属
 echo "5. 重命名至默认名"
 mv tls.key privkey.pem
 mv tls.crt fullchain.pem
+echo "成功"
+
+echo "创建证书完毕"
