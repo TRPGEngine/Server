@@ -1,4 +1,4 @@
-import { getTestUser, testUserInfo } from './example';
+import { getTestUser, testUserInfo, createTestPlayerLoginLog } from './example';
 import {
   PlayerUser,
   getPlayerUserCacheKey,
@@ -8,8 +8,12 @@ import _ from 'lodash';
 import { generateRandomStr } from 'test/utils/utils';
 import md5Encrypt from '../lib/utils/md5';
 import sha1Encrypt from '../lib/utils/sha1';
+import { PlayerLoginLog } from '../lib/models/login-log';
+import testExampleStack from 'test/utils/example';
 
 const context = buildAppContext();
+
+testExampleStack.regAfterAll();
 
 describe('PlayerUser', () => {
   describe('PlayerUser.findByUUID', () => {
@@ -133,5 +137,54 @@ describe('PlayerUser', () => {
         await newUser.destroy({ force: true });
       }
     });
+  });
+});
+
+describe('PlayerLoginLog', () => {
+  describe('scope', () => {
+    test('default scope', async () => {
+      const testPlayerLoginLog = await createTestPlayerLoginLog();
+
+      const row = await PlayerLoginLog.findByPk(testPlayerLoginLog.id);
+
+      expect(row).toHaveProperty('id', testPlayerLoginLog.id);
+      expect(row).toHaveProperty('user_uuid');
+      expect(row).toHaveProperty('user_name');
+      expect(row).toHaveProperty('type');
+      expect(row).toHaveProperty('channel');
+      expect(row).toHaveProperty('socket_id');
+      expect(row).toHaveProperty('ip');
+      expect(row).toHaveProperty('ip_address');
+      expect(row).toHaveProperty('platform');
+      expect(row).toHaveProperty('device_info');
+      expect(row).toHaveProperty('is_success');
+      expect(row).toHaveProperty('token');
+      expect(row).toHaveProperty('offline_date');
+      expect(row).toHaveProperty('createdAt');
+      expect(row).toHaveProperty('updatedAt');
+    });
+
+    test('public scope', async () => {
+      const testPlayerLoginLog = await createTestPlayerLoginLog();
+
+      const row = await PlayerLoginLog.scope('public').findByPk(
+        testPlayerLoginLog.id
+      );
+
+      expect(row).toHaveProperty('id', testPlayerLoginLog.id);
+      expect(row.socket_id).toBeFalsy();
+      expect(row.ip).toBeFalsy();
+      expect(row.token).toBeFalsy();
+    });
+  });
+
+  test('getPlayerLoginLog', async () => {
+    const testUser = await getTestUser();
+    const logs = await PlayerLoginLog.getPlayerLoginLog(testUser.uuid);
+
+    expect(logs.length).toBeLessThanOrEqual(10);
+    expect(_.get(logs, '0.socket_id')).toBeFalsy();
+    expect(_.get(logs, '0.ip')).toBeFalsy();
+    expect(_.get(logs, '0.token')).toBeFalsy();
   });
 });

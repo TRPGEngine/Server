@@ -1,6 +1,39 @@
 import { Orm, DBInstance, Model } from 'trpg/core';
+import { PlayerLoginLogType } from 'packages/Player/types/login-log';
 
-export class PlayerLoginLog extends Model {}
+export class PlayerLoginLog extends Model {
+  id: number;
+  user_uuid: string;
+  user_name: string;
+  type: PlayerLoginLogType;
+  channel: string;
+  socket_id: string;
+  ip: string;
+  ip_address: string;
+  platform: string;
+  device_info: object;
+  is_success: boolean;
+  token: string;
+  offline_date: Date;
+
+  /**
+   * 返回用户的登录记录
+   * @param userUUID 用户UUID
+   * @param size 返回列表大小
+   */
+  static getPlayerLoginLog(
+    userUUID: string,
+    size = 10
+  ): Promise<PlayerLoginLog[]> {
+    return PlayerLoginLog.scope('public').findAll({
+      where: {
+        user_uuid: userUUID,
+      },
+      order: [['id', 'DESC']],
+      limit: size,
+    });
+  }
+}
 
 export default function PlayerLoginLogDefinition(
   Sequelize: Orm,
@@ -27,6 +60,13 @@ export default function PlayerLoginLogDefinition(
     {
       tableName: 'player_login_log',
       sequelize: db,
+      scopes: {
+        public: {
+          attributes: {
+            exclude: ['socket_id', 'ip', 'token'],
+          },
+        },
+      },
     }
   );
 

@@ -4,6 +4,8 @@ import _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import { TRPGAppInstanceContext } from 'test/utils/app';
 import { sleep } from 'lib/helper/utils';
+import testExampleStack from 'test/utils/example';
+import { PlayerLoginLog } from 'packages/Player/lib/models/login-log';
 
 export const testUserInfo = {
   username: 'admin10',
@@ -93,4 +95,24 @@ export function sendPostWithToken<T extends object = any>(
       ...headers,
     });
   };
+}
+
+/**
+ * 创建一条测试登录记录
+ */
+export async function createTestPlayerLoginLog(): Promise<PlayerLoginLog> {
+  const testUser = await getTestUser();
+  const testPlayerLoginLog = await PlayerLoginLog.create({
+    user_uuid: testUser.uuid,
+    type: 'token',
+    platform: 'test platform',
+    device_info: {},
+    ip: '127.0.0.1',
+    token: 'test_token',
+    is_success: true,
+  });
+
+  testExampleStack.append(testPlayerLoginLog);
+
+  return testPlayerLoginLog;
 }
