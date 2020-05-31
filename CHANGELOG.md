@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.22.0](https://github.com/TRPGEngine/Server/compare/v1.21.0...v1.22.0) (2020-05-31)
+
+
+### Features
+
+* **chat:** 增加消息类型强制转换的指令 ([5a3c16c](https://github.com/TRPGEngine/Server/commit/5a3c16c0debe7e6012456e81c9dbeb94744dcad9))
+* **lib:** 增加依赖图生成函数 ([94f39b4](https://github.com/TRPGEngine/Server/commit/94f39b4cc67d8b6951225e974a0e75b09e8284e1))
+* **music:** 增加音乐服务 ([5d1ac9c](https://github.com/TRPGEngine/Server/commit/5d1ac9cfafc684b55b165a634daad27f1d775a8c))
+* **player:** 增加接口获取用户登录历史 ([40982d4](https://github.com/TRPGEngine/Server/commit/40982d4244804f7d8ef79bb799b94371c44e2f33))
+* **player:** 增加注册路由 ([d8f965f](https://github.com/TRPGEngine/Server/commit/d8f965f64ad2a1d6e44bfe73bf45f855374ee46d))
+* **rtc:** add health check for rtc server ([67d18b2](https://github.com/TRPGEngine/Server/commit/67d18b2764cb5d8a5db5224504845cb898ba104f))
+
 ## [1.21.0](https://github.com/TRPGEngine/Server/compare/v1.20.0...v1.21.0) (2020-05-16)
 
 
