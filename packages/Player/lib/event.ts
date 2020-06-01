@@ -19,7 +19,7 @@ export const login: EventFunc<{
   const socket = this.socket;
 
   // if(app.player.list.find(socket)) {
-  //   throw '您已经登录，请先登出'
+  //   throw new Error('您已经登录，请先登出')
   // }
 
   const { username, password, platform, isApp } = data;
@@ -250,10 +250,10 @@ export const getInfo: EventFunc<{
         info: user.getInfo(),
       };
     } else {
-      throw '用户不存在';
+      throw new Error('用户不存在');
     }
   } else {
-    throw '未知的类型';
+    throw new Error('未知的类型');
   }
 };
 
@@ -263,7 +263,7 @@ export const updateInfo: EventFunc = async function updateInfo(data, cb, db) {
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const user = await PlayerUser.findByUUID(player.uuid);
@@ -282,7 +282,7 @@ export const changePassword: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const { oldPassword, newPassword } = data;
@@ -295,7 +295,7 @@ export const changePassword: EventFunc<{
     oldPassword
   );
   if (!user) {
-    throw '原密码不正确';
+    throw new Error('原密码不正确');
   }
 
   user.password = PlayerUser.genPassword(newPassword, user.salt); // 还是用原来的盐值
@@ -313,7 +313,7 @@ export const logout: EventFunc<{
   const { uuid, token, isApp = false } = data;
 
   if (!uuid || !token) {
-    throw '参数不全';
+    throw new Error('参数不全');
   }
 
   const where = { uuid };
@@ -326,7 +326,7 @@ export const logout: EventFunc<{
   const user = await PlayerUser.findOne({ where });
   if (!user) {
     debug('logout fail, try to logout %s', uuid);
-    throw 'TOKEN错误或过期';
+    throw new Error('TOKEN错误或过期');
   } else {
     debug('logout success!user %s has been logout', user.uuid);
     user.token = '';
@@ -353,7 +353,7 @@ export const findUser: EventFunc<{
 
   const { text, type } = data;
   if (!text || !type) {
-    throw '缺少参数';
+    throw new Error('缺少参数');
   }
 
   const User = db.models.player_user;
@@ -396,7 +396,7 @@ export const getFriends: EventFunc = async function getFriends(data, cb, db) {
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   const uuid = player.uuid;
@@ -413,14 +413,14 @@ export const sendFriendInvite: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   const from_uuid = player.uuid;
   const to_uuid = data.to;
 
   if (from_uuid === to_uuid) {
-    throw '不能请求成为自己的好友';
+    throw new Error('不能请求成为自己的好友');
   }
 
   const Invite = db.models.player_invite;
@@ -434,7 +434,7 @@ export const sendFriendInvite: EventFunc<{
   });
 
   if (!!inviteIsExist) {
-    throw '重复请求';
+    throw new Error('重复请求');
   }
 
   let invite = await Invite.create({ from_uuid, to_uuid });
@@ -459,7 +459,7 @@ export const refuseFriendInvite: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   const playerUUID = player.uuid;
@@ -471,7 +471,7 @@ export const refuseFriendInvite: EventFunc<{
     },
   });
   if (!invite) {
-    throw '没有找到该邀请';
+    throw new Error('没有找到该邀请');
   }
 
   invite.is_refuse = true;
@@ -499,7 +499,7 @@ export const agreeFriendInvite: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   const inviteUUID = data.uuid;
@@ -515,7 +515,7 @@ export const agreeFriendInvite: EventFunc<{
     },
   });
   if (!invite) {
-    throw '没有找到该好友申请';
+    throw new Error('没有找到该好友申请');
   }
 
   invite.is_agree = true;
@@ -555,7 +555,7 @@ export const getFriendsInvite: EventFunc = async function getFriendsInvite(
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   const uuid = player.uuid;
@@ -580,7 +580,7 @@ export const getFriendInviteDetail: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   const uuid = data.uuid;
@@ -605,7 +605,7 @@ export const checkUserOnline: EventFunc<{
 
   const uuid = data.uuid;
   if (!uuid) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
   const isOnline = await app.player.manager.checkPlayerOnline(uuid);
   return {
@@ -619,7 +619,7 @@ export const getSettings: EventFunc = async function getSettings(data, cb, db) {
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '当前用户不存在';
+    throw new Error('当前用户不存在');
   }
   let uuid = player.uuid;
 
@@ -652,7 +652,7 @@ export const saveSettings: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '当前用户不存在';
+    throw new Error('当前用户不存在');
   }
   let uuid = player.uuid;
 

@@ -35,7 +35,7 @@ function checkAdminPassword() {
       config.admin.map((item) => `${item.username}/${item.password}`).join(',')
     );
   } else {
-    throw '初始化失败。Dashboard账号未定义，需要相关配置';
+    throw new Error('初始化失败。Dashboard账号未定义，需要相关配置');
   }
 }
 

@@ -10,7 +10,7 @@ export default function avatarStorage(): TRPGMiddleware {
     const trpgapp = ctx.trpgapp;
     if (!ctx.player) {
       ctx.response.status = 403;
-      throw '用户未找到，请检查登录状态';
+      throw new Error('用户未找到，请检查登录状态');
     }
 
     const filename = _.get(ctx.req, 'file.filename');

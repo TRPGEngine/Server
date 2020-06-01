@@ -45,7 +45,7 @@ export const roll: EventFunc = async function roll(data, cb) {
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   let { is_group, to_uuid } = data;
@@ -115,7 +115,7 @@ export const acceptDiceRequest: EventFunc = async function acceptDiceRequest(
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   let msg_card_uuid = data.msg_card_uuid;
@@ -126,7 +126,7 @@ export const acceptDiceRequest: EventFunc = async function acceptDiceRequest(
     diceRequestMsgInfo.data.type === 'diceRequest'
   ) {
     if (diceRequestMsgInfo.data.is_accept === true) {
-      throw '该请求已同意';
+      throw new Error('该请求已同意');
     }
 
     // 接受权限检测
@@ -135,7 +135,7 @@ export const acceptDiceRequest: EventFunc = async function acceptDiceRequest(
       diceRequestMsgInfo.data.allow_accept_list &&
       diceRequestMsgInfo.data.allow_accept_list.indexOf(playerUUID) === -1
     ) {
-      throw '您没有同意请求的权限';
+      throw new Error('您没有同意请求的权限');
     }
 
     diceRequestMsgInfo.data.is_accept = true;
@@ -161,7 +161,7 @@ export const acceptDiceRequest: EventFunc = async function acceptDiceRequest(
     );
     return { log };
   } else {
-    throw '非法数据';
+    throw new Error('非法数据');
   }
 };
 
@@ -174,7 +174,7 @@ export const sendDiceInvite: EventFunc = async function sendDiceInvite(
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   let sender_uuid = player.uuid;
   let {
@@ -186,7 +186,7 @@ export const sendDiceInvite: EventFunc = async function sendDiceInvite(
     inviteNameList,
   } = data;
   if (!to_uuid || is_group === undefined || !dice_request) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
   if (!inviteNameList) {
     inviteNameList = [];
@@ -224,7 +224,7 @@ export const acceptDiceInvite: EventFunc = async function acceptDiceInvite(
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   let playerUUID = player.uuid;
@@ -239,7 +239,7 @@ export const acceptDiceInvite: EventFunc = async function acceptDiceInvite(
       diceInviteMsgInfo.data.is_accept_list &&
       diceInviteMsgInfo.data.is_accept_list.indexOf(playerUUID) >= 0
     ) {
-      throw '该请求已同意';
+      throw new Error('该请求已同意');
     }
 
     // 接受权限检测
@@ -247,7 +247,7 @@ export const acceptDiceInvite: EventFunc = async function acceptDiceInvite(
       diceInviteMsgInfo.data.allow_accept_list &&
       diceInviteMsgInfo.data.allow_accept_list.indexOf(playerUUID) === -1
     ) {
-      throw '您没有同意请求的权限';
+      throw new Error('您没有同意请求的权限');
     }
 
     diceInviteMsgInfo.data.is_accept_list.push(playerUUID);
@@ -273,7 +273,7 @@ export const acceptDiceInvite: EventFunc = async function acceptDiceInvite(
     );
     return { log };
   } else {
-    throw '非法数据';
+    throw new Error('非法数据');
   }
 };
 
@@ -287,13 +287,13 @@ export const sendQuickDice: EventFunc = async function sendQuickDice(
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   let sender_uuid = player.uuid;
   let { to_uuid, is_group, dice_request } = data;
   if (!to_uuid || is_group === undefined || !dice_request) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let pkg: any = {

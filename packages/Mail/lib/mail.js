@@ -39,7 +39,7 @@ function initFunction() {
     async sendAsync(userUUID, from, to, subject, html) {
       // 发送邮件
       if (!userUUID || !from || !to || !subject || !html) {
-        throw '邮件发送错误, 缺少参数';
+        throw new Error('邮件发送错误, 缺少参数');
       }
 
       let mailOptions = {

@@ -22,7 +22,7 @@ export const create: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '发生异常，无法获取到用户信息，请检查您的登录状态';
+    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
   }
   const userUUID = player.uuid;
 
@@ -67,12 +67,12 @@ export const getInfo: EventFunc<{
 }> = async function getInfo(data, cb, db) {
   const uuid = data.uuid;
   if (!uuid) {
-    throw '缺少参数';
+    throw new Error('缺少参数');
   }
 
   const group = await GroupGroup.findByUUID(uuid);
   if (!group) {
-    throw '没有找到该团';
+    throw new Error('没有找到该团');
   }
   return { group };
 };
@@ -98,12 +98,12 @@ export const updateInfo: EventFunc<{
   }
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const { groupUUID, groupInfo } = data;
   if (!groupUUID || !groupInfo) {
-    throw '缺少参数';
+    throw new Error('缺少参数');
   }
 
   const group = await GroupGroup.updateInfo(groupUUID, groupInfo, player.uuid);
@@ -120,12 +120,12 @@ export const findGroup: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const { text, type } = data;
   if (!text || !type) {
-    throw '缺少参数';
+    throw new Error('缺少参数');
   }
 
   return {
@@ -141,26 +141,26 @@ export const requestJoinGroup: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   let from_uuid = player.uuid;
   let { group_uuid } = data;
   if (!group_uuid) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let group = await db.models.group_group.findOne({
     where: { uuid: group_uuid },
   });
   if (!group) {
-    throw '该团不存在';
+    throw new Error('该团不存在');
   }
 
   // 检测该用户是否已加入团
   let groupMembers = await group.getMembers();
   if (groupMembers.indexOf(from_uuid) >= 0) {
-    throw '您已加入该团';
+    throw new Error('您已加入该团');
   }
 
   // 检测团加入申请是否存在
@@ -173,7 +173,7 @@ export const requestJoinGroup: EventFunc<{
     },
   });
   if (!!requestIsExist) {
-    throw '重复请求';
+    throw new Error('重复请求');
   }
 
   // 添加团邀请
@@ -218,29 +218,29 @@ export const agreeGroupRequest: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   let { request_uuid } = data;
   if (!request_uuid) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let request = await GroupRequest.findOne({
     where: { uuid: request_uuid },
   });
   if (!request) {
-    throw '找不到该入团申请';
+    throw new Error('找不到该入团申请');
   }
   if (request.is_agree === true) {
-    throw '已同意该请求';
+    throw new Error('已同意该请求');
   }
 
   const groupUUID = request.group_uuid;
   const fromUUID = request.from_uuid; // 请求入团的人的UUID
   const group = await GroupGroup.findByUUID(groupUUID);
   if (!group) {
-    throw '找不到该团';
+    throw new Error('找不到该团');
   }
 
   // 发送入团成功消息
@@ -284,19 +284,19 @@ export const refuseGroupRequest: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   let { request_uuid } = data;
   if (!request_uuid) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let request = await db.models.group_request.findOne({
     where: { uuid: request_uuid },
   });
   if (!request) {
-    throw '找不到该入团申请';
+    throw new Error('找不到该入团申请');
   }
   if (request.is_agree === true) {
     return true;
@@ -307,7 +307,7 @@ export const refuseGroupRequest: EventFunc<{
     where: { uuid: group_uuid },
   });
   if (!group) {
-    throw '找不到该团';
+    throw new Error('找不到该团');
   }
 
   await request.refuseAsync();
@@ -335,14 +335,14 @@ export const sendGroupInvite: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   let group_uuid = data.group_uuid;
   let from_uuid = player.uuid;
   let to_uuid = data.to_uuid;
   if (from_uuid === to_uuid) {
-    throw '你不能邀请自己';
+    throw new Error('你不能邀请自己');
   }
 
   // TODO: 待迁移成GroupInvite.createInvites方法
@@ -350,11 +350,11 @@ export const sendGroupInvite: EventFunc<{
     where: { uuid: group_uuid },
   });
   if (!group) {
-    throw '该团不存在';
+    throw new Error('该团不存在');
   }
 
   if (!group.isManagerOrOwner(from_uuid)) {
-    throw '抱歉您不是该团管理员没有邀请权限';
+    throw new Error('抱歉您不是该团管理员没有邀请权限');
   }
 
   let inviteIsExist = await db.models.group_invite.findOne({
@@ -367,7 +367,7 @@ export const sendGroupInvite: EventFunc<{
     },
   });
   if (inviteIsExist) {
-    throw '重复请求';
+    throw new Error('重复请求');
   }
 
   let invite = await db.models.group_invite.create({
@@ -406,7 +406,7 @@ export const sendGroupInviteBatch: EventFunc<{
   const { app, socket } = this;
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   const { group_uuid, target_uuids } = data;
@@ -450,14 +450,14 @@ export const refuseGroupInvite: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   let playerUUID = player.uuid;
   let inviteUUID = data.uuid;
 
   if (!inviteUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let invite = await db.models.group_invite.findOne({
@@ -468,7 +468,7 @@ export const refuseGroupInvite: EventFunc<{
   });
 
   if (!invite) {
-    throw '拒绝失败: 该请求不存在';
+    throw new Error('拒绝失败: 该请求不存在');
   }
 
   invite.is_refuse = true;
@@ -509,7 +509,7 @@ export const agreeGroupInvite: EventFunc<{
   const groupUUID = invite.group_uuid;
   const group = await GroupGroup.findByUUID(groupUUID);
   if (!group) {
-    throw '该团不存在';
+    throw new Error('该团不存在');
   }
 
   await db.transactionAsync(async () => {
@@ -534,7 +534,7 @@ export const getGroupInviteDetail: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   const { uuid } = data;
@@ -564,7 +564,7 @@ export const getGroupInvite: EventFunc<{}> = async function getGroupInvite(
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户状态异常';
+    throw new Error('用户状态异常');
   }
 
   let uuid = player.uuid;
@@ -592,7 +592,7 @@ export const getGroupList: EventFunc<{}> = async function getGroupList(
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const groups = await GroupGroup.getAllUserGroupList(player.uuid);
@@ -609,11 +609,11 @@ export const getGroupMembers: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   let groupUUID = data.groupUUID;
   if (!groupUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let group = await db.models.group_group.findOne({
@@ -636,12 +636,12 @@ export const getGroupActors: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   let groupUUID = data.groupUUID;
   if (!groupUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const groupActors = await GroupActor.getAllGroupActors(groupUUID);
@@ -660,7 +660,7 @@ export const getGroupActorMapping: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const selfUUID = player.uuid;
@@ -670,7 +670,7 @@ export const getGroupActorMapping: EventFunc<{
     where: { uuid: groupUUID },
   });
   if (!group) {
-    throw '找不到团信息';
+    throw new Error('找不到团信息');
   }
 
   const members = await group.getMembers();
@@ -708,7 +708,7 @@ export const addGroupActor: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const groupUUID = data.groupUUID;
@@ -727,25 +727,25 @@ export const removeGroupActor: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   let groupUUID = data.groupUUID;
   let groupActorUUID = data.groupActorUUID;
   if (!groupUUID || !groupActorUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let group = await db.models.group_group.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
-    throw '找不到团';
+    throw new Error('找不到团');
   }
 
   // 检测权限
   if (!group.isManagerOrOwner(player.uuid)) {
-    throw '权限不足';
+    throw new Error('权限不足');
   }
 
   let isGroupActorExist = await db.models.group_actor.findOne({
@@ -755,7 +755,7 @@ export const removeGroupActor: EventFunc<{
     },
   });
   if (!isGroupActorExist) {
-    throw '该角色不存在';
+    throw new Error('该角色不存在');
   }
 
   // 清空选择角色
@@ -790,7 +790,7 @@ export const agreeGroupActor: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const groupActorUUID = data.groupActorUUID;
@@ -815,7 +815,7 @@ export const refuseGroupActor: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const groupActorUUID = data.groupActorUUID;
@@ -837,14 +837,14 @@ export const updateGroupActorInfo: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const groupActorUUID = data.groupActorUUID;
   const groupActorInfo = data.groupActorInfo;
 
   if (!groupActorUUID || !groupActorInfo) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const groupActor = await GroupActor.editActorInfo(
@@ -865,14 +865,14 @@ export const setPlayerSelectedGroupActor: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const userUUID = player.uuid;
   const groupUUID = data.groupUUID;
   const groupActorUUID = data.groupActorUUID; // 可以为null 即取消选择
   if (!groupUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   await GroupActor.setPlayerSelectedGroupActor(
@@ -896,20 +896,20 @@ export const getPlayerSelectedGroupActor: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const groupUUID = data.groupUUID;
   const groupMemberUUID = data.groupMemberUUID;
   if (!groupUUID || !groupMemberUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const group = await db.models.group_group.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
-    throw '找不到团';
+    throw new Error('找不到团');
   }
 
   const selectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
@@ -934,11 +934,11 @@ export const quitGroup: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   let groupUUID = data.groupUUID;
   if (!groupUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   await GroupGroup.removeGroupMember(groupUUID, player.uuid).then(
@@ -966,21 +966,21 @@ export const dismissGroup: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   const groupUUID = data.groupUUID;
   if (!groupUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   const group: GroupGroup = await GroupGroup.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
-    throw '找不到团';
+    throw new Error('找不到团');
   }
   if (group.owner_uuid !== player.uuid) {
-    throw '你没有该权限';
+    throw new Error('你没有该权限');
   }
 
   // 系统通知
@@ -1009,15 +1009,15 @@ export const tickMember: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   const groupUUID = data.groupUUID;
   const memberUUID = data.memberUUID;
   if (!groupUUID || !memberUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
   if (player.uuid === memberUUID) {
-    throw '您不能踢出你自己';
+    throw new Error('您不能踢出你自己');
   }
 
   await GroupGroup.removeGroupMember(groupUUID, memberUUID, player.uuid).then(
@@ -1048,38 +1048,38 @@ export const setMemberToManager: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   let groupUUID = data.groupUUID;
   let memberUUID = data.memberUUID;
   if (!groupUUID || !memberUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
   if (player.uuid === memberUUID) {
-    throw '你不能将自己提升为管理员';
+    throw new Error('你不能将自己提升为管理员');
   }
   let group = await db.models.group_group.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
-    throw '找不到团';
+    throw new Error('找不到团');
   }
   let member = await db.models.player_user.findOne({
     where: { uuid: memberUUID },
   });
   if (!member) {
-    throw '找不到该成员';
+    throw new Error('找不到该成员');
   }
   if (group.owner_uuid !== player.uuid) {
     // 操作人不是管理
-    throw '您不是团的所有者';
+    throw new Error('您不是团的所有者');
   }
   if (group.managers_uuid.indexOf(memberUUID) >= 0) {
     // 操作人不是管理
-    throw '该成员已经是团管理员';
+    throw new Error('该成员已经是团管理员');
   }
   if (!(await group.hasMember(member))) {
-    throw '该团没有该成员';
+    throw new Error('该团没有该成员');
   }
   group.managers_uuid = [...group.managers_uuid, memberUUID];
   let res = await group.save();
@@ -1111,7 +1111,7 @@ export const getGroupStatus: EventFunc<{
 
   let { groupUUID } = data;
   if (!groupUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
   let groupStatus = await app.cache.get(`component:group:${groupUUID}:status`);
   return { status: Boolean(groupStatus) };
@@ -1127,23 +1127,23 @@ export const setGroupStatus: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   let uuid = player.uuid;
   let { groupUUID, groupStatus } = data;
   groupStatus = Boolean(groupStatus);
   if (!groupUUID || groupStatus === undefined) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let group = await db.models.group_group.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
-    throw '没有找到该团';
+    throw new Error('没有找到该团');
   }
   if (!group.isManagerOrOwner(uuid)) {
-    throw '没有修改团状态的权限';
+    throw new Error('没有修改团状态的权限');
   }
 
   app.cache.set(`group:${groupUUID}:status`, groupStatus);
@@ -1166,7 +1166,7 @@ export const saveGroupDetail: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const { groupUUID, detailData } = data;
@@ -1188,7 +1188,7 @@ export const createGroupChannel: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const { groupUUID, name, desc } = data;
@@ -1220,7 +1220,7 @@ export const addGroupChannelMember: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const { channelUUID, memberUUIDs } = data;
@@ -1244,7 +1244,7 @@ export const removeGroupChannelMember: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const { channelUUID, memberUUIDs } = data;
