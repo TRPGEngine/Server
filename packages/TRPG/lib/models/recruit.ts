@@ -32,6 +32,18 @@ export class TRPGRecruit extends Model {
   static EDITABLE_FIELD = ['title', 'content'] as const; // 用户更新时可编辑字段
 
   /**
+   * 获取没有完成的招募列表
+   */
+  static async getTRPGRecruitList(): Promise<TRPGRecruit[]> {
+    return TRPGRecruit.findAll({
+      where: {
+        completed: false,
+      },
+      order: [['updatedAt', 'DESC']],
+    });
+  }
+
+  /**
    * 获取招募的Feed
    * 缓存优先
    */
@@ -44,12 +56,7 @@ export class TRPGRecruit extends Model {
       return String(data);
     }
 
-    const recruits: TRPGRecruit[] = await TRPGRecruit.findAll({
-      where: {
-        completed: false,
-      },
-      order: [['updatedAt', 'DESC']],
-    });
+    const recruits: TRPGRecruit[] = await TRPGRecruit.getTRPGRecruitList();
 
     const feed = new Feed({
       id: trpgapp.get('apihost'),
