@@ -51,7 +51,7 @@ describe('dependency-helper', () => {
         ['a', 'b', 'e'],
         ['a', 'b', 'd', 'e'],
       ],
-    ])('%s => %s', (loadNames, expectGraph) => {
+    ])('%#: %s => %s', (loadNames, expectGraph) => {
       test('normal load', () => {
         const graph = getPackageDependsGraph(loadNames, allPackages);
         expect(graph).toMatchObject(expectGraph);

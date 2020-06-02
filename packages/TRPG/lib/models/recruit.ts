@@ -10,11 +10,17 @@ declare module 'packages/Player/lib/models/user' {
   }
 }
 
+export type PlatformType = 'trpgengine' | 'qq' | 'other';
+export type ContactType = 'user' | 'group';
+
 export class TRPGRecruit extends Model {
   uuid: string;
   title: string;
   content: string;
   author: string;
+  platform: PlatformType;
+  contact_type: ContactType;
+  contact_content: string;
   completed: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -78,7 +84,10 @@ export class TRPGRecruit extends Model {
   static async createTRPGRecruit(
     playerUUID: string,
     title: string,
-    content: string
+    content: string,
+    platform?: PlatformType,
+    contact_type?: ContactType,
+    contact_content?: string
   ): Promise<TRPGRecruit> {
     const player = await PlayerUser.findByUUID(playerUUID);
     if (_.isNil(player)) {
@@ -101,6 +110,9 @@ export class TRPGRecruit extends Model {
       title,
       author: player.getName(),
       content,
+      platform,
+      contact_type,
+      contact_content,
       completed: false,
       ownerId: player.id,
     });
@@ -175,6 +187,15 @@ export default function TRPGRecruitDefinition(Sequelize: Orm, db: DBInstance) {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       title: { type: Sequelize.STRING, allowNull: false },
       author: { type: Sequelize.STRING, allowNull: false },
+      platform: {
+        type: Sequelize.ENUM('trpgengine', 'qq', 'other'),
+        defaultValue: 'other',
+      },
+      contact_type: {
+        type: Sequelize.ENUM('user', 'group'),
+        defaultValue: 'user',
+      },
+      contact_content: { type: Sequelize.STRING },
       content: { type: Sequelize.TEXT, allowNull: false },
       completed: { type: Sequelize.BOOLEAN, defaultValue: false },
     },
