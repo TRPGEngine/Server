@@ -6,7 +6,6 @@ import { TRPGApplication } from '../types/app';
 import { DBInstance } from './storage';
 const logger = getLogger();
 const appLogger = getLogger('application');
-const packageInfo = require('../../../package.json');
 import _ from 'lodash';
 
 export type MiddlewareFn = (socket: IO.Socket, fn: (err?: any) => void) => void;
@@ -118,10 +117,6 @@ export default class SocketService {
         );
         // socket.iosession.destroy(); // 离线时移除之前的iosession // TODO: 需要放在外面
         app.emit('disconnect', socket);
-      });
-      socket.on('hello', (data, cb) => {
-        var res = { data, version: packageInfo.version };
-        _.isFunction(cb) && cb(res);
       });
 
       app.emit('connection', socket);

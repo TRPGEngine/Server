@@ -9,7 +9,7 @@ const debug = Debug('trpg:component:internal');
 import CoreRouter from './routers/core';
 import MetricsRouter from './routers/metrics';
 import GraphQLRouter from './routers/graphql';
-import { getGlobalConfig } from './event';
+import { getGlobalConfig, health } from './event';
 
 const SOCKET_PREFIX = 'metrics:socket:event:';
 const WEBSERVICE_PREFIX = 'metrics:webservice:route:';
@@ -34,6 +34,7 @@ export default class Core extends BasePackage {
     this.regRoute(MetricsRouter);
     this.regRoute(GraphQLRouter);
 
+    this.regSocketEvent('health', health);
     this.regSocketEvent('getGlobalConfig', getGlobalConfig);
 
     // 每小时执行一次收集事件调用时间
