@@ -142,7 +142,8 @@ export default class SocketService {
         }
 
         const wrap = this; // 此处的this是指 injectCustomEvents 方法分配的this
-        const app = wrap.app;
+        const app: TRPGApplication = wrap.app;
+        const socket: Socket = wrap.socket;
         const db = app.storage.db;
         try {
           const ret = await eventFn.call(this, data, cb, db);
@@ -179,7 +180,14 @@ export default class SocketService {
                 4
               )}`;
             }
-            app.reportservice.reportError(err); // 使用汇报服务汇报错误
+
+            // 使用汇报服务汇报错误
+            app.reportservice.reportErrorWithContext(err, {
+              socketId: socket.id,
+              eventName,
+              received: data,
+              errorMsg,
+            });
           } else {
             applog(
               'unhandled error msg return on %s, received %o',
