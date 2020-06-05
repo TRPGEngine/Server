@@ -1,5 +1,7 @@
 import * as Sentry from '@sentry/node';
 import { getLogger } from './logger';
+import { TRPGApplication } from '../types/app';
+import { NoReportError } from 'lib/error';
 const logger = getLogger();
 const appLogger = getLogger('application');
 
@@ -22,10 +24,14 @@ class ReportService {
   private _setting: ReportConfig;
   installed = false;
 
-  constructor(reportSetting: ReportConfig) {
-    this._setting = Object.assign({}, defaultConfig, reportSetting);
+  constructor(app: TRPGApplication) {
+    this._setting = Object.assign({}, defaultConfig, app.get('report'));
     if (this._setting.sentry) {
-      Sentry.init({ dsn: this._setting.sentry });
+      Sentry.init({ dsn: this._setting.sentry, environment: app.get('env') });
+      Sentry.setTags({
+        apihost: app.get('apihost'),
+        fileStorage: app.get('file.storage'),
+      });
       this.installed = true;
     }
   }
@@ -49,6 +55,11 @@ class ReportService {
     }
 
     if (this.installed) {
+      if (err instanceof NoReportError) {
+        // 如果是不上报的错误，则跳过
+        return;
+      }
+
       let errorFn;
       if (typeof err === 'string') {
         // 如果不是一个错误类型的。提交错误文本信息到sentry

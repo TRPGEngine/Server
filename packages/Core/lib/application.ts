@@ -87,7 +87,7 @@ export class Application extends events.EventEmitter {
 
   initReportService() {
     try {
-      this.reportservice = new ReportService(this.get('report'));
+      this.reportservice = new ReportService(this);
       applog('create report service success!');
     } catch (err) {
       console.error('create report error:');
@@ -463,7 +463,11 @@ export class Application extends events.EventEmitter {
     return this;
   }
 
-  // 支持get('xxx.xxx')获取
+  /**
+   * 支持get('xxx.xxx')获取
+   * @param path 路径
+   * @param defaultValue 默认值, 默认为''
+   */
   get<T = string | number | any>(path: string, defaultValue: any = ''): T {
     return _.get<any, any, T>(this.settings, path, defaultValue);
   }
