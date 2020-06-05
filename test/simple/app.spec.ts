@@ -27,10 +27,8 @@ describe('app context', () => {
   });
 
   test('context.emitEvent should be ok', async () => {
-    const ret = await context.emitEvent('hello');
-    expect(ret).toMatchObject({
-      data: null,
-    });
+    const ret = await context.emitEvent('core::health');
+    expect(ret).toHaveProperty('data');
     expect(ret).toHaveProperty('version');
     expect(typeof ret.version).toBe('string');
   });
