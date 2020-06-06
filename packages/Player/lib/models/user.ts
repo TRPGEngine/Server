@@ -7,6 +7,7 @@ import _ from 'lodash';
 import { fn, col } from 'sequelize';
 import { PlayerJWTPayload } from 'packages/Player/types/player';
 import Debug from 'debug';
+import { NoReportError } from 'lib/error';
 const debug = Debug('trpg:component:player:model');
 
 // 阵营九宫格
@@ -158,7 +159,7 @@ export class PlayerUser extends Model {
     password: string
   ): Promise<PlayerUser> {
     if (username.length > 18) {
-      throw new Error('注册失败!用户名过长');
+      throw new NoReportError('注册失败!用户名过长');
     }
 
     const user = await PlayerUser.findOne({
@@ -167,7 +168,7 @@ export class PlayerUser extends Model {
     });
     if (!!user) {
       debug(`register failed!user ${user.username} has been existed`);
-      throw new Error('用户名已存在');
+      throw new NoReportError('用户名已存在');
     }
 
     const salt = PlayerUser.genSalt();

@@ -10,6 +10,7 @@ import { GroupRequest } from './models/request';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 import { GroupDetail } from './models/detail';
 import { GroupChannel } from './models/channel';
+import { NoReportError } from 'lib/error';
 
 export const create: EventFunc<{
   name: string;
@@ -28,14 +29,14 @@ export const create: EventFunc<{
 
   const { name, sub_name, desc, avatar } = data;
   if (!name) {
-    throw new Error('缺少团名');
+    throw new NoReportError('缺少团名');
   }
 
   const isExist = await GroupGroup.findOne({
     where: { name },
   });
   if (!!isExist) {
-    throw new Error('该团名已存在');
+    throw new NoReportError('该团名已存在');
   }
 
   const user = await PlayerUser.findByUUID(userUUID);
@@ -160,7 +161,7 @@ export const requestJoinGroup: EventFunc<{
   // 检测该用户是否已加入团
   let groupMembers = await group.getMembers();
   if (groupMembers.indexOf(from_uuid) >= 0) {
-    throw new Error('您已加入该团');
+    throw new NoReportError('您已加入该团');
   }
 
   // 检测团加入申请是否存在

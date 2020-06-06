@@ -36,6 +36,16 @@ class ReportService {
     }
   }
 
+  /**
+   * 增加操作面包屑
+   * @param breadcrumb 面包屑
+   */
+  addBreadcrumb(breadcrumb: Sentry.Breadcrumb) {
+    if (this.installed) {
+      Sentry.addBreadcrumb(breadcrumb);
+    }
+  }
+
   reportError(err: ReportErrorType, options = null) {
     console.error(err); // 在终端里输出一遍
 
