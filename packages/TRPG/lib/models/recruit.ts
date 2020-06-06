@@ -3,6 +3,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import { Feed } from 'feed';
 import _ from 'lodash';
 import moment from 'moment';
+import { NoReportError } from 'lib/error';
 
 declare module 'packages/Player/lib/models/user' {
   interface PlayerUser {
@@ -96,6 +97,10 @@ export class TRPGRecruit extends Model {
     contact_type?: ContactType,
     contact_content?: string
   ): Promise<TRPGRecruit> {
+    if (_.isNil(playerUUID) || _.isEmpty(title) || _.isEmpty(content)) {
+      throw new Error('缺少必要字段');
+    }
+
     const player = await PlayerUser.findByUUID(playerUUID);
     if (_.isNil(player)) {
       throw new Error('用户不存在');
@@ -110,7 +115,7 @@ export class TRPGRecruit extends Model {
       moment().diff(moment(prevRecruit.createdAt), 'days', true) < 1
     ) {
       // 上一条招募请求在一天内
-      throw new Error('不能在1天内发布多条招募信息');
+      throw new NoReportError('不能在1天内发布多条招募信息');
     }
 
     const recruit = await TRPGRecruit.create({

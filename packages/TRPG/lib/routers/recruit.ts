@@ -23,12 +23,21 @@ recruitRouter.get('/recruit/list', async (ctx) => {
 
 recruitRouter.post('/recruit/create', ssoAuth(), async (ctx) => {
   const playerUUID = ctx.state.player.uuid;
-  const { title, content } = ctx.request.body;
+  const {
+    title,
+    content,
+    platform,
+    contactType,
+    contactContent,
+  } = ctx.request.body;
 
   const recruit = await TRPGRecruit.createTRPGRecruit(
     playerUUID,
     title,
-    content
+    content,
+    platform,
+    contactType,
+    contactContent
   );
 
   ctx.body = { recruit };
