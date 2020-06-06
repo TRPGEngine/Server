@@ -86,6 +86,7 @@ class ReportService {
 
   reportErrorWithContext(err: ReportErrorType, context = {}) {
     if (!this.installed) {
+      console.error(err); // 如果未开启则在终端里输出一遍
       return;
     }
 
