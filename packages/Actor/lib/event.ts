@@ -14,7 +14,7 @@ export const getTemplate: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const uuid = data.uuid;
@@ -113,7 +113,7 @@ export const updateTemplate: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const uuid = data.uuid;
@@ -131,7 +131,7 @@ export const updateTemplate: EventFunc<{
   });
   const user = await PlayerUser.findByUUID(player.uuid);
   if (template.creatorId !== user.id) {
-    throw '您不是该模板的所有者，无法修改模板';
+    throw new Error('您不是该模板的所有者，无法修改模板');
   }
   if (name) {
     template.name = name;
@@ -158,7 +158,7 @@ export const removeTemplate: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const uuid = data.uuid;
@@ -170,7 +170,7 @@ export const removeTemplate: EventFunc<{
     },
   });
   if (!template) {
-    throw '删除失败，找不到该模板';
+    throw new Error('删除失败，找不到该模板');
   }
   await template.destroy();
   return true;
@@ -188,7 +188,7 @@ export const createActor: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const name = data.name;
@@ -197,7 +197,7 @@ export const createActor: EventFunc<{
   const info = data.info || {};
   const template_uuid = data.template_uuid;
   if (!name) {
-    throw '人物名不能为空';
+    throw new Error('人物名不能为空');
   }
 
   let actor = null;
@@ -240,7 +240,7 @@ export const getActor: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
 
   const uuid = data.uuid;
@@ -267,11 +267,11 @@ export const removeActor: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   const uuid = data.uuid;
   if (!uuid) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   await ActorActor.remove(uuid, player.uuid);
@@ -291,7 +291,7 @@ export const updateActor: EventFunc<{
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '用户不存在，请检查登录状态';
+    throw new Error('用户不存在，请检查登录状态');
   }
   const user = await PlayerUser.findByUUID(player.uuid);
   const userId = user.id;
@@ -302,10 +302,10 @@ export const updateActor: EventFunc<{
   const desc = data.desc;
   const info = data.info || {};
   if (!uuid) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
   if (!name) {
-    throw '人物名不能为空';
+    throw new Error('人物名不能为空');
   }
 
   return await db.transactionAsync(async () => {

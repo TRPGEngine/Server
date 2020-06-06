@@ -3184,6 +3184,24 @@
                     "field": "author",
                     "seqType": "Sequelize.STRING"
                 },
+                "platform": {
+                    "defaultValue": {
+                        "value": "other"
+                    },
+                    "field": "platform",
+                    "seqType": "Sequelize.ENUM('trpgengine', 'qq', 'other')"
+                },
+                "contact_type": {
+                    "defaultValue": {
+                        "value": "user"
+                    },
+                    "field": "contact_type",
+                    "seqType": "Sequelize.ENUM('user', 'group')"
+                },
+                "contact_content": {
+                    "field": "contact_content",
+                    "seqType": "Sequelize.STRING"
+                },
                 "content": {
                     "allowNull": false,
                     "field": "content",
@@ -3221,5 +3239,5 @@
             "indexes": []
         }
     },
-    "revision": 50
+    "revision": 51
 }

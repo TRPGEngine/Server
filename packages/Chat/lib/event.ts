@@ -41,12 +41,12 @@ export const getUserChatLog: EventFunc = async function getUserChatLog(
   let limit = data.limit || 10;
 
   if (!userUUID) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '尚未登录';
+    throw new Error('尚未登录');
   }
   let selfUUID = player.uuid;
   // IDEA: 定义: 获取用户间会话记录时无视掉自身发送的tip类型信息
@@ -123,12 +123,12 @@ export const getConverseChatLog: EventFunc = async function getConverseChatLog(
   let offsetDate = data.offsetDate || '';
   let limit = data.limit || 10;
   if (!converse_uuid) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '尚未登录';
+    throw new Error('尚未登录');
   }
   let selfUUID = player.uuid;
 
@@ -195,7 +195,7 @@ export const getAllUserConverse: EventFunc = async function getAllUserConverse(
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '尚未登录';
+    throw new Error('尚未登录');
   }
 
   let senders = [];
@@ -257,12 +257,12 @@ export const getOfflineUserConverse: EventFunc = async function getOfflineUserCo
   const Op = app.storage.Op;
   let lastLoginDate = data.lastLoginDate;
   if (!lastLoginDate) {
-    throw '缺少必要参数';
+    throw new Error('缺少必要参数');
   }
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '尚未登录';
+    throw new Error('尚未登录');
   }
   let senders = [];
 
@@ -411,12 +411,12 @@ export const removeConverse: EventFunc = async function removeConverse(
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '发生异常，无法获取到用户信息，请检查您的登录状态';
+    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
   }
   const user = await PlayerUser.findByUUID(player.uuid);
   let converse_uuid = data.converseUUID;
   if (!converse_uuid) {
-    throw '缺少必要字段';
+    throw new Error('缺少必要字段');
   }
 
   let converse = await db.models.chat_converse.findOne({
@@ -426,7 +426,7 @@ export const removeConverse: EventFunc = async function removeConverse(
     },
   });
   if (!converse) {
-    throw '该会话不存在';
+    throw new Error('该会话不存在');
   }
 
   await converse.destroy();
@@ -450,7 +450,7 @@ export const getConverses: EventFunc = async function getConverses(
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '发生异常，无法获取到用户信息，请检查您的登录状态';
+    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
   }
   let user = await db.models.player_user.findOne({
     where: { uuid: player.uuid },
@@ -473,7 +473,7 @@ export const updateCardChatData: EventFunc = async function updateCardChatData(
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '发生异常，无法获取到用户信息，请检查您的登录状态';
+    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
   }
 
   const { chatUUID, newData } = data;
@@ -506,7 +506,7 @@ export const updateCardChatData: EventFunc = async function updateCardChatData(
   });
 
   if (!log) {
-    throw '找不到该条系统信息';
+    throw new Error('找不到该条系统信息');
   }
 
   log.data = Object.assign({}, log.data, newData);
@@ -526,7 +526,7 @@ export const startWriting: EventFunc = async function startWriting(
   const socket = this.socket;
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '发生异常，无法获取到用户信息，请检查您的登录状态';
+    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
   }
 
   const { type = 'user', uuid, currentText } = data;
@@ -559,7 +559,7 @@ export const stopWriting: EventFunc = async function stopWriting(data, cb, db) {
   const socket = this.socket;
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw '发生异常，无法获取到用户信息，请检查您的登录状态';
+    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
   }
 
   const { type = 'user', uuid } = data;

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.23.0](https://github.com/TRPGEngine/Server/compare/v1.22.0...v1.23.0) (2020-06-06)
+
+
+### Features
+
+* **trpg:** 增加招募列表的路由 ([a14ba16](https://github.com/TRPGEngine/Server/commit/a14ba16916deec6fc382a0786b92d4c7d6e58239))
+
 ## [1.22.0](https://github.com/TRPGEngine/Server/compare/v1.21.0...v1.22.0) (2020-05-31)
 
 

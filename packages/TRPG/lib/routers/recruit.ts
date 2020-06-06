@@ -15,6 +15,12 @@ recruitRouter.get('/recruit/feed', async (ctx) => {
   ctx.type = 'application/rss+xml';
 });
 
+recruitRouter.get('/recruit/list', async (ctx) => {
+  const list = await TRPGRecruit.getTRPGRecruitList();
+
+  ctx.body = list;
+});
+
 recruitRouter.post('/recruit/create', ssoAuth(), async (ctx) => {
   const playerUUID = ctx.state.player.uuid;
   const { title, content } = ctx.request.body;

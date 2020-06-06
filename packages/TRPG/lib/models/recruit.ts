@@ -10,11 +10,17 @@ declare module 'packages/Player/lib/models/user' {
   }
 }
 
+export type PlatformType = 'trpgengine' | 'qq' | 'other';
+export type ContactType = 'user' | 'group';
+
 export class TRPGRecruit extends Model {
   uuid: string;
   title: string;
   content: string;
   author: string;
+  platform: PlatformType;
+  contact_type: ContactType;
+  contact_content: string;
   completed: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -24,6 +30,18 @@ export class TRPGRecruit extends Model {
   static FEED_CACHE_KEY = 'trpg:recruit:feed';
   static CACHE_EXPIRE = 30 * 60 * 1000; // 30分钟 缓存过期时间
   static EDITABLE_FIELD = ['title', 'content'] as const; // 用户更新时可编辑字段
+
+  /**
+   * 获取没有完成的招募列表
+   */
+  static async getTRPGRecruitList(): Promise<TRPGRecruit[]> {
+    return TRPGRecruit.findAll({
+      where: {
+        completed: false,
+      },
+      order: [['updatedAt', 'DESC']],
+    });
+  }
 
   /**
    * 获取招募的Feed
@@ -38,12 +56,7 @@ export class TRPGRecruit extends Model {
       return String(data);
     }
 
-    const recruits: TRPGRecruit[] = await TRPGRecruit.findAll({
-      where: {
-        completed: false,
-      },
-      order: [['updatedAt', 'DESC']],
-    });
+    const recruits: TRPGRecruit[] = await TRPGRecruit.getTRPGRecruitList();
 
     const feed = new Feed({
       id: trpgapp.get('apihost'),
@@ -78,7 +91,10 @@ export class TRPGRecruit extends Model {
   static async createTRPGRecruit(
     playerUUID: string,
     title: string,
-    content: string
+    content: string,
+    platform?: PlatformType,
+    contact_type?: ContactType,
+    contact_content?: string
   ): Promise<TRPGRecruit> {
     const player = await PlayerUser.findByUUID(playerUUID);
     if (_.isNil(player)) {
@@ -101,6 +117,9 @@ export class TRPGRecruit extends Model {
       title,
       author: player.getName(),
       content,
+      platform,
+      contact_type,
+      contact_content,
       completed: false,
       ownerId: player.id,
     });
@@ -175,6 +194,15 @@ export default function TRPGRecruitDefinition(Sequelize: Orm, db: DBInstance) {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       title: { type: Sequelize.STRING, allowNull: false },
       author: { type: Sequelize.STRING, allowNull: false },
+      platform: {
+        type: Sequelize.ENUM('trpgengine', 'qq', 'other'),
+        defaultValue: 'other',
+      },
+      contact_type: {
+        type: Sequelize.ENUM('user', 'group'),
+        defaultValue: 'user',
+      },
+      contact_content: { type: Sequelize.STRING },
       content: { type: Sequelize.TEXT, allowNull: false },
       completed: { type: Sequelize.BOOLEAN, defaultValue: false },
     },

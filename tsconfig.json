@@ -9,6 +9,7 @@
     "allowJs": true,
     "sourceMap": true,
     "experimentalDecorators": true,
+    "resolveJsonModule": true,
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {
