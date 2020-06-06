@@ -100,7 +100,7 @@ const siteConfig = {
               href: 'https://trpg.moonrailgun.com',
             },
             {
-              label: 'TRPGEngine博客',
+              label: 'TRPG Engine 博客',
               to: 'blog',
             },
             {
