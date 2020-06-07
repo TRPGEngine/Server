@@ -18,7 +18,7 @@ recruitRouter.get('/recruit/feed', async (ctx) => {
 recruitRouter.get('/recruit/list', async (ctx) => {
   const list = await TRPGRecruit.getTRPGRecruitList();
 
-  ctx.body = list;
+  ctx.body = { list };
 });
 
 recruitRouter.post('/recruit/create', ssoAuth(), async (ctx) => {
