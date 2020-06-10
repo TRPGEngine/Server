@@ -6,7 +6,7 @@ services:
     ports:
       - 21312:9000
     volumes:
-      - ./coolq-data:/home/user/coolq;
+      - ./coolq-data:/home/user/coolq
     environment:
       - VNC_PASSWD
       - COOLQ_ACCOUNT
