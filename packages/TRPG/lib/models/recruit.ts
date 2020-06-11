@@ -120,14 +120,15 @@ export class TRPGRecruit extends Model {
       throw new Error('缺少必要字段');
     }
 
-    const player = await PlayerUser.findByUUID(playerUUID);
-    if (_.isNil(player)) {
+    const user = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(user)) {
       throw new Error('用户不存在');
     }
 
     // 获取上一条招募信息
-    const prevRecruit = await TRPGRecruit.findOne({
+    const [prevRecruit] = await user.getRecruits({
       order: [['updatedAt', 'DESC']],
+      limit: 1,
     });
     if (
       !_.isNil(prevRecruit) &&
@@ -139,13 +140,13 @@ export class TRPGRecruit extends Model {
 
     const recruit = await TRPGRecruit.create({
       title,
-      author: player.getName(),
+      author: user.getName(),
       content,
       platform,
       contact_type,
       contact_content,
       completed: false,
-      ownerId: player.id,
+      ownerId: user.id,
     });
 
     // 清空缓存
