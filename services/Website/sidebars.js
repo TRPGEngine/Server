@@ -2,7 +2,7 @@ const wiki = require('./docs/wiki/_list.json');
 
 module.exports = {
   docs: {
-    开始: ['introduce', 'chat-interceptor', 'shortcuts'],
+    开始: ['introduce', 'chat-interceptor', 'shortcuts', 'recruit'],
     人物: [
       'actor/actor1',
       'actor/actor2',
