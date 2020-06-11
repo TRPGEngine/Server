@@ -93,6 +93,16 @@ const siteConfig = {
           ],
         },
         {
+          title: '沟通',
+          items: [
+            {
+              label: 'QQ群: 387587760',
+              href:
+                '//shang.qq.com/wpa/qunwpa?idkey=7be5cfe70436a65c965ae9c86d9e6cfc36c16258634a42897724dce026accf3d',
+            },
+          ],
+        },
+        {
           title: '更多',
           items: [
             {
