@@ -15,6 +15,7 @@ export type PlatformType = 'trpgengine' | 'qq' | 'other';
 export type ContactType = 'user' | 'group';
 
 export class TRPGRecruit extends Model {
+  id: number;
   uuid: string;
   title: string;
   content: string;
@@ -42,6 +43,24 @@ export class TRPGRecruit extends Model {
       },
       order: [['updatedAt', 'DESC']],
     });
+  }
+
+  /**
+   * 所有的用户招募
+   */
+  static async getAllUserRecruitList(
+    playerUUID: string
+  ): Promise<TRPGRecruit[]> {
+    const user = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(user)) {
+      throw new Error('用户不存在');
+    }
+
+    const recruits = await user.getRecruits({
+      order: [['updatedAt', 'DESC']],
+    });
+
+    return recruits;
   }
 
   /**
