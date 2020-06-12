@@ -158,6 +158,14 @@ export class PlayerUser extends Model {
     username: string,
     password: string
   ): Promise<PlayerUser> {
+    if (_.isNil(username)) {
+      throw new NoReportError('用户名不能为空');
+    }
+
+    if (_.isNil(password)) {
+      throw new NoReportError('密码不能为空');
+    }
+
     if (username.length > 18) {
       throw new NoReportError('注册失败!用户名过长');
     }
