@@ -7,3 +7,6 @@
 [submodule "services/file-preview/kkFileView"]
 	path = services/file-preview/kkFileView
 	url = https://github.com/kekingcn/kkFileView.git
+[submodule "services/tencent/coolq/plugins/coolq-rsspushbot"]
+	path = services/tencent/coolq/plugins/coolq-rsspushbot
+	url = https://github.com/zu1k/coolq-rsspushbot.git
