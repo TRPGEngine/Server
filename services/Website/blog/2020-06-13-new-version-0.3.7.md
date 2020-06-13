@@ -16,6 +16,8 @@ tags: [版本发布]
 
 <!--truncate-->
 
+## 其他
+
 - 升级了报错收集服务
 - 重构了portal的注册登录系统
 - 增加了FastForm
