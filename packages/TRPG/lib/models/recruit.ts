@@ -3,6 +3,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import { Feed } from 'feed';
 import _ from 'lodash';
 import moment from 'moment';
+import { NoReportError } from 'lib/error';
 
 declare module 'packages/Player/lib/models/user' {
   interface PlayerUser {
@@ -14,6 +15,7 @@ export type PlatformType = 'trpgengine' | 'qq' | 'other';
 export type ContactType = 'user' | 'group';
 
 export class TRPGRecruit extends Model {
+  id: number;
   uuid: string;
   title: string;
   content: string;
@@ -41,6 +43,24 @@ export class TRPGRecruit extends Model {
       },
       order: [['updatedAt', 'DESC']],
     });
+  }
+
+  /**
+   * 所有的用户招募
+   */
+  static async getAllUserRecruitList(
+    playerUUID: string
+  ): Promise<TRPGRecruit[]> {
+    const user = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(user)) {
+      throw new Error('用户不存在');
+    }
+
+    const recruits = await user.getRecruits({
+      order: [['updatedAt', 'DESC']],
+    });
+
+    return recruits;
   }
 
   /**
@@ -96,32 +116,37 @@ export class TRPGRecruit extends Model {
     contact_type?: ContactType,
     contact_content?: string
   ): Promise<TRPGRecruit> {
-    const player = await PlayerUser.findByUUID(playerUUID);
-    if (_.isNil(player)) {
+    if (_.isNil(playerUUID) || _.isEmpty(title) || _.isEmpty(content)) {
+      throw new Error('缺少必要字段');
+    }
+
+    const user = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(user)) {
       throw new Error('用户不存在');
     }
 
     // 获取上一条招募信息
-    const prevRecruit = await TRPGRecruit.findOne({
+    const [prevRecruit] = await user.getRecruits({
       order: [['updatedAt', 'DESC']],
+      limit: 1,
     });
     if (
       !_.isNil(prevRecruit) &&
       moment().diff(moment(prevRecruit.createdAt), 'days', true) < 1
     ) {
       // 上一条招募请求在一天内
-      throw new Error('不能在1天内发布多条招募信息');
+      throw new NoReportError('不能在1天内发布多条招募信息');
     }
 
     const recruit = await TRPGRecruit.create({
       title,
-      author: player.getName(),
+      author: user.getName(),
       content,
       platform,
       contact_type,
       contact_content,
       completed: false,
-      ownerId: player.id,
+      ownerId: user.id,
     });
 
     // 清空缓存

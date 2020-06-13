@@ -77,17 +77,27 @@ function HomeSplash(props) {
             )}
             to="https://trpg.moonrailgun.com"
           >
-            网页版
+            立即体验
           </Link>
           {/* <Button href={useBaseUrl('/download')}>下载桌面版</Button> */}
           <Link
             className={classnames(
-              'button button--outline button--primary button--lg',
+              'button button--outline button--primary button--lg margin-right--sm',
               styles.getStarted
             )}
             to="https://trpg.moonrailgun.com/portal/deploy"
           >
             下载移动版
+          </Link>
+
+          <Link
+            className={classnames(
+              'button button--primary button--lg',
+              styles.getStarted
+            )}
+            to="https://trpg.moonrailgun.com/portal/trpg/recruit/list"
+          >
+            自由招募
           </Link>
         </div>
       </div>

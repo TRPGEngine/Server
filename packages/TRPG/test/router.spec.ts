@@ -5,8 +5,10 @@ import {
 } from 'packages/Player/test/example';
 import { TRPGRecruit } from '../lib/models/recruit';
 import { createTestRecruit } from './example';
+import testExampleStack from 'test/utils/example';
 
 const context = buildAppContext();
+testExampleStack.regAfterAll();
 
 describe('recruit', () => {
   test('/trpg/recruit/create', async () => {
@@ -68,11 +70,11 @@ describe('recruit', () => {
     expect(body.recruit.content).toBe('new content');
   });
 
-  test('/trpg/recruit/:uuid/completed', async () => {
+  test('/trpg/recruit/:uuid/complete', async () => {
     const testPlayer = await getOtherTestUser('admin7');
     const testRecruit = await createTestRecruit(testPlayer.id);
     const { body } = await sendPostWithToken(context, 'admin7')(
-      `/trpg/recruit/${testRecruit.uuid}/completed`,
+      `/trpg/recruit/${testRecruit.uuid}/complete`,
       {}
     );
 

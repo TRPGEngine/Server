@@ -15,20 +15,37 @@ recruitRouter.get('/recruit/feed', async (ctx) => {
   ctx.type = 'application/rss+xml';
 });
 
-recruitRouter.get('/recruit/list', async (ctx) => {
+recruitRouter.get('/recruit/list/all', async (ctx) => {
   const list = await TRPGRecruit.getTRPGRecruitList();
 
-  ctx.body = list;
+  ctx.body = { list };
+});
+
+recruitRouter.get('/recruit/list/user', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+
+  const list = await TRPGRecruit.getAllUserRecruitList(playerUUID);
+
+  ctx.body = { list };
 });
 
 recruitRouter.post('/recruit/create', ssoAuth(), async (ctx) => {
   const playerUUID = ctx.state.player.uuid;
-  const { title, content } = ctx.request.body;
+  const {
+    title,
+    content,
+    platform,
+    contactType,
+    contactContent,
+  } = ctx.request.body;
 
   const recruit = await TRPGRecruit.createTRPGRecruit(
     playerUUID,
     title,
-    content
+    content,
+    platform,
+    contactType,
+    contactContent
   );
 
   ctx.body = { recruit };
@@ -48,7 +65,7 @@ recruitRouter.post('/recruit/:uuid/update', ssoAuth(), async (ctx) => {
   ctx.body = { recruit };
 });
 
-recruitRouter.post('/recruit/:uuid/completed', ssoAuth(), async (ctx) => {
+recruitRouter.post('/recruit/:uuid/complete', ssoAuth(), async (ctx) => {
   const playerUUID = ctx.state.player.uuid;
   const recruitUUID = ctx.params.uuid;
 

@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.24.0](https://github.com/TRPGEngine/Server/compare/v1.23.0...v1.24.0) (2020-06-12)
+
+
+### Features
+
+* **service:** add rssbot service ([a77fd61](https://github.com/TRPGEngine/Server/commit/a77fd610539c674d916f9a603caa0a1bac46e092))
+* **trpg:** 创建招募信息时增加更多的字段 ([a8c053e](https://github.com/TRPGEngine/Server/commit/a8c053ebbed0dc9f060940e553af9ca8303f8f63))
+* **trpg:** 增加获取用户招募列表的接口 ([7f83d76](https://github.com/TRPGEngine/Server/commit/7f83d76ecbf8276d91694b96ff2167272a3ec18a))
+
+
+### Bug Fixes
+
+* **trpg:** 修复错误的招募间隔判定 ([4261518](https://github.com/TRPGEngine/Server/commit/42615183079ba937bc3c9959c3d8d6c45779df5d))
+
 ## [1.23.0](https://github.com/TRPGEngine/Server/compare/v1.22.0...v1.23.0) (2020-06-06)
 
 

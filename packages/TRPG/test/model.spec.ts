@@ -2,9 +2,12 @@ import { TRPGGameMap } from '../lib/models/game-map';
 import { buildAppContext } from 'test/utils/app';
 import { createTestGroup } from 'packages/Group/test/example';
 import { getTestUser } from 'packages/Player/test/example';
-import { createTestMap } from './example';
+import { createTestMap, createTestRecruit } from './example';
+import testExampleStack from 'test/utils/example';
+import { TRPGRecruit } from '../lib/models/recruit';
 
 const context = buildAppContext();
+testExampleStack.regAfterAll();
 
 describe('TRPGGameMap', () => {
   test('TRPGGameMap.createGroupMap should be ok', async () => {
@@ -37,5 +40,16 @@ describe('TRPGGameMap', () => {
     expect(mapList).toHaveLength(1);
     expect(mapList).toHaveProperty([0, 'uuid'], testMap.uuid);
     expect(mapList).toHaveProperty([0, 'name'], testMap.name);
+  });
+});
+
+describe('TRPGRecruit', () => {
+  test('TRPGRecruit.getAllUserRecruitList should be ok', async () => {
+    const testUser = await getTestUser();
+    const testRecruit = await createTestRecruit(testUser.id);
+
+    const recruits = await TRPGRecruit.getAllUserRecruitList(testUser.uuid);
+    expect(Array.isArray(recruits)).toBe(true);
+    expect(recruits.map((i) => i.id).includes(testRecruit.id)).toBe(true);
   });
 });

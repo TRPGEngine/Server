@@ -14,10 +14,6 @@ userRouter.get('/info/:uuid', async (ctx) => {
 userRouter.post('/register', async (ctx) => {
   const { username, password } = ctx.request.body;
 
-  if (_.isNil(username) || _.isNil(password)) {
-    throw new Error('缺少必要字段');
-  }
-
   const results = await PlayerUser.registerUser(username, password);
   ctx.body = { results };
 });

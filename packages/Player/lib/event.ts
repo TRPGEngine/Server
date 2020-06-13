@@ -212,10 +212,6 @@ export const register: EventFunc<{
 }> = async function register(data, cb, db) {
   const username = data.username;
   const password = data.password;
-  if (!username || !password) {
-    debug('register fail, miss necessary parameter: %o', data);
-    throw new Error('缺少必要参数');
-  }
 
   const results = await PlayerUser.registerUser(username, password);
   debug('register success: %o', results);
