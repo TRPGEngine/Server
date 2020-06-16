@@ -65,7 +65,7 @@ export default abstract class BasePackage {
    * @param path 配置路径
    * @param defaultValue 默认值
    */
-  getConfig(path: string, defaultValue?: string) {
+  getConfig<T = any>(path: string, defaultValue?: T): T {
     return this.app.get(path, defaultValue);
   }
 

@@ -16,6 +16,7 @@ const deploy = require('../packages/Deploy');
 const info = require('../packages/Info');
 const oauth = require('../packages/OAuth');
 const trpg = require('../packages/TRPG');
+const bot = require('../packages/Bot');
 
 // TODO: 使用dependency-helper的方法进行排序
 module.exports = function loadModules(app) {
@@ -36,6 +37,7 @@ module.exports = function loadModules(app) {
   app.load(info);
   app.load(oauth);
   app.load(trpg);
+  app.load(bot);
 
   app.load(dashboard); // 尚未测试
 

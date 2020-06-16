@@ -126,4 +126,15 @@ module.exports = {
       enable: true,
     },
   },
+  bot: {
+    enable: false,
+    qqbot: {
+      url: '',
+      accessToken: '',
+      target: {
+        type: 'private',
+        id: '',
+      },
+    },
+  },
 };
