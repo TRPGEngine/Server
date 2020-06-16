@@ -51,6 +51,14 @@ recruitRouter.post('/recruit/create', ssoAuth(), async (ctx) => {
   ctx.body = { recruit };
 });
 
+recruitRouter.get('/recruit/:uuid', async (ctx) => {
+  const recruitUUID = ctx.params.uuid;
+
+  const recruit = await TRPGRecruit.findByUUID(recruitUUID);
+
+  ctx.body = { recruit };
+});
+
 recruitRouter.post('/recruit/:uuid/update', ssoAuth(), async (ctx) => {
   const playerUUID = ctx.state.player.uuid;
   const data = ctx.request.body;

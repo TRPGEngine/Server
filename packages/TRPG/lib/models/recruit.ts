@@ -34,6 +34,18 @@ export class TRPGRecruit extends Model {
   static EDITABLE_FIELD = ['title', 'content'] as const; // 用户更新时可编辑字段
 
   /**
+   * 根据招募UUID获取详细信息
+   * @param uuid 招募的UUID
+   */
+  static async findByUUID(uuid: string): Promise<TRPGRecruit | null> {
+    return TRPGRecruit.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
+
+  /**
    * 获取没有完成的招募列表
    */
   static async getTRPGRecruitList(): Promise<TRPGRecruit[]> {
