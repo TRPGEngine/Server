@@ -95,14 +95,14 @@ export class TRPGRecruit extends Model {
       id: trpgapp.get('apihost'),
       title: 'TRPG Engine Recruit',
       copyright: 'TRPG Engine',
-      link: '',
+      link: 'https://trpg.moonrailgun.com/portal/trpg/recruit/list',
       description: '',
       generator: 'TRPG Engine',
     });
     recruits.forEach((r) => {
       feed.addItem({
         title: r.title,
-        link: '', // TODO
+        link: `https://trpg.moonrailgun.com/portal/trpg/recruit/${r.uuid}`,
         content: r.content,
         contributor: [{ name: r.author }],
         date: r.updatedAt,
