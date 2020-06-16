@@ -4,6 +4,7 @@ import { TRPGRecruit } from 'packages/TRPG/lib/models/recruit';
 import { buildWatchFunctionWrapAsync } from 'lib/listener';
 import { recruitMsg } from './template/recruit';
 import { requestCQHttp } from './utils';
+import htmlToText from 'html-to-text';
 const debug = Debug('trpg:component:bot');
 
 export default class Bot extends BasePackage {
@@ -31,7 +32,14 @@ export default class Bot extends BasePackage {
           const result: TRPGRecruit = ctx.result;
           const { title, content, author } = result;
 
-          const message = recruitMsg(title, content, author);
+          const message = recruitMsg(
+            title,
+            htmlToText.fromString(content, {
+              wordwrap: false,
+              singleNewLineParagraphs: true,
+            }),
+            author
+          );
 
           if (target.type === 'private') {
             requestCQHttp('/send_private_msg_rate_limited', {

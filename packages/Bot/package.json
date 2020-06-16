@@ -14,5 +14,11 @@
     "bot"
   ],
   "author": "moonrailgun",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "html-to-text": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/html-to-text": "^5.1.1"
+  }
 }
