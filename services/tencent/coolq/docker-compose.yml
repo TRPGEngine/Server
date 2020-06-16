@@ -5,6 +5,7 @@ services:
     container_name: coolq
     ports:
       - 21312:9000
+      - 21313:5700
     volumes:
       - ./coolq-data:/home/user/coolq
     environment:
