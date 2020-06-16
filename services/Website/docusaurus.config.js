@@ -156,6 +156,7 @@ const siteConfig = {
         blog: {
           feedOptions: {
             type: 'all',
+            title: 'TRPG Engine Blog',
             copyright,
           },
         },

@@ -72,8 +72,8 @@ function HomeSplash(props) {
         <div className={styles.buttons}>
           <Link
             className={classnames(
-              'button button--outline button--primary button--lg margin-right--sm',
-              styles.getStarted
+              'button button--outline button--primary button--lg',
+              styles.homeButton
             )}
             to="https://trpg.moonrailgun.com"
           >
@@ -82,8 +82,8 @@ function HomeSplash(props) {
           {/* <Button href={useBaseUrl('/download')}>下载桌面版</Button> */}
           <Link
             className={classnames(
-              'button button--outline button--primary button--lg margin-right--sm',
-              styles.getStarted
+              'button button--outline button--primary button--lg',
+              styles.homeButton
             )}
             to="https://trpg.moonrailgun.com/portal/deploy"
           >
@@ -93,7 +93,7 @@ function HomeSplash(props) {
           <Link
             className={classnames(
               'button button--primary button--lg',
-              styles.getStarted
+              styles.homeButton
             )}
             to="https://trpg.moonrailgun.com/portal/trpg/recruit/list"
           >

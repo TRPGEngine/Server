@@ -12,7 +12,7 @@ recruitRouter.get('/recruit/feed', async (ctx) => {
   const feed = await TRPGRecruit.getTRPGRecruitFeed();
 
   ctx.body = feed;
-  ctx.type = 'application/rss+xml';
+  ctx.type = 'application/xml; charset=utf-8';
 });
 
 recruitRouter.get('/recruit/list/all', async (ctx) => {

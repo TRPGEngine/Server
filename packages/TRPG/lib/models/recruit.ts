@@ -66,6 +66,7 @@ export class TRPGRecruit extends Model {
   /**
    * 获取招募的Feed
    * 缓存优先
+   * 返回atom格式的数据
    */
   static async getTRPGRecruitFeed(): Promise<string> {
     const trpgapp = TRPGRecruit.getApplication();
@@ -96,7 +97,7 @@ export class TRPGRecruit extends Model {
       });
     });
 
-    const ret = feed.rss2();
+    const ret = feed.atom1();
     await trpgapp.cache.set(TRPGRecruit.FEED_CACHE_KEY, ret, {
       expires: TRPGRecruit.CACHE_EXPIRE,
     });
