@@ -1,5 +1,5 @@
 ---
-title: 版本发布0.3.6
+title: 版本发布0.3.7
 author: moonrailgun
 tags: [版本发布]
 ---
