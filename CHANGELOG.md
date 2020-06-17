@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.25.0](https://github.com/TRPGEngine/Server/compare/v1.24.1...v1.25.0) (2020-06-17)
+
+
+### Features
+
+* **bot:** 增加一个机器人模块并监听创建招募信息的创建 ([7e76408](https://github.com/TRPGEngine/Server/commit/7e764084657cc0344bca408f95a2cc9499ef2b3a))
+* **trpg:** 增加获取单个招募详情的接口 ([5730190](https://github.com/TRPGEngine/Server/commit/573019042bbb0ea617aae2dd9139dc140bff0a5d))
+
 ### [1.24.1](https://github.com/TRPGEngine/Server/compare/v1.24.0...v1.24.1) (2020-06-16)
 
 ## [1.24.0](https://github.com/TRPGEngine/Server/compare/v1.23.0...v1.24.0) (2020-06-12)
