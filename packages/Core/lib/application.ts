@@ -4,7 +4,7 @@ const debug = Debug('trpg:application');
 import schedule, { Job } from 'node-schedule';
 import fs from 'fs-extra';
 import path from 'path';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosPromise } from 'axios';
 import _ from 'lodash';
 import { IOSessionMiddleware } from './utils/iosession';
 import Storage, { TRPGDbOptions } from './storage';
@@ -350,29 +350,47 @@ export class Application extends events.EventEmitter {
   }
 
   request = {
-    get<T = any>(url: string, query?: any, config?: AxiosRequestConfig) {
+    get<T = any>(url: string, query?: any, config?: AxiosRequestConfig): any {
+      debug('[GET]%s:%o', url, query);
       return axios({
         url,
         method: 'get',
         params: query,
         ...config,
-      }).then((res: AxiosResponse<T>) => {
-        applog('[request GET]', url, query, res.status);
-        appLogger.info('\t[request res detail]:', res);
-        return res.data;
-      });
+      })
+        .then((res: AxiosResponse<T>) => {
+          applog('[request GET]', url, query, res.status);
+          appLogger.info('\t[request res detail]:', res);
+          return res.data;
+        })
+        .catch((err) => {
+          this.errorWithContext(err, {
+            url,
+            query,
+            config,
+          });
+        });
     },
-    post<T = any>(url: string, data: any, config?: AxiosRequestConfig) {
+    post<T = any>(url: string, data: any, config?: AxiosRequestConfig): any {
+      debug('[POST]%s:%o', url, data);
       return axios({
         url,
         method: 'post',
         data,
         ...config,
-      }).then((res: AxiosResponse<T>) => {
-        applog('[request POST]', url, data, res.status);
-        appLogger.info('\t[request res detail]:', res);
-        return res.data;
-      });
+      })
+        .then((res: AxiosResponse<T>) => {
+          applog('[request POST]', url, data, res.status);
+          appLogger.info('\t[request res detail]:', res);
+          return res.data;
+        })
+        .catch((err) => {
+          this.errorWithContext(err, {
+            url,
+            data,
+            config,
+          });
+        });
     },
   };
 

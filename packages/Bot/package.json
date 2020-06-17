@@ -1,0 +1,24 @@
+{
+  "name": "trpg-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "trpg",
+    "bot"
+  ],
+  "author": "moonrailgun",
+  "license": "MIT",
+  "dependencies": {
+    "html-to-text": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/html-to-text": "^5.1.1"
+  }
+}

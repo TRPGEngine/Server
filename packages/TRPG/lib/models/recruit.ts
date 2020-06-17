@@ -34,6 +34,18 @@ export class TRPGRecruit extends Model {
   static EDITABLE_FIELD = ['title', 'content'] as const; // 用户更新时可编辑字段
 
   /**
+   * 根据招募UUID获取详细信息
+   * @param uuid 招募的UUID
+   */
+  static async findByUUID(uuid: string): Promise<TRPGRecruit | null> {
+    return TRPGRecruit.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
+
+  /**
    * 获取没有完成的招募列表
    */
   static async getTRPGRecruitList(): Promise<TRPGRecruit[]> {
@@ -83,14 +95,14 @@ export class TRPGRecruit extends Model {
       id: trpgapp.get('apihost'),
       title: 'TRPG Engine Recruit',
       copyright: 'TRPG Engine',
-      link: '',
+      link: 'https://trpg.moonrailgun.com/portal/trpg/recruit/list',
       description: '',
       generator: 'TRPG Engine',
     });
     recruits.forEach((r) => {
       feed.addItem({
         title: r.title,
-        link: '', // TODO
+        link: `https://trpg.moonrailgun.com/portal/trpg/recruit/${r.uuid}`,
         content: r.content,
         contributor: [{ name: r.author }],
         date: r.updatedAt,
