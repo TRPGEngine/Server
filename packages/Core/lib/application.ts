@@ -350,7 +350,11 @@ export class Application extends events.EventEmitter {
   }
 
   request = {
-    get<T = any>(url: string, query?: any, config?: AxiosRequestConfig): any {
+    get: <T = any>(
+      url: string,
+      query?: any,
+      config?: AxiosRequestConfig
+    ): any => {
       debug('[GET]%s:%o', url, query);
       return axios({
         url,
@@ -371,7 +375,11 @@ export class Application extends events.EventEmitter {
           });
         });
     },
-    post<T = any>(url: string, data: any, config?: AxiosRequestConfig): any {
+    post: <T = any>(
+      url: string,
+      data: any,
+      config?: AxiosRequestConfig
+    ): any => {
       debug('[POST]%s:%o', url, data);
       return axios({
         url,
