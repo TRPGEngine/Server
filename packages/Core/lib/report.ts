@@ -27,7 +27,11 @@ class ReportService {
   constructor(app: TRPGApplication) {
     this._setting = Object.assign({}, defaultConfig, app.get('report'));
     if (this._setting.sentry) {
-      Sentry.init({ dsn: this._setting.sentry, environment: app.get('env') });
+      Sentry.init({
+        dsn: this._setting.sentry,
+        environment: app.get('env'),
+        release: app.get('version'),
+      });
       Sentry.setTags({
         apihost: app.get('apihost'),
         fileStorage: app.get('file.storage'),
