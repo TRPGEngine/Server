@@ -132,7 +132,8 @@ module.exports = {
     enable: false,
     qqbot: {
       url: '',
-      accessToken: '',
+      accessToken: '', // 发送到QQ机器人的授权
+      secret: '', // 事件上报的签名
       target: {
         type: 'private',
         id: '',
