@@ -5,6 +5,7 @@ import { buildWatchFunctionWrapAsync } from 'lib/listener';
 import { recruitMsg } from './template/recruit';
 import { requestCQHttp } from './utils';
 import htmlToText from 'html-to-text';
+import BotOperationLogDefinition from './models/operation-log';
 const debug = Debug('trpg:component:bot');
 
 export default class Bot extends BasePackage {
@@ -19,6 +20,8 @@ export default class Bot extends BasePackage {
       debug('无法加载Bot组件: 在配置中已关闭');
       return;
     }
+
+    this.regModel(BotOperationLogDefinition);
 
     this.initListener();
   }

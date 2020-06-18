@@ -1,6 +1,7 @@
 import { getGlobalApplication } from 'lib/application';
 import _ from 'lodash';
 import url from 'url';
+import { BotOperationLog } from './models/operation-log';
 
 /**
  * 接口说明
@@ -35,6 +36,12 @@ export async function requestCQHttp(path: string, data: object) {
       },
     }
   );
+
+  // 异步插入日志
+  BotOperationLog.insertLog('sendMsg', {
+    request: data,
+    response: res,
+  });
 
   if (res.status === 'failed') {
     throw new Error(`${path} error: ${JSON.stringify(res)}`);
