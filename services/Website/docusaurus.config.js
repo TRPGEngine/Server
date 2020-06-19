@@ -86,6 +86,10 @@ const siteConfig = {
               label: '普通用户',
               to: 'docs/introduce',
             },
+            {
+              label: 'Wiki',
+              to: 'docs/wiki/index',
+            },
             // {
             //   label: '开发者',
             //   to: 'docs/develop',
