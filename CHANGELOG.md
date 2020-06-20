@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.26.0](https://github.com/TRPGEngine/Server/compare/v1.25.0...v1.26.0) (2020-06-20)
+
+
+### Features
+
+* **bot:** 增加bot操作日志 ([e69fa1c](https://github.com/TRPGEngine/Server/commit/e69fa1c67d11210fdf9f90a0b36e02a12db6785c))
+
+
+### Bug Fixes
+
+* **core:** 修复报错指向错误的bug ([f4040c8](https://github.com/TRPGEngine/Server/commit/f4040c82496f80e08bae1b59ad9a75d5c49d76f7))
+* 修复命名关键字的问题 ([d8df92e](https://github.com/TRPGEngine/Server/commit/d8df92e57fdb582afb947e86829d1aade41d813d))
+
 ## [1.25.0](https://github.com/TRPGEngine/Server/compare/v1.24.1...v1.25.0) (2020-06-17)
 
 
