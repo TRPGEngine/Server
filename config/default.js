@@ -1,6 +1,8 @@
 const randomString = require('crypto-random-string');
+const packageConfig = require('../package.json');
 
 module.exports = {
+  version: packageConfig.version,
   env: process.env.NODE_ENV || 'development',
   port: process.env.TRPG_PORT || '23256',
   apihost: process.env.HOST || 'http://127.0.0.1:23256', // 后台服务的对外接口, 用于外部服务
@@ -130,7 +132,8 @@ module.exports = {
     enable: false,
     qqbot: {
       url: '',
-      accessToken: '',
+      accessToken: '', // 发送到QQ机器人的授权
+      secret: '', // 事件上报的签名
       target: {
         type: 'private',
         id: '',

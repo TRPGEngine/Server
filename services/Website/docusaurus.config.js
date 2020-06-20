@@ -86,6 +86,10 @@ const siteConfig = {
               label: '普通用户',
               to: 'docs/introduce',
             },
+            {
+              label: 'Wiki',
+              to: 'docs/wiki/index',
+            },
             // {
             //   label: '开发者',
             //   to: 'docs/develop',
@@ -139,7 +143,8 @@ const siteConfig = {
 
   // Add custom scripts here that would be placed in <script> tags.
   scripts: [
-    // 'https://buttons.github.io/buttons.js'
+    // 'https://buttons.github.io/buttons.js',
+    'https://cdn.bootcdn.net/ajax/libs/mermaid/8.5.2/mermaid.min.js',
   ],
 
   presets: [
@@ -151,7 +156,10 @@ const siteConfig = {
           path: './docs',
           // sidebars file relative to website dir.
           sidebarPath: require.resolve('./sidebars'),
-          remarkPlugins: [require('./src/plugins/remark-template-previewer')],
+          remarkPlugins: [
+            require('./src/plugins/remark-template-previewer'),
+            [require('remark-mermaid'), { simple: true }],
+          ],
         },
         blog: {
           feedOptions: {
