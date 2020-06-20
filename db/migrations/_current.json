@@ -2239,7 +2239,7 @@
                 },
                 "ua": {
                     "field": "ua",
-                    "seqType": "Sequelize.STRING"
+                    "seqType": "Sequelize.TEXT"
                 },
                 "version": {
                     "field": "version",
@@ -3237,52 +3237,7 @@
                 }
             },
             "indexes": []
-        },
-        "bot_operation_log": {
-            "tableName": "bot_operation_log",
-            "schema": {
-                "id": {
-                    "allowNull": false,
-                    "primaryKey": true,
-                    "autoIncrement": true,
-                    "field": "id",
-                    "seqType": "Sequelize.INTEGER"
-                },
-                "uuid": {
-                    "defaultValue": {
-                        "internal": true,
-                        "value": "Sequelize.UUIDV1"
-                    },
-                    "field": "uuid",
-                    "seqType": "Sequelize.UUID"
-                },
-                "hostname": {
-                    "field": "hostname",
-                    "seqType": "Sequelize.STRING"
-                },
-                "name": {
-                    "required": true,
-                    "allowNull": false,
-                    "field": "name",
-                    "seqType": "Sequelize.STRING"
-                },
-                "data": {
-                    "field": "data",
-                    "seqType": "Sequelize.BLOB"
-                },
-                "createdAt": {
-                    "allowNull": false,
-                    "field": "createdAt",
-                    "seqType": "Sequelize.DATE"
-                },
-                "updatedAt": {
-                    "allowNull": false,
-                    "field": "updatedAt",
-                    "seqType": "Sequelize.DATE"
-                }
-            },
-            "indexes": []
         }
     },
-    "revision": 52
+    "revision": 53
 }
