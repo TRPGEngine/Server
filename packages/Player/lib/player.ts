@@ -4,7 +4,6 @@ import BasePackage from 'lib/package';
 const Geetest = require('gt3-sdk');
 import md5 from './utils/md5';
 import sha1 from './utils/sha1';
-import memoizeOne from 'memoize-one';
 import PlayerUserDefinition, { PlayerUser } from './models/user';
 import PlayerInviteDefinition from './models/invite';
 import PlayerLoginLogDefinition, { PlayerLoginLog } from './models/login-log';
@@ -12,7 +11,6 @@ import PlayerSettingsDefinition from './models/settings';
 import * as event from './event';
 import { getPlayerManager, PlayerManagerCls } from './managers/player-manager';
 import { Socket } from 'trpg/core';
-import { AxiosResponse } from 'axios';
 import userRouter from './routers/user';
 import SSORouter from './routers/sso';
 import registerRouter from './routers/register';
@@ -282,15 +280,14 @@ export default class Player extends BasePackage {
           }
 
           debug('请求ip信息地址:', ip);
-          const info = await PlayerLoginLog.requestIpInfo(ip);
-          if (info.code === 0) {
-            // 请求成功
-            const data = info.data;
-            const ip_address = `[${data.isp}]${data.country} ${data.region} ${data.city} ${data.county}`;
-            log.ip_address = ip_address;
-            debug('请求ip信息结果:', ip_address);
-            cacheMap[ip] = ip_address;
+          try {
+            const location = await PlayerLoginLog.requestIpLocation(ip);
+            log.ip_address = location;
+            debug('请求ip地址信息结果:', location);
+            cacheMap[ip] = location;
             await log.save();
+          } catch (err) {
+            debug('请求ip地址信息失败:', location);
           }
         }
         return new Date().valueOf();
