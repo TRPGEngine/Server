@@ -1,5 +1,7 @@
 import { Orm, DBInstance, Model } from 'trpg/core';
 import { PlayerLoginLogType } from 'packages/Player/types/login-log';
+import memoizeOne from 'memoize-one';
+import { AxiosResponse } from 'axios';
 
 export class PlayerLoginLog extends Model {
   id: number;
@@ -33,6 +35,33 @@ export class PlayerLoginLog extends Model {
       limit: size,
     });
   }
+
+  /**
+   * 请求IP地址信息
+   * 缓存相同IP的信息
+   */
+  static requestIpInfo = memoizeOne(
+    (
+      ip: string
+    ): Promise<
+      AxiosResponse<{
+        city: string;
+        country: string;
+        county: string;
+        isp: string;
+        region: string;
+      }> & { code: number }
+    > => {
+      const trpgapp = PlayerLoginLog.getApplication();
+      return trpgapp.request.post(
+        'http://ip.taobao.com/service/getIpInfo2.php',
+        `ip=${ip}`,
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        }
+      );
+    }
+  );
 }
 
 export default function PlayerLoginLogDefinition(

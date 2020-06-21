@@ -282,7 +282,7 @@ export default class Player extends BasePackage {
           }
 
           debug('请求ip信息地址:', ip);
-          const info = await this.requestIpInfo(ip);
+          const info = await PlayerLoginLog.requestIpInfo(ip);
           if (info.code === 0) {
             // 请求成功
             const data = info.data;
@@ -300,65 +300,4 @@ export default class Player extends BasePackage {
       }
     });
   }
-
-  /**
-   * 请求IP信息
-   * 缓存相同IP的信息
-   */
-  private requestIpInfo = memoizeOne(
-    (
-      ip: string
-    ): Promise<
-      AxiosResponse<{
-        city: string;
-        country: string;
-        county: string;
-        isp: string;
-        region: string;
-      }> & { code: number }
-    > => {
-      return this.app.request.post(
-        'http://ip.taobao.com/service/getIpInfo2.php',
-        `ip=${ip}`,
-        {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        }
-      );
-    }
-  );
 }
-
-// function initReset() {
-//   let app = this;
-
-//   app.register('resetStorage', async function(storage, db) {
-//     debug('start reset player storage');
-//     try {
-//       let players = [];
-//       for (let i = 1; i <= 10; i++) {
-//         players.push({
-//           username: 'admin' + i,
-//           password: md5(md5('admin')),
-//         });
-//       }
-//       let res = await db.models.player_user.bulkCreate([
-//         {
-//           username: 'admin',
-//           password: md5(md5('admin')),
-//           avatar: 'http://www.qqzhi.com/uploadpic/2015-01-22/022222987.jpg',
-//           nickname: '管理员',
-//           sign: '伟大的管理员大大',
-//         },
-//         ...players,
-//       ]);
-
-//       // 测试：相互添加好友
-//       await res[0].addFriend(res[1]);
-//       await res[1].addFriend(res[0]);
-//       debug('player storage reset completed!');
-//     } catch (err) {
-//       console.error(err);
-//       throw err;
-//     }
-//   });
-// }
