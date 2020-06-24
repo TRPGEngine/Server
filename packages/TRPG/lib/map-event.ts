@@ -2,6 +2,8 @@ import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
 import { TRPGGameMap } from './models/game-map';
 import { MapUpdateType, UpdateTokenPayloadMap } from '../types/map';
+import { PlayerUser } from 'packages/Player/lib/models/user';
+import { notifyUpdateOnlineSocketList } from './map-notify';
 
 /**
  * 创建团地图
@@ -43,19 +45,36 @@ export const createGroupMap: EventFunc<{
 /**
  * 加入地图房间
  * 并返回房间数据
+ * 同时会通知房间所有成员更新地图连接列表
  */
 export const joinMapRoom: EventFunc<{
   mapUUID: string;
+  jwt?: string; // 可选。如果带了jwt则解析其是否绑定登录信息
 }> = async function joinMapRoom(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  const { mapUUID } = data;
+  const { mapUUID, jwt } = data;
   if (_.isNil(mapUUID)) {
     throw new Error('缺少必要字段');
   }
 
   await app.trpg.mapManager.joinRoom(mapUUID, socket);
+  if (_.isString(jwt)) {
+    // 如果登录时带了jwt。则尝试解析并绑定信息
+    try {
+      const payload = await PlayerUser.verifyJWT(jwt);
+      await app.trpg.mapManager.setSocketExtraInfo(socket, {
+        uuid: payload.uuid,
+        name: payload.name,
+      });
+    } catch (e) {}
+  }
+
+  notifyUpdateOnlineSocketList(
+    mapUUID,
+    await app.trpg.mapManager.getRoomAllSocketIds(mapUUID)
+  );
 
   const mapData = await TRPGGameMap.getMapData(mapUUID);
 
