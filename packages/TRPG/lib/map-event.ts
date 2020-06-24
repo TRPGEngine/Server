@@ -4,6 +4,8 @@ import { TRPGGameMap } from './models/game-map';
 import { MapUpdateType, UpdateTokenPayloadMap } from '../types/map';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { notifyUpdateOnlineSocketList } from './map-notify';
+import Debug from 'debug';
+const debug = Debug('trpg:package:trpg:map:event');
 
 /**
  * 创建团地图
@@ -67,16 +69,18 @@ export const joinMapRoom: EventFunc<{
       await app.trpg.mapManager.setSocketExtraInfo(socket, {
         uuid: payload.uuid,
         name: payload.name,
+        avatar: payload.avatar,
       });
-    } catch (e) {}
+    } catch (e) {
+      debug('[joinMapRoom] 设置绑定socket信息出现问题: %o', e);
+    }
   }
 
-  notifyUpdateOnlineSocketList(
-    mapUUID,
-    await app.trpg.mapManager.getRoomAllSocketIds(mapUUID)
-  );
-
   const mapData = await TRPGGameMap.getMapData(mapUUID);
+
+  notifyUpdateOnlineSocketList(
+    mapUUID
+  );
 
   return { mapData };
 };

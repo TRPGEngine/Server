@@ -113,7 +113,7 @@ export class PlayerUser extends Model {
     const data = await app.jwtVerify(jwt);
 
     if (_.isString(data) || _.isNil(_.get(data, 'uuid'))) {
-      throw new Error('该Token不是一个用户JWT');
+      throw new Error('该token不是一个用户JWT');
     }
 
     return data as PlayerJWTPayload;

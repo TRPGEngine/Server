@@ -42,12 +42,10 @@ export async function notifyAddGroupMap(
 /**
  * 通知更新地图连接列表
  */
-export async function notifyUpdateOnlineSocketList(
-  mapUUID: string,
-  socketIds: string[]
-) {
+export async function notifyUpdateOnlineSocketList(mapUUID: string) {
   const trpgapp = getGlobalApplication();
-  await trpgapp.player.manager.roomcastSocketEvent(
+  const socketIds = await trpgapp.trpg.mapManager.getRoomAllSocketIds(mapUUID);
+  await trpgapp.trpg.mapManager.roomcastSocketEvent(
     mapUUID,
     'trpg::updateMapConnects',
     { mapUUID, socketIds }
