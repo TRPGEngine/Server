@@ -158,7 +158,7 @@ const siteConfig = {
           sidebarPath: require.resolve('./sidebars'),
           remarkPlugins: [
             require('./src/plugins/remark-template-previewer'),
-            [require('remark-mermaid'), { simple: true }],
+            require('./src/plugins/remark-mermaid'),
           ],
         },
         blog: {
