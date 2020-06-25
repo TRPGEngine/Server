@@ -168,7 +168,10 @@ export abstract class SocketManager<
     await this.cache.remove(this.getSocketExtraInfoKey(socket.id));
   }
   async getSocketExtraInfo(socket: Socket): Promise<any | null> {
-    const data = await this.cache.get(this.getSocketExtraInfoKey(socket.id));
+    return this.getSocketExtraInfoBySocketId(socket.id);
+  }
+  async getSocketExtraInfoBySocketId(socketId: string): Promise<any | null> {
+    const data = await this.cache.get(this.getSocketExtraInfoKey(socketId));
     try {
       return JSON.parse(String(data));
     } catch (err) {

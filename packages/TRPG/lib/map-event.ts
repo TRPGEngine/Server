@@ -5,6 +5,7 @@ import { MapUpdateType, UpdateTokenPayloadMap } from '../types/map';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { notifyUpdateOnlineSocketList } from './map-notify';
 import Debug from 'debug';
+import { NoReportError } from 'lib/error';
 const debug = Debug('trpg:package:trpg:map:event');
 
 /**
@@ -15,7 +16,7 @@ export const createGroupMap: EventFunc<{
   name: string;
   width: number;
   height: number;
-}> = async function createGroupMap(data) {
+}> = async function(data) {
   const { app, socket } = this;
   const player = app.player.manager.findPlayer(socket);
   if (_.isNil(player)) {
@@ -52,7 +53,7 @@ export const createGroupMap: EventFunc<{
 export const joinMapRoom: EventFunc<{
   mapUUID: string;
   jwt?: string; // 可选。如果带了jwt则解析其是否绑定登录信息
-}> = async function joinMapRoom(data, cb, db) {
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -78,9 +79,7 @@ export const joinMapRoom: EventFunc<{
 
   const mapData = await TRPGGameMap.getMapData(mapUUID);
 
-  notifyUpdateOnlineSocketList(
-    mapUUID
-  );
+  notifyUpdateOnlineSocketList(mapUUID);
 
   return { mapData };
 };
@@ -92,7 +91,7 @@ export const updateMapToken: EventFunc<{
   mapUUID: string;
   type: MapUpdateType;
   payload: any;
-}> = async function updateMapToken(data, cb, db) {
+}> = async function(data, cb, db) {
   const { app, socket } = this;
   const { mapUUID, type, payload } = data;
 
@@ -134,7 +133,23 @@ export const updateMapLayer: EventFunc<{
   mapUUID: string;
   type: MapUpdateType;
   payload: {};
-}> = async function updateMapLayer(data, cb, db) {
+}> = async function(data, cb, db) {
   // TODO
   return false;
+};
+
+export const getMapMemberSocketInfo: EventFunc<{
+  socketId: string;
+}> = async function(data, cb, db) {
+  const { app } = this;
+
+  const { socketId } = data;
+
+  if (_.isNil(socketId)) {
+    throw new NoReportError('缺少必要参数');
+  }
+
+  const info = await app.trpg.mapManager.getSocketExtraInfoBySocketId(socketId);
+
+  return { info };
 };
