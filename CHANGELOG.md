@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.27.0](https://github.com/TRPGEngine/Server/compare/v1.26.0...v1.27.0) (2020-06-27)
+
+
+### Features
+
+* **docs:** 文档增加自实现的mermaid插件 ([2b8be9b](https://github.com/TRPGEngine/Server/commit/2b8be9bab745d94ba195d8ef292897b9f17aca88))
+* **trpg:** 加入地图房间时绑定用户基本信息与通知所有人更新连接列表 ([3d6fabe](https://github.com/TRPGEngine/Server/commit/3d6fabec9bc711561b7f13f02bce05ee9ec1aea3))
+* **trpg:** 增加获取地图用户绑定数据的接口 ([17f5b5f](https://github.com/TRPGEngine/Server/commit/17f5b5faac343a3b47cbede6b705b3d712e704b3))
+
+
+### Bug Fixes
+
+* **report:** 修复report模块ua字段过短的问题 ([974a118](https://github.com/TRPGEngine/Server/commit/974a118828db521191777d34685bc1dffff829a9))
+* **trpg:** 修复notifyUpdateOnlineSocketList方法无法通知到地图用户的问题 ([15e0e67](https://github.com/TRPGEngine/Server/commit/15e0e6744f3366c5e8c7f5c937f4b5b32350c674))
+
 ## [1.26.0](https://github.com/TRPGEngine/Server/compare/v1.25.0...v1.26.0) (2020-06-20)
 
 
