@@ -17,10 +17,7 @@ var info = {
     "comment": ""
 };
 
-var migrationCommands = [{
-        fn: "dropTable",
-        params: ["bot_operation_log"]
-    },
+var migrationCommands = [
     {
         fn: "changeColumn",
         params: [
