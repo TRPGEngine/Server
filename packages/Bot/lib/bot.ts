@@ -16,12 +16,12 @@ export default class Bot extends BasePackage {
 
   onInit(): void {
     const enable = this.getConfig('bot.enable', false);
+    this.regModel(BotOperationLogDefinition);
+
     if (!enable) {
       debug('无法加载Bot组件: 在配置中已关闭');
       return;
     }
-
-    this.regModel(BotOperationLogDefinition);
 
     this.initListener();
   }

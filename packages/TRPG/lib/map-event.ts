@@ -2,6 +2,11 @@ import { EventFunc } from 'trpg/core';
 import _ from 'lodash';
 import { TRPGGameMap } from './models/game-map';
 import { MapUpdateType, UpdateTokenPayloadMap } from '../types/map';
+import { PlayerUser } from 'packages/Player/lib/models/user';
+import { notifyUpdateOnlineSocketList } from './map-notify';
+import Debug from 'debug';
+import { NoReportError } from 'lib/error';
+const debug = Debug('trpg:package:trpg:map:event');
 
 /**
  * 创建团地图
@@ -11,7 +16,7 @@ export const createGroupMap: EventFunc<{
   name: string;
   width: number;
   height: number;
-}> = async function createGroupMap(data) {
+}> = async function(data) {
   const { app, socket } = this;
   const player = app.player.manager.findPlayer(socket);
   if (_.isNil(player)) {
@@ -43,21 +48,38 @@ export const createGroupMap: EventFunc<{
 /**
  * 加入地图房间
  * 并返回房间数据
+ * 同时会通知房间所有成员更新地图连接列表
  */
 export const joinMapRoom: EventFunc<{
   mapUUID: string;
-}> = async function joinMapRoom(data, cb, db) {
+  jwt?: string; // 可选。如果带了jwt则解析其是否绑定登录信息
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  const { mapUUID } = data;
+  const { mapUUID, jwt } = data;
   if (_.isNil(mapUUID)) {
     throw new Error('缺少必要字段');
   }
 
   await app.trpg.mapManager.joinRoom(mapUUID, socket);
+  if (_.isString(jwt)) {
+    // 如果登录时带了jwt。则尝试解析并绑定信息
+    try {
+      const payload = await PlayerUser.verifyJWT(jwt);
+      await app.trpg.mapManager.setSocketExtraInfo(socket, {
+        uuid: payload.uuid,
+        name: payload.name,
+        avatar: payload.avatar,
+      });
+    } catch (e) {
+      debug('[joinMapRoom] 设置绑定socket信息出现问题: %o', e);
+    }
+  }
 
   const mapData = await TRPGGameMap.getMapData(mapUUID);
+
+  notifyUpdateOnlineSocketList(mapUUID);
 
   return { mapData };
 };
@@ -69,7 +91,7 @@ export const updateMapToken: EventFunc<{
   mapUUID: string;
   type: MapUpdateType;
   payload: any;
-}> = async function updateMapToken(data, cb, db) {
+}> = async function(data, cb, db) {
   const { app, socket } = this;
   const { mapUUID, type, payload } = data;
 
@@ -111,7 +133,23 @@ export const updateMapLayer: EventFunc<{
   mapUUID: string;
   type: MapUpdateType;
   payload: {};
-}> = async function updateMapLayer(data, cb, db) {
+}> = async function(data, cb, db) {
   // TODO
   return false;
+};
+
+export const getMapMemberSocketInfo: EventFunc<{
+  socketId: string;
+}> = async function(data, cb, db) {
+  const { app } = this;
+
+  const { socketId } = data;
+
+  if (_.isNil(socketId)) {
+    throw new NoReportError('缺少必要参数');
+  }
+
+  const info = await app.trpg.mapManager.getSocketExtraInfoBySocketId(socketId);
+
+  return { info };
 };

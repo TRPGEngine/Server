@@ -7,6 +7,7 @@ import {
   joinMapRoom,
   updateMapToken,
   updateMapLayer,
+  getMapMemberSocketInfo,
 } from './map-event';
 import { getMapManager, MapManagerCls } from './managers/map-manager';
 import { getGroupMapList } from './event';
@@ -64,6 +65,7 @@ export default class TRPG extends BasePackage {
       this.regSocketEvent('joinMapRoom', joinMapRoom);
       this.regSocketEvent('updateMapToken', updateMapToken);
       this.regSocketEvent('updateMapLayer', updateMapLayer);
+      this.regSocketEvent('getMapMemberSocketInfo', getMapMemberSocketInfo);
 
       this.regScheduleJob(
         'dumpMapData',

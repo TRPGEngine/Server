@@ -1,5 +1,7 @@
 import { Orm, DBInstance, Model } from 'trpg/core';
 import { PlayerLoginLogType } from 'packages/Player/types/login-log';
+import memoizeOne from 'memoize-one';
+import iconv from 'iconv-lite';
 
 export class PlayerLoginLog extends Model {
   id: number;
@@ -33,6 +35,39 @@ export class PlayerLoginLog extends Model {
       limit: size,
     });
   }
+
+  /**
+   * 请求IP地址信息
+   * 缓存相同IP的信息(仅最近一条)
+   */
+  static requestIpLocation = memoizeOne(
+    async (ip: string): Promise<string> => {
+      const trpgapp = PlayerLoginLog.getApplication();
+      const res = await trpgapp.request.get(
+        `http://whois.pconline.com.cn/ipJson.jsp?ip=${ip}&json=true`,
+        undefined,
+        {
+          responseType: 'arraybuffer',
+        }
+      );
+
+      const rawText = iconv.decode(res, 'gbk');
+      let info;
+
+      try {
+        info = JSON.parse(rawText);
+      } catch (err) {
+        throw new Error('数据解析失败:' + rawText);
+      }
+
+      if (info?.ip === ip) {
+        // 如果查询结果正确(即返回结果IP)
+        return String(info?.addr ?? '').trim();
+      } else {
+        throw new Error(info?.err ?? '查询失败');
+      }
+    }
+  );
 }
 
 export default function PlayerLoginLogDefinition(

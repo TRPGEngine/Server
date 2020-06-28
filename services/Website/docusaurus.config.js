@@ -144,7 +144,7 @@ const siteConfig = {
   // Add custom scripts here that would be placed in <script> tags.
   scripts: [
     // 'https://buttons.github.io/buttons.js',
-    'https://cdn.bootcdn.net/ajax/libs/mermaid/8.5.2/mermaid.min.js',
+    'https://static4.moonrailgun.com/js/mermaid-8.5.2.min.js',
   ],
 
   presets: [
@@ -158,7 +158,7 @@ const siteConfig = {
           sidebarPath: require.resolve('./sidebars'),
           remarkPlugins: [
             require('./src/plugins/remark-template-previewer'),
-            [require('remark-mermaid'), { simple: true }],
+            require('./src/plugins/remark-mermaid'),
           ],
         },
         blog: {

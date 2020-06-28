@@ -187,4 +187,11 @@ describe('PlayerLoginLog', () => {
     expect(_.get(logs, '0.ip')).toBeFalsy();
     expect(_.get(logs, '0.token')).toBeFalsy();
   });
+
+  test('requestIpInfo', async () => {
+    const location = await PlayerLoginLog.requestIpLocation('127.0.0.1');
+    expect(location).toBe('本机地址');
+    const location2 = await PlayerLoginLog.requestIpLocation('114.114.114.114');
+    expect(location2).toBe('江苏省南京市 电信');
+  });
 });

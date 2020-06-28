@@ -7,13 +7,11 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 
 // 绑定通知信息: 极光推送
 export const bindJPushNotifyInfo: EventFunc<{
-  info: {
-    userUUID: string;
-    registrationID: string;
-  };
+  userUUID: string;
+  registrationID: string;
 }> = async function(data, cb, db) {
   const { app, socket } = this;
-  const info = data.info;
+  const info = data;
   const { userUUID, registrationID } = info;
   if (!userUUID || !registrationID) {
     throw new Error('缺少必要字段');
@@ -57,13 +55,11 @@ export const bindJPushNotifyInfo: EventFunc<{
 
 // 绑定友盟推送
 export const bindUPushNotifyInfo: EventFunc<{
-  info: {
-    userUUID: string;
-    registrationID: string;
-  };
+  userUUID: string;
+  registrationID: string;
 }> = async function(data, cb, db) {
   const { app, socket } = this;
-  const { userUUID, registrationID } = data.info;
+  const { userUUID, registrationID } = data;
 
   if (!userUUID || !registrationID) {
     throw new Error('缺少必要字段');

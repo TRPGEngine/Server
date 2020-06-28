@@ -105,6 +105,21 @@ export class PlayerUser extends Model {
   }
 
   /**
+   * 校验JWT
+   * 返回Token中的用户信息
+   */
+  static async verifyJWT(jwt: string): Promise<PlayerJWTPayload> {
+    const app = PlayerUser.getApplication();
+    const data = await app.jwtVerify(jwt);
+
+    if (_.isString(data) || _.isNil(_.get(data, 'uuid'))) {
+      throw new Error('该token不是一个用户JWT');
+    }
+
+    return data as PlayerJWTPayload;
+  }
+
+  /**
    * 根据用户UUID查找用户
    * @param userUUID 用户UUID
    */

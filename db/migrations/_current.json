@@ -2239,7 +2239,7 @@
                 },
                 "ua": {
                     "field": "ua",
-                    "seqType": "Sequelize.STRING"
+                    "seqType": "Sequelize.TEXT"
                 },
                 "version": {
                     "field": "version",
@@ -3284,5 +3284,5 @@
             "indexes": []
         }
     },
-    "revision": 52
+    "revision": 54
 }

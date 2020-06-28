@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.26.0",
+  "version": "1.27.0",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -56,6 +56,7 @@
     "execa": "^1.0.0",
     "fs-extra": "^8.0.1",
     "get-port": "^5.0.0",
+    "iconv-lite": "^0.6.0",
     "ioredis": "^4.14.1",
     "is-uuid": "^1.0.2",
     "jsonwebtoken": "^8.5.1",

@@ -38,3 +38,16 @@ export async function notifyAddGroupMap(
     { groupUUID, mapUUID, mapName }
   );
 }
+
+/**
+ * 通知更新地图连接列表
+ */
+export async function notifyUpdateOnlineSocketList(mapUUID: string) {
+  const trpgapp = getGlobalApplication();
+  const socketIds = await trpgapp.trpg.mapManager.getRoomAllSocketIds(mapUUID);
+  await trpgapp.trpg.mapManager.roomcastSocketEvent(
+    mapUUID,
+    'trpg::updateMapConnects',
+    { mapUUID, socketIds }
+  );
+}

@@ -35,6 +35,13 @@ export abstract class SocketManager<
 > extends EventEmitter {
   abstract getRoomKey: (key: string) => string;
 
+  /**
+   * 获取Socket额外信息的键
+   * 用于为Socket绑定上一些额外的信息
+   */
+  getSocketExtraInfoKey = (socketId: string) =>
+    `socket:manager:extra:${socketId}`;
+
   cache: ICache;
   pubClient: Redis.Redis;
   subClient: Redis.Redis;
@@ -148,6 +155,32 @@ export abstract class SocketManager<
   }
 
   /**
+   * Socket额外信息
+   * 用于为Socket绑定额外信息
+   */
+  async setSocketExtraInfo(socket: Socket, info: {}): Promise<void> {
+    await this.cache.set(
+      this.getSocketExtraInfoKey(socket.id),
+      JSON.stringify(info)
+    );
+  }
+  async unsetSocketExtraInfo(socket: Socket): Promise<void> {
+    await this.cache.remove(this.getSocketExtraInfoKey(socket.id));
+  }
+  async getSocketExtraInfo(socket: Socket): Promise<any | null> {
+    return this.getSocketExtraInfoBySocketId(socket.id);
+  }
+  async getSocketExtraInfoBySocketId(socketId: string): Promise<any | null> {
+    const data = await this.cache.get(this.getSocketExtraInfoKey(socketId));
+    try {
+      return JSON.parse(String(data));
+    } catch (err) {
+      debug(err);
+      return null;
+    }
+  }
+
+  /**
    * 加入房间
    * 在Redis存储一个Set记录每个房间的成员
    * 值为socketId
@@ -168,6 +201,7 @@ export abstract class SocketManager<
     socket.on('disconnect', () => {
       // NOTICE: 如果房间多可能会有性能问题。也许需要优化
       this.leaveRoom(roomUUID, socket);
+      this.unsetSocketExtraInfo(socket);
       debug(`[SocketManager] socket ${socketId} 离开房间 ${roomUUID}`);
     });
   }

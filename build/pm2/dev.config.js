@@ -1,4 +1,5 @@
 const path = require('path');
+const ignore = require('../../nodemon.json').ignore;
 
 module.exports = {
   apps: [
@@ -11,6 +12,8 @@ module.exports = {
         NODE_ENV: 'development',
         DEBUG: 'trpg:*',
       },
+      watch: true,
+      ignore_watch: ignore,
     },
   ],
 };
