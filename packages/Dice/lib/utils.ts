@@ -50,7 +50,7 @@ export function roll(requestStr: string): RollRes {
   });
 
   if (_.isEmpty(requestStr) || _.isEmpty(express)) {
-    throw new Error('invalid request');
+    throw new Error('Invalid Dice Request: ' + requestStr);
   }
 
   const result = eval(express);
