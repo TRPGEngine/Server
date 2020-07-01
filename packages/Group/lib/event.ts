@@ -937,7 +937,7 @@ export const quitGroup: EventFunc<{
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
-  let groupUUID = data.groupUUID;
+  const groupUUID = data.groupUUID;
   if (!groupUUID) {
     throw new Error('缺少必要参数');
   }
@@ -985,7 +985,7 @@ export const dismissGroup: EventFunc<{
   }
 
   // 系统通知
-  const members = await group.getMembers();
+  const members: PlayerUser[] = await group.getMembers();
   const systemMsg = `您所在的团 ${group.name} 解散了, ${members.length -
     1} 只小鸽子无家可归`;
   members.forEach((member) => {
@@ -1051,23 +1051,19 @@ export const setMemberToManager: EventFunc<{
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
-  let groupUUID = data.groupUUID;
-  let memberUUID = data.memberUUID;
+  const groupUUID = data.groupUUID;
+  const memberUUID = data.memberUUID;
   if (!groupUUID || !memberUUID) {
     throw new Error('缺少必要参数');
   }
   if (player.uuid === memberUUID) {
     throw new Error('你不能将自己提升为管理员');
   }
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
+  const group = await GroupGroup.findByUUID(groupUUID);
   if (!group) {
     throw new Error('找不到团');
   }
-  let member = await db.models.player_user.findOne({
-    where: { uuid: memberUUID },
-  });
+  const member = await PlayerUser.findByUUID(memberUUID);
   if (!member) {
     throw new Error('找不到该成员');
   }
@@ -1130,14 +1126,14 @@ export const setGroupStatus: EventFunc<{
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
-  let uuid = player.uuid;
+  const uuid = player.uuid;
   let { groupUUID, groupStatus } = data;
   groupStatus = Boolean(groupStatus);
   if (!groupUUID || groupStatus === undefined) {
     throw new Error('缺少必要参数');
   }
 
-  let group = await db.models.group_group.findOne({
+  const group = await db.models.group_group.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
