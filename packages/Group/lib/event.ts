@@ -11,6 +11,7 @@ import { ChatLog } from 'packages/Chat/lib/models/log';
 import { GroupDetail } from './models/detail';
 import { GroupChannel } from './models/channel';
 import { NoReportError } from 'lib/error';
+import { notifyGroupRemoveMember, notifyGroupDismiss } from './notify';
 
 export const create: EventFunc<{
   name: string;
@@ -974,9 +975,7 @@ export const dismissGroup: EventFunc<{
     throw new Error('缺少必要参数');
   }
 
-  const group: GroupGroup = await GroupGroup.findOne({
-    where: { uuid: groupUUID },
-  });
+  const group: GroupGroup = await GroupGroup.findByUUID(groupUUID);
   if (!group) {
     throw new Error('找不到团');
   }
@@ -996,9 +995,13 @@ export const dismissGroup: EventFunc<{
   });
 
   await group.destroy();
-  return true;
+
+  // 通知团成员移除角色
+  notifyGroupDismiss(groupUUID);
 
   // TODO: 解散socket房间
+
+  return true;
 };
 
 export const tickMember: EventFunc<{

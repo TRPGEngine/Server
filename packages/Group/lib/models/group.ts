@@ -16,7 +16,12 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
-import { notifyUpdateGroupInfo } from '../notify';
+import {
+  notifyUpdateGroupInfo,
+  notifyGroupRemoveMember,
+  notifyGroupAddMember,
+  notifyUserAddGroup,
+} from '../notify';
 import { GroupDetail } from './detail';
 import { GroupChannel } from './channel';
 import Debug from 'debug';
@@ -324,23 +329,12 @@ export class GroupGroup extends Model {
     if (app.player) {
       if (await app.player.manager.checkPlayerOnline(user.uuid)) {
         // 检查加入团的成员是否在线, 如果在线则发送一条更新通知要求其更新团信息
-        app.player.manager.unicastSocketEvent(
-          user.uuid,
-          'group::addGroupSuccess',
-          { group }
-        );
+        notifyUserAddGroup(user.uuid, group);
         app.player.manager.joinRoomWithUUID(group.uuid, user.uuid);
       }
 
       // 通知团其他所有人更新团成员列表
-      app.player.manager.roomcastSocketEvent(
-        group.uuid,
-        'group::addGroupMember',
-        {
-          groupUUID: group.uuid,
-          memberUUID: user.uuid,
-        }
-      );
+      notifyGroupAddMember(group.uuid, user.uuid);
     }
   }
 
@@ -398,14 +392,7 @@ export class GroupGroup extends Model {
     await app.player.manager.leaveRoomWithUUID(group.uuid, userUUID);
 
     // 通知团其他所有人更新团成员列表
-    app.player.manager.roomcastSocketEvent(
-      group.uuid,
-      'group::removeGroupMember',
-      {
-        groupUUID: group.uuid,
-        memberUUID: user.uuid,
-      }
-    );
+    notifyGroupRemoveMember(group.uuid, user.uuid);
 
     // 返回操作对象用于后续操作。如通知
     return {
