@@ -14,6 +14,7 @@ env:
 jobs:
   ding:
     runs-on: ubuntu-latest
+    if: github.repository == 'TRPGEngine/Server'
     name: 自动顶帖
     steps:
       - uses: actions/checkout@master
