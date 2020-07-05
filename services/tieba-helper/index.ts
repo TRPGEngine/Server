@@ -20,6 +20,10 @@ const REPLY_TID = process.env.REPLY_TID; // 帖子id
 const REPLY_MSG = process.env.REPLY_MSG; // 回帖内容
 const REPLY_MSG_SUFFIX = process.env.REPLY_MSG_SUFFIX;
 
+if (BDUSS === undefined || REPLY_TID === undefined || REPLY_MSG === undefined) {
+  throw new Error('缺少必要参数, 请检查环境变量!');
+}
+
 // 发送信息
 console.table({ REPLY_TIEBA_NAME, REPLY_TID, REPLY_MSG });
 
