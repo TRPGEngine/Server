@@ -42,6 +42,9 @@ async function getTBS(): Promise<string> {
       Cookie: `BDUSS=${BDUSS}`,
     },
   });
+  if (data.is_login !== 1) {
+    throw new Error('获取TBS出现问题:' + JSON.stringify(data));
+  }
   console.log('[GET TBS]', JSON.stringify(data));
   return data.tbs;
 }
@@ -185,4 +188,5 @@ async function reply2() {
   }
 }
 
-reply2();
+// reply2();
+getTBS();
