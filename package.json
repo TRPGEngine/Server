@@ -98,7 +98,7 @@
     "prettier": "^1.19.1",
     "sequelize-auto-migrations": "github:TRPGEngine/sequelize-auto-migrations",
     "socket.io-client": "^2.2.0",
-    "standard-version": "^7.0.1",
+    "standard-version": "^8.0.1",
     "supertest": "^4.0.2",
     "ts-jest": "^24.0.2"
   }
