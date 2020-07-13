@@ -2031,6 +2031,13 @@
                     "field": "desc",
                     "seqType": "Sequelize.STRING"
                 },
+                "visible": {
+                    "defaultValue": {
+                        "value": "all"
+                    },
+                    "field": "visible",
+                    "seqType": "Sequelize.ENUM('all', 'manager', 'assign')"
+                },
                 "members": {
                     "defaultValue": {
                         "internal": true,
@@ -3284,5 +3291,5 @@
             "indexes": []
         }
     },
-    "revision": 54
+    "revision": 55
 }

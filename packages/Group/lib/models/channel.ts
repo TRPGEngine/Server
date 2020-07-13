@@ -18,6 +18,8 @@ declare module './group' {
   }
 }
 
+type GroupChannelVisible = 'all' | 'manager' | 'assign';
+
 /**
  * 一个群组可以有多个频道
  */
@@ -25,7 +27,9 @@ export class GroupChannel extends Model {
   uuid: string;
   name: string;
   desc: string;
-  members: string[];
+
+  visible: GroupChannelVisible; // 可见性
+  members: string[]; // 当visible为assign时有效
 
   groupId?: number;
 
@@ -52,6 +56,7 @@ export class GroupChannel extends Model {
     playerUUID: string,
     name: string,
     desc: string,
+    visible: GroupChannelVisible = 'all',
     memberUUIDs?: string[]
   ): Promise<GroupChannel> {
     const group = await GroupGroup.findByUUID(groupUUID);
@@ -70,6 +75,7 @@ export class GroupChannel extends Model {
     const channel: GroupChannel = await group.createChannel({
       name,
       desc,
+      visible,
       members: _.uniq(memberUUIDs),
     });
 
@@ -160,6 +166,10 @@ export default function GroupChannelDefinition(Sequelize: Orm, db: DBInstance) {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       name: { type: Sequelize.STRING }, // 对应actor_actor的UUID
       desc: { type: Sequelize.STRING },
+      visible: {
+        type: Sequelize.ENUM('all', 'manager', 'assign'),
+        defaultValue: 'all',
+      },
       members: { type: Sequelize.JSON, defaultValue: [] },
     },
     {

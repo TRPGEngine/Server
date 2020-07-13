@@ -528,6 +528,7 @@ describe('group model function', () => {
         expect(channel.name).toBe(name);
         expect(channel.desc).toBe(desc);
         expect(Array.isArray(channel.members)).toBe(true);
+        expect(channel.visible).toBe('all');
         expect(channel.members.length).toBeGreaterThan(0);
         expect(channel.members.includes(testUser.uuid)).toBe(true);
       } finally {
