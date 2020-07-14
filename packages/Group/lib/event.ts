@@ -1231,3 +1231,33 @@ export const removeGroupChannelMember: EventFunc<{
 
   return true;
 };
+
+/**
+ * 获取Group的初始化信息
+ */
+export const getGroupInitData: EventFunc<{
+  groupUUID: string;
+}> = async function(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+  const groupUUID = data.groupUUID;
+  if (!groupUUID) {
+    throw new Error('缺少必要参数');
+  }
+
+  // 获取团成员
+  const group = await GroupGroup.findByUUID(groupUUID);
+  const members: PlayerUser[] = await group.getAllGroupMember();
+
+  // 获取团人物
+  const groupActors: GroupActor[] = await group.getGroupActors();
+
+  // 获取团选择人物的Mapping
+  const groupActorsMapping = await group.getGroupActorMapping(player.uuid);
+
+  return { members, groupActors, groupActorsMapping };
+};
