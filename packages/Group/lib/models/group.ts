@@ -478,6 +478,40 @@ export class GroupGroup extends Model {
   }
 
   /**
+   * 获取团所有团角色的设置mapping
+   * @param selfUUID 用户自己的UUID
+   */
+  async getGroupActorMapping(
+    selfUUID: string
+  ): Promise<{
+    [userUUID: string]: string;
+  }> {
+    const members = await this.getMembers();
+    const mapping = _.fromPairs<string>(
+      members.map((member) => {
+        const userUUID = _.get(member, 'uuid');
+        const groupActorUUID = _.get(
+          member,
+          'group_group_members.selected_group_actor_uuid'
+        );
+
+        if (_.isNil(groupActorUUID)) {
+          return [];
+        }
+
+        return [userUUID, groupActorUUID];
+      })
+    );
+
+    // TODO: 这个self不知道有没有用，应当在前端指定而不是后端
+    if (mapping[selfUUID]) {
+      mapping['self'] = mapping[selfUUID];
+    }
+
+    return mapping;
+  }
+
+  /**
    * 获取在某个团中的用户信息
    * 返回的信息中会包含关联模型关联信息
    * @param playerUUID 用户UUID

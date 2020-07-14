@@ -246,6 +246,7 @@ describe('group model function', () => {
         const testUser = await getTestUser();
         await testGroup.addMember(testUser);
 
+        // 创建测试用户并指派
         const testGroupActor = await createTestGroupActor(testGroup.id);
         await GroupActor.setPlayerSelectedGroupActor(
           testGroup.uuid,
@@ -258,6 +259,27 @@ describe('group model function', () => {
         expect(members.length).toBeGreaterThan(0);
         expect(members[0].uuid).toBe(testUser.uuid);
         expect(members[0].selected_actor_uuid).toBe(testGroupActor.uuid);
+      });
+    });
+
+    test('group.getGroupActorMapping should be ok', async () => {
+      const testGroup = await createTestGroup();
+      const testUser = await getTestUser();
+      await testGroup.addMember(testUser);
+
+      // 创建测试用户并指派
+      const testGroupActor = await createTestGroupActor(testGroup.id);
+      await GroupActor.setPlayerSelectedGroupActor(
+        testGroup.uuid,
+        testGroupActor.uuid,
+        testUser.uuid,
+        testUser.uuid
+      );
+
+      const mapping = await testGroup.getGroupActorMapping(testUser.uuid);
+      expect(mapping).toMatchObject({
+        [testUser.uuid]: testGroupActor.uuid,
+        self: testGroupActor.uuid,
       });
     });
   });

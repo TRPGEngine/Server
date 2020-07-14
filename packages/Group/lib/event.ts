@@ -651,7 +651,7 @@ export const getGroupActors: EventFunc<{
  */
 export const getGroupActorMapping: EventFunc<{
   groupUUID: string;
-}> = async function getGroupActorMapping(data, cb, db) {
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -663,32 +663,12 @@ export const getGroupActorMapping: EventFunc<{
   const selfUUID = player.uuid;
   const { groupUUID } = data;
 
-  const group = await (db.models.group_group as any).findOne({
-    where: { uuid: groupUUID },
-  });
+  const group = await GroupGroup.findByUUID(groupUUID);
   if (!group) {
     throw new Error('找不到团信息');
   }
 
-  const members = await group.getMembers();
-  const mapping = _.fromPairs(
-    members.map((member) => {
-      const userUUID = _.get(member, 'uuid');
-      const groupActorUUID = _.get(
-        member,
-        'group_group_members.selected_group_actor_uuid'
-      );
-
-      if (_.isNil(groupActorUUID)) {
-        return [];
-      }
-
-      return [userUUID, groupActorUUID];
-    })
-  );
-  if (mapping[selfUUID]) {
-    mapping['self'] = mapping[selfUUID];
-  }
+  const mapping = await group.getGroupActorMapping(selfUUID);
 
   return { mapping };
 };
