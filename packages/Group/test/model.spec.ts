@@ -12,13 +12,13 @@ import {
 } from './example';
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
-import testExampleStack from 'test/utils/example';
+import { regAutoClear } from 'test/utils/example';
 import { GroupDetail } from '../lib/models/detail';
 import { GroupChannel } from '../lib/models/channel';
 
 const context = buildAppContext();
 
-testExampleStack.regAfterAll();
+regAutoClear();
 
 describe('group model function', () => {
   let testActor: ActorActor;
@@ -227,6 +227,38 @@ describe('group model function', () => {
       const testGroup3 = await GroupGroup.findByPk(testGroup.id);
       const num3 = testGroup3.members_count;
       expect(num3).toBe(num1);
+    });
+
+    describe('group.getAllGroupMember should be ok', () => {
+      test('should get correct members', async () => {
+        const testGroup = await createTestGroup();
+        const testUser = await getTestUser();
+        await testGroup.addMember(testUser);
+
+        const members = await testGroup.getAllGroupMember();
+
+        expect(members.length).toBeGreaterThan(0);
+        expect(members[0].uuid).toBe(testUser.uuid);
+      });
+
+      test('should get member selected group actor uuid', async () => {
+        const testGroup = await createTestGroup();
+        const testUser = await getTestUser();
+        await testGroup.addMember(testUser);
+
+        const testGroupActor = await createTestGroupActor(testGroup.id);
+        await GroupActor.setPlayerSelectedGroupActor(
+          testGroup.uuid,
+          testGroupActor.uuid,
+          testUser.uuid,
+          testUser.uuid
+        );
+
+        const members = await testGroup.getAllGroupMember();
+        expect(members.length).toBeGreaterThan(0);
+        expect(members[0].uuid).toBe(testUser.uuid);
+        expect(members[0].selected_actor_uuid).toBe(testGroupActor.uuid);
+      });
     });
   });
 

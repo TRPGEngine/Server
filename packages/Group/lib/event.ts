@@ -602,7 +602,9 @@ export const getGroupList: EventFunc<{}> = async function getGroupList(
   return { groups };
 };
 
-// TODO: selected_actor_uuid相关可能会有问题。需要处理
+/**
+ * 获取团角色列表
+ */
 export const getGroupMembers: EventFunc<{
   groupUUID: string;
 }> = async function getGroupMembers(data, cb, db) {
@@ -613,20 +615,13 @@ export const getGroupMembers: EventFunc<{
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
-  let groupUUID = data.groupUUID;
+  const groupUUID = data.groupUUID;
   if (!groupUUID) {
     throw new Error('缺少必要参数');
   }
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  let members = await group.getMembers();
-  members = members.map((i) =>
-    Object.assign({}, i.getInfo(), {
-      selected_actor_uuid: i.group_group_members.selected_group_actor_uuid,
-    })
-  );
+  const group = await GroupGroup.findByUUID(groupUUID);
+  const members = await group.getAllGroupMember();
   return { members };
 };
 

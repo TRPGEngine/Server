@@ -464,6 +464,20 @@ export class GroupGroup extends Model {
   }
 
   /**
+   * TODO: selected_actor_uuid 相关可能会有问题。需要处理
+   * 获取团成员列表
+   */
+  async getAllGroupMember(): Promise<any[]> {
+    let members = await this.getMembers();
+    members = members.map((i) => ({
+      ...i.getInfo(),
+      selected_actor_uuid: i.group_group_members.selected_group_actor_uuid,
+    }));
+
+    return members;
+  }
+
+  /**
    * 获取在某个团中的用户信息
    * 返回的信息中会包含关联模型关联信息
    * @param playerUUID 用户UUID
