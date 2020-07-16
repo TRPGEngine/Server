@@ -18,14 +18,39 @@ export class PlayerSettings extends Model {
 
   /**
    * 根据uuid获取用户设置
-   * @param uuid 用户UUID
+   * @param userUUID 用户UUID
    */
-  static getByUserUUID(uuid: string): Promise<PlayerSettings> {
+  static async findByUserUUID(userUUID: string): Promise<PlayerSettings> {
     return PlayerSettings.findOne({
       where: {
-        user_uuid: uuid,
+        user_uuid: userUUID,
       },
     });
+  }
+
+  /**
+   * 根据用户UUID获取用户的列表
+   * @param userUUID 用户UUID
+   */
+  static async getUserSettings(
+    userUUID: string
+  ): Promise<{
+    userSettings: UserSetting;
+    systemSettings: SystemSetting;
+  }> {
+    const settings = await PlayerSettings.findByUserUUID(userUUID);
+    if (!settings) {
+      // 没有记录过用户设置
+      return {
+        userSettings: {},
+        systemSettings: {},
+      };
+    }
+
+    return {
+      userSettings: settings.user_settings || {},
+      systemSettings: settings.system_settings || {},
+    };
   }
 
   /**
@@ -74,8 +99,8 @@ export default function PlayerSettingsDefinition(
   PlayerSettings.init(
     {
       user_uuid: { type: Sequelize.STRING, unique: true },
-      user_settings: { type: Sequelize.JSON },
-      system_settings: { type: Sequelize.JSON },
+      user_settings: { type: Sequelize.JSON, defaultValue: {} },
+      system_settings: { type: Sequelize.JSON, defaultValue: {} },
     },
     {
       tableName: 'player_settings',

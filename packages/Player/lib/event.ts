@@ -8,6 +8,7 @@ import { TRPGApplication, Socket } from 'trpg/core';
 import { Platform } from '../types/player';
 import { PlayerInvite } from './models/invite';
 import { autoJoinSocketRoom } from './managers/socketroom-manager';
+import { PlayerSettings } from './models/settings';
 
 export const login: EventFunc<{
   username: string;
@@ -555,13 +556,7 @@ export const getFriendsInvite: EventFunc = async function getFriendsInvite(
   }
 
   const uuid = player.uuid;
-  const res = await db.models.player_invite.findAll({
-    where: {
-      to_uuid: uuid,
-      is_agree: false,
-      is_refuse: false,
-    },
-  });
+  const res = await PlayerInvite.getAllUnprocessedInvites(uuid);
 
   return { res };
 };
@@ -610,30 +605,19 @@ export const checkUserOnline: EventFunc<{
 };
 
 export const getSettings: EventFunc = async function getSettings(data, cb, db) {
-  let app = this.app;
-  let socket = this.socket;
+  const app = this.app;
+  const socket = this.socket;
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw new Error('当前用户不存在');
   }
-  let uuid = player.uuid;
+  const uuid = player.uuid;
 
-  let settings = await db.models.player_settings.findOne({
-    where: { user_uuid: uuid },
-  });
+  const settings = await PlayerSettings.getUserSettings(uuid);
 
-  if (!settings) {
-    // 没有记录过用户设置
     return {
-      userSettings: {},
-      systemSettings: {},
-    };
-  }
-
-  return {
-    userSettings: settings.user_settings || {},
-    systemSettings: settings.system_settings || {},
+    ...settings,
   };
 };
 

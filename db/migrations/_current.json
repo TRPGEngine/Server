@@ -451,10 +451,18 @@
                     "seqType": "Sequelize.STRING"
                 },
                 "user_settings": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.Object"
+                    },
                     "field": "user_settings",
                     "seqType": "Sequelize.JSON"
                 },
                 "system_settings": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.Object"
+                    },
                     "field": "system_settings",
                     "seqType": "Sequelize.JSON"
                 },
@@ -3291,5 +3299,5 @@
             "indexes": []
         }
     },
-    "revision": 55
+    "revision": 56
 }

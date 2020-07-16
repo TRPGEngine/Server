@@ -117,7 +117,7 @@ export const activeNofifyEvent: EventFunc<{
   const userUUID = player.uuid;
   const registrationID = _.get(data, 'info.registrationID');
 
-  const setting = await PlayerSettings.getByUserUUID(userUUID);
+  const setting = await PlayerSettings.findByUserUUID(userUUID);
   const upush = await NotifyUPush.findByRegistrationAndUserUUID(
     registrationID,
     userUUID
@@ -151,7 +151,7 @@ export const deactiveNofifyEvent: EventFunc<{
   const userUUID = player.uuid;
   const registrationID = _.get(data, 'info.registrationID');
 
-  const setting = await PlayerSettings.getByUserUUID(userUUID);
+  const setting = await PlayerSettings.findByUserUUID(userUUID);
   const upush = await NotifyUPush.findByRegistrationAndUserUUID(
     registrationID,
     userUUID
