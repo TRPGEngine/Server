@@ -1,10 +1,16 @@
 import md5Encrypt from '../utils/md5';
 import sha1Encrypt from '../utils/sha1';
 import randomString from 'crypto-random-string';
-import { Model, DBInstance, Orm } from 'trpg/core';
+import {
+  Model,
+  DBInstance,
+  Orm,
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManyAddAssociationMixin,
+} from 'trpg/core';
 import config from 'config';
 import _ from 'lodash';
-import { fn, col, BelongsToManyGetAssociationsMixin } from 'sequelize';
+import { fn, col } from 'sequelize';
 import {
   PlayerJWTPayload,
   PlayerInfoObject,
@@ -35,6 +41,7 @@ export const getPlayerUserCacheKey = (uuid: string): string =>
 declare module 'packages/Player/lib/models/user' {
   interface PlayerUser {
     getFriend?: BelongsToManyGetAssociationsMixin<PlayerUser>;
+    addFriend?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
   }
 }
 
