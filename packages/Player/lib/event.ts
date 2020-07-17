@@ -616,7 +616,7 @@ export const getSettings: EventFunc = async function getSettings(data, cb, db) {
 
   const settings = await PlayerSettings.getUserSettings(uuid);
 
-    return {
+  return {
     ...settings,
   };
 };
@@ -662,5 +662,39 @@ export const saveSettings: EventFunc<{
   return {
     userSettings: settings.user_settings,
     systemSettings: settings.system_settings,
+  };
+};
+
+/**
+ * 获取用户初始数据
+ * 用于减少初始的请求
+ */
+export const getUserInitData: EventFunc = async function(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户状态异常');
+  }
+
+  const userUUID = player.uuid;
+  const user = await PlayerUser.findByUUID(userUUID);
+
+  // 获取用户列表
+  const friendList = await user.getFriendList();
+
+  // 获取所有未处理的好友邀请
+  const unprocessedFriendInvites = await PlayerInvite.getAllUnprocessedInvites(
+    userUUID
+  );
+
+  // 获取用户设置与系统设置
+  const settings = await PlayerSettings.getUserSettings(userUUID);
+
+  return {
+    friendList,
+    unprocessedFriendInvites,
+    settings,
   };
 };

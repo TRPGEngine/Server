@@ -218,6 +218,7 @@ export default class Player extends BasePackage {
     this.regSocketEvent('player::checkUserOnline', event.checkUserOnline);
     this.regSocketEvent('player::getSettings', event.getSettings);
     this.regSocketEvent('player::saveSettings', event.saveSettings);
+    this.regSocketEvent('player::getUserInitData', event.getUserInitData);
 
     // TODO:需要考虑到断线重连的问题
     const app = this.app;
