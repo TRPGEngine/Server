@@ -1,4 +1,9 @@
-import { getTestUser, testUserInfo, createTestPlayerLoginLog } from './example';
+import {
+  getTestUser,
+  testUserInfo,
+  createTestPlayerLoginLog,
+  getOtherTestUser,
+} from './example';
 import {
   PlayerUser,
   getPlayerUserCacheKey,
@@ -137,6 +142,18 @@ describe('PlayerUser', () => {
         await newUser.destroy({ force: true });
       }
     });
+  });
+
+  test('user.getFriendList should be ok', async () => {
+    const testUser = await getTestUser();
+    const otherTestUser = await getOtherTestUser('admin9');
+    await testUser.addFriend(otherTestUser); // 确保有一条好友关系
+
+    const list = await testUser.getFriendList();
+
+    expect(list.length).toBeGreaterThan(0);
+    expect(list[0]).toHaveProperty('id');
+    expect(list[0]).toHaveProperty('username');
   });
 });
 

@@ -5,31 +5,29 @@ var Sequelize = require('sequelize');
 /**
  * Actions summary:
  *
- * dropTable "bot_operation_log"
- * changeColumn "ua" on table "report_error"
+ * addColumn "visible" to table "group_channel"
  *
  **/
 
 var info = {
-    "revision": 53,
-    "name": "update_report_ua_length",
-    "created": "2020-06-20T10:24:21.357Z",
+    "revision": 55,
+    "name": "group_channel_visible",
+    "created": "2020-07-13T08:42:59.633Z",
     "comment": ""
 };
 
-var migrationCommands = [
-    {
-        fn: "changeColumn",
-        params: [
-            "report_error",
-            "ua",
-            {
-                "type": Sequelize.TEXT,
-                "field": "ua"
-            }
-        ]
-    }
-];
+var migrationCommands = [{
+    fn: "addColumn",
+    params: [
+        "group_channel",
+        "visible",
+        {
+            "type": Sequelize.ENUM('all', 'manager', 'assign'),
+            "field": "visible",
+            "defaultValue": "all"
+        }
+    ]
+}];
 
 module.exports = {
     pos: 0,

@@ -8,6 +8,7 @@ import { TRPGApplication, Socket } from 'trpg/core';
 import { Platform } from '../types/player';
 import { PlayerInvite } from './models/invite';
 import { autoJoinSocketRoom } from './managers/socketroom-manager';
+import { PlayerSettings } from './models/settings';
 
 export const login: EventFunc<{
   username: string;
@@ -555,13 +556,7 @@ export const getFriendsInvite: EventFunc = async function getFriendsInvite(
   }
 
   const uuid = player.uuid;
-  const res = await db.models.player_invite.findAll({
-    where: {
-      to_uuid: uuid,
-      is_agree: false,
-      is_refuse: false,
-    },
-  });
+  const res = await PlayerInvite.getAllUnprocessedInvites(uuid);
 
   return { res };
 };
@@ -610,30 +605,19 @@ export const checkUserOnline: EventFunc<{
 };
 
 export const getSettings: EventFunc = async function getSettings(data, cb, db) {
-  let app = this.app;
-  let socket = this.socket;
+  const app = this.app;
+  const socket = this.socket;
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw new Error('当前用户不存在');
   }
-  let uuid = player.uuid;
+  const uuid = player.uuid;
 
-  let settings = await db.models.player_settings.findOne({
-    where: { user_uuid: uuid },
-  });
-
-  if (!settings) {
-    // 没有记录过用户设置
-    return {
-      userSettings: {},
-      systemSettings: {},
-    };
-  }
+  const settings = await PlayerSettings.getUserSettings(uuid);
 
   return {
-    userSettings: settings.user_settings || {},
-    systemSettings: settings.system_settings || {},
+    ...settings,
   };
 };
 
@@ -678,5 +662,39 @@ export const saveSettings: EventFunc<{
   return {
     userSettings: settings.user_settings,
     systemSettings: settings.system_settings,
+  };
+};
+
+/**
+ * 获取用户初始数据
+ * 用于减少初始的请求
+ */
+export const getUserInitData: EventFunc = async function(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户状态异常');
+  }
+
+  const userUUID = player.uuid;
+  const user = await PlayerUser.findByUUID(userUUID);
+
+  // 获取用户列表
+  const friendList = await user.getFriendList();
+
+  // 获取所有未处理的好友邀请
+  const unprocessedFriendInvites = await PlayerInvite.getAllUnprocessedInvites(
+    userUUID
+  );
+
+  // 获取用户设置与系统设置
+  const settings = await PlayerSettings.getUserSettings(userUUID);
+
+  return {
+    friendList,
+    unprocessedFriendInvites,
+    settings,
   };
 };

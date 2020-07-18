@@ -16,7 +16,12 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupActor } from './actor';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
-import { notifyUpdateGroupInfo } from '../notify';
+import {
+  notifyUpdateGroupInfo,
+  notifyGroupRemoveMember,
+  notifyGroupAddMember,
+  notifyUserAddGroup,
+} from '../notify';
 import { GroupDetail } from './detail';
 import { GroupChannel } from './channel';
 import Debug from 'debug';
@@ -324,23 +329,12 @@ export class GroupGroup extends Model {
     if (app.player) {
       if (await app.player.manager.checkPlayerOnline(user.uuid)) {
         // 检查加入团的成员是否在线, 如果在线则发送一条更新通知要求其更新团信息
-        app.player.manager.unicastSocketEvent(
-          user.uuid,
-          'group::addGroupSuccess',
-          { group }
-        );
+        notifyUserAddGroup(user.uuid, group);
         app.player.manager.joinRoomWithUUID(group.uuid, user.uuid);
       }
 
       // 通知团其他所有人更新团成员列表
-      app.player.manager.roomcastSocketEvent(
-        group.uuid,
-        'group::addGroupMember',
-        {
-          groupUUID: group.uuid,
-          memberUUID: user.uuid,
-        }
-      );
+      notifyGroupAddMember(group.uuid, user.uuid);
     }
   }
 
@@ -398,14 +392,7 @@ export class GroupGroup extends Model {
     await app.player.manager.leaveRoomWithUUID(group.uuid, userUUID);
 
     // 通知团其他所有人更新团成员列表
-    app.player.manager.roomcastSocketEvent(
-      group.uuid,
-      'group::removeGroupMember',
-      {
-        groupUUID: group.uuid,
-        memberUUID: user.uuid,
-      }
-    );
+    notifyGroupRemoveMember(group.uuid, user.uuid);
 
     // 返回操作对象用于后续操作。如通知
     return {
@@ -474,6 +461,54 @@ export class GroupGroup extends Model {
    */
   getManagerUUIDs(): string[] {
     return Array.from(new Set([this.owner_uuid].concat(this.managers_uuid)));
+  }
+
+  /**
+   * TODO: selected_actor_uuid 相关可能会有问题。需要处理
+   * 获取团成员列表
+   */
+  async getAllGroupMember(): Promise<any[]> {
+    let members = await this.getMembers();
+    members = members.map((i) => ({
+      ...i.getInfo(),
+      selected_actor_uuid: i.group_group_members.selected_group_actor_uuid,
+    }));
+
+    return members;
+  }
+
+  /**
+   * 获取团所有团角色的设置mapping
+   * @param selfUUID 用户自己的UUID
+   */
+  async getGroupActorMapping(
+    selfUUID: string
+  ): Promise<{
+    [userUUID: string]: string;
+  }> {
+    const members = await this.getMembers();
+    const mapping = _.fromPairs<string>(
+      members.map((member) => {
+        const userUUID = _.get(member, 'uuid');
+        const groupActorUUID = _.get(
+          member,
+          'group_group_members.selected_group_actor_uuid'
+        );
+
+        if (_.isNil(groupActorUUID)) {
+          return [];
+        }
+
+        return [userUUID, groupActorUUID];
+      })
+    );
+
+    // TODO: 这个self不知道有没有用，应当在前端指定而不是后端
+    if (mapping[selfUUID]) {
+      mapping['self'] = mapping[selfUUID];
+    }
+
+    return mapping;
   }
 
   /**

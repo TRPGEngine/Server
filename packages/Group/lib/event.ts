@@ -11,6 +11,7 @@ import { ChatLog } from 'packages/Chat/lib/models/log';
 import { GroupDetail } from './models/detail';
 import { GroupChannel } from './models/channel';
 import { NoReportError } from 'lib/error';
+import { notifyGroupRemoveMember, notifyGroupDismiss } from './notify';
 
 export const create: EventFunc<{
   name: string;
@@ -601,7 +602,9 @@ export const getGroupList: EventFunc<{}> = async function getGroupList(
   return { groups };
 };
 
-// TODO: selected_actor_uuid相关可能会有问题。需要处理
+/**
+ * 获取团角色列表
+ */
 export const getGroupMembers: EventFunc<{
   groupUUID: string;
 }> = async function getGroupMembers(data, cb, db) {
@@ -612,20 +615,13 @@ export const getGroupMembers: EventFunc<{
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
-  let groupUUID = data.groupUUID;
+  const groupUUID = data.groupUUID;
   if (!groupUUID) {
     throw new Error('缺少必要参数');
   }
 
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
-  let members = await group.getMembers();
-  members = members.map((i) =>
-    Object.assign({}, i.getInfo(), {
-      selected_actor_uuid: i.group_group_members.selected_group_actor_uuid,
-    })
-  );
+  const group = await GroupGroup.findByUUID(groupUUID);
+  const members = await group.getAllGroupMember();
   return { members };
 };
 
@@ -655,7 +651,7 @@ export const getGroupActors: EventFunc<{
  */
 export const getGroupActorMapping: EventFunc<{
   groupUUID: string;
-}> = async function getGroupActorMapping(data, cb, db) {
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -667,32 +663,12 @@ export const getGroupActorMapping: EventFunc<{
   const selfUUID = player.uuid;
   const { groupUUID } = data;
 
-  const group = await (db.models.group_group as any).findOne({
-    where: { uuid: groupUUID },
-  });
+  const group = await GroupGroup.findByUUID(groupUUID);
   if (!group) {
     throw new Error('找不到团信息');
   }
 
-  const members = await group.getMembers();
-  const mapping = _.fromPairs(
-    members.map((member) => {
-      const userUUID = _.get(member, 'uuid');
-      const groupActorUUID = _.get(
-        member,
-        'group_group_members.selected_group_actor_uuid'
-      );
-
-      if (_.isNil(groupActorUUID)) {
-        return [];
-      }
-
-      return [userUUID, groupActorUUID];
-    })
-  );
-  if (mapping[selfUUID]) {
-    mapping['self'] = mapping[selfUUID];
-  }
+  const mapping = await group.getGroupActorMapping(selfUUID);
 
   return { mapping };
 };
@@ -937,7 +913,7 @@ export const quitGroup: EventFunc<{
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
-  let groupUUID = data.groupUUID;
+  const groupUUID = data.groupUUID;
   if (!groupUUID) {
     throw new Error('缺少必要参数');
   }
@@ -974,9 +950,7 @@ export const dismissGroup: EventFunc<{
     throw new Error('缺少必要参数');
   }
 
-  const group: GroupGroup = await GroupGroup.findOne({
-    where: { uuid: groupUUID },
-  });
+  const group: GroupGroup = await GroupGroup.findByUUID(groupUUID);
   if (!group) {
     throw new Error('找不到团');
   }
@@ -985,7 +959,7 @@ export const dismissGroup: EventFunc<{
   }
 
   // 系统通知
-  const members = await group.getMembers();
+  const members: PlayerUser[] = await group.getMembers();
   const systemMsg = `您所在的团 ${group.name} 解散了, ${members.length -
     1} 只小鸽子无家可归`;
   members.forEach((member) => {
@@ -996,9 +970,13 @@ export const dismissGroup: EventFunc<{
   });
 
   await group.destroy();
-  return true;
+
+  // 通知团成员移除角色
+  notifyGroupDismiss(groupUUID);
 
   // TODO: 解散socket房间
+
+  return true;
 };
 
 export const tickMember: EventFunc<{
@@ -1051,23 +1029,19 @@ export const setMemberToManager: EventFunc<{
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
-  let groupUUID = data.groupUUID;
-  let memberUUID = data.memberUUID;
+  const groupUUID = data.groupUUID;
+  const memberUUID = data.memberUUID;
   if (!groupUUID || !memberUUID) {
     throw new Error('缺少必要参数');
   }
   if (player.uuid === memberUUID) {
     throw new Error('你不能将自己提升为管理员');
   }
-  let group = await db.models.group_group.findOne({
-    where: { uuid: groupUUID },
-  });
+  const group = await GroupGroup.findByUUID(groupUUID);
   if (!group) {
     throw new Error('找不到团');
   }
-  let member = await db.models.player_user.findOne({
-    where: { uuid: memberUUID },
-  });
+  const member = await PlayerUser.findByUUID(memberUUID);
   if (!member) {
     throw new Error('找不到该成员');
   }
@@ -1130,14 +1104,14 @@ export const setGroupStatus: EventFunc<{
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
-  let uuid = player.uuid;
+  const uuid = player.uuid;
   let { groupUUID, groupStatus } = data;
   groupStatus = Boolean(groupStatus);
   if (!groupUUID || groupStatus === undefined) {
     throw new Error('缺少必要参数');
   }
 
-  let group = await db.models.group_group.findOne({
+  const group = await db.models.group_group.findOne({
     where: { uuid: groupUUID },
   });
   if (!group) {
@@ -1256,4 +1230,34 @@ export const removeGroupChannelMember: EventFunc<{
   await GroupChannel.removeMember(channelUUID, player.uuid, memberUUIDs);
 
   return true;
+};
+
+/**
+ * 获取Group的初始化信息
+ */
+export const getGroupInitData: EventFunc<{
+  groupUUID: string;
+}> = async function(data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+  const groupUUID = data.groupUUID;
+  if (!groupUUID) {
+    throw new Error('缺少必要参数');
+  }
+
+  // 获取团成员
+  const group = await GroupGroup.findByUUID(groupUUID);
+  const members: PlayerUser[] = await group.getAllGroupMember();
+
+  // 获取团人物
+  const groupActors: GroupActor[] = await group.getGroupActors();
+
+  // 获取团选择人物的Mapping
+  const groupActorsMapping = await group.getGroupActorMapping(player.uuid);
+
+  return { members, groupActors, groupActorsMapping };
 };

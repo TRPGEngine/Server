@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.28.0](https://github.com/TRPGEngine/Server/compare/v1.27.0...v1.28.0) (2020-07-18)
+
+
+### Features
+
+* 增加自动顶帖服务 ([32e80cb](https://github.com/TRPGEngine/Server/commit/32e80cb81af895105fe65b4960459f3efa79699d))
+* **group:** add group channel visible field ([6245f52](https://github.com/TRPGEngine/Server/commit/6245f52934cbfdfb43a736615a079723ab73b093))
+* **group:** 增加解散团时同步客户端状态 ([f7d0f76](https://github.com/TRPGEngine/Server/commit/f7d0f767c1cea2735b86c0d2c8c4723134bda7dd))
+
 ## [1.27.0](https://github.com/TRPGEngine/Server/compare/v1.26.0...v1.27.0) (2020-06-27)
 
 

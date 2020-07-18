@@ -1,11 +1,20 @@
 import md5Encrypt from '../utils/md5';
 import sha1Encrypt from '../utils/sha1';
 import randomString from 'crypto-random-string';
-import { Model, DBInstance, Orm } from 'trpg/core';
+import {
+  Model,
+  DBInstance,
+  Orm,
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManyAddAssociationMixin,
+} from 'trpg/core';
 import config from 'config';
 import _ from 'lodash';
 import { fn, col } from 'sequelize';
-import { PlayerJWTPayload } from 'packages/Player/types/player';
+import {
+  PlayerJWTPayload,
+  PlayerInfoObject,
+} from 'packages/Player/types/player';
 import Debug from 'debug';
 import { NoReportError } from 'lib/error';
 const debug = Debug('trpg:component:player:model');
@@ -28,6 +37,13 @@ export type Alignment =
  */
 export const getPlayerUserCacheKey = (uuid: string): string =>
   `player:user:info:${uuid}`;
+
+declare module 'packages/Player/lib/models/user' {
+  interface PlayerUser {
+    getFriend?: BelongsToManyGetAssociationsMixin<PlayerUser>;
+    addFriend?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
+  }
+}
 
 export class PlayerUser extends Model {
   // 保护字段
@@ -234,10 +250,20 @@ export class PlayerUser extends Model {
   }
 
   /**
+   * 获取用户的好友列表
+   */
+  async getFriendList(): Promise<PlayerInfoObject[]> {
+    const friends: PlayerUser[] = await this.getFriend();
+    const friendList = friends.map((i) => i.getInfo());
+
+    return friendList;
+  }
+
+  /**
    * 获取用户信息
    * @param includeToken 是否包含token
    */
-  getInfo(includeToken = false) {
+  getInfo(includeToken = false): PlayerInfoObject {
     return {
       id: this.id,
       uuid: this.uuid,

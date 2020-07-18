@@ -5,27 +5,39 @@ var Sequelize = require('sequelize');
 /**
  * Actions summary:
  *
- * dropTable "bot_operation_log"
- * changeColumn "ua" on table "report_error"
+ * changeColumn "system_settings" on table "player_settings"
+ * changeColumn "user_settings" on table "player_settings"
  *
  **/
 
 var info = {
-    "revision": 53,
-    "name": "update_report_ua_length",
-    "created": "2020-06-20T10:24:21.357Z",
+    "revision": 56,
+    "name": "add_player_settings_default_value",
+    "created": "2020-07-16T10:04:08.551Z",
     "comment": ""
 };
 
-var migrationCommands = [
+var migrationCommands = [{
+        fn: "changeColumn",
+        params: [
+            "player_settings",
+            "system_settings",
+            {
+                "type": Sequelize.JSON,
+                "field": "system_settings",
+                "defaultValue": Sequelize.Object
+            }
+        ]
+    },
     {
         fn: "changeColumn",
         params: [
-            "report_error",
-            "ua",
+            "player_settings",
+            "user_settings",
             {
-                "type": Sequelize.TEXT,
-                "field": "ua"
+                "type": Sequelize.JSON,
+                "field": "user_settings",
+                "defaultValue": Sequelize.Object
             }
         ]
     }

@@ -38,3 +38,14 @@ class TestExampleStack {
 
 const testExampleStack = new TestExampleStack();
 export default testExampleStack;
+
+/**
+ * 注册自动清理方法
+ */
+export function regAutoClear() {
+  testExampleStack.regAfterAll();
+}
+
+export function appendAutoClear(model: TRPGModel) {
+  testExampleStack.append(model);
+}

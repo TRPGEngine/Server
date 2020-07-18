@@ -1,0 +1,37 @@
+# 贴吧宣传贴自动顶帖
+name: 'Auto Tieba Ding'
+
+on:
+  schedule:
+    - cron: 15 8,20 * * *
+
+env:
+  REPLY_TIEBA_NAME: 跑团
+  REPLY_TID: 6567381589
+  REPLY_MSG: 顶一下
+  REPLY_MSG_SUFFIX: _(:з」∠)_
+
+jobs:
+  ding:
+    runs-on: ubuntu-latest
+    if: github.repository == 'TRPGEngine/Server'
+    name: 自动顶帖
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2.1.0
+        with:
+          node-version: 10
+      - run: cd services/tieba-helper
+      - run: npm ci
+      - name: Run Ding
+        run: |
+          random_time=$(($RANDOM % 300))
+          echo "等待 ${random_time} 分钟后开始顶帖"
+          for((i=1;i<=${random_time};i++));
+          do
+          echo "倒计时 $[${random_time}-$i] 分钟"
+          sleep 1m
+          done
+          npx ts-node index.ts
