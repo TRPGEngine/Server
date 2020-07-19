@@ -100,6 +100,7 @@ export class PlayerUser extends Model {
   static async signJWT(uuid: string): Promise<string> {
     const app = PlayerUser.getApplication();
     const cacheKey = `player:jwt:${uuid}`;
+    const cacheExpires = 1000 * 60 * 60 * 12; // 缓存过期时间12小时
 
     // 如果缓存中已经有签证了，则直接返回缓存中的签证
     const cachedJWT = await app.cache.get(cacheKey);
@@ -115,7 +116,7 @@ export class PlayerUser extends Model {
       avatar: user.getAvatarUrl(),
     } as PlayerJWTPayload);
 
-    await app.cache.set(cacheKey, jwt, { expires: 1000 * 60 * 60 * 12 });
+    await app.cache.set(cacheKey, jwt, { expires: cacheExpires });
 
     return jwt;
   }
