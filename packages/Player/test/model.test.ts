@@ -237,4 +237,23 @@ describe('PlayerInvite', () => {
       await invite.destroy();
     }
   });
+
+  test('getAllUnprocessedInvites should be ok', async () => {
+    const testUser7 = await getOtherTestUser('admin7');
+    const testUser8 = await getOtherTestUser('admin8');
+
+    const invite = await PlayerInvite.sendFriendInvite(
+      testUser7.uuid,
+      testUser8.uuid
+    );
+
+    try {
+      const invites = await PlayerInvite.getAllUnprocessedInvites(
+        testUser8.uuid
+      );
+      expect(invites.map((item) => item.uuid).includes(invite.uuid)).toBe(true);
+    } finally {
+      await invite.destroy();
+    }
+  });
 });
