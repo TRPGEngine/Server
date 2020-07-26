@@ -1,5 +1,5 @@
 import uuid from 'uuid/v1';
-import { Model, Orm, DBInstance } from 'trpg/core';
+import { Model, Orm, DBInstance, Op } from 'trpg/core';
 import { notifyAddInvite } from '../notify';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 
@@ -20,7 +20,14 @@ export class PlayerInvite extends Model {
   ): Promise<PlayerInvite[]> {
     return PlayerInvite.findAll({
       where: {
-        to_uuid: userUUID,
+        [Op.or]: [
+          {
+            to_uuid: userUUID,
+          },
+          {
+            from_uuid: userUUID,
+          },
+        ],
         is_agree: false,
         is_refuse: false,
       },
