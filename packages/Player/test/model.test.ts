@@ -15,6 +15,7 @@ import md5Encrypt from '../lib/utils/md5';
 import sha1Encrypt from '../lib/utils/sha1';
 import { PlayerLoginLog } from '../lib/models/login-log';
 import testExampleStack from 'test/utils/example';
+import { PlayerInvite } from '../lib/models/invite';
 
 const context = buildAppContext();
 
@@ -210,5 +211,30 @@ describe('PlayerLoginLog', () => {
     expect(location).toBe('本机地址');
     const location2 = await PlayerLoginLog.requestIpLocation('114.114.114.114');
     expect(location2).toBe('江苏省南京市 电信');
+  });
+});
+
+describe('PlayerInvite', () => {
+  test('sendFriendInvite should be ok', async () => {
+    const testUser = await getTestUser();
+    const testUser9 = await getOtherTestUser('admin9');
+    const invite = await PlayerInvite.sendFriendInvite(
+      testUser.uuid,
+      testUser9.uuid
+    );
+
+    try {
+      expect(invite.from_uuid).toBe(testUser.uuid);
+      expect(invite.to_uuid).toBe(testUser9.uuid);
+      expect(invite.is_agree).toBe(false);
+      expect(invite.is_refuse).toBe(false);
+
+      const inviteId = invite.id;
+      const inviteIns: PlayerInvite = await PlayerInvite.findByPk(inviteId);
+
+      expect(inviteIns.uuid).toBe(invite.uuid);
+    } finally {
+      await invite.destroy();
+    }
   });
 });
