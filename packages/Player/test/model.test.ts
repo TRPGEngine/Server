@@ -196,7 +196,7 @@ describe('PlayerLoginLog', () => {
     });
   });
 
-  test('getPlayerLoginLog', async () => {
+  test('PlayerLoginLog.getPlayerLoginLog', async () => {
     const testUser = await getTestUser();
     const logs = await PlayerLoginLog.getPlayerLoginLog(testUser.uuid);
 
@@ -206,7 +206,7 @@ describe('PlayerLoginLog', () => {
     expect(_.get(logs, '0.token')).toBeFalsy();
   });
 
-  test('requestIpInfo', async () => {
+  test('PlayerLoginLog.requestIpLocation', async () => {
     const location = await PlayerLoginLog.requestIpLocation('127.0.0.1');
     expect(location).toBe('本机地址');
     const location2 = await PlayerLoginLog.requestIpLocation('114.114.114.114');
@@ -215,7 +215,7 @@ describe('PlayerLoginLog', () => {
 });
 
 describe('PlayerInvite', () => {
-  test('sendFriendInvite should be ok', async () => {
+  test('PlayerInvite.sendFriendInvite should be ok', async () => {
     const testUser = await getTestUser();
     const testUser9 = await getOtherTestUser('admin9');
     const invite = await PlayerInvite.sendFriendInvite(
@@ -238,7 +238,7 @@ describe('PlayerInvite', () => {
     }
   });
 
-  test('getAllUnprocessedInvites should be ok', async () => {
+  test('PlayerInvite.getAllUnprocessedInvites should be ok', async () => {
     const testUser7 = await getOtherTestUser('admin7');
     const testUser8 = await getOtherTestUser('admin8');
 
