@@ -41,3 +41,9 @@
   height: 200px;
   width: 200px;
 }
+
+.downloadChrome {
+  text-align: center;
+  margin: 20px 0;
+  padding: 0 1rem;
+}

@@ -105,6 +105,19 @@ function HomeSplash(props) {
   );
 }
 
+function ChromeDownload() {
+  return (
+    <div className={styles.downloadChrome}>
+      <div><img src="/img/chrome-logo.svg" width="96" height="96" /></div>
+      <h2>下载 Chrome 浏览器</h2>
+      <p><strong>TRPG Engine</strong> 使用了许多新的浏览器特性，强烈推荐使用地上最强浏览器Chrome以获得最佳的浏览体验</p>
+      <div>
+        <a href="https://www.google.cn/chrome/" target="_blank" className="button button--lg button--primary">下载Chrome</a>
+      </div>
+    </div>
+  )
+}
+
 function Index() {
   const context = useDocusaurusContext();
   const { siteConfig } = context;
@@ -126,6 +139,8 @@ function Index() {
               </div>
             </section>
           )}
+
+          <ChromeDownload />
         </main>
       </div>
     </Layout>
