@@ -8,7 +8,9 @@
     "wiki": "ts-node ./script/buildWiki.ts"
   },
   "devDependencies": {
-    "@types/react": "^16.9.41"
+    "@docusaurus/module-type-aliases": "^2.0.0-alpha.51",
+    "@types/classnames": "^2.2.10",
+    "@types/react": "^16.9.43"
   },
   "dependencies": {
     "@docusaurus/core": "^2.0.0-alpha.56",
