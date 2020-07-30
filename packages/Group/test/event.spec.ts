@@ -361,5 +361,6 @@ describe('group action', () => {
     expect(ret).toHaveProperty('members');
     expect(ret).toHaveProperty('groupActors');
     expect(ret).toHaveProperty('groupActorsMapping');
+    expect(ret).toHaveProperty('groupPanels');
   });
 });

@@ -1259,5 +1259,7 @@ export const getGroupInitData: EventFunc<{
   // 获取团选择人物的Mapping
   const groupActorsMapping = await group.getGroupActorMapping(player.uuid);
 
-  return { members, groupActors, groupActorsMapping };
+  const groupPanels = await group.getGroupPanels();
+
+  return { members, groupActors, groupActorsMapping, groupPanels };
 };

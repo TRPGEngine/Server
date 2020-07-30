@@ -1,16 +1,23 @@
-import { Model, Orm, DBInstance } from 'trpg/core';
+import { Model, Orm, DBInstance, HasManyGetAssociationsMixin } from 'trpg/core';
 import { GroupGroup } from 'packages/Group/lib/models/group';
 
 /**
  * 团面板
  */
 
+declare module './group' {
+  interface GroupGroup {
+    getGroupPanels?: HasManyGetAssociationsMixin<GroupPanel>;
+  }
+}
+
 export type GroupPanelType =
   | 'channel' // 文字聊天频道
   | 'richtext' // 富文本
   | 'voicechannel' // 语音聊天频道
   | 'map' // 地图
-  | 'actors'; // 团角色
+  | 'actors' // 团角色
+  | 'kanban'; // 看板
 
 export class GroupPanel extends Model {
   id: string;
@@ -55,7 +62,7 @@ export default function GroupPanelDefinition(Sequelize: Orm, db: DBInstance) {
   });
   GroupGroup.hasMany(GroupPanel, {
     foreignKey: 'groupId',
-    as: 'groupPanel',
+    as: 'groupPanels',
   });
 
   return GroupPanel;
