@@ -15,6 +15,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import { regAutoClear } from 'test/utils/example';
 import { GroupDetail } from '../lib/models/detail';
 import { GroupChannel } from '../lib/models/channel';
+import { GroupPanel } from '../lib/models/panel';
 
 const context = buildAppContext();
 
@@ -587,6 +588,20 @@ describe('group model function', () => {
         expect(channel.members.includes(testUser.uuid)).toBe(true);
       } finally {
         await channel.destroy();
+      }
+    });
+  });
+
+  describe('GroupPanel', () => {
+    test('GroupPanel.createPanel should be ok', async () => {
+      const panel = await GroupPanel.createPanel('test', 'channel');
+
+      try {
+        expect(panel).toHaveProperty('uuid', expect.any(String));
+        expect(panel.name).toBe('test');
+        expect(panel.type).toBe('channel');
+      } finally {
+        await panel.destroy({ force: true });
       }
     });
   });
