@@ -42,6 +42,9 @@ export const get: EventFunc<{
   };
 };
 
+/**
+ * 旧版保存逻辑 弃用
+ */
 export const save: EventFunc<{
   noteUUID: string;
   noteTitle: string;
@@ -88,6 +91,33 @@ export const save: EventFunc<{
       ownerId: id,
     });
   }
+
+  return { note };
+};
+
+/**
+ * 新版保存笔记
+ */
+export const saveNote: EventFunc<{
+  uuid: string;
+  title: string;
+  data: object;
+}> = async function(eventData) {
+  const { app, socket } = this;
+
+  if (!app.player) {
+    debug('[GroupComponent] need [PlayerComponent]');
+    return;
+  }
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const { uuid, title, data: noteData } = eventData;
+
+  const note = await NoteNote.saveNote(uuid, title, noteData, player.uuid);
 
   return { note };
 };

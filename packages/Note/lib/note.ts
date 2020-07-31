@@ -11,8 +11,12 @@ export default class Note extends BasePackage {
   onInit(): void {
     this.regModel(NoteNoteDefinition);
 
+    // 旧版事件
     this.regSocketEvent('note::get', event.get);
     this.regSocketEvent('note::save', event.save);
+
+    // 新版事件
+    this.regSocketEvent('note::saveNote', event.saveNote);
 
     this.regRoute(noteRouter);
   }

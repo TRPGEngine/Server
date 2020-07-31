@@ -2184,6 +2184,10 @@
                     "field": "content",
                     "seqType": "Sequelize.TEXT"
                 },
+                "data": {
+                    "field": "data",
+                    "seqType": "Sequelize.JSON"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -3368,5 +3372,5 @@
             "indexes": []
         }
     },
-    "revision": 57
+    "revision": 58
 }
