@@ -53,6 +53,11 @@ export class NoteNote extends Model {
 
       return newNote;
     } else {
+      const owner = await note.getOwner();
+      if (owner.uuid != user.uuid) {
+        throw new Error('保存失败, 笔记所有权不属于你');
+      }
+
       // 更新
       note.title = title;
       note.data = data;
