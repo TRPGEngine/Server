@@ -3,6 +3,7 @@ import createUUID from 'uuid/v1';
 import { getTestUser } from 'packages/Player/test/example';
 import { buildAppContext } from 'test/utils/app';
 import { regAutoClear } from 'test/utils/example';
+import { createTestNote } from './example';
 
 const context = buildAppContext();
 regAutoClear();
@@ -68,6 +69,19 @@ describe('NoteNote', () => {
       expect(Array.isArray(note.data)).toBe(true);
       expect(note.data).toMatchObject([]);
       expect((await note.getOwner()).id).toBe(testUser.id);
+    } finally {
+      await note.destroy({ force: true });
+    }
+  });
+
+  test('NoteNote.getUserNotes should be ok', async () => {
+    const testUser = await getTestUser();
+    const note = await createTestNote(testUser.id);
+
+    try {
+      const notes = await NoteNote.getUserNotes(testUser.uuid);
+      const index = notes.findIndex((item) => item.uuid === note.uuid);
+      expect(index).toBeGreaterThanOrEqual(0);
     } finally {
       await note.destroy({ force: true });
     }

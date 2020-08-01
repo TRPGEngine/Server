@@ -96,16 +96,27 @@ export const save: EventFunc<{
 };
 
 /**
+ * 获取用户的所有笔记
+ */
+export const getUserNotes: EventFunc = async function() {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const notes = await NoteNote.getUserNotes(player.uuid);
+
+  return { notes };
+};
+
+/**
  * 新版创建笔记
  * 是没有参数版本的保存笔记
  */
 export const createNote: EventFunc = async function() {
   const { app, socket } = this;
-
-  if (!app.player) {
-    debug('[GroupComponent] need [PlayerComponent]');
-    return;
-  }
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
@@ -126,11 +137,6 @@ export const saveNote: EventFunc<{
   data: object;
 }> = async function(eventData) {
   const { app, socket } = this;
-
-  if (!app.player) {
-    debug('[GroupComponent] need [PlayerComponent]');
-    return;
-  }
 
   const player = app.player.manager.findPlayer(socket);
   if (!player) {

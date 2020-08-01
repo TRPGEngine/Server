@@ -4,11 +4,18 @@ import {
   Orm,
   DBInstance,
   BelongsToGetAssociationMixin,
+  HasManyGetAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
 import createUUID from 'uuid/v1';
 import { isUUID } from 'lib/helper/string-helper';
+
+declare module 'packages/Player/lib/models/user' {
+  interface PlayerUser {
+    getNotes?: HasManyGetAssociationsMixin<NoteNote>;
+  }
+}
 
 export class NoteNote extends Model {
   uuid: string;
@@ -30,6 +37,17 @@ export class NoteNote extends Model {
     });
 
     return note;
+  }
+
+  /**
+   * 获取用户的所有笔记
+   * @param userUUID 用户UUID
+   */
+  static async getUserNotes(userUUID: string): Promise<NoteNote[]> {
+    const user = await PlayerUser.findByUUID(userUUID);
+    const notes = await user.getNotes();
+
+    return notes;
   }
 
   /**
@@ -136,7 +154,7 @@ export default function NoteNoteDefinition(Sequelize: Orm, db: DBInstance) {
     foreignKey: 'ownerId',
     as: 'owner',
   });
-  PlayerUser.hasOne(NoteNote, {
+  PlayerUser.hasMany(NoteNote, {
     foreignKey: 'ownerId',
     as: 'notes',
   });

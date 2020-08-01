@@ -16,6 +16,7 @@ export default class Note extends BasePackage {
     this.regSocketEvent('note::save', event.save);
 
     // 新版事件
+    this.regSocketEvent('note::getUserNotes', event.getUserNotes);
     this.regSocketEvent('note::createNote', event.createNote);
     this.regSocketEvent('note::saveNote', event.saveNote);
 
