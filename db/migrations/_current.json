@@ -2169,6 +2169,11 @@
                     "seqType": "Sequelize.INTEGER"
                 },
                 "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "unique": true,
                     "required": true,
                     "allowNull": false,
                     "field": "uuid",
@@ -3372,5 +3377,5 @@
             "indexes": []
         }
     },
-    "revision": 58
+    "revision": 59
 }

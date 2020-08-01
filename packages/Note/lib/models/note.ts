@@ -1,13 +1,22 @@
 import striptags from 'striptags';
-import { Model, Orm, DBInstance } from 'trpg/core';
+import {
+  Model,
+  Orm,
+  DBInstance,
+  BelongsToGetAssociationMixin,
+} from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
+import createUUID from 'uuid/v1';
+import { isUUID } from 'lib/helper/string-helper';
 
 export class NoteNote extends Model {
   uuid: string;
   title: string;
   content: string;
   data: object; // 前端slate的结构化数据
+
+  getOwner?: BelongsToGetAssociationMixin<PlayerUser>;
 
   /**
    * 根据笔记UUID查找笔记
@@ -43,6 +52,11 @@ export class NoteNote extends Model {
 
     const note = await NoteNote.findByUUID(uuid);
     if (_.isNil(note)) {
+      if (!isUUID(uuid)) {
+        // 如果不是一个合法的UUID
+        uuid = createUUID();
+      }
+
       // 创建
       const newNote = await NoteNote.create({
         uuid,
@@ -91,7 +105,12 @@ export class NoteNote extends Model {
 export default function NoteNoteDefinition(Sequelize: Orm, db: DBInstance) {
   NoteNote.init(
     {
-      uuid: { type: Sequelize.UUID, required: true },
+      uuid: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV1,
+        unique: true,
+        required: true,
+      },
       title: { type: Sequelize.STRING, required: true },
       content: { type: Sequelize.TEXT },
       data: { type: Sequelize.JSON },
