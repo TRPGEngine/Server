@@ -57,4 +57,19 @@ describe('NoteNote', () => {
       }
     });
   });
+
+  test('NoteNote.createNote should be ok', async () => {
+    const testUser = await getTestUser();
+    const note = await NoteNote.createNote(testUser.uuid);
+
+    try {
+      expect(note).toHaveProperty('uuid');
+      expect(note.title).toBe('未命名');
+      expect(Array.isArray(note.data)).toBe(true);
+      expect(note.data).toMatchObject([]);
+      expect((await note.getOwner()).id).toBe(testUser.id);
+    } finally {
+      await note.destroy({ force: true });
+    }
+  });
 });

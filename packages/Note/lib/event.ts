@@ -96,6 +96,28 @@ export const save: EventFunc<{
 };
 
 /**
+ * 新版创建笔记
+ * 是没有参数版本的保存笔记
+ */
+export const createNote: EventFunc = async function() {
+  const { app, socket } = this;
+
+  if (!app.player) {
+    debug('[GroupComponent] need [PlayerComponent]');
+    return;
+  }
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const note = await NoteNote.createNote(player.uuid);
+
+  return { note };
+};
+
+/**
  * 新版保存笔记
  */
 export const saveNote: EventFunc<{

@@ -81,6 +81,17 @@ export class NoteNote extends Model {
     }
   }
 
+  /**
+   * 创建笔记
+   * 没有参数版本的保存笔记
+   * @param userUUID 用户的UUID
+   */
+  static async createNote(userUUID: string): Promise<NoteNote> {
+    const note = await NoteNote.saveNote(createUUID(), '未命名', [], userUUID);
+
+    return note;
+  }
+
   getCoverImage() {
     let content = this.content;
     let imgIndex = content.indexOf('<img');
