@@ -72,12 +72,16 @@ export class InfoWebsite extends Model {
       icon = urlParser.resolve(url, icon);
     }
 
-    await InfoWebsite.create({
-      url,
-      title,
-      content,
-      icon,
-    });
+    try {
+      await InfoWebsite.create({
+        url,
+        title,
+        content,
+        icon,
+      });
+    } catch (e) {
+      // 不处理创建错误
+    }
 
     return {
       title,
