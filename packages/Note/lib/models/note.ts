@@ -63,6 +63,10 @@ export class NoteNote extends Model {
     data: object,
     userUUID: string
   ): Promise<NoteNote> {
+    if (_.isNil(uuid)) {
+      throw new Error('保存笔记失败, 缺少必要参数');
+    }
+
     const user = await PlayerUser.findByUUID(userUUID);
     if (_.isNil(user)) {
       throw new Error('保存笔记失败, 用户不存在');
