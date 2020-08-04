@@ -9,6 +9,7 @@ import generateUUID from 'uuid/v4';
 import emoji from 'node-emoji';
 import Debug from 'debug';
 import { notifyUpdateMessage } from '../notify';
+import { NoReportError } from 'lib/error';
 const debug = Debug('trpg:component:chat:model:log');
 
 export class ChatLog extends Model implements ChatMessagePayload {
@@ -363,7 +364,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
         const group = await GroupGroup.findByUUID(msg.converse_uuid);
         if (!group.isManagerOrOwner(userUUID)) {
           // 不是管理员
-          throw new Error('撤回失败, 没有撤回权限');
+          throw new NoReportError('撤回失败, 没有撤回权限');
         }
 
         isGroupManagerRevoke = true;
@@ -376,7 +377,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
     const now = new Date().valueOf();
     const msgDate = new Date(msg.date).valueOf();
     if (!(isGroupManagerRevoke || now - msgDate <= 2 * 60 * 1000)) {
-      throw new Error('撤回失败, 已超出撤回时间');
+      throw new NoReportError('撤回失败, 已超出撤回时间');
     }
     // 如果撤回时间在2分钟内，或为管理员撤回则允许撤回
 
