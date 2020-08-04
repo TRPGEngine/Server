@@ -240,7 +240,8 @@ export class ChatLog extends Model implements ChatMessagePayload {
       if (!log.is_group) {
         // TODO: 这里好像有问题, 需要检查一下
         // 疑问: 什么情况下会出现公开的用户信息？
-        await app.player.manager.broadcastSocketEvent('chat::message', log);
+        // await app.player.manager.broadcastSocketEvent('chat::message', log);
+        throw new Error('出现异常, 不支持的广播消息');
       } else {
         await app.player.manager.roomcastSocketEvent(
           log.converse_uuid,
@@ -263,15 +264,18 @@ export class ChatLog extends Model implements ChatMessagePayload {
     >
   ): Promise<ChatMessagePartial> {
     const { to_uuid, converse_uuid, message, type, data } = payload;
+
+    const isPrivateMsg = _.isNil(converse_uuid); // 如果没有会话ID则为私人消息
+
     const full: ChatMessagePayload = {
       uuid: generateUUID(),
       sender_uuid: 'trpgsystem',
       to_uuid,
       message,
       converse_uuid,
-      // 如果有具体的发送对象，则为私有消息，否则则为公共消息
-      is_public: _.isNil(to_uuid) ? true : false,
-      is_group: false,
+      // 要么都为true 要么都为false
+      is_public: isPrivateMsg ? false : true,
+      is_group: isPrivateMsg ? false : true,
       type,
       data,
       date: new Date().toISOString(),
