@@ -13,7 +13,8 @@ jobs:
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/mongo:3.4.4
-      - image: circleci/mysql:5.7.21
+      - image: mysql:5.7.21
+        command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_DATABASE: trpg_ci
