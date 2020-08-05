@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.28.2](https://github.com/TRPGEngine/Server/compare/v1.28.1...v1.28.2) (2020-08-04)
+
+
+### Bug Fixes
+
+* **chat:** 修复入团通知会发送广播的问题 ([13b0e5e](https://github.com/TRPGEngine/Server/commit/13b0e5ea0137ba3dba44515e2ddf0a4536f6ef26))
+
 ### [1.28.1](https://github.com/TRPGEngine/Server/compare/v1.28.0...v1.28.1) (2020-08-02)
 
 ## [1.28.0](https://github.com/TRPGEngine/Server/compare/v1.27.0...v1.28.0) (2020-07-18)
