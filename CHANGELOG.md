@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.29.0](https://github.com/TRPGEngine/Server/compare/v1.28.2...v1.29.0) (2020-08-05)
+
+
+### Features
+
+* **group:** 团面板 ([1d63af2](https://github.com/TRPGEngine/Server/commit/1d63af2ff86f43518427c33715bee55a2768ecd2))
+* **note:** add createNote ([a26aaf3](https://github.com/TRPGEngine/Server/commit/a26aaf36501d79d13ddf5cf36b0d844eb1c3d561))
+* **note:** 增加note的uuid字段的唯一性处理 ([41cfc25](https://github.com/TRPGEngine/Server/commit/41cfc2542a8b1e9f22f265008496528ce9123b97))
+* **note:** 增加新版笔记功能保存功能 ([34a3a2e](https://github.com/TRPGEngine/Server/commit/34a3a2efa683e8bbd5985e7b87283f8a6238b564))
+* **note:** 新版获取笔记列表 ([37ae38e](https://github.com/TRPGEngine/Server/commit/37ae38e8b0e0eae24d867080a608aac007e3753a))
+
+
+### Bug Fixes
+
+* **chat:** 修复入团通知会发送广播的问题 ([045b2ae](https://github.com/TRPGEngine/Server/commit/045b2ae61d5053d804f616eaff5686ea832f0439))
+* **info:** 修复短时间请求两次数据库写入会报错的bug ([dc25be9](https://github.com/TRPGEngine/Server/commit/dc25be99213efbec23bf2ee76515a228aa524c7b))
+
 ### [1.28.2](https://github.com/TRPGEngine/Server/compare/v1.28.1...v1.28.2) (2020-08-04)
 
 
