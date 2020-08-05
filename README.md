@@ -29,3 +29,8 @@ npm start
 npm run dbreset
 ```
 初始账号密码:admin/admin
+
+
+## 数据库编码
+
+因为用户的输入奇奇怪怪。所以请确保数据库字符集为`utf8mb4`, 至少要确保`chat_log.message`的编码方式为`utf8mb4`
