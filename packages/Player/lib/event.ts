@@ -416,34 +416,7 @@ export const sendFriendInvite: EventFunc<{
   const from_uuid = player.uuid;
   const to_uuid = data.to;
 
-  if (from_uuid === to_uuid) {
-    throw new Error('不能请求成为自己的好友');
-  }
-
-  const Invite = db.models.player_invite;
-  const inviteIsExist = await Invite.findOne({
-    where: {
-      from_uuid,
-      to_uuid,
-      is_agree: false,
-      is_refuse: false,
-    },
-  });
-
-  if (!!inviteIsExist) {
-    throw new Error('重复请求');
-  }
-
-  let invite = await Invite.create({ from_uuid, to_uuid });
-  app.player.manager.unicastSocketEvent(to_uuid, 'player::invite', invite);
-
-  const user = await PlayerUser.findByUUID(from_uuid);
-  if (app.chat && app.chat.sendMsg) {
-    let msg = `${user.nickname || user.username} 想添加您为好友`;
-    app.chat.sendSystemMsg(to_uuid, 'friendInvite', '好友邀请', msg, {
-      invite,
-    });
-  }
+  const invite = await PlayerInvite.sendFriendInvite(from_uuid, to_uuid);
 
   return { invite };
 };

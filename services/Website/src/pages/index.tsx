@@ -105,6 +105,50 @@ function HomeSplash(props) {
   );
 }
 
+function SimpleDice() {
+  return (
+    <div className={styles.simpleSection}>
+      <h2>Simple Dice</h2>
+      <p>不想注册新账号? 只想要一个骰子？</p>
+      <p>主持人自己投骰玩家不服？想要让别人为自己的大成功喊666？</p>
+      <p>TRPG Engine 专门提供了一个极简在线投骰工具</p>
+      <div>
+        <a
+          href="https://dice.moonrailgun.com/"
+          target="_blank"
+          className="button button--lg button--primary"
+        >
+          快来试一试!
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function ChromeDownload() {
+  return (
+    <div className={styles.simpleSection}>
+      <div>
+        <img src="/img/chrome-logo.svg" width="96" height="96" />
+      </div>
+      <h2>下载 Chrome 浏览器</h2>
+      <p>
+        <strong>TRPG Engine</strong>{' '}
+        使用了许多新的浏览器特性，强烈推荐使用地上最强浏览器Chrome以获得最佳的浏览体验
+      </p>
+      <div>
+        <a
+          href="https://www.google.cn/chrome/"
+          target="_blank"
+          className="button button--lg button--primary button--outline"
+        >
+          下载Chrome
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function Index() {
   const context = useDocusaurusContext();
   const { siteConfig } = context;
@@ -126,6 +170,10 @@ function Index() {
               </div>
             </section>
           )}
+
+          <SimpleDice />
+
+          <ChromeDownload />
         </main>
       </div>
     </Layout>

@@ -10,7 +10,7 @@ import classNames from 'classnames';
 
 import MarkdownBlock from './MarkdownBlock';
 
-class GridBlock extends React.Component {
+class GridBlock extends React.Component<any> {
   renderBlock(origBlock) {
     const blockDefaults = {
       imageAlign: 'left',
@@ -94,7 +94,6 @@ class GridBlock extends React.Component {
     );
   }
 }
-
 GridBlock.defaultProps = {
   align: 'left',
   contents: [],

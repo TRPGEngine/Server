@@ -41,3 +41,10 @@
   height: 200px;
   width: 200px;
 }
+
+.simpleSection {
+  text-align: center;
+  margin: 20px 0;
+  padding: 2rem 1rem;
+  border-top: 1px solid #ccc;
+}

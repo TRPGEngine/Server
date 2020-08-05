@@ -3,7 +3,8 @@
     "dist",
     "logs",
     "packages/Dashboard/app/",
-    "*.marko.js"
+    "*.marko.js",
+    "*.spec.ts"
   ],
   "env": {
     "NODE_ENV": "development"

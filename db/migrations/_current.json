@@ -2089,6 +2089,75 @@
             },
             "indexes": []
         },
+        "group_panel": {
+            "tableName": "group_panel",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "type": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "type",
+                    "seqType": "Sequelize.STRING"
+                },
+                "color": {
+                    "field": "color",
+                    "seqType": "Sequelize.STRING(24)"
+                },
+                "order": {
+                    "defaultValue": {
+                        "value": 0
+                    },
+                    "field": "order",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "groupId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "group_group",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "groupId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
         "note_note": {
             "tableName": "note_note",
             "schema": {
@@ -2100,6 +2169,11 @@
                     "seqType": "Sequelize.INTEGER"
                 },
                 "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "unique": true,
                     "required": true,
                     "allowNull": false,
                     "field": "uuid",
@@ -2114,6 +2188,10 @@
                 "content": {
                     "field": "content",
                     "seqType": "Sequelize.TEXT"
+                },
+                "data": {
+                    "field": "data",
+                    "seqType": "Sequelize.JSON"
                 },
                 "createdAt": {
                     "allowNull": false,
@@ -3299,5 +3377,5 @@
             "indexes": []
         }
     },
-    "revision": 56
+    "revision": 59
 }

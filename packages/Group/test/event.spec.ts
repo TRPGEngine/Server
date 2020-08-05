@@ -351,4 +351,16 @@ describe('group action', () => {
 
     expect(ret.result).toBe(true);
   });
+
+  test('getGroupInitData should be ok', async () => {
+    const ret = await context.emitEvent('group::getGroupInitData', {
+      groupUUID: testGroup.uuid,
+    });
+
+    expect(ret).toBeSuccess();
+    expect(ret).toHaveProperty('members');
+    expect(ret).toHaveProperty('groupActors');
+    expect(ret).toHaveProperty('groupActorsMapping');
+    expect(ret).toHaveProperty('groupPanels');
+  });
 });

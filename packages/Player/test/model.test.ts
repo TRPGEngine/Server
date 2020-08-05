@@ -15,6 +15,7 @@ import md5Encrypt from '../lib/utils/md5';
 import sha1Encrypt from '../lib/utils/sha1';
 import { PlayerLoginLog } from '../lib/models/login-log';
 import testExampleStack from 'test/utils/example';
+import { PlayerInvite } from '../lib/models/invite';
 
 const context = buildAppContext();
 
@@ -195,7 +196,7 @@ describe('PlayerLoginLog', () => {
     });
   });
 
-  test('getPlayerLoginLog', async () => {
+  test('PlayerLoginLog.getPlayerLoginLog', async () => {
     const testUser = await getTestUser();
     const logs = await PlayerLoginLog.getPlayerLoginLog(testUser.uuid);
 
@@ -205,10 +206,79 @@ describe('PlayerLoginLog', () => {
     expect(_.get(logs, '0.token')).toBeFalsy();
   });
 
-  test('requestIpInfo', async () => {
+  test('PlayerLoginLog.requestIpLocation', async () => {
     const location = await PlayerLoginLog.requestIpLocation('127.0.0.1');
     expect(location).toBe('本机地址');
     const location2 = await PlayerLoginLog.requestIpLocation('114.114.114.114');
     expect(location2).toBe('江苏省南京市 电信');
+  });
+});
+
+describe('PlayerInvite', () => {
+  test('PlayerInvite.sendFriendInvite should be ok', async () => {
+    const testUser = await getTestUser();
+    const testUser9 = await getOtherTestUser('admin9');
+    const invite = await PlayerInvite.sendFriendInvite(
+      testUser.uuid,
+      testUser9.uuid
+    );
+
+    try {
+      expect(invite.from_uuid).toBe(testUser.uuid);
+      expect(invite.to_uuid).toBe(testUser9.uuid);
+      expect(invite.is_agree).toBe(false);
+      expect(invite.is_refuse).toBe(false);
+
+      const inviteId = invite.id;
+      const inviteIns: PlayerInvite = await PlayerInvite.findByPk(inviteId);
+
+      expect(inviteIns.uuid).toBe(invite.uuid);
+    } finally {
+      await invite.destroy();
+    }
+  });
+
+  describe('PlayerInvite.getAllUnprocessedInvites', () => {
+    test('should be get received invite', async () => {
+      const testUser7 = await getOtherTestUser('admin7');
+      const testUser8 = await getOtherTestUser('admin8');
+
+      const invite = await PlayerInvite.sendFriendInvite(
+        testUser7.uuid,
+        testUser8.uuid
+      );
+
+      try {
+        const invites = await PlayerInvite.getAllUnprocessedInvites(
+          testUser8.uuid
+        );
+        expect(invites.map((item) => item.uuid).includes(invite.uuid)).toBe(
+          true
+        );
+      } finally {
+        await invite.destroy();
+      }
+    });
+
+    test('should be get sended invite', async () => {
+      const testUser7 = await getOtherTestUser('admin7');
+      const testUser8 = await getOtherTestUser('admin8');
+
+      const invite = await PlayerInvite.sendFriendInvite(
+        testUser8.uuid,
+        testUser7.uuid
+      );
+
+      try {
+        const invites = await PlayerInvite.getAllUnprocessedInvites(
+          testUser8.uuid
+        );
+        expect(invites.map((item) => item.uuid).includes(invite.uuid)).toBe(
+          true
+        );
+      } finally {
+        await invite.destroy();
+      }
+    });
   });
 });

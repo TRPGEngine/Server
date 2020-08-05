@@ -11,6 +11,7 @@ import actorRouter from './routers/actor';
 import groupRouter from './routers/group';
 import GroupChannelDefinition from './models/channel';
 import { regRoomGather } from 'packages/Player/lib/managers/socketroom-manager';
+import GroupPanelDefinition from './models/panel';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -23,6 +24,7 @@ export default class Group extends BasePackage {
     this.regModel(GroupRequestDefinition);
     this.regModel(GroupDetailDefinition);
     this.regModel(GroupChannelDefinition);
+    this.regModel(GroupPanelDefinition);
 
     const app = this.app;
     const db = this.db;

@@ -1,7 +1,10 @@
 import uuid from 'uuid/v1';
-import { Model, Orm, DBInstance } from 'trpg/core';
+import { Model, Orm, DBInstance, Op } from 'trpg/core';
+import { notifyAddInvite } from '../notify';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 
 export class PlayerInvite extends Model {
+  id: number;
   uuid: string;
   from_uuid: string;
   to_uuid: string;
@@ -17,11 +20,62 @@ export class PlayerInvite extends Model {
   ): Promise<PlayerInvite[]> {
     return PlayerInvite.findAll({
       where: {
-        to_uuid: userUUID,
+        [Op.or]: [
+          {
+            to_uuid: userUUID,
+          },
+          {
+            from_uuid: userUUID,
+          },
+        ],
         is_agree: false,
         is_refuse: false,
       },
     });
+  }
+
+  /**
+   * 发送好友请求
+   * @param fromUUID 发送者的UUID
+   * @param toUUID 接收者的UUID
+   */
+  static async sendFriendInvite(
+    fromUUID: string,
+    toUUID: string
+  ): Promise<PlayerInvite> {
+    if (fromUUID === toUUID) {
+      throw new Error('不能请求成为自己的好友');
+    }
+
+    const inviteIsExist = await PlayerInvite.findOne({
+      where: {
+        from_uuid: fromUUID,
+        to_uuid: toUUID,
+        is_agree: false,
+        is_refuse: false,
+      },
+    });
+
+    if (!!inviteIsExist) {
+      throw new Error('重复请求');
+    }
+
+    const invite = await PlayerInvite.create({
+      from_uuid: fromUUID,
+      to_uuid: toUUID,
+    });
+    notifyAddInvite(toUUID, invite);
+
+    const trpgapp = PlayerInvite.getApplication();
+    const user = await PlayerUser.findByUUID(fromUUID);
+    if (trpgapp.chat?.sendSystemMsg) {
+      const msg = `${user.getName()} 想添加您为好友`;
+      trpgapp.chat.sendSystemMsg(toUUID, 'friendInvite', '好友邀请', msg, {
+        invite,
+      });
+    }
+
+    return invite;
   }
 }
 
