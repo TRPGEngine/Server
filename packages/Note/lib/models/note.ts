@@ -104,6 +104,29 @@ export class NoteNote extends Model {
   }
 
   /**
+   * 删除笔记
+   * @param noteUUID 笔记UUID
+   * @param userUUID 操作人UUID
+   */
+  static async deleteNote(noteUUID: string, userUUID: string): Promise<void> {
+    if (_.isNil(noteUUID) || _.isNil(userUUID)) {
+      throw new Error('移除笔记失败, 缺少必要参数');
+    }
+
+    const user = await PlayerUser.findByUUID(userUUID);
+    const rows = await NoteNote.destroy({
+      where: {
+        uuid: noteUUID,
+        ownerId: user.id,
+      },
+    });
+
+    if (rows === 0) {
+      throw new Error('移除笔记失败, 没有找到该笔记');
+    }
+  }
+
+  /**
    * 创建笔记
    * 没有参数版本的保存笔记
    * @param userUUID 用户的UUID
@@ -151,6 +174,7 @@ export default function NoteNoteDefinition(Sequelize: Orm, db: DBInstance) {
     {
       tableName: 'note_note',
       sequelize: db,
+      paranoid: true,
     }
   );
 

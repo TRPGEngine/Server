@@ -19,6 +19,7 @@ export default class Note extends BasePackage {
     this.regSocketEvent('note::getUserNotes', event.getUserNotes);
     this.regSocketEvent('note::createNote', event.createNote);
     this.regSocketEvent('note::saveNote', event.saveNote);
+    this.regSocketEvent('note::deleteNote', event.deleteNote);
 
     this.regRoute(noteRouter);
   }

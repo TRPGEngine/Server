@@ -86,4 +86,21 @@ describe('NoteNote', () => {
       await note.destroy({ force: true });
     }
   });
+
+  test('NoteNote.deleteNote should be ok', async () => {
+    const testUser = await getTestUser();
+    const note = await NoteNote.create({
+      title: 'test',
+      data: [],
+      ownerId: testUser.id,
+    });
+
+    try {
+      await NoteNote.deleteNote(note.uuid, testUser.uuid);
+
+      expect(await NoteNote.findByUUID(note.uuid)).toBeNull();
+    } finally {
+      await note.destroy({ force: true });
+    }
+  });
 });

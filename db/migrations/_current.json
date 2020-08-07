@@ -2203,6 +2203,10 @@
                     "field": "updatedAt",
                     "seqType": "Sequelize.DATE"
                 },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
                 "ownerId": {
                     "allowNull": true,
                     "references": {
@@ -3377,5 +3381,5 @@
             "indexes": []
         }
     },
-    "revision": 59
+    "revision": 60
 }
