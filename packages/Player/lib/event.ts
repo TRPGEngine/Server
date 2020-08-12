@@ -402,6 +402,9 @@ export const getFriends: EventFunc = async function getFriends(data, cb, db) {
   return { list };
 };
 
+/**
+ * 发送好友请求
+ */
 export const sendFriendInvite: EventFunc<{
   to: string;
 }> = async function sendFriendInvite(data, cb, db) {
@@ -421,6 +424,9 @@ export const sendFriendInvite: EventFunc<{
   return { invite };
 };
 
+/**
+ * 拒绝好友请求
+ */
 export const refuseFriendInvite: EventFunc<{
   uuid: string;
 }> = async function refuseFriendInvite(data, cb, db) {
@@ -461,6 +467,9 @@ export const refuseFriendInvite: EventFunc<{
   return { res: invite };
 };
 
+/**
+ * 同意好友请求
+ */
 export const agreeFriendInvite: EventFunc<{
   uuid: string;
 }> = async function agreeFriendInvite(data, cb, db) {
@@ -475,7 +484,7 @@ export const agreeFriendInvite: EventFunc<{
   const inviteUUID = data.uuid;
 
   if (_.isNil(inviteUUID)) {
-    throw new Error('数据异常');
+    throw new Error('缺少必要参数');
   }
 
   const invite = await db.models.player_invite.findOne({
@@ -513,6 +522,30 @@ export const agreeFriendInvite: EventFunc<{
   });
 
   return { invite };
+};
+
+/**
+ * 移除好友请求
+ */
+export const removeFriendInvite: EventFunc<{
+  inviteUUID: string;
+}> = async function(data) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户状态异常');
+  }
+
+  const { inviteUUID } = data;
+  if (_.isNil(inviteUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await PlayerInvite.removeFriendInvite(inviteUUID, player.uuid);
+
+  return true;
 };
 
 export const getFriendsInvite: EventFunc = async function getFriendsInvite(

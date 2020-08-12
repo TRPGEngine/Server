@@ -3,6 +3,7 @@ import {
   testUserInfo,
   createTestPlayerLoginLog,
   getOtherTestUser,
+  createTestPlayerInvite,
 } from './example';
 import {
   PlayerUser,
@@ -280,5 +281,19 @@ describe('PlayerInvite', () => {
         await invite.destroy();
       }
     });
+  });
+
+  test('PlayerInvite.removeFriendInvite should be ok', async () => {
+    const testUser = await getTestUser();
+    const invite = await createTestPlayerInvite();
+
+    await PlayerInvite.removeFriendInvite(invite.uuid, testUser.uuid);
+
+    const findedinvite = await PlayerInvite.findOne({
+      where: {
+        uuid: invite.uuid,
+      },
+    });
+    expect(findedinvite).toBeNull();
   });
 });

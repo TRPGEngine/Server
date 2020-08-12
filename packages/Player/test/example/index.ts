@@ -6,6 +6,7 @@ import { TRPGAppInstanceContext } from 'test/utils/app';
 import { sleep } from 'lib/helper/utils';
 import testExampleStack from 'test/utils/example';
 import { PlayerLoginLog } from 'packages/Player/lib/models/login-log';
+import { PlayerInvite } from 'packages/Player/lib/models/invite';
 
 export const testUserInfo = {
   username: 'admin10',
@@ -115,4 +116,19 @@ export async function createTestPlayerLoginLog(): Promise<PlayerLoginLog> {
   testExampleStack.append(testPlayerLoginLog);
 
   return testPlayerLoginLog;
+}
+
+/**
+ * 创建一条测试的好友邀请
+ */
+export async function createTestPlayerInvite(): Promise<PlayerInvite> {
+  const testUser = await getTestUser();
+  const testInvite = await PlayerInvite.create({
+    from_uuid: testUser.uuid,
+    to_uuid: 'any test uuid',
+  });
+
+  testExampleStack.append(testInvite);
+
+  return testInvite;
 }
