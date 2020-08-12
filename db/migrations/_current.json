@@ -2119,6 +2119,11 @@
                     "field": "type",
                     "seqType": "Sequelize.STRING"
                 },
+                "target_uuid": {
+                    "comment": "根据类型指向不同的模型的UUID",
+                    "field": "target_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
                 "color": {
                     "field": "color",
                     "seqType": "Sequelize.STRING(24)"
@@ -3381,5 +3386,5 @@
             "indexes": []
         }
     },
-    "revision": 60
+    "revision": 61
 }

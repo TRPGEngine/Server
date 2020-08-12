@@ -1,5 +1,6 @@
 import { Model, Orm, DBInstance, HasManyGetAssociationsMixin } from 'trpg/core';
 import { GroupGroup } from 'packages/Group/lib/models/group';
+import _ from 'lodash';
 
 /**
  * 团面板
@@ -24,6 +25,7 @@ export class GroupPanel extends Model {
   uuid: string;
   name: string;
   type: GroupPanelType;
+  target_uuid: string;
   color: string; // panel文本颜色
   order: number;
 
@@ -38,6 +40,16 @@ export class GroupPanel extends Model {
 
     return groupPanel;
   }
+
+  /**
+   * 获取团所有的面板
+   * @param groupUUID 团UUID
+   */
+  static async getPanelByGroup(group: GroupGroup): Promise<GroupPanel[]> {
+    const panels: GroupPanel[] = await group.getGroupPanels();
+
+    return _.orderBy(panels, 'order', 'asc');
+  }
 }
 
 export default function GroupPanelDefinition(Sequelize: Orm, db: DBInstance) {
@@ -46,6 +58,10 @@ export default function GroupPanelDefinition(Sequelize: Orm, db: DBInstance) {
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       name: { type: Sequelize.STRING, required: true },
       type: { type: Sequelize.STRING, required: true },
+      target_uuid: {
+        type: Sequelize.STRING,
+        comment: '根据类型指向不同的模型的UUID',
+      },
       color: { type: Sequelize.STRING(24) },
       order: { type: Sequelize.INTEGER, defaultValue: 0 },
     },

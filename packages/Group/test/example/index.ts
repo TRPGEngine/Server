@@ -5,6 +5,7 @@ import { getTestUser } from 'packages/Player/test/example';
 import testExampleStack from 'test/utils/example';
 import { generateRandomStr } from 'test/utils/utils';
 import { GroupDetail } from 'packages/Group/lib/models/detail';
+import { GroupPanel } from 'packages/Group/lib/models/panel';
 
 export const createTestGroup = async (): Promise<GroupGroup> => {
   const testUser = await getTestUser();
@@ -59,4 +60,20 @@ export const createTestGroupDetail = async (groupId: number) => {
   testExampleStack.append(groupDetail);
 
   return groupDetail;
+};
+
+export const createTestGroupPanel = async (
+  groupId: number,
+  attrs: object
+): Promise<GroupPanel> => {
+  const groupPanel = await GroupPanel.create({
+    name: generateRandomStr(),
+    type: 'channel',
+    ...attrs,
+    groupId,
+  });
+
+  testExampleStack.append(groupPanel);
+
+  return groupPanel;
 };

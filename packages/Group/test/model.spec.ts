@@ -9,6 +9,7 @@ import {
   createTestGroupActor,
   createTestGroupDetail,
   testGroupActorInfo,
+  createTestGroupPanel,
 } from './example';
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
@@ -603,6 +604,17 @@ describe('group model function', () => {
       } finally {
         await panel.destroy({ force: true });
       }
+    });
+
+    test('GroupPanel.getPanelByGroup should be ok', async () => {
+      const group = await createTestGroup();
+      const panel2 = await createTestGroupPanel(group.id, { order: 2 });
+      const panel1 = await createTestGroupPanel(group.id, { order: 1 });
+
+      const panels = await GroupPanel.getPanelByGroup(group);
+
+      // should be order by id asc
+      expect(panels.map((p) => p.id)).toMatchObject([panel1.id, panel2.id]);
     });
   });
 });

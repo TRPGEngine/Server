@@ -12,6 +12,7 @@ import { GroupDetail } from './models/detail';
 import { GroupChannel } from './models/channel';
 import { NoReportError } from 'lib/error';
 import { notifyGroupRemoveMember, notifyGroupDismiss } from './notify';
+import { GroupPanel } from './models/panel';
 
 export const create: EventFunc<{
   name: string;
@@ -1259,7 +1260,7 @@ export const getGroupInitData: EventFunc<{
   // 获取团选择人物的Mapping
   const groupActorsMapping = await group.getGroupActorMapping(player.uuid);
 
-  const groupPanels = await group.getGroupPanels();
+  const groupPanels = await GroupPanel.getPanelByGroup(group);
 
   return { members, groupActors, groupActorsMapping, groupPanels };
 };
