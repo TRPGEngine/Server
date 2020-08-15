@@ -4,11 +4,11 @@ import uuid from 'uuid/v1';
 import _ from 'lodash';
 import { EventFunc } from 'trpg/core';
 import { PlayerUser } from './models/user';
-import { TRPGApplication, Socket } from 'trpg/core';
 import { Platform } from '../types/player';
 import { PlayerInvite } from './models/invite';
 import { autoJoinSocketRoom } from './managers/socketroom-manager';
 import { PlayerSettings } from './models/settings';
+import { PlayerLoginLog } from './models/login-log';
 
 export const login: EventFunc<{
   username: string;
@@ -18,10 +18,6 @@ export const login: EventFunc<{
 }> = async function login(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
-
-  // if(app.player.list.find(socket)) {
-  //   throw new Error('您已经登录，请先登出')
-  // }
 
   const { username, password, platform, isApp } = data;
   const ip =
@@ -38,7 +34,7 @@ export const login: EventFunc<{
   if (!user) {
     debug('login fail, try to login [%s] and password error', username);
     cb({ result: false, msg: '用户不存在或密码错误' });
-    await db.models.player_login_log.create({
+    await PlayerLoginLog.create({
       user_name: username,
       type: isApp ? 'app_standard' : 'standard',
       socket_id: socket.id,
@@ -67,10 +63,15 @@ export const login: EventFunc<{
     }
 
     // 加入到列表中
-    if (!!app.player) {
-      await app.player.manager.addPlayer(user.uuid, socket, platform);
-      await autoJoinSocketRoom(app, socket);
+    const loginResult = await app.player.manager.addPlayer(
+      user.uuid,
+      socket,
+      platform
+    );
+    if (!loginResult) {
+      throw new Error('登录失败: 锁已经被占用');
     }
+    await autoJoinSocketRoom(app, socket);
 
     await socket.iosession.set('user', user.getInfo(true)); // 将用户信息加入到session中
 
@@ -82,7 +83,7 @@ export const login: EventFunc<{
     await user.save();
 
     // 添加登录记录
-    await db.models.player_login_log.create({
+    await PlayerLoginLog.create({
       user_uuid: user.uuid,
       user_name: user.username,
       type: isApp ? 'app_standard' : 'standard',
