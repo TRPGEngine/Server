@@ -609,7 +609,7 @@ describe('group model function', () => {
         try {
           expect(panel).toHaveProperty('uuid', expect.any(String));
           expect(panel.name).toBe('test');
-          expect(panel.type).toBe('channel');
+          expect(panel.type).toBe('any');
           expect(panel.groupId).toBe(testGroup.id);
         } finally {
           await panel.destroy({ force: true });
