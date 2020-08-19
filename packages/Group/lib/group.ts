@@ -86,6 +86,7 @@ export default class Group extends BasePackage {
       'removeGroupChannelMember',
       event.removeGroupChannelMember
     );
+    this.regSocketEvent('createGroupPanel', event.createGroupPanel);
 
     this.regRoute(actorRouter);
     this.regRoute(groupRouter);

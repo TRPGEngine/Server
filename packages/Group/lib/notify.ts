@@ -1,6 +1,7 @@
 import { getGlobalApplication } from 'lib/application';
 import { GroupActor } from './models/actor';
 import { GroupGroup } from './models/group';
+import { GroupPanel } from './models/panel';
 
 /**
  * 通知更新团信息
@@ -80,6 +81,15 @@ export async function notifyUpdateGroupChannel(group: GroupGroup) {
   const channels = await group.getChannels();
 
   await notifyUpdateGroupInfo(group.uuid, { channels });
+}
+
+/**
+ * 通知更新团面板列表
+ */
+export async function notifyUpdateGroupPanel(group: GroupGroup) {
+  const groupPanels = await GroupPanel.getPanelByGroup(group);
+
+  await notifyUpdateGroupInfo(group.uuid, { panels: groupPanels });
 }
 
 /**

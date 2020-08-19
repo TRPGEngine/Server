@@ -25,6 +25,7 @@ import {
 import { GroupDetail } from './detail';
 import { GroupChannel } from './channel';
 import Debug from 'debug';
+import { GroupPanel } from './panel';
 const debug = Debug('trpg:component:group:model:group');
 
 type GroupType = 'group' | 'channel' | 'test';
@@ -54,6 +55,7 @@ export class GroupGroup extends Model {
   members_count?: number;
   detail?: GroupDetail;
   channels?: GroupChannel[];
+  panels?: GroupPanel[];
 
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
@@ -207,6 +209,10 @@ export class GroupGroup extends Model {
         {
           model: GroupChannel,
           as: 'channels',
+        },
+        {
+          model: GroupPanel,
+          as: 'panels',
         },
       ],
     });

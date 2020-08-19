@@ -113,6 +113,7 @@ describe('group model function', () => {
         expect(testTargetGroup).toHaveProperty('channels'); // 该数据应当有channels字段
         expect(testTargetGroup.detail).toBeNull();
         expect(Array.isArray(testTargetGroup.channels)).toBe(true);
+        expect(Array.isArray(testTargetGroup.panels)).toBe(true);
       });
       test('have detail', async () => {
         const testGroup = await createTestGroup();
@@ -594,16 +595,28 @@ describe('group model function', () => {
   });
 
   describe('GroupPanel', () => {
-    test('GroupPanel.createPanel should be ok', async () => {
-      const panel = await GroupPanel.createPanel('test', 'channel');
+    describe('GroupPanel.createPanel', () => {
+      test('GroupPanel.createPanel should be ok', async () => {
+        const testUser = await getTestUser();
+        const testGroup = await createTestGroup();
+        const { groupPanel: panel } = await GroupPanel.createPanel(
+          'test',
+          'any' as any,
+          testGroup.uuid,
+          testUser.uuid
+        );
 
-      try {
-        expect(panel).toHaveProperty('uuid', expect.any(String));
-        expect(panel.name).toBe('test');
-        expect(panel.type).toBe('channel');
-      } finally {
-        await panel.destroy({ force: true });
-      }
+        try {
+          expect(panel).toHaveProperty('uuid', expect.any(String));
+          expect(panel.name).toBe('test');
+          expect(panel.type).toBe('channel');
+          expect(panel.groupId).toBe(testGroup.id);
+        } finally {
+          await panel.destroy({ force: true });
+        }
+      });
+
+      test.todo('GroupPanel.createPanel should be create channel');
     });
 
     test('GroupPanel.getPanelByGroup should be ok', async () => {

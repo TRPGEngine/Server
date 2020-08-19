@@ -12,7 +12,7 @@ import { GroupDetail } from './models/detail';
 import { GroupChannel } from './models/channel';
 import { NoReportError } from 'lib/error';
 import { notifyGroupRemoveMember, notifyGroupDismiss } from './notify';
-import { GroupPanel } from './models/panel';
+import { GroupPanel, GroupPanelType } from './models/panel';
 
 export const create: EventFunc<{
   name: string;
@@ -1209,6 +1209,33 @@ export const addGroupChannelMember: EventFunc<{
   return true;
 };
 
+export const createGroupPanel: EventFunc<{
+  groupUUID: string;
+  name: string;
+  type: GroupPanelType;
+}> = async function(data) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const { groupUUID, name, type } = data;
+  if (_.isNil(groupUUID) || _.isNil(name) || _.isNil(type)) {
+    throw new Error('缺少必要参数');
+  }
+
+  const { groupPanel, other } = await GroupPanel.createPanel(
+    name,
+    type,
+    groupUUID,
+    player.uuid
+  );
+
+  return { ...other, groupPanel };
+};
+
 /**
  * 移除团频道的成员
  */
@@ -1260,7 +1287,5 @@ export const getGroupInitData: EventFunc<{
   // 获取团选择人物的Mapping
   const groupActorsMapping = await group.getGroupActorMapping(player.uuid);
 
-  const groupPanels = await GroupPanel.getPanelByGroup(group);
-
-  return { members, groupActors, groupActorsMapping, groupPanels };
+  return { members, groupActors, groupActorsMapping };
 };
