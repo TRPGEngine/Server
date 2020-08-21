@@ -629,5 +629,38 @@ describe('group model function', () => {
       // should be order by id asc
       expect(panels.map((p) => p.id)).toMatchObject([panel1.id, panel2.id]);
     });
+
+    test('GroupPanel.updateGroupPanelOrder should be ok', async () => {
+      const testUser = await getTestUser();
+      const group = await createTestGroup();
+
+      const panel1 = await createTestGroupPanel(group.id, { order: 1 });
+      const panel2 = await createTestGroupPanel(group.id, { order: 2 });
+
+      const affectedRow = await GroupPanel.updateGroupPanelOrder(
+        group.uuid,
+        testUser.uuid,
+        [
+          {
+            uuid: panel1.uuid,
+            order: 3,
+          },
+        ]
+      );
+
+      expect(affectedRow).toBe(1); // 影响字段数为 1
+
+      // 重新请求以进行进一步确认
+      expect(await GroupPanel.getPanelByGroup(group)).toMatchObject([
+        {
+          uuid: panel2.uuid,
+          order: 2,
+        },
+        {
+          uuid: panel1.uuid,
+          order: 3,
+        },
+      ]);
+    });
   });
 });

@@ -31,4 +31,18 @@ panelRouter.post('/:groupUUID/panel/create', ssoAuth(), async (ctx) => {
   ctx.body = { ...other, groupPanel };
 });
 
+panelRouter.post('/:groupUUID/panel/updateOrder', ssoAuth(), async (ctx) => {
+  const groupUUID = ctx.params.groupUUID;
+  const playerUUID = ctx.state.player.uuid;
+  const { groupOrderList } = ctx.request.body;
+
+  if (_.isNil(groupUUID) || _.isNil(groupOrderList)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await GroupPanel.updateGroupPanelOrder(groupUUID, playerUUID, groupOrderList);
+
+  ctx.body = { result: true };
+});
+
 export default panelRouter;

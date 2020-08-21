@@ -68,7 +68,7 @@ export const createTestGroupPanel = async (
 ): Promise<GroupPanel> => {
   const groupPanel = await GroupPanel.create({
     name: generateRandomStr(),
-    type: 'channel',
+    type: 'test',
     ...attrs,
     groupId,
   });

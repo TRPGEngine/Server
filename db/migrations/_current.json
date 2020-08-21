@@ -2104,6 +2104,7 @@
                         "internal": true,
                         "value": "Sequelize.UUIDV1"
                     },
+                    "unique": true,
                     "field": "uuid",
                     "seqType": "Sequelize.UUID"
                 },
@@ -3386,5 +3387,5 @@
             "indexes": []
         }
     },
-    "revision": 61
+    "revision": 62
 }

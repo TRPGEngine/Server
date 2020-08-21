@@ -102,6 +102,65 @@ export class GroupPanel extends Model {
   }
 
   /**
+   * 更新团面板order
+   * @param groupUUID 团UUID
+   * @param userUUID 操作人UUID
+   * @param groupOrderList 更新团面板order列表
+   */
+  static async updateGroupPanelOrder(
+    groupUUID: string,
+    userUUID: string,
+    groupOrderList: { uuid: string; order: number }[]
+  ): Promise<number> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+
+    // 检测权限
+    if (!group.isManagerOrOwner(userUUID)) {
+      throw new Error('创建失败: 你没有权限创建面板');
+    }
+
+    const groupPanels = await GroupPanel.getPanelByGroup(group);
+    const allAllowPanelUUIDs = groupPanels.map((panel) => panel.uuid);
+
+    // 手动处理一遍确保不会有额外的参数
+    groupOrderList = groupOrderList.map((item) =>
+      _.pick(item, ['uuid', 'order'])
+    );
+
+    // 仅保留在团里的面板列表
+    // 不在团里的直接过滤掉
+    const validatedGroupOrderList = groupOrderList.filter(({ uuid }) =>
+      allAllowPanelUUIDs.includes(uuid)
+    );
+
+    const affectedRowList = await Promise.all(
+      validatedGroupOrderList.map(({ uuid, order }) => {
+        return GroupPanel.update(
+          {
+            order,
+          },
+          {
+            where: {
+              uuid,
+              groupId: group.id,
+            },
+          }
+        );
+      })
+    );
+
+    let affectedRow = 0;
+    for (const row of affectedRowList) {
+      affectedRow += Number(row);
+    }
+
+    // 通知用户更新团面板
+    await notifyUpdateGroupPanel(group);
+
+    return affectedRow;
+  }
+
+  /**
    * 删除目标记录
    */
   async destroyTargetRecord(options: GroupPanelDestroyTargetRecordOptions) {
@@ -122,7 +181,11 @@ export class GroupPanel extends Model {
 export default function GroupPanelDefinition(Sequelize: Orm, db: DBInstance) {
   GroupPanel.init(
     {
-      uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
+      uuid: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV1,
+        unique: true,
+      },
       name: { type: Sequelize.STRING, required: true },
       type: { type: Sequelize.STRING, required: true },
       target_uuid: {
