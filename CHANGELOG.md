@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.29.1](https://github.com/TRPGEngine/Server/compare/v1.29.0...v1.29.1) (2020-08-23)
+
+
+### Features
+
+* **db:** coc7版人物卡增加san值 ([d8dea04](https://github.com/TRPGEngine/Server/commit/d8dea04f7d29ce46c9c7c007a8bfb7cfbdd699c9))
+
 ## [1.29.0](https://github.com/TRPGEngine/Server/compare/v1.28.2...v1.29.0) (2020-08-05)
 
 
