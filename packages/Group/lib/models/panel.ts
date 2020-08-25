@@ -37,6 +37,8 @@ export class GroupPanel extends Model {
 
   groupId?: number;
 
+  static defaultOrder = 'asc' as const;
+
   /**
    * 创建面板
    * @param name 面板名
@@ -98,19 +100,19 @@ export class GroupPanel extends Model {
   static async getPanelByGroup(group: GroupGroup): Promise<GroupPanel[]> {
     const panels: GroupPanel[] = await group.getPanels();
 
-    return _.orderBy(panels, 'order', 'asc');
+    return _.orderBy(panels, 'order', GroupPanel.defaultOrder);
   }
 
   /**
    * 更新团面板order
    * @param groupUUID 团UUID
    * @param userUUID 操作人UUID
-   * @param groupOrderList 更新团面板order列表
+   * @param panelOrderList 更新团面板order列表
    */
   static async updateGroupPanelOrder(
     groupUUID: string,
     userUUID: string,
-    groupOrderList: { uuid: string; order: number }[]
+    panelOrderList: { uuid: string; order: number }[]
   ): Promise<number> {
     const group = await GroupGroup.findByUUID(groupUUID);
 
@@ -123,13 +125,13 @@ export class GroupPanel extends Model {
     const allAllowPanelUUIDs = groupPanels.map((panel) => panel.uuid);
 
     // 手动处理一遍确保不会有额外的参数
-    groupOrderList = groupOrderList.map((item) =>
+    panelOrderList = panelOrderList.map((item) =>
       _.pick(item, ['uuid', 'order'])
     );
 
     // 仅保留在团里的面板列表
     // 不在团里的直接过滤掉
-    const validatedGroupOrderList = groupOrderList.filter(({ uuid }) =>
+    const validatedGroupOrderList = panelOrderList.filter(({ uuid }) =>
       allAllowPanelUUIDs.includes(uuid)
     );
 

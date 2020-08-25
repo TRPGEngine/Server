@@ -109,12 +109,14 @@ describe('group model function', () => {
         expect(groups.length).toBeGreaterThan(0);
 
         const testTargetGroup = _.find(groups, ['uuid', testGroup.uuid]);
+        expect(testTargetGroup).not.toBeNull();
         expect(testTargetGroup).toHaveProperty('detail'); // 该数据应当有detail字段
         expect(testTargetGroup).toHaveProperty('channels'); // 该数据应当有channels字段
         expect(testTargetGroup.detail).toBeNull();
         expect(Array.isArray(testTargetGroup.channels)).toBe(true);
         expect(Array.isArray(testTargetGroup.panels)).toBe(true);
       });
+
       test('have detail', async () => {
         const testGroup = await createTestGroup();
         await createTestGroupDetail(testGroup.id);
@@ -125,12 +127,33 @@ describe('group model function', () => {
         expect(groups.length).toBeGreaterThan(0);
 
         const testTargetGroup = _.find(groups, ['uuid', testGroup.uuid]);
+        expect(testTargetGroup).not.toBeNull();
         expect(testTargetGroup).toHaveProperty('detail'); // 该数据应当有detail字段
         expect(testTargetGroup.detail).not.toBeNull();
         expect(typeof testTargetGroup.detail.master_name).toBe('string');
         expect(typeof testTargetGroup.detail.disable_quick_dice).toBe(
           'boolean'
         );
+      });
+
+      test.only('have ordered panels', async () => {
+        const testGroup = await createTestGroup();
+        await createTestGroupPanel(testGroup.id, { order: 2 });
+        await createTestGroupPanel(testGroup.id, { order: 1 });
+        const user = await getTestUser();
+        await testGroup.addMember(user);
+
+        const groups = await GroupGroup.getAllUserGroupList(user.uuid);
+
+        const testTargetGroup = groups.find(
+          (group) => group.uuid === testGroup.uuid
+        );
+        expect(testTargetGroup).not.toBeNull();
+        expect(testTargetGroup.panels).not.toBeNull();
+        const panels = testTargetGroup.panels;
+        expect(panels.length).toBe(2);
+        expect(panels[0].order).toBe(1);
+        expect(panels[1].order).toBe(2);
       });
     });
 

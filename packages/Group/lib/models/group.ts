@@ -200,7 +200,7 @@ export class GroupGroup extends Model {
     }
 
     const user = await PlayerUser.findByUUID(userUUID);
-    return await user.getGroups({
+    const groups = await user.getGroups({
       include: [
         {
           model: GroupDetail,
@@ -213,9 +213,12 @@ export class GroupGroup extends Model {
         {
           model: GroupPanel,
           as: 'panels',
+          separate: true,
+          order: [['order', GroupPanel.defaultOrder]],
         },
       ],
     });
+    return groups;
   }
 
   /**
