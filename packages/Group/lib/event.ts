@@ -30,34 +30,14 @@ export const create: EventFunc<{
   const userUUID = player.uuid;
 
   const { name, sub_name, desc, avatar } = data;
-  if (!name) {
-    throw new NoReportError('缺少团名');
-  }
 
-  const isExist = await GroupGroup.findOne({
-    where: { name },
-  });
-  if (!!isExist) {
-    throw new NoReportError('该团名已存在');
-  }
-
-  const user = await PlayerUser.findByUUID(userUUID);
-  const group: GroupGroup = await GroupGroup.create({
-    type: 'group',
+  const group = await GroupGroup.createGroup(
     name,
+    avatar,
     sub_name,
     desc,
-    avatar,
-    creator_uuid: userUUID,
-    owner_uuid: userUUID,
-    managers_uuid: [],
-    maps_uuid: [],
-  });
-
-  await group.setOwner(user);
-  await GroupGroup.addGroupMember(group.uuid, userUUID);
-
-  await app.player.manager.joinRoom(group.uuid, socket); // 加入房间
+    userUUID
+  );
 
   return { group };
 };

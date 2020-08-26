@@ -29,6 +29,29 @@ groupRouter.get('/list/own', ssoAuth(), async (ctx) => {
 });
 
 /**
+ * 创建团
+ */
+groupRouter.post('/create', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { name, avatar, subName, desc } = ctx.request.body;
+
+  const user = await PlayerUser.findByUUID(playerUUID);
+  if (_.isNil(user)) {
+    throw new Error('用户不存在');
+  }
+
+  const group = await GroupGroup.createGroup(
+    name,
+    avatar,
+    subName,
+    desc,
+    user.uuid
+  );
+
+  ctx.body = { group };
+});
+
+/**
  * 获取团队一定时间范围内所有的会话记录
  */
 groupRouter.get('/log/:groupUUID/range', ssoAuth(), async (ctx) => {

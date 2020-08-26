@@ -26,6 +26,7 @@ import { GroupDetail } from './detail';
 import { GroupChannel } from './channel';
 import Debug from 'debug';
 import { GroupPanel } from './panel';
+import { NoReportError } from 'lib/error';
 const debug = Debug('trpg:component:group:model:group');
 
 type GroupType = 'group' | 'channel' | 'test';
@@ -105,6 +106,54 @@ export class GroupGroup extends Model {
     });
 
     return _.get(group, 'groupActors', []);
+  }
+
+  /**
+   * 创建一个团
+   * @param name 团名
+   * @param avatar 团头像
+   * @param subName 团副名
+   * @param desc 团简介
+   * @param userUUID 操作人UUID
+   */
+  static async createGroup(
+    name: string,
+    avatar: string,
+    subName: string,
+    desc: string,
+    userUUID: string
+  ): Promise<GroupGroup> {
+    if (!name) {
+      throw new NoReportError('缺少团名');
+    }
+
+    const isExist = await GroupGroup.findOne({
+      where: { name },
+    });
+    if (!!isExist) {
+      throw new NoReportError('该团名已存在');
+    }
+
+    const user = await PlayerUser.findByUUID(userUUID);
+    const group: GroupGroup = await GroupGroup.create({
+      type: 'group',
+      name,
+      sub_name: subName,
+      desc,
+      avatar,
+      creator_uuid: userUUID,
+      owner_uuid: userUUID,
+      managers_uuid: [],
+      maps_uuid: [],
+    });
+
+    await group.setOwner(user);
+    await GroupGroup.addGroupMember(group.uuid, userUUID);
+
+    const trpgapp = GroupGroup.getApplication();
+    await trpgapp.player.manager.joinRoomWithUUID(group.uuid, userUUID);
+
+    return group;
   }
 
   /**

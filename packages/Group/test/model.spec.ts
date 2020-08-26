@@ -40,6 +40,36 @@ describe('group model function', () => {
       expect(group.toJSON()).toHaveProperty('members_count');
     });
 
+    test('GroupGroup.createGroup should be ok', async () => {
+      const testUser = await getTestUser();
+      const userUUID = testUser.uuid;
+      const name = 'test name';
+      const avatar = 'test avatar';
+      const subName = 'test sub name';
+      const desc = 'test desc';
+      const group = await GroupGroup.createGroup(
+        name,
+        avatar,
+        subName,
+        desc,
+        userUUID
+      );
+
+      try {
+        expect(group.name).toBe(name);
+        expect(group.avatar).toBe(avatar);
+        expect(group.sub_name).toBe(subName);
+        expect(group.desc).toBe(desc);
+        expect(group.owner_uuid).toBe(userUUID);
+        expect(group.isManagerOrOwner(userUUID)).toBe(true);
+        expect(
+          (await group.getMembers()).map((user) => user.uuid).includes(userUUID)
+        ).toBe(true);
+      } finally {
+        await group.destroy({ force: true });
+      }
+    });
+
     describe('GroupGroup.searchGroup should be ok', () => {
       /**
        * 检测一个团UUID是否应该在搜索结果中
@@ -136,7 +166,7 @@ describe('group model function', () => {
         );
       });
 
-      test.only('have ordered panels', async () => {
+      test('have ordered panels', async () => {
         const testGroup = await createTestGroup();
         await createTestGroupPanel(testGroup.id, { order: 2 });
         await createTestGroupPanel(testGroup.id, { order: 1 });
