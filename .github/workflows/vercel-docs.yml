@@ -3,10 +3,9 @@ name: "deploy website"
 on:
   push:
     branches:
-      - master
-  pull_request:
-    branches:
-      - master
+      - release
+      - docs
+  workflow_dispatch:
 
 jobs:
   deploy:
