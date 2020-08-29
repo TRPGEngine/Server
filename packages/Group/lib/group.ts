@@ -7,6 +7,7 @@ import GroupInviteDefinition from './models/invite';
 import GroupActorDefinition from './models/actor';
 import GroupRequestDefinition from './models/request';
 import GroupDetailDefinition from './models/detail';
+import GroupInviteCodeDefinition from './models/invite-code';
 import actorRouter from './routers/actor';
 import groupRouter from './routers/group';
 import GroupChannelDefinition from './models/channel';
@@ -26,6 +27,7 @@ export default class Group extends BasePackage {
     this.regModel(GroupDetailDefinition);
     this.regModel(GroupChannelDefinition);
     this.regModel(GroupPanelDefinition);
+    this.regModel(GroupInviteCodeDefinition);
 
     const app = this.app;
     const db = this.db;

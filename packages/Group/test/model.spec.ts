@@ -17,6 +17,8 @@ import { regAutoClear } from 'test/utils/example';
 import { GroupDetail } from '../lib/models/detail';
 import { GroupChannel } from '../lib/models/channel';
 import { GroupPanel } from '../lib/models/panel';
+import { GroupInviteCode } from '../lib/models/invite-code';
+import shortid from 'shortid';
 
 const context = buildAppContext();
 
@@ -714,6 +716,28 @@ describe('group model function', () => {
           order: 3,
         },
       ]);
+    });
+  });
+
+  describe('GroupInviteCode', () => {
+    test('GroupInviteCode.createInvite', async () => {
+      const testUser = await getTestUser();
+      const testGroup = await createTestGroup();
+
+      const invite = await GroupInviteCode.createInvite(
+        testGroup.uuid,
+        testUser.uuid
+      );
+
+      try {
+        expect(invite.group_uuid).toBe(testGroup.uuid);
+        expect(invite.from_uuid).toBe(testUser.uuid);
+        expect(invite.expiredAt).toBe(undefined);
+        expect(invite.times).toBe(-1);
+        expect(shortid.isValid(invite.code)).toBe(true);
+      } finally {
+        await invite.destroy();
+      }
     });
   });
 });

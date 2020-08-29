@@ -2164,6 +2164,59 @@
             },
             "indexes": []
         },
+        "group_invite_code": {
+            "tableName": "group_invite_code",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "code": {
+                    "required": true,
+                    "unique": true,
+                    "allowNull": false,
+                    "field": "code",
+                    "seqType": "Sequelize.STRING"
+                },
+                "group_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "group_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "from_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "from_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "expiredAt": {
+                    "field": "expiredAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "times": {
+                    "defaultValue": {
+                        "value": -1
+                    },
+                    "field": "times",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
         "note_note": {
             "tableName": "note_note",
             "schema": {
@@ -3387,5 +3440,5 @@
             "indexes": []
         }
     },
-    "revision": 62
+    "revision": 63
 }
