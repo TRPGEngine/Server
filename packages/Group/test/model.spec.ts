@@ -717,6 +717,24 @@ describe('group model function', () => {
         },
       ]);
     });
+
+    test('GroupPanel.updatePanelInfo should be ok', async () => {
+      const testUser = await getTestUser();
+      const group = await createTestGroup();
+      const panel = await createTestGroupPanel(group.id);
+      const targetName = 'new panel name';
+
+      const newPanel = await GroupPanel.updatePanelInfo(
+        panel.uuid,
+        testUser.uuid,
+        {
+          name: targetName,
+        }
+      );
+
+      expect(newPanel.uuid).toBe(panel.uuid);
+      expect(newPanel.name).toBe(targetName);
+    });
   });
 
   describe('GroupInviteCode', () => {

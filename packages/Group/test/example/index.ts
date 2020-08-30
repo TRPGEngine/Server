@@ -64,7 +64,7 @@ export const createTestGroupDetail = async (groupId: number) => {
 
 export const createTestGroupPanel = async (
   groupId: number,
-  attrs: object
+  attrs?: object
 ): Promise<GroupPanel> => {
   const groupPanel = await GroupPanel.create({
     name: generateRandomStr(),

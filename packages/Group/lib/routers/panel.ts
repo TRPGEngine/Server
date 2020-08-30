@@ -45,4 +45,18 @@ panelRouter.post('/:groupUUID/panel/updateOrder', ssoAuth(), async (ctx) => {
   ctx.body = { result: true };
 });
 
+panelRouter.post('/:groupUUID/panel/updateInfo', ssoAuth(), async (ctx) => {
+  const groupUUID = ctx.params.groupUUID;
+  const playerUUID = ctx.state.player.uuid;
+  const { panelUUID, info } = ctx.request.body;
+
+  if (_.isNil(panelUUID) || _.isNil(info)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await GroupPanel.updatePanelInfo(panelUUID, playerUUID, info);
+
+  ctx.body = { result: true };
+});
+
 export default panelRouter;

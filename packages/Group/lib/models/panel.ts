@@ -1,4 +1,10 @@
-import { Model, Orm, DBInstance, HasManyGetAssociationsMixin } from 'trpg/core';
+import {
+  Model,
+  Orm,
+  DBInstance,
+  HasManyGetAssociationsMixin,
+  BelongsToGetAssociationMixin,
+} from 'trpg/core';
 import { GroupGroup } from 'packages/Group/lib/models/group';
 import _ from 'lodash';
 import { GroupChannel } from './channel';
@@ -37,7 +43,19 @@ export class GroupPanel extends Model {
 
   groupId?: number;
 
+  getGroup?: BelongsToGetAssociationMixin<GroupGroup>;
+
   static defaultOrder = 'asc' as const;
+
+  static async findByUUID(panelUUID: string): Promise<GroupPanel | null> {
+    const panel = await GroupPanel.findOne({
+      where: {
+        uuid: panelUUID,
+      },
+    });
+
+    return panel;
+  }
 
   /**
    * 创建面板
@@ -91,6 +109,43 @@ export class GroupPanel extends Model {
     await notifyUpdateGroupPanel(group);
 
     return { groupPanel, other };
+  }
+
+  /**
+   * 更新团信息
+   * @param panelUUID 团面板UUID
+   * @param userUUID 操作用户UID
+   * @param newData 新的参数
+   */
+  static async updatePanelInfo(
+    panelUUID: string,
+    userUUID: string,
+    newData: object
+  ): Promise<GroupPanel> {
+    const allowedInfo = ['name'];
+
+    newData = _.pick(newData, allowedInfo);
+
+    const panel = await GroupPanel.findByUUID(panelUUID);
+    if (_.isNil(panel)) {
+      throw new Error('找不到该面板');
+    }
+
+    const group: GroupGroup = await panel.getGroup();
+    if (_.isNil(group)) {
+      throw new Error('找不到团');
+    }
+
+    const isManager = group.isManagerOrOwner(userUUID);
+    if (!isManager) {
+      throw new Error('无权限修改团面板信息');
+    }
+
+    await panel.update(newData);
+
+    await notifyUpdateGroupPanel(group);
+
+    return panel;
   }
 
   /**
