@@ -674,6 +674,19 @@ describe('group model function', () => {
       test.todo('GroupPanel.createPanel should be create channel');
     });
 
+    test('GroupPanel.removePanel should be ok', async () => {
+      const testUser = await getTestUser();
+      const testGroup = await createTestGroup();
+      const testPanel = await createTestGroupPanel(testGroup.id);
+
+      const fn = jest.spyOn(GroupPanel.prototype, 'destroyTargetRecord');
+      await GroupPanel.removePanel(testPanel.uuid, testUser.uuid);
+
+      expect(await GroupPanel.findByPk(testPanel.id)).toBeNull();
+      expect(fn).toHaveBeenCalled();
+      expect(fn).toHaveBeenCalledTimes(1);
+    });
+
     test('GroupPanel.getPanelByGroup should be ok', async () => {
       const group = await createTestGroup();
       const panel2 = await createTestGroupPanel(group.id, { order: 2 });

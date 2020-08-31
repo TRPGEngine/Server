@@ -86,6 +86,8 @@ export class GroupPanel extends Model {
 
     const other: any = {};
     let target_uuid: string = undefined;
+
+    // 根据类型进行对应的创建操作
     if (type === 'channel') {
       // 如果是文字类型则新建文字类型
       const channel = await GroupChannel.createChannel(
@@ -109,6 +111,28 @@ export class GroupPanel extends Model {
     await notifyUpdateGroupPanel(group);
 
     return { groupPanel, other };
+  }
+
+  /**
+   * 删除面板
+   */
+  static async removePanel(panelUUID: string, userUUID: string): Promise<void> {
+    const panel = await GroupPanel.findByUUID(panelUUID);
+    if (_.isNil(panel)) {
+      throw new Error('找不到面板');
+    }
+
+    const group: GroupGroup = await panel.getGroup();
+    if (_.isNil(group)) {
+      throw new Error('找不到关联的团');
+    }
+    if (!group.isManagerOrOwner(userUUID)) {
+      throw new Error('删除失败: 你没有权限创建面板');
+    }
+
+    await panel.destroy(); // 面板删除后会自动调用hook来触发destroyTargetRecord
+
+    await notifyUpdateGroupPanel(group);
   }
 
   /**

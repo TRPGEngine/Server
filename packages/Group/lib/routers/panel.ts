@@ -31,6 +31,24 @@ panelRouter.post('/:groupUUID/panel/create', ssoAuth(), async (ctx) => {
   ctx.body = { ...other, groupPanel };
 });
 
+panelRouter.post(
+  '/:groupUUID/panel/:panelUUID/remove',
+  ssoAuth(),
+  async (ctx) => {
+    const groupUUID = ctx.params.groupUUID;
+    const panelUUID = ctx.params.panelUUID;
+    const playerUUID = ctx.state.player.uuid;
+
+    if (_.isNil(panelUUID)) {
+      throw new Error('缺少必要参数');
+    }
+
+    await GroupPanel.removePanel(panelUUID, playerUUID);
+
+    ctx.body = { result: true };
+  }
+);
+
 panelRouter.post('/:groupUUID/panel/updateOrder', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
   const playerUUID = ctx.state.player.uuid;
