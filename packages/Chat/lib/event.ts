@@ -332,6 +332,7 @@ export const message: EventFunc = async function message(data, cb) {
   const sender_uuid = player.uuid;
   const to_uuid = data.to_uuid;
   const converse_uuid = data.converse_uuid;
+  const group_uuid = data.group_uuid;
   let type = data.type || 'normal';
   const is_public = data.is_public || false;
   const is_group = data.is_group || false;
@@ -349,6 +350,7 @@ export const message: EventFunc = async function message(data, cb) {
     sender_uuid,
     to_uuid,
     converse_uuid,
+    group_uuid,
     type,
     is_public,
     is_group,

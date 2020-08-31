@@ -24,6 +24,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
   sender_uuid: string;
   to_uuid: string;
   converse_uuid: string;
+  group_uuid: string;
   message: string;
   type: ChatMessageType;
   data: object;
@@ -243,8 +244,9 @@ export class ChatLog extends Model implements ChatMessagePayload {
         // await app.player.manager.broadcastSocketEvent('chat::message', log);
         throw new Error('出现异常, 不支持的广播消息');
       } else {
+        const roomUUID = log.group_uuid ?? log.converse_uuid;
         await app.player.manager.roomcastSocketEvent(
-          log.converse_uuid,
+          roomUUID,
           'chat::message',
           log
         );
@@ -440,6 +442,9 @@ export default function LogDefinition(Sequelize: Orm, db: DBInstance) {
       sender_uuid: { type: Sequelize.STRING, required: true },
       to_uuid: { type: Sequelize.STRING },
       converse_uuid: { type: Sequelize.STRING },
+      // 这是一个广播的房间UUID，用于团频道不同会话复用同一个房间，防止团频道与团不同的导致房间的几何增长
+      // 可以为空, 为空的话使用原来的converse_uuid作为广播
+      group_uuid: { type: Sequelize.STRING },
       message: { type: Sequelize.STRING(1000) },
       type: {
         type: Sequelize.ENUM(

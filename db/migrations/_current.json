@@ -1076,6 +1076,10 @@
                     "field": "converse_uuid",
                     "seqType": "Sequelize.STRING"
                 },
+                "group_uuid": {
+                    "field": "group_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
                 "message": {
                     "field": "message",
                     "seqType": "Sequelize.STRING(1000)"
@@ -3440,5 +3444,5 @@
             "indexes": []
         }
     },
-    "revision": 63
+    "revision": 64
 }

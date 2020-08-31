@@ -15,6 +15,7 @@ export interface ChatMessagePayload {
   sender_uuid: string;
   to_uuid: string | null;
   converse_uuid: string;
+  group_uuid?: string;
   type: ChatMessageType;
   is_public: boolean;
   is_group: boolean;
