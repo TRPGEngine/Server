@@ -10,10 +10,11 @@ import GroupDetailDefinition from './models/detail';
 import GroupInviteCodeDefinition from './models/invite-code';
 import actorRouter from './routers/actor';
 import groupRouter from './routers/group';
-import GroupChannelDefinition from './models/channel';
+import GroupChannelDefinition, { GroupChannel } from './models/channel';
 import { regRoomGather } from 'packages/Player/lib/managers/socketroom-manager';
 import GroupPanelDefinition from './models/panel';
 import panelRouter from './routers/panel';
+import { regGroupPanelHandler } from './panels/reg';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -104,6 +105,33 @@ export default class Group extends BasePackage {
       const groups: GroupGroup[] = await user.getGroups();
 
       return groups.map((g) => g.uuid);
+    });
+
+    // 文字类型的团面板
+    regGroupPanelHandler('channel', {
+      async onCreate(panelInfo) {
+        const channel = await GroupChannel.createChannel(
+          panelInfo.groupUUID,
+          panelInfo.userUUID,
+          panelInfo.name,
+          panelInfo.name
+        );
+
+        return {
+          targetUUID: channel.uuid,
+          other: {
+            groupChannel: channel,
+          },
+        };
+      },
+      async onDestroy(panel, options) {
+        await GroupChannel.destroy({
+          where: {
+            uuid: panel.target_uuid,
+          },
+          ...options,
+        });
+      },
     });
   }
 }

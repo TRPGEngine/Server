@@ -9,6 +9,11 @@ import { GroupGroup } from 'packages/Group/lib/models/group';
 import _ from 'lodash';
 import { GroupChannel } from './channel';
 import { notifyUpdateGroupPanel } from '../notify';
+import {
+  GroupPanelDestroyTargetRecordOptions,
+  handleGroupPanelCreate,
+  handleGroupPanelDestroy,
+} from '../panels/reg';
 
 /**
  * 团面板
@@ -26,11 +31,8 @@ export type GroupPanelType =
   | 'voicechannel' // 语音聊天频道
   | 'map' // 地图
   | 'actors' // 团角色
-  | 'kanban'; // 看板
-
-interface GroupPanelDestroyTargetRecordOptions {
-  force?: boolean;
-}
+  | 'kanban' // 看板
+  | 'test'; // 测试类型
 
 export class GroupPanel extends Model {
   id: string;
@@ -88,17 +90,12 @@ export class GroupPanel extends Model {
     let target_uuid: string = undefined;
 
     // 根据类型进行对应的创建操作
-    if (type === 'channel') {
-      // 如果是文字类型则新建文字类型
-      const channel = await GroupChannel.createChannel(
-        groupUUID,
-        userUUID,
-        name,
-        name
-      );
-      other.groupChannel = channel;
-      target_uuid = channel.uuid;
-    }
+    await handleGroupPanelCreate(type, {
+      name,
+      type,
+      groupUUID,
+      userUUID,
+    });
 
     const groupPanel = await GroupPanel.create({
       name,
@@ -127,7 +124,7 @@ export class GroupPanel extends Model {
       throw new Error('找不到关联的团');
     }
     if (!group.isManagerOrOwner(userUUID)) {
-      throw new Error('删除失败: 你没有权限创建面板');
+      throw new Error('删除失败: 你没有权限移除面板');
     }
 
     await panel.destroy(); // 面板删除后会自动调用hook来触发destroyTargetRecord
@@ -246,16 +243,8 @@ export class GroupPanel extends Model {
    */
   async destroyTargetRecord(options: GroupPanelDestroyTargetRecordOptions) {
     const type = this.type;
-    const targetUUID = this.target_uuid;
 
-    if (type === 'channel') {
-      await GroupChannel.destroy({
-        where: {
-          uuid: targetUUID,
-        },
-        ...options,
-      });
-    }
+    await handleGroupPanelDestroy(type, this, options);
   }
 }
 

@@ -655,16 +655,16 @@ describe('group model function', () => {
         const testUser = await getTestUser();
         const testGroup = await createTestGroup();
         const { groupPanel: panel } = await GroupPanel.createPanel(
+          'test name',
           'test',
-          'any' as any,
           testGroup.uuid,
           testUser.uuid
         );
 
         try {
           expect(panel).toHaveProperty('uuid', expect.any(String));
-          expect(panel.name).toBe('test');
-          expect(panel.type).toBe('any');
+          expect(panel.name).toBe('test name');
+          expect(panel.type).toBe('test');
           expect(panel.groupId).toBe(testGroup.id);
         } finally {
           await panel.destroy({ force: true });
