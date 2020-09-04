@@ -2,6 +2,8 @@ import * as event from './event';
 import BasePackage from 'lib/package';
 import NoteNoteDefinition from './models/note';
 import noteRouter from './routers/note';
+import NoteNoteVersionDefinition from './models/note-version';
+import noteVersionRouter from './routers/note-version';
 
 export default class Note extends BasePackage {
   public name: string = 'Note';
@@ -10,6 +12,7 @@ export default class Note extends BasePackage {
 
   onInit(): void {
     this.regModel(NoteNoteDefinition);
+    this.regModel(NoteNoteVersionDefinition);
 
     // 旧版事件
     this.regSocketEvent('note::get', event.get);
@@ -22,5 +25,6 @@ export default class Note extends BasePackage {
     this.regSocketEvent('note::deleteNote', event.deleteNote);
 
     this.regRoute(noteRouter);
+    this.regRoute(noteVersionRouter);
   }
 }

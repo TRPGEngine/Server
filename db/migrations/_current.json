@@ -2284,6 +2284,69 @@
             },
             "indexes": []
         },
+        "note_note_version": {
+            "tableName": "note_note_version",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "unique": true,
+                    "required": true,
+                    "allowNull": false,
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "title": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "title",
+                    "seqType": "Sequelize.STRING"
+                },
+                "data": {
+                    "field": "data",
+                    "seqType": "Sequelize.JSON"
+                },
+                "comment": {
+                    "field": "comment",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "noteId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "note_note",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "noteId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
         "help_feedback": {
             "tableName": "help_feedback",
             "schema": {
@@ -3444,5 +3507,5 @@
             "indexes": []
         }
     },
-    "revision": 64
+    "revision": 65
 }
