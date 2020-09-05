@@ -15,6 +15,7 @@ import { regRoomGather } from 'packages/Player/lib/managers/socketroom-manager';
 import GroupPanelDefinition from './models/panel';
 import panelRouter from './routers/panel';
 import { regGroupPanelHandler } from './panels/reg';
+import { startWriting, stopWriting } from './chatEvent';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -91,6 +92,10 @@ export default class Group extends BasePackage {
       event.removeGroupChannelMember
     );
     this.regSocketEvent('createGroupPanel', event.createGroupPanel);
+
+    // 注册chat的事件
+    this.regSocketEvent('chat::startWriting', startWriting);
+    this.regSocketEvent('chat::stopWriting', stopWriting);
 
     this.regRoute(actorRouter);
     this.regRoute(groupRouter);

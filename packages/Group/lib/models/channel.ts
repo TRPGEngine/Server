@@ -20,6 +20,9 @@ declare module './group' {
 
 type GroupChannelVisible = 'all' | 'manager' | 'assign';
 
+export const getGroupChannelGroupUUIDCacheKey = (uuid: string): string =>
+  `group:channel:${uuid}:groupUUID`;
+
 /**
  * 一个群组可以有多个频道
  */
@@ -157,6 +160,37 @@ export class GroupChannel extends Model {
     // 离开房间
     const trpgapp = GroupChannel.getApplication();
     trpgapp.player.manager.leaveRoomWithUUIDs(channel.uuid, channel.members);
+  }
+
+  /**
+   * 获取频道所在团的UUID
+   * 用于获取频道转发的房间号
+   */
+  static async getChannelGroupUUID(channelUUID: string): Promise<string> {
+    const cacheKey = getGroupChannelGroupUUIDCacheKey(channelUUID);
+    const app = PlayerUser.getApplication();
+    const cacheVal = await app.cache.get(cacheKey);
+    if (_.isString(cacheVal)) {
+      // 使用缓存
+      return cacheVal;
+    } else {
+      const channel = await GroupChannel.findByUUID(channelUUID);
+      if (_.isNil(channel)) {
+        throw new Error('找不到相关频道');
+      }
+      const group: GroupGroup = await channel.getGroup();
+      if (_.isNil(group)) {
+        throw new Error('找不到相关团');
+      }
+
+      const groupUUID = group.uuid;
+      if (!_.isString(groupUUID)) {
+        throw new Error('无法正确获取到团UUID');
+      }
+
+      await app.cache.set(cacheKey, groupUUID); // 设置缓存
+      return group.uuid;
+    }
   }
 }
 
