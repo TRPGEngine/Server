@@ -15,13 +15,13 @@ export interface GroupPanelDestroyTargetRecordOptions {
   force?: boolean;
 }
 
+export type GroupPanelHandlerCreateReturn = Promise<{
+  targetUUID?: string;
+  other?: {};
+}>;
+
 interface GroupPanelHandler {
-  onCreate: (
-    panelInfo: GroupPanelInfo
-  ) => Promise<{
-    targetUUID?: string;
-    other?: {};
-  }>;
+  onCreate: (panelInfo: GroupPanelInfo) => GroupPanelHandlerCreateReturn;
 
   onDestroy: (
     panel: GroupPanel,
@@ -63,12 +63,12 @@ function getGroupPanelHandler(type: GroupPanelType): GroupPanelHandler | null {
 export async function handleGroupPanelCreate(
   type: GroupPanelType,
   panelInfo: GroupPanelInfo
-) {
+): GroupPanelHandlerCreateReturn {
   const groupPanelHandler = getGroupPanelHandler(type);
 
   if (_.isNull(groupPanelHandler)) {
     if (type === 'test') {
-      return;
+      return {};
     }
 
     throw new Error(`未知的面板: ${type}`);
