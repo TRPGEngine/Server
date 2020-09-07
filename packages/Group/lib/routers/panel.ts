@@ -15,7 +15,7 @@ const panelRouter = new TRPGRouter<{
 panelRouter.post('/:groupUUID/panel/create', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
   const playerUUID = ctx.state.player.uuid;
-  const { name, type } = ctx.request.body;
+  const { name, type, extra } = ctx.request.body;
 
   if (_.isNil(groupUUID) || _.isNil(name) || _.isNil(type)) {
     throw new Error('缺少必要参数');
@@ -24,6 +24,7 @@ panelRouter.post('/:groupUUID/panel/create', ssoAuth(), async (ctx) => {
   const { groupPanel, other } = await GroupPanel.createPanel(
     name,
     type,
+    extra,
     groupUUID,
     playerUUID
   );

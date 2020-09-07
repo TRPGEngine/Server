@@ -6,6 +6,7 @@ const panels = new Map<GroupPanelType, GroupPanelHandler>();
 interface GroupPanelInfo {
   name: string;
   type: GroupPanelType;
+  extra: object;
   groupUUID: string; // 相关团UUID
   userUUID: string; // 操作人UUID
 }
@@ -66,10 +67,11 @@ export async function handleGroupPanelCreate(
   const groupPanelHandler = getGroupPanelHandler(type);
 
   if (_.isNull(groupPanelHandler)) {
-    if (type !== 'test') {
-      console.error('未知的面板', type);
+    if (type === 'test') {
+      return;
     }
-    return;
+
+    throw new Error(`未知的面板: ${type}`);
   }
 
   return await groupPanelHandler.onCreate(panelInfo);
@@ -83,10 +85,11 @@ export async function handleGroupPanelDestroy(
   const groupPanelHandler = getGroupPanelHandler(type);
 
   if (_.isNull(groupPanelHandler)) {
-    if (type !== 'test') {
-      console.error('未知的面板', type);
+    if (type === 'test') {
+      return;
     }
-    return;
+
+    throw new Error(`未知的面板: ${type}`);
   }
 
   return await groupPanelHandler.onDestroy(panel, options);

@@ -69,6 +69,7 @@ export class GroupPanel extends Model {
   static async createPanel(
     name: string,
     type: GroupPanelType,
+    extra: any,
     groupUUID: string,
     userUUID: string
   ): Promise<{ groupPanel: GroupPanel; other: any }> {
@@ -93,6 +94,7 @@ export class GroupPanel extends Model {
     await handleGroupPanelCreate(type, {
       name,
       type,
+      extra,
       groupUUID,
       userUUID,
     });

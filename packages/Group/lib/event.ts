@@ -1193,6 +1193,7 @@ export const createGroupPanel: EventFunc<{
   groupUUID: string;
   name: string;
   type: GroupPanelType;
+  extra: object;
 }> = async function(data) {
   const { app, socket } = this;
 
@@ -1201,7 +1202,7 @@ export const createGroupPanel: EventFunc<{
     throw new Error('用户不存在，请检查登录状态');
   }
 
-  const { groupUUID, name, type } = data;
+  const { groupUUID, name, type, extra } = data;
   if (_.isNil(groupUUID) || _.isNil(name) || _.isNil(type)) {
     throw new Error('缺少必要参数');
   }
@@ -1209,6 +1210,7 @@ export const createGroupPanel: EventFunc<{
   const { groupPanel, other } = await GroupPanel.createPanel(
     name,
     type,
+    extra,
     groupUUID,
     player.uuid
   );

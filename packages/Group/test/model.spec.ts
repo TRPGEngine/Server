@@ -657,6 +657,7 @@ describe('group model function', () => {
         const { groupPanel: panel } = await GroupPanel.createPanel(
           'test name',
           'test',
+          {},
           testGroup.uuid,
           testUser.uuid
         );
