@@ -6,7 +6,7 @@ const panels = new Map<GroupPanelType, GroupPanelHandler>();
 interface GroupPanelInfo {
   name: string;
   type: GroupPanelType;
-  extra: object;
+  extra: { [key: string]: any };
   groupUUID: string; // 相关团UUID
   userUUID: string; // 操作人UUID
 }

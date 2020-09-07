@@ -27,7 +27,7 @@ declare module './group' {
 
 export type GroupPanelType =
   | 'channel' // 文字聊天频道
-  | 'richtext' // 富文本
+  | 'note' // 团笔记
   | 'voicechannel' // 语音聊天频道
   | 'map' // 地图
   | 'actors' // 团角色
@@ -87,11 +87,8 @@ export class GroupPanel extends Model {
       },
     });
 
-    const other: any = {};
-    let target_uuid: string = undefined;
-
     // 根据类型进行对应的创建操作
-    await handleGroupPanelCreate(type, {
+    const { targetUUID, other } = await handleGroupPanelCreate(type, {
       name,
       type,
       extra,
@@ -102,7 +99,7 @@ export class GroupPanel extends Model {
     const groupPanel = await GroupPanel.create({
       name,
       type,
-      target_uuid,
+      target_uuid: targetUUID,
       order: maxOrder + 1, // 确保新加的panel顺序在最后
       groupId,
     });

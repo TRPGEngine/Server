@@ -25,9 +25,9 @@ module.exports = function loadModules(app) {
   app.load(actor);
   app.load(chat);
   app.load(chatEmotion);
-  app.load(dice); // 尚未测试
+  app.load(dice);
   app.load(group);
-  app.load(note); // 尚未测试
+  app.load(note);
   app.load(help);
   app.load(qqconnect); // 尚未测试
   app.load(report); // 尚未测试
