@@ -451,8 +451,12 @@ export class Application extends events.EventEmitter {
     this.scheduleJob.forEach(({ job }) => job.cancel()); // 关闭计划任务列表
     debug('closed all scheduleJob');
 
-    await closeLogger(); // 关闭日志
-    debug('shutdown all logger');
+    try {
+      await closeLogger(); // 关闭日志
+      debug('shutdown all logger');
+    } catch (e) {
+      console.error('关闭日志出现异常', e);
+    }
 
     // 执行关闭事件
     await Promise.all(
