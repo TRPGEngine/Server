@@ -4,7 +4,10 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 
 const noteRouter = new TRPGRouter();
 
-noteRouter.get('/:noteUUID', async (ctx, next) => {
+/**
+ * 获取笔记静态页面
+ */
+noteRouter.get('/:noteUUID', async (ctx) => {
   const noteTemplate = require('../views/note');
   const notFoundTemplate = require('../views/404');
 
@@ -24,6 +27,19 @@ noteRouter.get('/:noteUUID', async (ctx, next) => {
     ctx.render(notFoundTemplate);
     ctx.status = 404;
   }
+});
+
+/**
+ * 获取笔记信息
+ */
+noteRouter.get('/:noteUUID/info', async (ctx) => {
+  const noteUUID = ctx.params.noteUUID;
+
+  const note = await NoteNote.findByUUID(noteUUID);
+
+  ctx.body = {
+    note,
+  };
 });
 
 export default noteRouter;
