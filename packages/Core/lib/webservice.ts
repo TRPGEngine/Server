@@ -23,6 +23,7 @@ import { TRPGApplication } from '../types/app';
 import { CacheValue } from './cache';
 import Application from './application';
 import { TRPGRouter, TRPGMiddleware } from '../types/webservice';
+import { rateLimitMiddleware } from './utils/rate-limit';
 
 const publicDir = path.resolve(process.cwd(), './public');
 const jwtIssuer = 'trpg';
@@ -140,6 +141,7 @@ export default class WebService {
     this.use(bodyParser());
     this.use(serve(publicDir, { maxage: 14 * 24 * 60 * 60 * 1000 })); // 缓存14天
     this.use(session(this.sessionOpt, this._app));
+    this.use(rateLimitMiddleware()); // 请求限速
     this.use(async (ctx, next) => {
       const url = ctx.url;
       if (_.isString(url) && url.startsWith('/api')) {
