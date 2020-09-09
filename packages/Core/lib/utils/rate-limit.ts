@@ -6,6 +6,12 @@ import {
 import IORedis from 'ioredis';
 import { TRPGMiddleware } from 'trpg/core';
 import _ from 'lodash';
+import config from 'config';
+
+const rateLimit = config.get<{
+  points: number;
+  duration: number;
+}>('rateLimit');
 
 export interface RateLimiter extends RateLimiterAbstract {}
 
@@ -16,8 +22,8 @@ export function createRateLimiter(redisClient: IORedis.Redis): RateLimiter {
   const options: IRateLimiterStoreOptions = {
     // Basic options
     storeClient: redisClient,
-    points: 50, // Number of points
-    duration: 5, // Per second(s)
+    points: rateLimit.points ?? 50, // Number of points
+    duration: rateLimit.duration ?? 5, // Per second(s)
 
     // Custom
     execEvenly: false, // Do not delay actions evenly
@@ -40,13 +46,15 @@ export function rateLimitMiddleware(): TRPGMiddleware {
       if (!_.isNil(trpgapp.rateLimiter)) {
         await trpgapp.rateLimiter.consume(ctx.ip);
       }
-      await next();
     } catch (rejRes) {
       ctx.status = 429;
       ctx.body = {
         result: false,
         msg: `Too Many Requests: ${ctx.ip}`,
       };
+      return; // 退出下一步
     }
+
+    return next();
   };
 }
