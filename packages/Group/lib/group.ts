@@ -16,6 +16,7 @@ import GroupPanelDefinition from './models/panel';
 import panelRouter from './routers/panel';
 import { regGroupPanelHandler } from './panels/reg';
 import { startWriting, stopWriting } from './chatEvent';
+import inviteCodeRouter from './routers/invite-code';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -100,6 +101,7 @@ export default class Group extends BasePackage {
     this.regRoute(actorRouter);
     this.regRoute(groupRouter);
     this.regRoute(panelRouter);
+    this.regRoute(inviteCodeRouter);
 
     this.regStatJob('groupCount', async () => {
       let res = await db.models.group_group.count();

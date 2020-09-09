@@ -20,6 +20,24 @@ export class GroupInviteCode extends Model {
   expiredAt: Date;
   times: number;
 
+  /**
+   * 根据邀请代码获取邀请信息
+   * @param code 邀请代码
+   */
+  static async findByCode(code: string): Promise<GroupInviteCode> {
+    return GroupInviteCode.findOne({
+      where: {
+        code,
+      },
+    });
+  }
+
+  /**
+   * 创建一条邀请
+   * @param groupUUID 团UUID
+   * @param userUUID 操作人员UUID
+   * @param options 选项
+   */
   static async createInvite(
     groupUUID: string,
     userUUID: string,
