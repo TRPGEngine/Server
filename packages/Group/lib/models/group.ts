@@ -293,11 +293,7 @@ export class GroupGroup extends Model {
       throw new Error('不是团成员');
     }
 
-    return ChatLog.findRangeConverseLog(
-      groupUUID,
-      new Date(from),
-      new Date(to)
-    );
+    return ChatLog.findRangeConverseLog(groupUUID, from, to);
   }
 
   /**

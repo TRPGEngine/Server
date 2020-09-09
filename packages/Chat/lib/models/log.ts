@@ -75,8 +75,8 @@ export class ChatLog extends Model implements ChatMessagePayload {
    */
   public static async findRangeConverseLog(
     converseUUID: string,
-    from: Date,
-    to: Date
+    from: string,
+    to: string
   ): Promise<ChatLog[]> {
     return ChatLog.findAll({
       where: {
