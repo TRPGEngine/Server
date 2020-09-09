@@ -9,6 +9,14 @@ const groupRouter = new TRPGRouter<{
   player?: PlayerJWTPayload;
 }>();
 
+groupRouter.get('/:groupUUID/info', async (ctx) => {
+  const groupUUID = ctx.params.groupUUID;
+
+  const group = await GroupGroup.findByUUID(groupUUID);
+
+  ctx.body = { group };
+});
+
 /**
  * 获取用户拥有的所有团列表
  */
