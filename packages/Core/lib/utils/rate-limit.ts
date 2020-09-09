@@ -4,9 +4,10 @@ import {
   RateLimiterAbstract,
 } from 'rate-limiter-flexible';
 import IORedis from 'ioredis';
-import { TRPGMiddleware } from 'trpg/core';
+import type { TRPGMiddleware, TRPGApplication } from 'trpg/core';
 import _ from 'lodash';
 import config from 'config';
+import { NoReportError } from 'lib/error';
 
 const rateLimit = config.get<{
   points: number;
@@ -39,7 +40,7 @@ export function createRateLimiter(redisClient: IORedis.Redis): RateLimiter {
 /**
  * koa中间件限速
  */
-export function rateLimitMiddleware(): TRPGMiddleware {
+export function rateLimitKoaMiddleware(): TRPGMiddleware {
   return async (ctx, next) => {
     try {
       const trpgapp = ctx.trpgapp;
@@ -57,4 +58,17 @@ export function rateLimitMiddleware(): TRPGMiddleware {
 
     return next();
   };
+}
+
+/**
+ * 检查Socket是否达到请求上限
+ */
+export async function rateLimitSocketCheck(app: TRPGApplication, ip: string) {
+  try {
+    if (!_.isNil(app.rateLimiter) && _.isString(ip)) {
+      await app.rateLimiter.consume(ip);
+    }
+  }catch(err) {
+    throw new NoReportError(`Too Many Requests: ${ip}`)
+  }
 }

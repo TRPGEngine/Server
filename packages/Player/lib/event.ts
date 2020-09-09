@@ -9,6 +9,7 @@ import { PlayerInvite } from './models/invite';
 import { autoJoinSocketRoom } from './managers/socketroom-manager';
 import { PlayerSettings } from './models/settings';
 import { PlayerLoginLog } from './models/login-log';
+import { getSocketIp } from 'packages/Core/lib/utils/socket-helper';
 
 export const login: EventFunc<{
   username: string;
@@ -20,9 +21,7 @@ export const login: EventFunc<{
   const socket = this.socket;
 
   const { username, password, platform, isApp } = data;
-  const ip =
-    _.get(socket, 'handshake.headers.x-real-ip') ||
-    _.get(socket, 'handshake.address');
+  const ip = getSocketIp(socket);
 
   if (!username || !password) {
     debug('login fail, miss necessary parameter: %o', data);
@@ -115,9 +114,7 @@ export const loginWithToken: EventFunc<{
   // }
 
   const { uuid, token, platform, isApp, channel } = data;
-  const ip =
-    _.get(socket, 'handshake.headers.x-real-ip') ||
-    _.get(socket, 'handshake.address');
+  const ip = getSocketIp(socket);
 
   if (!uuid || !token) {
     debug('login with token fail, miss necessary parameter: %o', data);
