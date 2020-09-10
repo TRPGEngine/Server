@@ -63,6 +63,23 @@ export class GroupInviteCode extends Model {
 
     return inviteCode;
   }
+
+  /**
+   * 通过邀请代码(地址)加入团
+   * @param inviteCode 邀请代码
+   * @param userUUID 使用邀请代码的用户UUID
+   */
+  static async joinGroupWithCode(
+    inviteCode: string,
+    userUUID: string
+  ): Promise<void> {
+    const invite = await GroupInviteCode.findByCode(inviteCode);
+    if (_.isNil(invite)) {
+      throw new Error('找不到邀请信息');
+    }
+    const groupUUID = invite.group_uuid;
+    await GroupGroup.addGroupMember(groupUUID, userUUID);
+  }
 }
 
 export default function GroupInviteCodeDefinition(

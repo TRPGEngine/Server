@@ -368,12 +368,12 @@ export class GroupGroup extends Model {
 
     const user = await PlayerUser.findByUUID(userUUID);
     if (_.isNil(user)) {
-      throw new Error('该用户不存在');
+      throw new Error('用户不存在');
     }
 
     const exist = await group.hasMembers([user]);
     if (exist) {
-      throw new Error('该用户已经在团中');
+      throw new NoReportError('用户已经在团中');
     }
 
     await group.addMember(user);
@@ -390,6 +390,9 @@ export class GroupGroup extends Model {
       // 通知团其他所有人更新团成员列表
       notifyGroupAddMember(group.uuid, user.uuid);
     }
+
+    // 发送系统消息
+    group.sendAddMemberNotify(userUUID);
   }
 
   /**
@@ -476,7 +479,7 @@ export class GroupGroup extends Model {
   }
 
   /**
-   * 发送加入成员的系统通知
+   * 发送加入成员的团系统通知
    */
   async sendAddMemberNotify(memberUUID: string) {
     const user = await PlayerUser.findByUUID(memberUUID);

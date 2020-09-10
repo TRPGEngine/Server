@@ -22,6 +22,7 @@ export default class Group extends BasePackage {
   public name: string = 'Group';
   public require: string[] = ['Player', 'File', 'Chat'];
   public desc: string = '团模块';
+
   onInit(): void {
     this.regModel(GroupGroupDefinition);
     this.regModel(GroupInviteDefinition);

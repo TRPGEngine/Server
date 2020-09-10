@@ -249,7 +249,6 @@ export const agreeGroupRequest: EventFunc<{
       groupUUID: groupUUID,
     }
   );
-  group.sendAddMemberNotify(fromUUID); // 发送系统广播
 
   const members = await group.getMembers();
   const membersUUID = members.map((i) => i.uuid);
@@ -500,8 +499,6 @@ export const agreeGroupInvite: EventFunc<{
     await invite.agreeAsync();
     _.set(invite, 'dataValues.group', group);
   });
-
-  group.sendAddMemberNotify(playerUUID); // 发送系统广播
 
   return { res: invite };
 };
