@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "docusaurus start --no-open",
+    "start": "docusaurus start --no-open -p 4000",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
@@ -13,8 +13,8 @@
     "@types/react": "^16.9.43"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-alpha.56",
-    "@docusaurus/preset-classic": "^2.0.0-alpha.56",
+    "@docusaurus/core": "^2.0.0-alpha.64",
+    "@docusaurus/preset-classic": "^2.0.0-alpha.64",
     "classnames": "^2.2.6",
     "highlight.js": "^9.18.1",
     "lodash": "^4.17.15",
