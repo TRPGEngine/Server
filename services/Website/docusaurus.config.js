@@ -143,7 +143,7 @@ const siteConfig = {
   // Add custom scripts here that would be placed in <script> tags.
   scripts: [
     // 'https://buttons.github.io/buttons.js',
-    'https://static4.moonrailgun.com/js/mermaid-8.5.2.min.js',
+    'https://static7.moonrailgun.com/js/mermaid-8.5.2.min.js',
   ],
 
   presets: [
