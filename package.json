@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.29.1",
+  "version": "1.30.0",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {

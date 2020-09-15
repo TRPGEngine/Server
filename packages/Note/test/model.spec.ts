@@ -106,7 +106,7 @@ describe('NoteNote', () => {
   });
 });
 
-describe.only('NoteNoteVersion', () => {
+describe('NoteNoteVersion', () => {
   test('NoteNoteVersion.createNoteVersion should be ok', async () => {
     const testUser = await getTestUser();
     const testNote = await createTestNote(testUser.id);
