@@ -13,3 +13,16 @@ export async function notifyAddInvite(userUUID: string, invite: PlayerInvite) {
     invite
   );
 }
+
+/**
+ * 通知用户删除好友请求
+ */
+export async function notifyRemoveInvite(userUUID: string, inviteUUID: string) {
+  const trpgapp = getGlobalApplication();
+
+  await trpgapp.player.manager.unicastSocketEvent(
+    userUUID,
+    'player::removeInvite',
+    { inviteUUID }
+  );
+}

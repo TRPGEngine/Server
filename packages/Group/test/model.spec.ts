@@ -9,6 +9,7 @@ import {
   createTestGroupActor,
   createTestGroupDetail,
   testGroupActorInfo,
+  createTestGroupPanel,
 } from './example';
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
@@ -16,6 +17,8 @@ import { regAutoClear } from 'test/utils/example';
 import { GroupDetail } from '../lib/models/detail';
 import { GroupChannel } from '../lib/models/channel';
 import { GroupPanel } from '../lib/models/panel';
+import { GroupInviteCode } from '../lib/models/invite-code';
+import shortid from 'shortid';
 
 const context = buildAppContext();
 
@@ -37,6 +40,36 @@ describe('group model function', () => {
 
       // 获取时应当返回团人数
       expect(group.toJSON()).toHaveProperty('members_count');
+    });
+
+    test('GroupGroup.createGroup should be ok', async () => {
+      const testUser = await getTestUser();
+      const userUUID = testUser.uuid;
+      const name = 'test name';
+      const avatar = 'test avatar';
+      const subName = 'test sub name';
+      const desc = 'test desc';
+      const group = await GroupGroup.createGroup(
+        name,
+        avatar,
+        subName,
+        desc,
+        userUUID
+      );
+
+      try {
+        expect(group.name).toBe(name);
+        expect(group.avatar).toBe(avatar);
+        expect(group.sub_name).toBe(subName);
+        expect(group.desc).toBe(desc);
+        expect(group.owner_uuid).toBe(userUUID);
+        expect(group.isManagerOrOwner(userUUID)).toBe(true);
+        expect(
+          (await group.getMembers()).map((user) => user.uuid).includes(userUUID)
+        ).toBe(true);
+      } finally {
+        await group.destroy({ force: true });
+      }
     });
 
     describe('GroupGroup.searchGroup should be ok', () => {
@@ -108,11 +141,14 @@ describe('group model function', () => {
         expect(groups.length).toBeGreaterThan(0);
 
         const testTargetGroup = _.find(groups, ['uuid', testGroup.uuid]);
+        expect(testTargetGroup).not.toBeNull();
         expect(testTargetGroup).toHaveProperty('detail'); // 该数据应当有detail字段
         expect(testTargetGroup).toHaveProperty('channels'); // 该数据应当有channels字段
         expect(testTargetGroup.detail).toBeNull();
         expect(Array.isArray(testTargetGroup.channels)).toBe(true);
+        expect(Array.isArray(testTargetGroup.panels)).toBe(true);
       });
+
       test('have detail', async () => {
         const testGroup = await createTestGroup();
         await createTestGroupDetail(testGroup.id);
@@ -123,12 +159,33 @@ describe('group model function', () => {
         expect(groups.length).toBeGreaterThan(0);
 
         const testTargetGroup = _.find(groups, ['uuid', testGroup.uuid]);
+        expect(testTargetGroup).not.toBeNull();
         expect(testTargetGroup).toHaveProperty('detail'); // 该数据应当有detail字段
         expect(testTargetGroup.detail).not.toBeNull();
         expect(typeof testTargetGroup.detail.master_name).toBe('string');
         expect(typeof testTargetGroup.detail.disable_quick_dice).toBe(
           'boolean'
         );
+      });
+
+      test('have ordered panels', async () => {
+        const testGroup = await createTestGroup();
+        await createTestGroupPanel(testGroup.id, { order: 2 });
+        await createTestGroupPanel(testGroup.id, { order: 1 });
+        const user = await getTestUser();
+        await testGroup.addMember(user);
+
+        const groups = await GroupGroup.getAllUserGroupList(user.uuid);
+
+        const testTargetGroup = groups.find(
+          (group) => group.uuid === testGroup.uuid
+        );
+        expect(testTargetGroup).not.toBeNull();
+        expect(testTargetGroup.panels).not.toBeNull();
+        const panels = testTargetGroup.panels;
+        expect(panels.length).toBe(2);
+        expect(panels[0].order).toBe(1);
+        expect(panels[1].order).toBe(2);
       });
     });
 
@@ -593,15 +650,125 @@ describe('group model function', () => {
   });
 
   describe('GroupPanel', () => {
-    test('GroupPanel.createPanel should be ok', async () => {
-      const panel = await GroupPanel.createPanel('test', 'channel');
+    describe('GroupPanel.createPanel', () => {
+      test('GroupPanel.createPanel should be ok', async () => {
+        const testUser = await getTestUser();
+        const testGroup = await createTestGroup();
+        const { groupPanel: panel } = await GroupPanel.createPanel(
+          'test name',
+          'test',
+          {},
+          testGroup.uuid,
+          testUser.uuid
+        );
+
+        try {
+          expect(panel).toHaveProperty('uuid', expect.any(String));
+          expect(panel.name).toBe('test name');
+          expect(panel.type).toBe('test');
+          expect(panel.groupId).toBe(testGroup.id);
+        } finally {
+          await panel.destroy({ force: true });
+        }
+      });
+
+      test.todo('GroupPanel.createPanel should be create channel');
+    });
+
+    test('GroupPanel.removePanel should be ok', async () => {
+      const testUser = await getTestUser();
+      const testGroup = await createTestGroup();
+      const testPanel = await createTestGroupPanel(testGroup.id);
+
+      const fn = jest.spyOn(GroupPanel.prototype, 'destroyTargetRecord');
+      await GroupPanel.removePanel(testPanel.uuid, testUser.uuid);
+
+      expect(await GroupPanel.findByPk(testPanel.id)).toBeNull();
+      expect(fn).toHaveBeenCalled();
+      expect(fn).toHaveBeenCalledTimes(1);
+    });
+
+    test('GroupPanel.getPanelByGroup should be ok', async () => {
+      const group = await createTestGroup();
+      const panel2 = await createTestGroupPanel(group.id, { order: 2 });
+      const panel1 = await createTestGroupPanel(group.id, { order: 1 });
+
+      const panels = await GroupPanel.getPanelByGroup(group);
+
+      // should be order by id asc
+      expect(panels.map((p) => p.id)).toMatchObject([panel1.id, panel2.id]);
+    });
+
+    test('GroupPanel.updateGroupPanelOrder should be ok', async () => {
+      const testUser = await getTestUser();
+      const group = await createTestGroup();
+
+      const panel1 = await createTestGroupPanel(group.id, { order: 1 });
+      const panel2 = await createTestGroupPanel(group.id, { order: 2 });
+
+      const affectedRow = await GroupPanel.updateGroupPanelOrder(
+        group.uuid,
+        testUser.uuid,
+        [
+          {
+            uuid: panel1.uuid,
+            order: 3,
+          },
+        ]
+      );
+
+      expect(affectedRow).toBe(1); // 影响字段数为 1
+
+      // 重新请求以进行进一步确认
+      expect(await GroupPanel.getPanelByGroup(group)).toMatchObject([
+        {
+          uuid: panel2.uuid,
+          order: 2,
+        },
+        {
+          uuid: panel1.uuid,
+          order: 3,
+        },
+      ]);
+    });
+
+    test('GroupPanel.updatePanelInfo should be ok', async () => {
+      const testUser = await getTestUser();
+      const group = await createTestGroup();
+      const panel = await createTestGroupPanel(group.id);
+      const targetName = 'new panel name';
+
+      const newPanel = await GroupPanel.updatePanelInfo(
+        panel.uuid,
+        testUser.uuid,
+        {
+          name: targetName,
+        }
+      );
+
+      expect(newPanel.uuid).toBe(panel.uuid);
+      expect(newPanel.name).toBe(targetName);
+    });
+  });
+
+  describe('GroupInviteCode', () => {
+    test('GroupInviteCode.createInvite', async () => {
+      const testUser = await getTestUser();
+      const testGroup = await createTestGroup();
+
+      const invite = await GroupInviteCode.createInvite(
+        testGroup.uuid,
+        testUser.uuid
+      );
 
       try {
-        expect(panel).toHaveProperty('uuid', expect.any(String));
-        expect(panel.name).toBe('test');
-        expect(panel.type).toBe('channel');
+        expect(invite.group_uuid).toBe(testGroup.uuid);
+        expect(invite.from_uuid).toBe(testUser.uuid);
+        expect(invite.expiredAt).toBe(undefined);
+        expect(invite.times).toBe(-1);
+        expect(shortid.isValid(invite.code)).toBe(true);
       } finally {
-        await panel.destroy({ force: true });
+        await invite.destroy();
       }
     });
   });

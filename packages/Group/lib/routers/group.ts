@@ -9,6 +9,14 @@ const groupRouter = new TRPGRouter<{
   player?: PlayerJWTPayload;
 }>();
 
+groupRouter.get('/:groupUUID/info', async (ctx) => {
+  const groupUUID = ctx.params.groupUUID;
+
+  const group = await GroupGroup.findByUUID(groupUUID);
+
+  ctx.body = { group };
+});
+
 /**
  * 获取用户拥有的所有团列表
  */
@@ -26,6 +34,29 @@ groupRouter.get('/list/own', ssoAuth(), async (ctx) => {
   });
 
   ctx.body = { groups };
+});
+
+/**
+ * 创建团
+ */
+groupRouter.post('/create', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { name, avatar, subName, desc } = ctx.request.body;
+
+  const user = await PlayerUser.findByUUID(playerUUID);
+  if (_.isNil(user)) {
+    throw new Error('用户不存在');
+  }
+
+  const group = await GroupGroup.createGroup(
+    name,
+    avatar,
+    subName,
+    desc,
+    user.uuid
+  );
+
+  ctx.body = { group };
 });
 
 /**

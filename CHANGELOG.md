@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.30.0](https://github.com/TRPGEngine/Server/compare/v1.29.1...v1.30.0) (2020-09-15)
+
+
+### Features
+
+* **core:** socket事件增加限流 ([28d1949](https://github.com/TRPGEngine/Server/commit/28d19492661b96aa1baad37ec061f59406277b45))
+* **core:** 增加http请求限流 ([655c510](https://github.com/TRPGEngine/Server/commit/655c5103a00d09e250d4b4b31d44810268c68711))
+* **db:** coc7版人物卡增加san值 ([e6cf631](https://github.com/TRPGEngine/Server/commit/e6cf63190bff1c9d191e748a2fa2f1614b6b4dfe))
+* **group:** 团面板增加额外参数的处理 ([05e08bb](https://github.com/TRPGEngine/Server/commit/05e08bbeff7951e336499ebeb917af2bf305d9af))
+* **group:** 增加GroupInviteCode作为新的团邀请 ([23a6387](https://github.com/TRPGEngine/Server/commit/23a638789ee0698e05144a1744eac0b35cee8d09))
+* **group:** 增加删除面板的接口 ([c788942](https://github.com/TRPGEngine/Server/commit/c788942561bc31fbf026e563d60fadc8f2234474))
+* **group:** 增加团邀请代码的方式加入团 ([380f989](https://github.com/TRPGEngine/Server/commit/380f989f3be162080b53b03f14f78bc15ceff21b))
+* **group:** 增加团面板信息更新接口 ([fb6c3da](https://github.com/TRPGEngine/Server/commit/fb6c3da3a4d7d9686c03d8cd4d824e8503ec7811))
+* **group:** 增加团面板接口 ([e8e7250](https://github.com/TRPGEngine/Server/commit/e8e7250ea22418ed47aa4e58984d13aaf80977b6))
+* **group:** 增加团面板顺序更新方法 ([83d53f2](https://github.com/TRPGEngine/Server/commit/83d53f25375fd55a033b95472a44b855472ab83f))
+* **group:** 增加接口用于获取邀请信息 ([be785c4](https://github.com/TRPGEngine/Server/commit/be785c4b5432a21d737ece12b4af661c7ac5d315))
+* **group:** 增加新的接口用于获取团信息 ([2fba58a](https://github.com/TRPGEngine/Server/commit/2fba58a02f61221494565089ca2693b2a3fb1ac3))
+* **group:** 抽象创建团的方法并增加创建团的请求 ([309da65](https://github.com/TRPGEngine/Server/commit/309da652675ae11169d856a412f48652d49ac0d2))
+* **note:** 增加删除笔记的接口 ([e3865ac](https://github.com/TRPGEngine/Server/commit/e3865ac834387ac576226867e46ede335b7d4446))
+* **note:** 增加团笔记面板的处理 ([5850ba3](https://github.com/TRPGEngine/Server/commit/5850ba357074ce441f2fe99f2d8c74df552bc8eb))
+* **note:** 增加接口以获取笔记信息 ([2d73a82](https://github.com/TRPGEngine/Server/commit/2d73a821585edfc78f24f4bda3d9f066325e367d))
+* **note:** 增加笔记版本锁定功能 ([8e7e4b3](https://github.com/TRPGEngine/Server/commit/8e7e4b3e4f2884d788ffd5b64a28d281c76fe83e))
+* **player:** 增加新的路由获取实例当前sockets ([0980657](https://github.com/TRPGEngine/Server/commit/0980657ddf340e0e03203aa77e013e7541b53467))
+* **player:** 增加移除好友邀请的接口 ([bde62d6](https://github.com/TRPGEngine/Server/commit/bde62d6672e0e4d88182a6117c37008a3ae4b19d))
+* **player:** 增加获取私有登录日志的接口 ([fb4120f](https://github.com/TRPGEngine/Server/commit/fb4120f27b76f8c185d6193e265c9468564500c7))
+
+
+### Bug Fixes
+
+* **player:** 修复一个可能会出现的登录操作锁抢占的问题 ([1188586](https://github.com/TRPGEngine/Server/commit/1188586f06a7108790cb2a7503e3244075df4a21))
+
 ### [1.29.1](https://github.com/TRPGEngine/Server/compare/v1.29.0...v1.29.1) (2020-08-23)
 
 

@@ -7,13 +7,14 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8.11
+      - image: circleci/node:10.19.0
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/mongo:3.4.4
-      - image: circleci/mysql:5.7.21
+      - image: mysql:5.7.21
+        command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_DATABASE: trpg_ci

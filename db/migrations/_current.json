@@ -1076,6 +1076,10 @@
                     "field": "converse_uuid",
                     "seqType": "Sequelize.STRING"
                 },
+                "group_uuid": {
+                    "field": "group_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
                 "message": {
                     "field": "message",
                     "seqType": "Sequelize.STRING(1000)"
@@ -2104,6 +2108,7 @@
                         "internal": true,
                         "value": "Sequelize.UUIDV1"
                     },
+                    "unique": true,
                     "field": "uuid",
                     "seqType": "Sequelize.UUID"
                 },
@@ -2117,6 +2122,11 @@
                     "required": true,
                     "allowNull": false,
                     "field": "type",
+                    "seqType": "Sequelize.STRING"
+                },
+                "target_uuid": {
+                    "comment": "根据类型指向不同的模型的UUID",
+                    "field": "target_uuid",
                     "seqType": "Sequelize.STRING"
                 },
                 "color": {
@@ -2154,6 +2164,59 @@
                     "onUpdate": "CASCADE",
                     "field": "groupId",
                     "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "group_invite_code": {
+            "tableName": "group_invite_code",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "code": {
+                    "required": true,
+                    "unique": true,
+                    "allowNull": false,
+                    "field": "code",
+                    "seqType": "Sequelize.STRING"
+                },
+                "group_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "group_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "from_uuid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "from_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "expiredAt": {
+                    "field": "expiredAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "times": {
+                    "defaultValue": {
+                        "value": -1
+                    },
+                    "field": "times",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
                 }
             },
             "indexes": []
@@ -2203,6 +2266,10 @@
                     "field": "updatedAt",
                     "seqType": "Sequelize.DATE"
                 },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
                 "ownerId": {
                     "allowNull": true,
                     "references": {
@@ -2212,6 +2279,69 @@
                     "onDelete": "SET NULL",
                     "onUpdate": "CASCADE",
                     "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
+        "note_note_version": {
+            "tableName": "note_note_version",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "unique": true,
+                    "required": true,
+                    "allowNull": false,
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "title": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "title",
+                    "seqType": "Sequelize.STRING"
+                },
+                "data": {
+                    "field": "data",
+                    "seqType": "Sequelize.JSON"
+                },
+                "comment": {
+                    "field": "comment",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "noteId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "note_note",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "noteId",
                     "seqType": "Sequelize.INTEGER"
                 }
             },
@@ -3377,5 +3507,5 @@
             "indexes": []
         }
     },
-    "revision": 59
+    "revision": 65
 }

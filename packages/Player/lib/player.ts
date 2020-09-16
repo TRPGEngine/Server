@@ -210,6 +210,7 @@ export default class Player extends BasePackage {
     this.regSocketEvent('player::sendFriendInvite', event.sendFriendInvite);
     this.regSocketEvent('player::refuseFriendInvite', event.refuseFriendInvite);
     this.regSocketEvent('player::agreeFriendInvite', event.agreeFriendInvite);
+    this.regSocketEvent('player::removeFriendInvite', event.removeFriendInvite);
     this.regSocketEvent('player::getFriendsInvite', event.getFriendsInvite);
     this.regSocketEvent(
       'player::getFriendInviteDetail',

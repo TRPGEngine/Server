@@ -19,15 +19,33 @@ export class PlayerLoginLog extends Model {
   offline_date: Date;
 
   /**
-   * 返回用户的登录记录
+   * 返回用户的公共登录记录
    * @param userUUID 用户UUID
    * @param size 返回列表大小
    */
-  static getPlayerLoginLog(
+  static getPublicPlayerLoginLog(
     userUUID: string,
     size = 10
   ): Promise<PlayerLoginLog[]> {
     return PlayerLoginLog.scope('public').findAll({
+      where: {
+        user_uuid: userUUID,
+      },
+      order: [['id', 'DESC']],
+      limit: size,
+    });
+  }
+
+  /**
+   * 返回用户的所有登录记录
+   * @param userUUID 用户UUID
+   * @param size 返回列表大小
+   */
+  static getPrivatePlayerLoginLog(
+    userUUID: string,
+    size = 10
+  ): Promise<PlayerLoginLog[]> {
+    return PlayerLoginLog.findAll({
       where: {
         user_uuid: userUUID,
       },
@@ -95,6 +113,11 @@ export default function PlayerLoginLogDefinition(
     {
       tableName: 'player_login_log',
       sequelize: db,
+      defaultScope: {
+        attributes: {
+          exclude: ['token'],
+        },
+      },
       scopes: {
         public: {
           attributes: {

@@ -4,11 +4,12 @@ import uuid from 'uuid/v1';
 import _ from 'lodash';
 import { EventFunc } from 'trpg/core';
 import { PlayerUser } from './models/user';
-import { TRPGApplication, Socket } from 'trpg/core';
 import { Platform } from '../types/player';
 import { PlayerInvite } from './models/invite';
 import { autoJoinSocketRoom } from './managers/socketroom-manager';
 import { PlayerSettings } from './models/settings';
+import { PlayerLoginLog } from './models/login-log';
+import { getSocketIp } from 'packages/Core/lib/utils/socket-helper';
 
 export const login: EventFunc<{
   username: string;
@@ -19,14 +20,8 @@ export const login: EventFunc<{
   const app = this.app;
   const socket = this.socket;
 
-  // if(app.player.list.find(socket)) {
-  //   throw new Error('您已经登录，请先登出')
-  // }
-
   const { username, password, platform, isApp } = data;
-  const ip =
-    _.get(socket, 'handshake.headers.x-real-ip') ||
-    _.get(socket, 'handshake.address');
+  const ip = getSocketIp(socket);
 
   if (!username || !password) {
     debug('login fail, miss necessary parameter: %o', data);
@@ -38,7 +33,7 @@ export const login: EventFunc<{
   if (!user) {
     debug('login fail, try to login [%s] and password error', username);
     cb({ result: false, msg: '用户不存在或密码错误' });
-    await db.models.player_login_log.create({
+    await PlayerLoginLog.create({
       user_name: username,
       type: isApp ? 'app_standard' : 'standard',
       socket_id: socket.id,
@@ -67,10 +62,15 @@ export const login: EventFunc<{
     }
 
     // 加入到列表中
-    if (!!app.player) {
-      await app.player.manager.addPlayer(user.uuid, socket, platform);
-      await autoJoinSocketRoom(app, socket);
+    const loginResult = await app.player.manager.addPlayer(
+      user.uuid,
+      socket,
+      platform
+    );
+    if (!loginResult) {
+      throw new Error('登录失败: 锁已经被占用');
     }
+    await autoJoinSocketRoom(app, socket);
 
     await socket.iosession.set('user', user.getInfo(true)); // 将用户信息加入到session中
 
@@ -82,7 +82,7 @@ export const login: EventFunc<{
     await user.save();
 
     // 添加登录记录
-    await db.models.player_login_log.create({
+    await PlayerLoginLog.create({
       user_uuid: user.uuid,
       user_name: user.username,
       type: isApp ? 'app_standard' : 'standard',
@@ -114,9 +114,7 @@ export const loginWithToken: EventFunc<{
   // }
 
   const { uuid, token, platform, isApp, channel } = data;
-  const ip =
-    _.get(socket, 'handshake.headers.x-real-ip') ||
-    _.get(socket, 'handshake.address');
+  const ip = getSocketIp(socket);
 
   if (!uuid || !token) {
     debug('login with token fail, miss necessary parameter: %o', data);
@@ -402,6 +400,9 @@ export const getFriends: EventFunc = async function getFriends(data, cb, db) {
   return { list };
 };
 
+/**
+ * 发送好友请求
+ */
 export const sendFriendInvite: EventFunc<{
   to: string;
 }> = async function sendFriendInvite(data, cb, db) {
@@ -421,6 +422,9 @@ export const sendFriendInvite: EventFunc<{
   return { invite };
 };
 
+/**
+ * 拒绝好友请求
+ */
 export const refuseFriendInvite: EventFunc<{
   uuid: string;
 }> = async function refuseFriendInvite(data, cb, db) {
@@ -461,6 +465,9 @@ export const refuseFriendInvite: EventFunc<{
   return { res: invite };
 };
 
+/**
+ * 同意好友请求
+ */
 export const agreeFriendInvite: EventFunc<{
   uuid: string;
 }> = async function agreeFriendInvite(data, cb, db) {
@@ -475,7 +482,7 @@ export const agreeFriendInvite: EventFunc<{
   const inviteUUID = data.uuid;
 
   if (_.isNil(inviteUUID)) {
-    throw new Error('数据异常');
+    throw new Error('缺少必要参数');
   }
 
   const invite = await db.models.player_invite.findOne({
@@ -513,6 +520,30 @@ export const agreeFriendInvite: EventFunc<{
   });
 
   return { invite };
+};
+
+/**
+ * 移除好友请求
+ */
+export const removeFriendInvite: EventFunc<{
+  inviteUUID: string;
+}> = async function(data) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户状态异常');
+  }
+
+  const { inviteUUID } = data;
+  if (_.isNil(inviteUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await PlayerInvite.removeFriendInvite(inviteUUID, player.uuid);
+
+  return true;
 };
 
 export const getFriendsInvite: EventFunc = async function getFriendsInvite(

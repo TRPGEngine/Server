@@ -7,8 +7,18 @@ import { DBInstance } from './storage';
 const logger = getLogger();
 const appLogger = getLogger('application');
 import _ from 'lodash';
+import { rateLimitSocketCheck } from './utils/rate-limit';
+import { getSocketIp } from './utils/socket-helper';
 
-export type MiddlewareFn = (socket: IO.Socket, fn: (err?: any) => void) => void;
+export type NamespaceMiddlewareFn = (
+  socket: IO.Socket,
+  next: (err?: any) => void
+) => void;
+
+export type SocketMiddlewareFn = (
+  packet: IO.Packet,
+  next: (err?: any) => void
+) => void;
 
 export interface SocketEventType {
   name: string;
@@ -144,8 +154,12 @@ export default class SocketService {
         const wrap = this; // 此处的this是指 injectCustomEvents 方法分配的this
         const app: TRPGApplication = wrap.app;
         const socket: Socket = wrap.socket;
+        const ip: string = wrap.ip;
+
         const db = app.storage.db;
         try {
+          await rateLimitSocketCheck(app, ip); // 限流
+
           const ret = await eventFn.call(this, data, cb, db);
           if (ret !== undefined) {
             // return 方法返回结果信息
@@ -205,7 +219,9 @@ export default class SocketService {
   injectCustomEvents(socket: Socket) {
     // 注册事件
     const app = this._app;
-    const wrap = { app, socket };
+    const ip = getSocketIp(socket);
+    const wrap = { app, socket, ip };
+
     for (let event of this.events) {
       let eventName = event.name;
       socket.on(eventName, (data, cb) => {
@@ -308,7 +324,7 @@ export default class SocketService {
   }
 
   // 应用中间件
-  use(middleware: MiddlewareFn) {
+  use(middleware: NamespaceMiddlewareFn) {
     this._io.use(middleware);
   }
 

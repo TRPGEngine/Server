@@ -7,16 +7,22 @@ import GroupInviteDefinition from './models/invite';
 import GroupActorDefinition from './models/actor';
 import GroupRequestDefinition from './models/request';
 import GroupDetailDefinition from './models/detail';
+import GroupInviteCodeDefinition from './models/invite-code';
 import actorRouter from './routers/actor';
 import groupRouter from './routers/group';
-import GroupChannelDefinition from './models/channel';
+import GroupChannelDefinition, { GroupChannel } from './models/channel';
 import { regRoomGather } from 'packages/Player/lib/managers/socketroom-manager';
 import GroupPanelDefinition from './models/panel';
+import panelRouter from './routers/panel';
+import { regGroupPanelHandler } from './panels/reg';
+import { startWriting, stopWriting } from './chatEvent';
+import inviteCodeRouter from './routers/invite-code';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
   public require: string[] = ['Player', 'File', 'Chat'];
   public desc: string = '团模块';
+
   onInit(): void {
     this.regModel(GroupGroupDefinition);
     this.regModel(GroupInviteDefinition);
@@ -25,6 +31,7 @@ export default class Group extends BasePackage {
     this.regModel(GroupDetailDefinition);
     this.regModel(GroupChannelDefinition);
     this.regModel(GroupPanelDefinition);
+    this.regModel(GroupInviteCodeDefinition);
 
     const app = this.app;
     const db = this.db;
@@ -86,9 +93,16 @@ export default class Group extends BasePackage {
       'removeGroupChannelMember',
       event.removeGroupChannelMember
     );
+    this.regSocketEvent('createGroupPanel', event.createGroupPanel);
+
+    // 注册chat的事件
+    this.regSocketEvent('chat::startWriting', startWriting);
+    this.regSocketEvent('chat::stopWriting', stopWriting);
 
     this.regRoute(actorRouter);
     this.regRoute(groupRouter);
+    this.regRoute(panelRouter);
+    this.regRoute(inviteCodeRouter);
 
     this.regStatJob('groupCount', async () => {
       let res = await db.models.group_group.count();
@@ -99,6 +113,33 @@ export default class Group extends BasePackage {
       const groups: GroupGroup[] = await user.getGroups();
 
       return groups.map((g) => g.uuid);
+    });
+
+    // 文字类型的团面板
+    regGroupPanelHandler('channel', {
+      async onCreate(panelInfo) {
+        const channel = await GroupChannel.createChannel(
+          panelInfo.groupUUID,
+          panelInfo.userUUID,
+          panelInfo.name,
+          panelInfo.name
+        );
+
+        return {
+          targetUUID: channel.uuid,
+          other: {
+            groupChannel: channel,
+          },
+        };
+      },
+      async onDestroy(panel, options) {
+        await GroupChannel.destroy({
+          where: {
+            uuid: panel.target_uuid,
+          },
+          ...options,
+        });
+      },
     });
   }
 }

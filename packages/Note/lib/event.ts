@@ -149,3 +149,23 @@ export const saveNote: EventFunc<{
 
   return { note };
 };
+
+/**
+ * 删除笔记
+ */
+export const deleteNote: EventFunc<{
+  uuid: string;
+}> = async function(eventData) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const { uuid } = eventData;
+
+  await NoteNote.deleteNote(uuid, player.uuid);
+
+  return true;
+};

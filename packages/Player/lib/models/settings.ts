@@ -29,7 +29,7 @@ export class PlayerSettings extends Model {
   }
 
   /**
-   * 根据用户UUID获取用户的列表
+   * 根据用户UUID获取用户的个人设置与系统设置
    * @param userUUID 用户UUID
    */
   static async getUserSettings(

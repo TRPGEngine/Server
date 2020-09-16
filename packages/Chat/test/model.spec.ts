@@ -1,6 +1,7 @@
 import { ChatConverse } from '../lib/models/converse';
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { buildAppContext } from 'test/utils/app';
+import { ChatLog } from '../lib/models/log';
 
 const context = buildAppContext();
 
@@ -8,6 +9,19 @@ describe('ChatLog', () => {
   test.todo('ChatLog.findDeepByUUID should be ok');
   test.todo('ChatLog.updateByUUID should be ok');
   test.todo('ChatLog.sendConverseSystemMsg should be ok');
+
+  test('should save 4 byte message', async () => {
+    const testUser = await getTestUser();
+    const message = new Buffer([0xf0, 0x9f, 0x8f, 0x83]).toString(); // 🏃
+
+    // 直接检查数据库能否正常写入
+    const chatlog = await ChatLog.create({
+      sender_uuid: testUser.uuid,
+      message,
+    });
+
+    await chatlog.destroy();
+  });
 });
 
 describe('chatconverse model', () => {

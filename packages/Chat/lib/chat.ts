@@ -37,8 +37,6 @@ export default class Chat extends BasePackage {
     this.regSocketEvent('getAllUserConverse', event.getAllUserConverse);
     this.regSocketEvent('getOfflineUserConverse', event.getOfflineUserConverse);
     this.regSocketEvent('updateCardChatData', event.updateCardChatData);
-    this.regSocketEvent('startWriting', event.startWriting);
-    this.regSocketEvent('stopWriting', event.stopWriting);
 
     this.initTimer();
     this.initData();

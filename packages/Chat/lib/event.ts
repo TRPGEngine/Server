@@ -332,6 +332,7 @@ export const message: EventFunc = async function message(data, cb) {
   const sender_uuid = player.uuid;
   const to_uuid = data.to_uuid;
   const converse_uuid = data.converse_uuid;
+  const group_uuid = data.group_uuid;
   let type = data.type || 'normal';
   const is_public = data.is_public || false;
   const is_group = data.is_group || false;
@@ -349,6 +350,7 @@ export const message: EventFunc = async function message(data, cb) {
     sender_uuid,
     to_uuid,
     converse_uuid,
+    group_uuid,
     type,
     is_public,
     is_group,
@@ -512,73 +514,4 @@ export const updateCardChatData: EventFunc = async function updateCardChatData(
   log.data = Object.assign({}, log.data, newData);
   await log.save();
   return { log };
-};
-
-/**
- * 发送正在输入信号
- */
-export const startWriting: EventFunc = async function startWriting(
-  data,
-  cb,
-  db
-) {
-  const app = this.app;
-  const socket = this.socket;
-  const player = app.player.manager.findPlayer(socket);
-  if (!player) {
-    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
-  }
-
-  const { type = 'user', uuid, currentText } = data;
-
-  const from_uuid = player.uuid;
-  const to_uuid = uuid;
-
-  if (type === 'user') {
-    // 对user发送的信息
-    app.player.manager.unicastSocketEvent(to_uuid, 'chat::startWriting', {
-      type,
-      from: from_uuid,
-    });
-  } else if (type === 'group') {
-    // 对group群发消息
-    app.player.manager.roomcastSocketEvent(to_uuid, 'chat::startWriting', {
-      type,
-      from: from_uuid,
-      groupUUID: to_uuid,
-      currentText,
-    });
-  }
-};
-
-/**
- * 发送停止输入信号
- */
-export const stopWriting: EventFunc = async function stopWriting(data, cb, db) {
-  const app = this.app;
-  const socket = this.socket;
-  const player = app.player.manager.findPlayer(socket);
-  if (!player) {
-    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
-  }
-
-  const { type = 'user', uuid } = data;
-
-  const from_uuid = player.uuid;
-  const to_uuid = uuid;
-
-  if (type === 'user') {
-    // 对user发送的信息
-    app.player.manager.unicastSocketEvent(to_uuid, 'chat::stopWriting', {
-      type,
-      from: from_uuid,
-    });
-  } else if (type === 'group') {
-    // 对group群发消息
-    app.player.manager.roomcastSocketEvent(to_uuid, 'chat::stopWriting', {
-      type,
-      from: from_uuid,
-      groupUUID: to_uuid,
-    });
-  }
 };

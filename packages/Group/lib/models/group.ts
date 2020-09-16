@@ -25,6 +25,8 @@ import {
 import { GroupDetail } from './detail';
 import { GroupChannel } from './channel';
 import Debug from 'debug';
+import { GroupPanel } from './panel';
+import { NoReportError } from 'lib/error';
 const debug = Debug('trpg:component:group:model:group');
 
 type GroupType = 'group' | 'channel' | 'test';
@@ -54,6 +56,7 @@ export class GroupGroup extends Model {
   members_count?: number;
   detail?: GroupDetail;
   channels?: GroupChannel[];
+  panels?: GroupPanel[];
 
   setOwner?: BelongsToSetAssociationMixin<PlayerUser, number>;
   addMember?: BelongsToManyAddAssociationMixin<PlayerUser, number>;
@@ -103,6 +106,54 @@ export class GroupGroup extends Model {
     });
 
     return _.get(group, 'groupActors', []);
+  }
+
+  /**
+   * 创建一个团
+   * @param name 团名
+   * @param avatar 团头像
+   * @param subName 团副名
+   * @param desc 团简介
+   * @param userUUID 操作人UUID
+   */
+  static async createGroup(
+    name: string,
+    avatar: string,
+    subName: string,
+    desc: string,
+    userUUID: string
+  ): Promise<GroupGroup> {
+    if (!name) {
+      throw new NoReportError('缺少团名');
+    }
+
+    const isExist = await GroupGroup.findOne({
+      where: { name },
+    });
+    if (!!isExist) {
+      throw new NoReportError('该团名已存在');
+    }
+
+    const user = await PlayerUser.findByUUID(userUUID);
+    const group: GroupGroup = await GroupGroup.create({
+      type: 'group',
+      name,
+      sub_name: subName,
+      desc,
+      avatar,
+      creator_uuid: userUUID,
+      owner_uuid: userUUID,
+      managers_uuid: [],
+      maps_uuid: [],
+    });
+
+    await group.setOwner(user);
+    await GroupGroup.addGroupMember(group.uuid, userUUID);
+
+    const trpgapp = GroupGroup.getApplication();
+    await trpgapp.player.manager.joinRoomWithUUID(group.uuid, userUUID);
+
+    return group;
   }
 
   /**
@@ -198,7 +249,7 @@ export class GroupGroup extends Model {
     }
 
     const user = await PlayerUser.findByUUID(userUUID);
-    return await user.getGroups({
+    const groups = await user.getGroups({
       include: [
         {
           model: GroupDetail,
@@ -208,8 +259,15 @@ export class GroupGroup extends Model {
           model: GroupChannel,
           as: 'channels',
         },
+        {
+          model: GroupPanel,
+          as: 'panels',
+          separate: true,
+          order: [['order', GroupPanel.defaultOrder]],
+        },
       ],
     });
+    return groups;
   }
 
   /**
@@ -235,11 +293,7 @@ export class GroupGroup extends Model {
       throw new Error('不是团成员');
     }
 
-    return ChatLog.findRangeConverseLog(
-      groupUUID,
-      new Date(from),
-      new Date(to)
-    );
+    return ChatLog.findRangeConverseLog(groupUUID, from, to);
   }
 
   /**
@@ -314,12 +368,12 @@ export class GroupGroup extends Model {
 
     const user = await PlayerUser.findByUUID(userUUID);
     if (_.isNil(user)) {
-      throw new Error('该用户不存在');
+      throw new Error('用户不存在');
     }
 
     const exist = await group.hasMembers([user]);
     if (exist) {
-      throw new Error('该用户已经在团中');
+      throw new NoReportError('用户已经在团中');
     }
 
     await group.addMember(user);
@@ -336,6 +390,9 @@ export class GroupGroup extends Model {
       // 通知团其他所有人更新团成员列表
       notifyGroupAddMember(group.uuid, user.uuid);
     }
+
+    // 发送系统消息
+    group.sendAddMemberNotify(userUUID);
   }
 
   /**
@@ -422,7 +479,7 @@ export class GroupGroup extends Model {
   }
 
   /**
-   * 发送加入成员的系统通知
+   * 发送加入成员的团系统通知
    */
   async sendAddMemberNotify(memberUUID: string) {
     const user = await PlayerUser.findByUUID(memberUUID);

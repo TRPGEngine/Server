@@ -3,6 +3,7 @@ import {
   testUserInfo,
   createTestPlayerLoginLog,
   getOtherTestUser,
+  createTestPlayerInvite,
 } from './example';
 import {
   PlayerUser,
@@ -196,13 +197,21 @@ describe('PlayerLoginLog', () => {
     });
   });
 
-  test('PlayerLoginLog.getPlayerLoginLog', async () => {
+  test('PlayerLoginLog.getPublicPlayerLoginLog', async () => {
     const testUser = await getTestUser();
-    const logs = await PlayerLoginLog.getPlayerLoginLog(testUser.uuid);
+    const logs = await PlayerLoginLog.getPublicPlayerLoginLog(testUser.uuid);
 
     expect(logs.length).toBeLessThanOrEqual(10);
     expect(_.get(logs, '0.socket_id')).toBeFalsy();
     expect(_.get(logs, '0.ip')).toBeFalsy();
+    expect(_.get(logs, '0.token')).toBeFalsy();
+  });
+
+  test('PlayerLoginLog.getPrivatePlayerLoginLog', async () => {
+    const testUser = await getTestUser();
+    const logs = await PlayerLoginLog.getPrivatePlayerLoginLog(testUser.uuid);
+
+    expect(logs.length).toBeLessThanOrEqual(10);
     expect(_.get(logs, '0.token')).toBeFalsy();
   });
 
@@ -280,5 +289,19 @@ describe('PlayerInvite', () => {
         await invite.destroy();
       }
     });
+  });
+
+  test('PlayerInvite.removeFriendInvite should be ok', async () => {
+    const testUser = await getTestUser();
+    const invite = await createTestPlayerInvite();
+
+    await PlayerInvite.removeFriendInvite(invite.uuid, testUser.uuid);
+
+    const findedinvite = await PlayerInvite.findOne({
+      where: {
+        uuid: invite.uuid,
+      },
+    });
+    expect(findedinvite).toBeNull();
   });
 });

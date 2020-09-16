@@ -2,7 +2,12 @@ import { TRPGRouter } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
 import { PlayerLoginLog } from '../models/login-log';
-const userRouter = new TRPGRouter();
+import { PlayerJWTPayload } from 'packages/Player/types/player';
+import { ssoAuth } from '../middleware/auth';
+
+const userRouter = new TRPGRouter<{
+  player?: PlayerJWTPayload;
+}>();
 
 userRouter.get('/info/:uuid', async (ctx) => {
   const playerUUID = ctx.params.uuid;
@@ -18,11 +23,27 @@ userRouter.post('/register', async (ctx) => {
   ctx.body = { results };
 });
 
+/**
+ * 获取用户个人的登录记录
+ */
+userRouter.get('/login/history/private', ssoAuth(), async (ctx) => {
+  const player = ctx.state.player;
+
+  if (_.isNil(player) || !_.isString(player.uuid)) {
+    throw new Error('无法正确获取到用户信息');
+  }
+
+  // 只获取公开数据
+  const logs = await PlayerLoginLog.getPrivatePlayerLoginLog(player.uuid);
+
+  ctx.body = { logs };
+});
+
 userRouter.get('/login/history/:uuid', async (ctx) => {
   const playerUUID = ctx.params.uuid;
 
   // 只获取公开数据
-  const logs = PlayerLoginLog.getPlayerLoginLog(playerUUID);
+  const logs = await PlayerLoginLog.getPublicPlayerLoginLog(playerUUID);
 
   ctx.body = { logs };
 });

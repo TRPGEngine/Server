@@ -17,6 +17,7 @@ const logger = getLogger();
 const appLogger = getLogger('application');
 import BasePackage from 'lib/package';
 import { CoreSchedulejobRecord } from './internal/models/schedulejob-record';
+import { RateLimiter, createRateLimiter } from './utils/rate-limit';
 
 type AppSettings = {
   [key: string]: string | number | {};
@@ -46,6 +47,7 @@ export class Application extends events.EventEmitter {
   settings: AppSettings = {}; // 设置配置列表
   storage: Storage = null; // 数据库服务列表
   cache: ICache = null; // 缓存服务
+  rateLimiter: RateLimiter | null = null;
   reportservice: ReportService = null; // 汇报服务
   webservice: WebService = null; // 网页服务
   socketservice: SocketService = null; // websocket服务
@@ -77,6 +79,7 @@ export class Application extends events.EventEmitter {
     this.initSocketService();
     this.initStorage();
     this.initCache();
+    this.initRateLimit(); // 初始化限速器
     this.initStatJob();
     this.initComponents();
 
@@ -130,6 +133,7 @@ export class Application extends events.EventEmitter {
     const dbconfig = this.get('db') as TRPGDbOptions;
     this.storage = new Storage(dbconfig, this);
   }
+
   initCache() {
     const redisUrl = this.get('redisUrl').toString();
     if (redisUrl) {
@@ -138,6 +142,15 @@ export class Application extends events.EventEmitter {
       this.cache = new Cache();
     }
   }
+
+  initRateLimit() {
+    if (this.cache instanceof RedisCache) {
+      // 仅在使用redis cache时生效
+      const redisClient = this.cache.redis;
+      this.rateLimiter = createRateLimiter(redisClient);
+    }
+  }
+
   initStatJob() {
     const run = () =>
       this.cache.lockScope(
@@ -451,8 +464,12 @@ export class Application extends events.EventEmitter {
     this.scheduleJob.forEach(({ job }) => job.cancel()); // 关闭计划任务列表
     debug('closed all scheduleJob');
 
-    await closeLogger(); // 关闭日志
-    debug('shutdown all logger');
+    try {
+      await closeLogger(); // 关闭日志
+      debug('shutdown all logger');
+    } catch (e) {
+      console.error('关闭日志出现异常', e);
+    }
 
     // 执行关闭事件
     await Promise.all(

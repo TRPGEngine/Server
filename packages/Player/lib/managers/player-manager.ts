@@ -239,10 +239,11 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
     platform: Platform = 'web'
   ): Promise<boolean> {
     const uuidKey = this.getUUIDKey(uuid, platform);
+    const lockKey = `${ONLINE_PLAYER_KEY}:${uuidKey}`;
 
     // 添加到在线列表
     // 此处需要使用uuidKey, 为了保证移除时只会移除该平台的登录数据
-    const isLock = await this.cache.lock(ONLINE_PLAYER_KEY);
+    const isLock = await this.cache.lock(lockKey);
     if (!isLock) {
       // 如果已被别的服务占用了。则跳过
       return false;
@@ -256,7 +257,7 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
       // 不存在则新增
       await this.cache.sadd(ONLINE_PLAYER_KEY, uuidKey);
     }
-    await this.cache.unlock(ONLINE_PLAYER_KEY);
+    await this.cache.unlock(lockKey);
 
     // 添加到本地的会话管理
     this.players[socket.id] = {

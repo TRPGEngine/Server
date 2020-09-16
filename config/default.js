@@ -25,6 +25,10 @@ module.exports = {
       },
     },
   },
+  rateLimit: {
+    points: 50, // 请求点数 可以看做是单位时间请求数
+    duration: 5, // 单位时间 单位为秒
+  },
   graphql: {
     // 默认在开发环境打开GraphQL
     enable: process.env.NODE_ENV === 'development' ? true : false,

@@ -172,7 +172,7 @@ export class PlayerUser extends Model {
   static findByUsernameAndPassword(
     username: string,
     password: string
-  ): Promise<PlayerUser> {
+  ): Promise<PlayerUser | null> {
     return PlayerUser.scope('login').findOne({
       where: {
         username,

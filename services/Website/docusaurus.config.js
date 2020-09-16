@@ -4,7 +4,6 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-
 const copyright = `Copyright © 2017 - ${new Date().getFullYear()} moonrailgun`;
 
 // 用于内部渲染的用户
@@ -44,7 +43,7 @@ const siteConfig = {
         alt: 'TRPGEngine Logo',
         src: 'img/trpg_logo.png',
       },
-      links: [
+      items: [
         { to: 'docs/introduce', label: '文档', position: 'left' },
         // { to: 'docs/develop', label: '开发', position: 'left' },
         // { to: 'help', label: '帮助', position: 'left' },
@@ -75,8 +74,6 @@ const siteConfig = {
         src: 'img/trpg_logo.png',
       },
       copyright,
-      ogImage: 'img/trpg_logo.png',
-      twitterImage: 'img/trpg_logo.png',
       style: 'dark',
       links: [
         {
@@ -101,8 +98,10 @@ const siteConfig = {
           items: [
             {
               label: 'QQ群: 387587760',
+              // href:
+              //   '//shang.qq.com/wpa/qunwpa?idkey=7be5cfe70436a65c965ae9c86d9e6cfc36c16258634a42897724dce026accf3d',
               href:
-                '//shang.qq.com/wpa/qunwpa?idkey=7be5cfe70436a65c965ae9c86d9e6cfc36c16258634a42897724dce026accf3d',
+                'https://shang.qq.com/wpa/qunwpa?idkey=7be5cfe70436a65c965ae9c86d9e6cfc36c16258634a42897724dce026accf3d',
             },
           ],
         },
@@ -144,7 +143,7 @@ const siteConfig = {
   // Add custom scripts here that would be placed in <script> tags.
   scripts: [
     // 'https://buttons.github.io/buttons.js',
-    'https://static4.moonrailgun.com/js/mermaid-8.5.2.min.js',
+    'https://static7.moonrailgun.com/js/mermaid-8.5.2.min.js',
   ],
 
   presets: [

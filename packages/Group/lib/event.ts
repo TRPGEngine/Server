@@ -12,6 +12,7 @@ import { GroupDetail } from './models/detail';
 import { GroupChannel } from './models/channel';
 import { NoReportError } from 'lib/error';
 import { notifyGroupRemoveMember, notifyGroupDismiss } from './notify';
+import { GroupPanel, GroupPanelType } from './models/panel';
 
 export const create: EventFunc<{
   name: string;
@@ -29,34 +30,14 @@ export const create: EventFunc<{
   const userUUID = player.uuid;
 
   const { name, sub_name, desc, avatar } = data;
-  if (!name) {
-    throw new NoReportError('缺少团名');
-  }
 
-  const isExist = await GroupGroup.findOne({
-    where: { name },
-  });
-  if (!!isExist) {
-    throw new NoReportError('该团名已存在');
-  }
-
-  const user = await PlayerUser.findByUUID(userUUID);
-  const group: GroupGroup = await GroupGroup.create({
-    type: 'group',
+  const group = await GroupGroup.createGroup(
     name,
+    avatar,
     sub_name,
     desc,
-    avatar,
-    creator_uuid: userUUID,
-    owner_uuid: userUUID,
-    managers_uuid: [],
-    maps_uuid: [],
-  });
-
-  await group.setOwner(user);
-  await GroupGroup.addGroupMember(group.uuid, userUUID);
-
-  await app.player.manager.joinRoom(group.uuid, socket); // 加入房间
+    userUUID
+  );
 
   return { group };
 };
@@ -268,7 +249,6 @@ export const agreeGroupRequest: EventFunc<{
       groupUUID: groupUUID,
     }
   );
-  group.sendAddMemberNotify(fromUUID); // 发送系统广播
 
   const members = await group.getMembers();
   const membersUUID = members.map((i) => i.uuid);
@@ -519,8 +499,6 @@ export const agreeGroupInvite: EventFunc<{
     await invite.agreeAsync();
     _.set(invite, 'dataValues.group', group);
   });
-
-  group.sendAddMemberNotify(playerUUID); // 发送系统广播
 
   return { res: invite };
 };
@@ -1208,6 +1186,35 @@ export const addGroupChannelMember: EventFunc<{
   return true;
 };
 
+export const createGroupPanel: EventFunc<{
+  groupUUID: string;
+  name: string;
+  type: GroupPanelType;
+  extra: object;
+}> = async function(data) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const { groupUUID, name, type, extra } = data;
+  if (_.isNil(groupUUID) || _.isNil(name) || _.isNil(type)) {
+    throw new Error('缺少必要参数');
+  }
+
+  const { groupPanel, other } = await GroupPanel.createPanel(
+    name,
+    type,
+    extra,
+    groupUUID,
+    player.uuid
+  );
+
+  return { ...other, groupPanel };
+};
+
 /**
  * 移除团频道的成员
  */
@@ -1259,7 +1266,5 @@ export const getGroupInitData: EventFunc<{
   // 获取团选择人物的Mapping
   const groupActorsMapping = await group.getGroupActorMapping(player.uuid);
 
-  const groupPanels = await group.getGroupPanels();
-
-  return { members, groupActors, groupActorsMapping, groupPanels };
+  return { members, groupActors, groupActorsMapping };
 };

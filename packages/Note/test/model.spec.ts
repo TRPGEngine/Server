@@ -4,6 +4,7 @@ import { getTestUser } from 'packages/Player/test/example';
 import { buildAppContext } from 'test/utils/app';
 import { regAutoClear } from 'test/utils/example';
 import { createTestNote } from './example';
+import { NoteNoteVersion } from '../lib/models/note-version';
 
 const context = buildAppContext();
 regAutoClear();
@@ -84,6 +85,44 @@ describe('NoteNote', () => {
       expect(index).toBeGreaterThanOrEqual(0);
     } finally {
       await note.destroy({ force: true });
+    }
+  });
+
+  test('NoteNote.deleteNote should be ok', async () => {
+    const testUser = await getTestUser();
+    const note = await NoteNote.create({
+      title: 'test',
+      data: [],
+      ownerId: testUser.id,
+    });
+
+    try {
+      await NoteNote.deleteNote(note.uuid, testUser.uuid);
+
+      expect(await NoteNote.findByUUID(note.uuid)).toBeNull();
+    } finally {
+      await note.destroy({ force: true });
+    }
+  });
+});
+
+describe('NoteNoteVersion', () => {
+  test('NoteNoteVersion.createNoteVersion should be ok', async () => {
+    const testUser = await getTestUser();
+    const testNote = await createTestNote(testUser.id);
+
+    const version = await NoteNoteVersion.createNoteVersion(
+      testNote.uuid,
+      testUser.uuid,
+      'test comment'
+    );
+
+    try {
+      expect(version.title).toBe(testNote.title);
+      expect(version.data).toMatchObject(testNote.data);
+      expect(version.comment).toBe('test comment');
+    } finally {
+      version.destroy({ force: true });
     }
   });
 });

@@ -1,7 +1,8 @@
 import uuid from 'uuid/v1';
 import { Model, Orm, DBInstance, Op } from 'trpg/core';
-import { notifyAddInvite } from '../notify';
+import { notifyAddInvite, notifyRemoveInvite } from '../notify';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import _ from 'lodash';
 
 export class PlayerInvite extends Model {
   id: number;
@@ -10,6 +11,14 @@ export class PlayerInvite extends Model {
   to_uuid: string;
   is_agree: boolean;
   is_refuse: boolean;
+
+  static async findByUUID(uuid: string): Promise<PlayerInvite> {
+    return PlayerInvite.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
 
   /**
    * 获取所有未处理的好友邀请
@@ -76,6 +85,30 @@ export class PlayerInvite extends Model {
     }
 
     return invite;
+  }
+
+  /**
+   * 移除好友请求
+   */
+  static async removeFriendInvite(
+    inviteUUID: string,
+    userUUID: string
+  ): Promise<void> {
+    const invite = await PlayerInvite.findByUUID(inviteUUID);
+    if (_.isNil(invite)) {
+      throw new Error('找不到该邀请');
+    }
+
+    const { from_uuid, to_uuid } = invite;
+
+    if (from_uuid !== userUUID) {
+      throw new Error('没有权限删除该邀请');
+    }
+
+    await invite.destroy();
+
+    notifyRemoveInvite(from_uuid, inviteUUID);
+    notifyRemoveInvite(to_uuid, inviteUUID);
   }
 }
 
