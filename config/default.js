@@ -26,7 +26,7 @@ module.exports = {
     },
   },
   rateLimit: {
-    points: 200, // 请求点数 可以看做是单位时间请求数
+    points: 400, // 请求点数 可以看做是单位时间请求数
     duration: 20, // 单位时间 单位为秒
   },
   graphql: {
