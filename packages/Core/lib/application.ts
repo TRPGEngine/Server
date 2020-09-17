@@ -570,6 +570,9 @@ export class Application extends events.EventEmitter {
     }
   }
 
+  /**
+   * @deprecated
+   */
   async reset({ force = false } = {}) {
     const app = this;
     const storage = app.storage;

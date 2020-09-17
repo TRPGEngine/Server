@@ -28,6 +28,10 @@ module.exports = {
   rateLimit: {
     points: 400, // 请求点数 可以看做是单位时间请求数
     duration: 20, // 单位时间 单位为秒
+    whitelist: {
+      // 白名单。白名单内的操作不会被限流
+      ws: ['player::getInfo'],
+    }
   },
   graphql: {
     // 默认在开发环境打开GraphQL

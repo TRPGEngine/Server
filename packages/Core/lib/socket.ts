@@ -135,6 +135,7 @@ export default class SocketService {
   }
 
   registerIOEvent(eventName: string, eventFn: EventFunc) {
+    const whitelist: string[] = this._app.get('rateLimit.whitelist.ws', []);
     const index = this.events.findIndex((e) => {
       return e.name === eventName;
     });
@@ -158,7 +159,10 @@ export default class SocketService {
 
         const db = app.storage.db;
         try {
-          await rateLimitSocketCheck(app, ip); // 限流
+          if (!whitelist.includes(eventName)) {
+            // 不在白名单中的请求进行限流检测
+            await rateLimitSocketCheck(app, ip);
+          }
 
           const ret = await eventFn.call(this, data, cb, db);
           if (ret !== undefined) {
