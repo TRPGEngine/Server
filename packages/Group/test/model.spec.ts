@@ -253,6 +253,10 @@ describe('group model function', () => {
       await testGroup.removeMember(testUser);
     });
 
+    test.todo('GroupGroup.setMemberToManager');
+
+    test.todo('GroupGroup.tickMember');
+
     test('group.getMembersCount should be ok', async () => {
       const testUser = await getOtherTestUser('admin9');
       const num = await testGroup.getMembersCount();

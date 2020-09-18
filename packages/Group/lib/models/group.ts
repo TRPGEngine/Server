@@ -479,6 +479,95 @@ export class GroupGroup extends Model {
   }
 
   /**
+   * 将某个团成员提升为管理员
+   * @param groupUUID 团UUID
+   * @param memberUUID 成员UUID
+   * @param operatorUserUUID 操作人员UUID
+   */
+  static async setMemberToManager(
+    groupUUID: string,
+    memberUUID: string,
+    operatorUserUUID: string
+  ): Promise<GroupGroup> {
+    if (operatorUserUUID === memberUUID) {
+      throw new Error('你不能将自己提升为管理员');
+    }
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (!group) {
+      throw new Error('找不到团');
+    }
+    const member = await PlayerUser.findByUUID(memberUUID);
+    if (!member) {
+      throw new Error('找不到该成员');
+    }
+    if (group.owner_uuid !== operatorUserUUID) {
+      // 操作人不是管理
+      throw new Error('您不是团的所有者');
+    }
+    if (group.managers_uuid.indexOf(memberUUID) >= 0) {
+      // 操作人不是管理
+      throw new Error('该成员已经是团管理员');
+    }
+    if (!(await group.hasMember(member))) {
+      throw new Error('该团没有该成员');
+    }
+    group.managers_uuid = [...group.managers_uuid, memberUUID];
+    const res = await group.save();
+
+    // 发通知
+    ChatLog.sendSimpleSystemMsg(
+      memberUUID,
+      null,
+      `您已成为团 [${group.name}] 的管理员`
+    );
+    group.getManagerUUIDs().forEach((uuid) => {
+      ChatLog.sendSimpleSystemMsg(
+        uuid,
+        null,
+        `团成员 ${member.getName()} 已被提升为团 [${group.name}] 的管理员`
+      );
+    });
+
+    return res;
+  }
+
+  /**
+   * 将团成员踢出
+   * @param groupUUID 团UUID
+   * @param memberUUID 成员UUID
+   * @param operatorUserUUID 操作人员UUID - 必须是管理员
+   */
+  static async tickMember(
+    groupUUID: string,
+    memberUUID: string,
+    operatorUserUUID?: string
+  ) {
+    if (operatorUserUUID === memberUUID) {
+      throw new Error('您不能踢出你自己');
+    }
+
+    const { group, user } = await GroupGroup.removeGroupMember(
+      groupUUID,
+      memberUUID,
+      operatorUserUUID
+    );
+
+    // 发通知
+    ChatLog.sendSimpleSystemMsg(
+      user.uuid,
+      null,
+      `您已被踢出团 [${group.name}]`
+    );
+    group.getManagerUUIDs().forEach((uuid) => {
+      ChatLog.sendSimpleSystemMsg(
+        uuid,
+        null,
+        `团成员 ${user.getName()} 已被踢出团 [${group.name}]`
+      );
+    });
+  }
+
+  /**
    * 发送加入成员的团系统通知
    */
   async sendAddMemberNotify(memberUUID: string) {

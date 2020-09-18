@@ -957,10 +957,13 @@ export const dismissGroup: EventFunc<{
   return true;
 };
 
+/**
+ * 将成员踢出
+ */
 export const tickMember: EventFunc<{
   groupUUID: string;
   memberUUID: string;
-}> = async function tickMember(data, cb, db) {
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -973,29 +976,15 @@ export const tickMember: EventFunc<{
   if (!groupUUID || !memberUUID) {
     throw new Error('缺少必要参数');
   }
-  if (player.uuid === memberUUID) {
-    throw new Error('您不能踢出你自己');
-  }
 
-  await GroupGroup.removeGroupMember(groupUUID, memberUUID, player.uuid).then(
-    ({ group, user }) => {
-      // 发通知
-      app.chat.sendSystemMsg(user.uuid, '', '', `您已被踢出团 [${group.name}]`);
-      group.getManagerUUIDs().forEach((uuid) => {
-        app.chat.sendSystemMsg(
-          uuid,
-          '',
-          '',
-          `团成员 ${user.getName()} 已被踢出团 [${group.name}]`
-        );
-      });
-    }
-  );
+  await GroupGroup.tickMember(groupUUID, memberUUID, player.uuid);
 
   return true;
 };
 
-// 将普通用户提升为管理员
+/**
+ * 将普通用户提升为管理员
+ */
 export const setMemberToManager: EventFunc<{
   groupUUID: string;
   memberUUID: string;
@@ -1009,50 +998,16 @@ export const setMemberToManager: EventFunc<{
   }
   const groupUUID = data.groupUUID;
   const memberUUID = data.memberUUID;
-  if (!groupUUID || !memberUUID) {
+  if (_.isNil(groupUUID) || _.isNil(memberUUID)) {
     throw new Error('缺少必要参数');
   }
-  if (player.uuid === memberUUID) {
-    throw new Error('你不能将自己提升为管理员');
-  }
-  const group = await GroupGroup.findByUUID(groupUUID);
-  if (!group) {
-    throw new Error('找不到团');
-  }
-  const member = await PlayerUser.findByUUID(memberUUID);
-  if (!member) {
-    throw new Error('找不到该成员');
-  }
-  if (group.owner_uuid !== player.uuid) {
-    // 操作人不是管理
-    throw new Error('您不是团的所有者');
-  }
-  if (group.managers_uuid.indexOf(memberUUID) >= 0) {
-    // 操作人不是管理
-    throw new Error('该成员已经是团管理员');
-  }
-  if (!(await group.hasMember(member))) {
-    throw new Error('该团没有该成员');
-  }
-  group.managers_uuid = [...group.managers_uuid, memberUUID];
-  let res = await group.save();
 
-  // 发通知
-  app.chat.sendSystemMsg(
+  const group = await GroupGroup.setMemberToManager(
+    groupUUID,
     memberUUID,
-    '',
-    '',
-    `您已成为团 [${group.name}] 的管理员`
+    player.uuid
   );
-  group.getManagerUUIDs().forEach((uuid) => {
-    app.chat.sendSystemMsg(
-      uuid,
-      '',
-      '',
-      `团成员 ${member.getName()} 已被提升为团 [${group.name}] 的管理员`
-    );
-  });
-  return { group: res };
+  return { group };
 };
 
 // 获取团状态

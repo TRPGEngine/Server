@@ -60,6 +60,42 @@ groupRouter.post('/create', ssoAuth(), async (ctx) => {
 });
 
 /**
+ * 将普通用户提升为管理员
+ */
+groupRouter.post('/setMemberToManager', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { groupUUID, memberUUID } = ctx.request.body;
+
+  if (_.isNil(groupUUID) || _.isNil(memberUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  const group = await GroupGroup.setMemberToManager(
+    groupUUID,
+    memberUUID,
+    playerUUID
+  );
+
+  ctx.body = { group };
+});
+
+/**
+ * 将用户踢出
+ */
+groupRouter.post('/tickMember', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { groupUUID, memberUUID } = ctx.request.body;
+
+  if (_.isNil(groupUUID) || _.isNil(memberUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await GroupGroup.tickMember(groupUUID, memberUUID, playerUUID);
+
+  ctx.body = { result: true };
+});
+
+/**
  * 获取团队一定时间范围内所有的会话记录
  */
 groupRouter.get('/log/:groupUUID/range', ssoAuth(), async (ctx) => {
