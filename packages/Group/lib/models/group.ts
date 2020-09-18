@@ -442,6 +442,14 @@ export class GroupGroup extends Model {
       throw new Error('该团没有该成员');
     }
 
+    if (group.managers_uuid.includes(user.uuid)) {
+      // 如果管理员列表中有该用户，则删除
+      group.managers_uuid = _.without(group.managers_uuid, user.uuid);
+      notifyUpdateGroupInfo(group.uuid, {
+        managers_uuid: group.managers_uuid,
+      });
+      await group.save();
+    }
     await group.removeMember(user);
 
     // 离开房间
@@ -511,6 +519,7 @@ export class GroupGroup extends Model {
     if (!(await group.hasMember(member))) {
       throw new Error('该团没有该成员');
     }
+
     group.managers_uuid = [...group.managers_uuid, memberUUID];
     const res = await group.save();
 
@@ -526,6 +535,11 @@ export class GroupGroup extends Model {
         null,
         `团成员 ${member.getName()} 已被提升为团 [${group.name}] 的管理员`
       );
+    });
+
+    // 通知更新管理员列表
+    notifyUpdateGroupInfo(group.uuid, {
+      managers_uuid: group.managers_uuid,
     });
 
     return res;
