@@ -8,28 +8,60 @@
 本项目基于`NodeJS`，因此服务器上必须配备`NodeJS`才能正常运行本服务器。  
 同时本项目使用`npm`进行包管理，由于安装`NodeJS`环境的时候会自动安装`npm`因此无需另外安装。
 
-建议的Node版本: 10.19.0
+建议的Node版本: `v10.19.0`
 
-**安装依赖环境**
+需要依赖:
+- Redis
+- MySQL
+
+## 配置代码依赖
 ```bash
 # 安装所有环境
-npm install
-
-# 安装生产环境
-npm install --production
+$ npm install && npm run packages:install
 ```
 
-**运行脚本**
+## 配置数据库
+本项目基于[config](https://www.npmjs.com/package/config)作为配置管理方案
+
+创建`config/local.js`文件, 参考`config/default.js`的内容进行配置的覆写
+
+你可以以以下的配置例子作为起步配置
+```javascript
+module.exports = {
+  db: {
+    database: 'trpg',
+    username: 'root',
+    password: 'root',
+    options: {
+      host: 'localhost',
+      dialect: 'mysql',
+    },
+  },
+  jwt: {
+    secret: 'any string',
+  },
+  redisUrl: 'redis://127.0.0.1:6379/8',
+};
+
+```
+
+写入数据库结构
 ```bash
-npm start
+$ npm run db:migrate:run
 ```
 
-## 创建/重建数据库
+写入默认数据
 ```bash
-npm run dbreset
+$ npm run db:seeder:run
 ```
-初始账号密码:admin/admin
 
+## 运行服务器
+
+```bash
+$ npm run dev
+# or 
+$ npm run pro
+```
 
 ## 数据库编码
 
