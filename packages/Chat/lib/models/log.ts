@@ -343,6 +343,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
       // 在数据库中没有找到，尝试在缓存中查找
       msg = await ChatLog.getCachedChatLogByUUID(msgUUID);
       if (_.isNil(msg)) {
+        // 在数据库和缓存中都找不到
         throw new Error('撤回失败, 找不到此信息');
       }
       isCachedMsg = true;
