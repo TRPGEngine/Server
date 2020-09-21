@@ -3491,7 +3491,7 @@
                 },
                 "data": {
                     "field": "data",
-                    "seqType": "Sequelize.BLOB"
+                    "seqType": "Sequelize.JSON"
                 },
                 "createdAt": {
                     "allowNull": false,
@@ -3560,5 +3560,5 @@
             "indexes": []
         }
     },
-    "revision": 66
+    "revision": 67
 }

@@ -7,8 +7,8 @@ import { BotOperationLog } from './operation-log';
 import { GroupGroup } from 'packages/Group/lib/models/group';
 
 export class BotMsgToken extends Model {
-  uuid: string;
-  token: string;
+  uuid: string; // 机器人标识符 不暴露给外部
+  token: string; // 机器人验证 暴露给外部 允许重新生成
   name: string;
   group_uuid: string;
   channel_uuid: string | null;

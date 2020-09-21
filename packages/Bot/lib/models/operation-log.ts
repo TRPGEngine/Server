@@ -27,7 +27,7 @@ export default function BotOperationLogDefinition(
       uuid: { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV1 },
       hostname: { type: Sequelize.STRING },
       name: { type: Sequelize.STRING, required: true },
-      data: { type: Sequelize.BLOB },
+      data: { type: Sequelize.JSON },
     },
     { tableName: 'bot_operation_log', sequelize: db }
   );

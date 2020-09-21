@@ -9,7 +9,7 @@ const msgRouter = new TRPGRouter<{
 
 msgRouter.post('/msg/token/create', ssoAuth(), async (ctx) => {
   const playerUUID = ctx.state.player.uuid;
-  const { name, groupUUID, channelUUID } = ctx.body;
+  const { name, groupUUID, channelUUID } = ctx.request.body;
 
   if (_.isNil(name) || _.isNil(groupUUID)) {
     throw new Error('缺少必要参数');
@@ -47,7 +47,7 @@ msgRouter.get('/msg/send', async (ctx) => {
 
   await BotMsgToken.sendMsgWithToken(token, msg);
 
-  ctx.body = { result: true };
+  ctx.body = { result: true, msg: '消息发送成功' };
 });
 
 msgRouter.post('/msg/send', async (ctx) => {
@@ -60,7 +60,7 @@ msgRouter.post('/msg/send', async (ctx) => {
 
   await BotMsgToken.sendMsgWithToken(token, msg, data);
 
-  ctx.body = { result: true };
+  ctx.body = { result: true, msg: '消息发送成功' };
 });
 
 export default msgRouter;
