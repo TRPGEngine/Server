@@ -10,6 +10,7 @@ module.exports = {
     process.env.VERBOSE && process.env.VERBOSE.toLowerCase() === 'true'
       ? true
       : false,
+  heapdump: false, // debug 内存
   db: {
     database: 'trpg',
     username: 'root',

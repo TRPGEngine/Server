@@ -18,6 +18,7 @@ const appLogger = getLogger('application');
 import BasePackage from 'lib/package';
 import { CoreSchedulejobRecord } from './internal/models/schedulejob-record';
 import { RateLimiter, createRateLimiter } from './utils/rate-limit';
+import { setupHeapDumps } from './utils/heap-dumps';
 
 type AppSettings = {
   [key: string]: string | number | {};
@@ -82,6 +83,7 @@ export class Application extends events.EventEmitter {
     this.initRateLimit(); // 初始化限速器
     this.initStatJob();
     this.initComponents();
+    this.initHeapDumps();
 
     applog('init completed!');
     this.emit('initCompleted', this);
@@ -232,6 +234,12 @@ export class Application extends events.EventEmitter {
         console.warn(`component init error when ${component}:\n`);
         throw e;
       }
+    }
+  }
+
+  initHeapDumps() {
+    if (this.get('heapdump') === true) {
+      setupHeapDumps();
     }
   }
 
