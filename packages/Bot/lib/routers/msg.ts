@@ -1,18 +1,41 @@
 import { TRPGRouter } from 'trpg/core';
 import _ from 'lodash';
 import { BotMsgToken } from '../models/msg-token';
-const msgRouter = new TRPGRouter();
+import { ssoAuth } from 'packages/Player/lib/middleware/auth';
+import { PlayerJWTPayload } from 'packages/Player/types/player';
+const msgRouter = new TRPGRouter<{
+  player?: PlayerJWTPayload;
+}>();
 
-msgRouter.post('/msg/token/create', async (ctx) => {
-  const { name, group_uuid, channel_uuid } = ctx.body;
+msgRouter.post('/msg/token/create', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { name, groupUUID, channelUUID } = ctx.body;
 
-  if (_.isNil(name) || _.isNil(group_uuid)) {
+  if (_.isNil(name) || _.isNil(groupUUID)) {
     throw new Error('缺少必要参数');
   }
 
-  const bot = await BotMsgToken.createMsgToken(name, group_uuid, channel_uuid);
+  const bot = await BotMsgToken.createMsgToken(
+    name,
+    groupUUID,
+    channelUUID,
+    playerUUID
+  );
 
   ctx.body = { result: true, bot };
+});
+
+msgRouter.get('/msg/token/list', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { groupUUID } = ctx.body;
+
+  if (_.isNil(groupUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  const list = await BotMsgToken.getMsgTokenList(groupUUID, playerUUID);
+
+  ctx.body = { list };
 });
 
 msgRouter.get('/msg/send', async (ctx) => {

@@ -3,6 +3,8 @@ import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 import { ChatMessagePayload } from 'packages/Chat/types/message';
 import { generateChatMsgUUID } from 'packages/Chat/lib/utils';
+import { BotOperationLog } from './operation-log';
+import { GroupGroup } from 'packages/Group/lib/models/group';
 
 export class BotMsgToken extends Model {
   uuid: string;
@@ -30,16 +32,50 @@ export class BotMsgToken extends Model {
    */
   static async createMsgToken(
     name: string,
-    group_uuid: string,
-    channel_uuid?: string
+    groupUUID: string,
+    channelUUID: string | null | undefined,
+    operatorUserUUID: string
   ): Promise<BotMsgToken> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    const isManager = group.isManagerOrOwner(operatorUserUUID);
+    if (isManager === false) {
+      throw new Error('不是团管理员, 没有权限');
+    }
+
     const bot = await BotMsgToken.create({
       name,
-      group_uuid,
-      channel_uuid,
+      group_uuid: groupUUID,
+      channel_uuid: channelUUID,
     });
 
+    await BotOperationLog.insertLog('create-msg-token', { bot });
+
     return bot;
+  }
+
+  /**
+   * 获取机器人列表
+   * @param groupUUID 团UUID
+   * @param operatorUserUUID 操作人UUID
+   */
+  static async getMsgTokenList(
+    groupUUID: string,
+    operatorUserUUID: string
+  ): Promise<BotMsgToken[]> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+
+    const isManager = group.isManagerOrOwner(operatorUserUUID);
+    if (isManager === false) {
+      throw new Error('不是团管理员, 没有权限');
+    }
+
+    const list = await BotMsgToken.findAll({
+      where: {
+        group_uuid: groupUUID,
+      },
+    });
+
+    return list;
   }
 
   /**
@@ -84,6 +120,8 @@ export class BotMsgToken extends Model {
     }
 
     const pkg = await ChatLog.sendMsg(payload);
+
+    BotOperationLog.insertLog('send-msg-with-token', { token, pkg });
 
     return pkg;
   }

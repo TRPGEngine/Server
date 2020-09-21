@@ -270,14 +270,14 @@ describe('group model function', () => {
       expect(member.uuid).toBe(testUser.uuid);
     });
 
-    test('group.checkMember should be ok', async () => {
+    test('group.isMember should be ok', async () => {
       const testGroup = await createTestGroup();
       const testUser = await getOtherTestUser('admin9');
 
       await testGroup.addMember(testUser);
 
       const group = await GroupGroup.findByPk(testGroup.id);
-      const isMember = await group.checkMember(testUser.uuid);
+      const isMember = await group.isMember(testUser.uuid);
 
       expect(isMember).toBe(true);
     });
