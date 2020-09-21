@@ -1,5 +1,4 @@
 import fs from 'fs';
-import heapdump from 'heapdump';
 import { getLogger } from '../logger';
 const appLogger = getLogger('application');
 
@@ -22,6 +21,8 @@ function dumpHeap(prefix: string) {
       fs.mkdirSync('./logs/heapdump');
     }
     const filename = `./logs/heapdump/${prefix}-${Date.now()}.heapsnapshot`;
+
+    const heapdump = require('heapdump');
     heapdump.writeSnapshot(filename);
     appLogger.info(`Dumped heap at ${filename}`);
   } catch (err) {
