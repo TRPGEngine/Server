@@ -257,6 +257,31 @@ describe('group model function', () => {
 
     test.todo('GroupGroup.tickMember');
 
+    test('group.getMemberByUUID should be ok', async () => {
+      const testGroup = await createTestGroup();
+      const testUser = await getOtherTestUser('admin9');
+
+      await testGroup.addMember(testUser);
+
+      const group = await GroupGroup.findByPk(testGroup.id);
+      const member = await group.getMemberByUUID(testUser.uuid);
+
+      expect(member).not.toBeNull();
+      expect(member.uuid).toBe(testUser.uuid);
+    });
+
+    test('group.checkMember should be ok', async () => {
+      const testGroup = await createTestGroup();
+      const testUser = await getOtherTestUser('admin9');
+
+      await testGroup.addMember(testUser);
+
+      const group = await GroupGroup.findByPk(testGroup.id);
+      const isMember = await group.checkMember(testUser.uuid);
+
+      expect(isMember).toBe(true);
+    });
+
     test('group.getMembersCount should be ok', async () => {
       const testUser = await getOtherTestUser('admin9');
       const num = await testGroup.getMembersCount();

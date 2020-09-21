@@ -688,6 +688,16 @@ export class GroupGroup extends Model {
   }
 
   /**
+   * 检查用户是否在团里
+   * @param memberUUID 成员UUID
+   */
+  async checkMember(memberUUID: string): Promise<boolean> {
+    const member = await this.getMemberByUUID(memberUUID);
+
+    return !_.isNil(member);
+  }
+
+  /**
    * 获取当前团人数
    */
   getMembersCount(): Promise<number> {
