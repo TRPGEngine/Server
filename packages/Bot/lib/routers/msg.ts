@@ -27,7 +27,7 @@ msgRouter.post('/msg/token/create', ssoAuth(), async (ctx) => {
 
 msgRouter.get('/msg/token/list', ssoAuth(), async (ctx) => {
   const playerUUID = ctx.state.player.uuid;
-  const { groupUUID } = ctx.body;
+  const { groupUUID } = ctx.query;
 
   if (_.isNil(groupUUID)) {
     throw new Error('缺少必要参数');
