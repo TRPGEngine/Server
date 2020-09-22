@@ -6,6 +6,7 @@ import NoteNoteVersionDefinition from './models/note-version';
 import noteVersionRouter from './routers/note-version';
 import { regGroupPanelHandler } from 'packages/Group/lib/panels/reg';
 import _ from 'lodash';
+import { NoReportError } from 'lib/error';
 
 export default class Note extends BasePackage {
   public name: string = 'Note';
@@ -34,7 +35,7 @@ export default class Note extends BasePackage {
       async onCreate(panelInfo) {
         const targetUUID = panelInfo.extra.noteUUID;
         if (!_.isString(targetUUID)) {
-          throw new Error('需要指定笔记');
+          throw new NoReportError('需要指定笔记');
         }
 
         const note = await NoteNote.findByUUID(targetUUID);

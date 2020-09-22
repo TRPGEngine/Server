@@ -6,17 +6,22 @@ import { recruitMsg } from './template/recruit';
 import { requestCQHttp } from './utils';
 import htmlToText from 'html-to-text';
 import BotOperationLogDefinition from './models/operation-log';
+import BotMsgTokenDefinition from './models/msg-token';
+import msgRouter from './routers/msg';
 const debug = Debug('trpg:component:bot');
 
 export default class Bot extends BasePackage {
   public name: string = 'Bot';
-  public require: string[] = ['TRPG'];
+  public require: string[] = ['chat', 'group', 'TRPG'];
   public desc: string =
     '一个机器人模块，将外部的消息转发到内部或者把内部的事件推送到外部';
 
   onInit(): void {
     const enable = this.getConfig('bot.enable', false);
     this.regModel(BotOperationLogDefinition);
+    this.regModel(BotMsgTokenDefinition);
+
+    this.regRoute(msgRouter);
 
     if (!enable) {
       debug('无法加载Bot组件: 在配置中已关闭');

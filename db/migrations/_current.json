@@ -3491,7 +3491,60 @@
                 },
                 "data": {
                     "field": "data",
-                    "seqType": "Sequelize.BLOB"
+                    "seqType": "Sequelize.JSON"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "bot_msg_token": {
+            "tableName": "bot_msg_token",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "token": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "token",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "group_uuid": {
+                    "allowNull": false,
+                    "field": "group_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "channel_uuid": {
+                    "field": "channel_uuid",
+                    "seqType": "Sequelize.STRING"
                 },
                 "createdAt": {
                     "allowNull": false,
@@ -3507,5 +3560,5 @@
             "indexes": []
         }
     },
-    "revision": 65
+    "revision": 67
 }

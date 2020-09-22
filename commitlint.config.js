@@ -1,4 +1,6 @@
 /**
+ * document: https://commitlint.js.org/#/reference-configuration
+ *
  * feat：新功能（feature）
  * fix：修补bug
  * docs：文档（documentation）
@@ -11,4 +13,7 @@
 
 module.exports = {
   extends: ['@commitlint/config-conventional'],
+  rules: {
+    'subject-case': [2, 'always', ['lowerCase', 'pascal-case']],
+  },
 };

@@ -442,6 +442,14 @@ export class GroupGroup extends Model {
       throw new Error('该团没有该成员');
     }
 
+    if (group.managers_uuid.includes(user.uuid)) {
+      // 如果管理员列表中有该用户，则删除
+      group.managers_uuid = _.without(group.managers_uuid, user.uuid);
+      notifyUpdateGroupInfo(group.uuid, {
+        managers_uuid: group.managers_uuid,
+      });
+      await group.save();
+    }
     await group.removeMember(user);
 
     // 离开房间
@@ -476,6 +484,101 @@ export class GroupGroup extends Model {
     ]);
 
     return selectedGroupActorUUID;
+  }
+
+  /**
+   * 将某个团成员提升为管理员
+   * @param groupUUID 团UUID
+   * @param memberUUID 成员UUID
+   * @param operatorUserUUID 操作人员UUID
+   */
+  static async setMemberToManager(
+    groupUUID: string,
+    memberUUID: string,
+    operatorUserUUID: string
+  ): Promise<GroupGroup> {
+    if (operatorUserUUID === memberUUID) {
+      throw new Error('你不能将自己提升为管理员');
+    }
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (!group) {
+      throw new Error('找不到团');
+    }
+    const member = await PlayerUser.findByUUID(memberUUID);
+    if (!member) {
+      throw new Error('找不到该成员');
+    }
+    if (group.owner_uuid !== operatorUserUUID) {
+      // 操作人不是管理
+      throw new Error('您不是团的所有者');
+    }
+    if (group.managers_uuid.indexOf(memberUUID) >= 0) {
+      // 操作人不是管理
+      throw new Error('该成员已经是团管理员');
+    }
+    if (!(await group.hasMember(member))) {
+      throw new Error('该团没有该成员');
+    }
+
+    group.managers_uuid = [...group.managers_uuid, memberUUID];
+    const res = await group.save();
+
+    // 发通知
+    ChatLog.sendSimpleSystemMsg(
+      memberUUID,
+      null,
+      `您已成为团 [${group.name}] 的管理员`
+    );
+    group.getManagerUUIDs().forEach((uuid) => {
+      ChatLog.sendSimpleSystemMsg(
+        uuid,
+        null,
+        `团成员 ${member.getName()} 已被提升为团 [${group.name}] 的管理员`
+      );
+    });
+
+    // 通知更新管理员列表
+    notifyUpdateGroupInfo(group.uuid, {
+      managers_uuid: group.managers_uuid,
+    });
+
+    return res;
+  }
+
+  /**
+   * 将团成员踢出
+   * @param groupUUID 团UUID
+   * @param memberUUID 成员UUID
+   * @param operatorUserUUID 操作人员UUID - 必须是管理员
+   */
+  static async tickMember(
+    groupUUID: string,
+    memberUUID: string,
+    operatorUserUUID?: string
+  ) {
+    if (operatorUserUUID === memberUUID) {
+      throw new Error('您不能踢出你自己');
+    }
+
+    const { group, user } = await GroupGroup.removeGroupMember(
+      groupUUID,
+      memberUUID,
+      operatorUserUUID
+    );
+
+    // 发通知
+    ChatLog.sendSimpleSystemMsg(
+      user.uuid,
+      null,
+      `您已被踢出团 [${group.name}]`
+    );
+    group.getManagerUUIDs().forEach((uuid) => {
+      ChatLog.sendSimpleSystemMsg(
+        uuid,
+        null,
+        `团成员 ${user.getName()} 已被踢出团 [${group.name}]`
+      );
+    });
   }
 
   /**
@@ -582,6 +685,16 @@ export class GroupGroup extends Model {
         limit: 1,
       })
     );
+  }
+
+  /**
+   * 检查用户是否在团里
+   * @param memberUUID 成员UUID
+   */
+  async isMember(memberUUID: string): Promise<boolean> {
+    const member = await this.getMemberByUUID(memberUUID);
+
+    return !_.isNil(member);
   }
 
   /**

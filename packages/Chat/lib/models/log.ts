@@ -5,11 +5,11 @@ import {
   ChatMessagePartial,
 } from 'packages/Chat/types/message';
 import _ from 'lodash';
-import generateUUID from 'uuid/v4';
 import emoji from 'node-emoji';
 import Debug from 'debug';
 import { notifyUpdateMessage } from '../notify';
 import { NoReportError } from 'lib/error';
+import { generateChatMsgUUID } from '../utils';
 const debug = Debug('trpg:component:chat:model:log');
 
 export class ChatLog extends Model implements ChatMessagePayload {
@@ -160,7 +160,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
 
     // 预处理数据
     if (_.isEmpty(payload.uuid)) {
-      payload.uuid = generateUUID();
+      payload.uuid = generateChatMsgUUID();
     }
     const date = _.isEmpty(payload.date) ? new Date() : new Date(payload.date);
     payload.date = date.toISOString();
@@ -270,7 +270,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
     const isPrivateMsg = _.isNil(converse_uuid); // 如果没有会话ID则为私人消息
 
     const full: ChatMessagePayload = {
-      uuid: generateUUID(),
+      uuid: generateChatMsgUUID(),
       sender_uuid: 'trpgsystem',
       to_uuid,
       message,
@@ -317,7 +317,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
     to_uuid: string = null
   ) {
     return ChatLog.sendMsg({
-      uuid: generateUUID(),
+      uuid: generateChatMsgUUID(),
       sender_uuid: 'trpgsystem',
       to_uuid,
       converse_uuid: converseUUID,
@@ -343,6 +343,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
       // 在数据库中没有找到，尝试在缓存中查找
       msg = await ChatLog.getCachedChatLogByUUID(msgUUID);
       if (_.isNil(msg)) {
+        // 在数据库和缓存中都找不到
         throw new Error('撤回失败, 找不到此信息');
       }
       isCachedMsg = true;
