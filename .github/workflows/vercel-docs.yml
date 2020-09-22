@@ -10,20 +10,22 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      DOCDIR: ./services/Website/
     steps:
-      - uses: actions/checkout@v2
-      - run: cd services/Website
+      - name: checkout
+        uses: actions/checkout@v2
       - name: NPM Cache
         uses: actions/cache@v1
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('./package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles(format('{0}./package-lock.json', env.DOCDIR)) }}
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install deps
-        run: npm ci
+        run: cd ${{ env.DOCDIR }} && npm ci
       - name: Build
-        run: npm run build
+        run: cd ${{ env.DOCDIR }} && npm run build
       - name: Deploy
         uses: ngduc/vercel-deploy-action@master
         with:
@@ -31,4 +33,4 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.ORG_ID}}
           vercel-project-id: ${{ secrets.PROJECT_ID}}
-          working-directory: ./services/Website
+          working-directory: ${{ env.DOCDIR }}
