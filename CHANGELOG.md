@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.31.0](https://github.com/TRPGEngine/Server/compare/v1.30.0...v1.31.0) (2020-09-22)
+
+
+### Features
+
+* **bot:** 增加msg token bot 的获取列表的方法 ([3dd3344](https://github.com/TRPGEngine/Server/commit/3dd3344eb865dbf0030ca072f72109b06287db35))
+* **bot:** 增加简单机器人 ([f621b0c](https://github.com/TRPGEngine/Server/commit/f621b0cb89d9b4e3aaa546d7902fd14b0195cba6))
+* **core:** add heap dumps用于增加内存调试 ([cbbb748](https://github.com/TRPGEngine/Server/commit/cbbb74802ca9f4aab83ff40c3613c669b9365302))
+* **group:** 增加成员踢出与成员升为管理员的http接口 ([4a515ab](https://github.com/TRPGEngine/Server/commit/4a515ab8d2835e5d137b00ed0e39a5868b9e5ad2))
+
+
+### Bug Fixes
+
+* **bot:** 修复operation-log错误类型与修复创建机器人无法获取数据的bug ([0c1b307](https://github.com/TRPGEngine/Server/commit/0c1b30776df41bd451a91b5c8731ffafcfc2df1b))
+* **bot:** 修复错误的获取数据的方式 ([dc4c450](https://github.com/TRPGEngine/Server/commit/dc4c450159fe9592759b8332cc44f8f22b372277))
+
 ## [1.30.0](https://github.com/TRPGEngine/Server/compare/v1.29.1...v1.30.0) (2020-09-15)
 
 
