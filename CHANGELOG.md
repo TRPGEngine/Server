@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.31.1](https://github.com/TRPGEngine/Server/compare/v1.31.0...v1.31.1) (2020-09-24)
+
+
+### Bug Fixes
+
+* **bot:** 修复消息机器人post请求无法正常处理的bug ([67709b4](https://github.com/TRPGEngine/Server/commit/67709b42288196ab03679353551ee328abfeb101))
+* **notify:** 修复发送推送时找不到发送者信息会报错的问题 ([da02698](https://github.com/TRPGEngine/Server/commit/da026982e6b6d7bce6539c53b36170eeab72e453))
+
 ## [1.31.0](https://github.com/TRPGEngine/Server/compare/v1.30.0...v1.31.0) (2020-09-22)
 
 
