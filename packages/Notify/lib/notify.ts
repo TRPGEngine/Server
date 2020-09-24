@@ -144,6 +144,10 @@ function initFunction() {
 
       // 发送友盟推送
       const senderInfo = await PlayerUser.findByUUID(sender_uuid);
+      if(_.isNil(senderInfo)) {
+        // 没有发送者
+        return;
+      }
       const upush = await NotifyUPush.findByUserUUID(to_uuid);
       if (!(upush && upush.is_active)) {
         debug(

@@ -52,7 +52,7 @@ msgRouter.get('/msg/send', async (ctx) => {
 
 msgRouter.post('/msg/send', async (ctx) => {
   const { token } = ctx.query;
-  const { msg, data } = ctx.body;
+  const { msg, data } = ctx.request.body;
 
   if (_.isNil(token)) {
     throw new Error('缺少必要参数');

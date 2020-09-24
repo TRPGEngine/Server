@@ -1,4 +1,4 @@
-name: "deploy website"
+name: "deploy doc website"
 
 on:
   push:
@@ -11,11 +11,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: ngduc/vercel-deploy-action@master
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: Deploy
+        uses: ngduc/vercel-deploy-action@master
         with:
           vercel-cli: vercel
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.ORG_ID}}
           vercel-project-id: ${{ secrets.PROJECT_ID}}
-          working-directory: ./services/Website
+          working-directory: ./services/Website/
