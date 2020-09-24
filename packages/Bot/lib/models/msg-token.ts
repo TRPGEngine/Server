@@ -13,6 +13,8 @@ export class BotMsgToken extends Model {
   group_uuid: string;
   channel_uuid: string | null;
 
+  static MSG_SENDER_UUID = 'trpgbot'; // 用于标识发送者的内容
+
   /**
    * 根据token获取机器人
    */
@@ -98,7 +100,7 @@ export class BotMsgToken extends Model {
     const payload: ChatMessagePayload = {
       uuid: generateChatMsgUUID(),
       message: msg,
-      sender_uuid: null,
+      sender_uuid: BotMsgToken.MSG_SENDER_UUID,
       to_uuid: null,
       converse_uuid: model.group_uuid,
       is_public: true,
