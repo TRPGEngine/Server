@@ -2140,6 +2140,22 @@
                     "field": "order",
                     "seqType": "Sequelize.INTEGER"
                 },
+                "visible": {
+                    "defaultValue": {
+                        "value": "all"
+                    },
+                    "field": "visible",
+                    "seqType": "Sequelize.ENUM('all', 'manager', 'assign')"
+                },
+                "members": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.Array"
+                    },
+                    "comment": "仅visible为assign时生效",
+                    "field": "members",
+                    "seqType": "Sequelize.JSON"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -3560,5 +3576,5 @@
             "indexes": []
         }
     },
-    "revision": 67
+    "revision": 68
 }

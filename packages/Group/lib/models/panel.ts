@@ -25,6 +25,8 @@ declare module './group' {
   }
 }
 
+type GroupPanelVisible = 'all' | 'manager' | 'assign';
+
 export type GroupPanelType =
   | 'channel' // 文字聊天频道
   | 'note' // 团笔记
@@ -42,6 +44,9 @@ export class GroupPanel extends Model {
   target_uuid: string;
   color: string; // panel文本颜色
   order: number;
+
+  visible: GroupPanelVisible; // 可见性
+  members: string[]; // 当visible为assign时有效
 
   groupId?: number;
 
@@ -142,7 +147,7 @@ export class GroupPanel extends Model {
     userUUID: string,
     newData: object
   ): Promise<GroupPanel> {
-    const allowedInfo = ['name'];
+    const allowedInfo = ['name', 'visible', 'members'];
 
     newData = _.pick(newData, allowedInfo);
 
@@ -263,6 +268,15 @@ export default function GroupPanelDefinition(Sequelize: Orm, db: DBInstance) {
       },
       color: { type: Sequelize.STRING(24) },
       order: { type: Sequelize.INTEGER, defaultValue: 0 },
+      visible: {
+        type: Sequelize.ENUM('all', 'manager', 'assign'),
+        defaultValue: 'all',
+      },
+      members: {
+        type: Sequelize.JSON,
+        defaultValue: [],
+        comment: '仅visible为assign时生效',
+      },
     },
     {
       tableName: 'group_panel',
