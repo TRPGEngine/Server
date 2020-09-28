@@ -189,7 +189,15 @@ export default class SocketService {
               errorMsg = err.toString();
             }
 
-            cb({ result: false, msg: errorMsg || '系统忙' });
+            const errorPayload: any = {
+              result: false,
+              msg: errorMsg || '系统忙',
+            };
+            if (!_.isNil(err.code)) {
+              errorPayload.code = err.code;
+            }
+            cb(errorPayload);
+
             if (typeof err === 'string') {
               // 如果不是一个带有堆栈信息的错误。则修改err为一个带其他信息的字符串
               err = `${err}\nEvent Name: ${eventName}\nReceive:\n${JSON.stringify(

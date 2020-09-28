@@ -232,6 +232,10 @@ export default class WebService {
           msg: e instanceof Error ? e.message : e.toString(),
         };
 
+        if (!_.isNil(e.code)) {
+          ctx.body.code = e.code;
+        }
+
         if (typeof e === 'string') {
           e = `[webservice] ${ctx.request.originalUrl}: ${e}`;
         }
@@ -246,7 +250,7 @@ export default class WebService {
    */
   initContext() {
     // 渲染方法
-    this.context.render = function(template, data) {
+    this.context.render = function (template, data) {
       this.response.type = 'html';
       this.response.body = template.stream(data);
     };
