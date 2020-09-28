@@ -147,7 +147,7 @@ export default class SocketService {
     applog('register socket event [%s]', eventName);
     this.events.push({
       name: eventName,
-      fn: async function(data, cb) {
+      fn: async function (data, cb) {
         if (!data) {
           data = {}; // 定义一个默认空对象防止在方法内部因为取不到参数而报错
         }

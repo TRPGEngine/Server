@@ -29,6 +29,11 @@ module.exports = {
   rateLimit: {
     points: 400, // 请求点数 可以看做是单位时间请求数
     duration: 20, // 单位时间 单位为秒
+    register: {
+      // 每3小时可以注册4次
+      points: 40,
+      duration: 3 * 60 * 60
+    },
     whitelist: {
       // 白名单。白名单内的操作不会被限流
       ws: ['player::getInfo'],

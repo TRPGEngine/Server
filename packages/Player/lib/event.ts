@@ -209,10 +209,13 @@ export const register: EventFunc<{
   username: string;
   password: string;
 }> = async function register(data, cb, db) {
+  const socket = this.socket;
   const username = data.username;
   const password = data.password;
 
-  const results = await PlayerUser.registerUser(username, password);
+  const ip = getSocketIp(socket);
+
+  const results = await PlayerUser.registerUser(username, password, ip);
   debug('register success: %o', results);
   return { results };
 };

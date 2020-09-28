@@ -19,7 +19,7 @@ userRouter.get('/info/:uuid', async (ctx) => {
 userRouter.post('/register', async (ctx) => {
   const { username, password } = ctx.request.body;
 
-  const results = await PlayerUser.registerUser(username, password);
+  const results = await PlayerUser.registerUser(username, password, ctx.ip);
   ctx.body = { results };
 });
 
