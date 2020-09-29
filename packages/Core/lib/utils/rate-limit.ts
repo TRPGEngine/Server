@@ -1,13 +1,15 @@
 import {
   RateLimiterRedis,
-  IRateLimiterStoreOptions,
   RateLimiterAbstract,
+  RateLimiterMemory,
+  IRateLimiterOptions,
 } from 'rate-limiter-flexible';
 import IORedis from 'ioredis';
 import type { TRPGMiddleware, TRPGApplication } from 'trpg/core';
 import _ from 'lodash';
 import config from 'config';
-import { NoReportError } from 'lib/error';
+import { errorCode, LimitedError } from 'lib/error';
+import { RedisCache } from '../cache';
 
 const rateLimit = config.get<{
   points: number;
@@ -16,25 +18,76 @@ const rateLimit = config.get<{
 
 export interface RateLimiter extends RateLimiterAbstract {}
 
+const baseOptions: IRateLimiterOptions = {
+  // Basic options
+
+  points: rateLimit.points ?? 50, // Number of points
+  duration: rateLimit.duration ?? 5, // Per second(s)
+
+  // Custom
+  execEvenly: false, // Do not delay actions evenly
+  blockDuration: 0, // Do not block if consumed more than points
+  keyPrefix: 'trpg-limiter', // must be unique for limiters with different purpose
+};
+
+const getKeyPrefix = (keyPrefix: string | undefined | null) => {
+  const k = keyPrefix ?? '';
+  if (k !== '') {
+    return `trpg-limiter:${k}`;
+  } else {
+    return 'trpg-limiter';
+  }
+};
+
 /**
+ * 内存版
  * 创建一个速度限流器实例
  */
-export function createRateLimiter(redisClient: IORedis.Redis): RateLimiter {
-  const options: IRateLimiterStoreOptions = {
-    // Basic options
+function createRateLimiterMemory(options?: IRateLimiterOptions): RateLimiter {
+  const rateLimiterMemory = new RateLimiterMemory({
+    ...baseOptions,
+    ...options,
+    keyPrefix: getKeyPrefix(options?.keyPrefix),
+  });
+
+  return rateLimiterMemory;
+}
+
+/**
+ * Redis版
+ * 创建一个速度限流器实例
+ */
+function createRateLimiterRedis(
+  redisClient: IORedis.Redis,
+  options?: IRateLimiterOptions
+): RateLimiter {
+  const rateLimiterRedis = new RateLimiterRedis({
+    ...baseOptions,
+    ...options,
     storeClient: redisClient,
-    points: rateLimit.points ?? 50, // Number of points
-    duration: rateLimit.duration ?? 5, // Per second(s)
-
-    // Custom
-    execEvenly: false, // Do not delay actions evenly
-    blockDuration: 0, // Do not block if consumed more than points
-    keyPrefix: 'trpg-limiter', // must be unique for limiters with different purpose
-  };
-
-  const rateLimiterRedis = new RateLimiterRedis(options);
+    keyPrefix: getKeyPrefix(options?.keyPrefix),
+  });
 
   return rateLimiterRedis;
+}
+
+/**
+ * 根据一个应用实例来创建限制器
+ * @param trpgapp 应用实例
+ * @param options 配置 可为空
+ */
+export function createRateLimiterWithTRPGApplication(
+  trpgapp: TRPGApplication,
+  options?: IRateLimiterOptions
+): RateLimiter {
+  if (trpgapp.cache instanceof RedisCache) {
+    // 当使用Redis作为缓存机制时
+    const redisClient = trpgapp.cache.redis;
+    return createRateLimiterRedis(redisClient, options);
+  } else {
+    // 其他情况
+    return createRateLimiterMemory(options);
+  }
 }
 
 /**
@@ -52,6 +105,7 @@ export function rateLimitKoaMiddleware(): TRPGMiddleware {
       ctx.body = {
         result: false,
         msg: `Too Many Requests: ${ctx.ip}`,
+        code: errorCode.LIMITED,
       };
       return; // 退出下一步
     }
@@ -68,7 +122,7 @@ export async function rateLimitSocketCheck(app: TRPGApplication, ip: string) {
     if (!_.isNil(app.rateLimiter) && _.isString(ip)) {
       await app.rateLimiter.consume(ip);
     }
-  }catch(err) {
-    throw new NoReportError(`Too Many Requests: ${ip}`)
+  } catch (err) {
+    throw new LimitedError(`Too Many Requests: ${ip}`);
   }
 }

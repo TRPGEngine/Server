@@ -17,7 +17,10 @@ const logger = getLogger();
 const appLogger = getLogger('application');
 import BasePackage from 'lib/package';
 import { CoreSchedulejobRecord } from './internal/models/schedulejob-record';
-import { RateLimiter, createRateLimiter } from './utils/rate-limit';
+import {
+  RateLimiter,
+  createRateLimiterWithTRPGApplication,
+} from './utils/rate-limit';
 import { setupHeapDumps } from './utils/heap-dumps';
 
 type AppSettings = {
@@ -146,11 +149,7 @@ export class Application extends events.EventEmitter {
   }
 
   initRateLimit() {
-    if (this.cache instanceof RedisCache) {
-      // 仅在使用redis cache时生效
-      const redisClient = this.cache.redis;
-      this.rateLimiter = createRateLimiter(redisClient);
-    }
+    this.rateLimiter = createRateLimiterWithTRPGApplication(this);
   }
 
   initStatJob() {

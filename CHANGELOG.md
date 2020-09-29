@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.32.0](https://github.com/TRPGEngine/Server/compare/v1.31.1...v1.32.0) (2020-09-29)
+
+
+### Features
+
+* **core:** 抛出异常时增加错误代码 ([0e6a060](https://github.com/TRPGEngine/Server/commit/0e6a0603a1e0af1299b4c75663156755f2ff7075))
+* **group:** 团面板可见性 ([8c6112b](https://github.com/TRPGEngine/Server/commit/8c6112b01ea7fb17ba14859dbfde6c6cdcd0acd7))
+* **player:** 注册增加注册限流 ([f483920](https://github.com/TRPGEngine/Server/commit/f483920bce5734f7df36ac6fedfdb7d4657d9fee))
+
+
+### Bug Fixes
+
+* **bot:** 修复无法正确处理空发送者的问题 ([eded69e](https://github.com/TRPGEngine/Server/commit/eded69e8bfad54e6d01052ad8d247e1941f47d88))
+
 ### [1.31.1](https://github.com/TRPGEngine/Server/compare/v1.31.0...v1.31.1) (2020-09-24)
 
 

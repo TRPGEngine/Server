@@ -147,7 +147,7 @@ export default class SocketService {
     applog('register socket event [%s]', eventName);
     this.events.push({
       name: eventName,
-      fn: async function(data, cb) {
+      fn: async function (data, cb) {
         if (!data) {
           data = {}; // 定义一个默认空对象防止在方法内部因为取不到参数而报错
         }
@@ -189,7 +189,15 @@ export default class SocketService {
               errorMsg = err.toString();
             }
 
-            cb({ result: false, msg: errorMsg || '系统忙' });
+            const errorPayload: any = {
+              result: false,
+              msg: errorMsg || '系统忙',
+            };
+            if (!_.isNil(err.code)) {
+              errorPayload.code = err.code;
+            }
+            cb(errorPayload);
+
             if (typeof err === 'string') {
               // 如果不是一个带有堆栈信息的错误。则修改err为一个带其他信息的字符串
               err = `${err}\nEvent Name: ${eventName}\nReceive:\n${JSON.stringify(

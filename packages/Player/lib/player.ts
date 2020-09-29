@@ -29,7 +29,7 @@ declare module 'packages/Core/lib/application' {
 
 export default class Player extends BasePackage {
   public name: string = 'Player';
-  public require: string[] = [];
+  public require: string[] = ['Core'];
   public desc: string = '用户模块';
   private geetest = null; // 极验的实例
 

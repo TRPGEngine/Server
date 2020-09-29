@@ -17,6 +17,10 @@ import {
 } from 'packages/Player/types/player';
 import Debug from 'debug';
 import { NoReportError } from 'lib/error';
+import {
+  createRateLimiterWithTRPGApplication,
+  RateLimiter,
+} from 'packages/Core/lib/utils/rate-limit';
 const debug = Debug('trpg:component:player:model');
 
 // 阵营九宫格
@@ -75,6 +79,29 @@ export class PlayerUser extends Model {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
+
+  private static _registerRateLimiter: RateLimiter = null;
+  /**
+   * 单例模式
+   * 获取注册的限流器
+   *
+   */
+  static getRegisterRateLimiter(): RateLimiter {
+    if (_.isNull(PlayerUser._registerRateLimiter)) {
+      const trpgapp = PlayerUser.getApplication();
+      PlayerUser._registerRateLimiter = createRateLimiterWithTRPGApplication(
+        trpgapp,
+        {
+          keyPrefix: 'register',
+          // 默认每3小时可以注册4次 每次注册成功扣10点 仅发送请求扣1点
+          points: trpgapp.get('rateLimit.register.points') ?? 40,
+          duration: trpgapp.get('rateLimit.register.duration') ?? 3 * 60 * 60,
+        }
+      );
+    }
+
+    return PlayerUser._registerRateLimiter;
+  }
 
   /**
    * 生成一个长度为16的随机盐
@@ -188,7 +215,8 @@ export class PlayerUser extends Model {
    */
   static async registerUser(
     username: string,
-    password: string
+    password: string,
+    ip: string = 'none'
   ): Promise<PlayerUser> {
     if (_.isNil(username)) {
       throw new NoReportError('用户名不能为空');
@@ -202,6 +230,14 @@ export class PlayerUser extends Model {
       throw new NoReportError('注册失败!用户名过长');
     }
 
+    const rateLimiter = PlayerUser.getRegisterRateLimiter();
+
+    try {
+      await rateLimiter.consume(ip, 1);
+    } catch (err) {
+      throw new NoReportError('注册过于频繁, 请3小时后再试');
+    }
+
     const user = await PlayerUser.findOne({
       where: { username },
       limit: 1,
@@ -212,11 +248,19 @@ export class PlayerUser extends Model {
     }
 
     const salt = PlayerUser.genSalt();
-    return PlayerUser.create({
+
+    const player = PlayerUser.create({
       username,
       password: PlayerUser.genPassword(password, salt), // 存储密码为sha1(md5(md5(realpass)) + salt)
       salt,
     });
+
+    try {
+      // 整套注册机制扣10点
+      await rateLimiter.consume(ip, 9);
+    } catch (err) {}
+
+    return player;
   }
 
   /**
@@ -369,7 +413,7 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
         },
       },
       hooks: {
-        beforeSave: function(user, options) {
+        beforeSave: function (user, options) {
           if (typeof user.last_login === 'string') {
             user.last_login = new Date(user.last_login);
           }
