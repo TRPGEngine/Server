@@ -21,6 +21,8 @@ export class GroupVoiceChannel extends Model {
   name: string;
   desc: string;
 
+  groupId?: number;
+
   static findByUUID(uuid: string): Promise<GroupVoiceChannel> {
     return GroupVoiceChannel.findOne({
       where: {

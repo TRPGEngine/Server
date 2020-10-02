@@ -19,6 +19,7 @@ import { GroupChannel } from '../lib/models/channel';
 import { GroupPanel } from '../lib/models/panel';
 import { GroupInviteCode } from '../lib/models/invite-code';
 import shortid from 'shortid';
+import { GroupVoiceChannel } from '../lib/models/voice-channel';
 
 const context = buildAppContext();
 
@@ -658,6 +659,28 @@ describe('group model function', () => {
       const name = 'test channel';
       const desc = 'test channel desc';
       const channel = await GroupChannel.createChannel(
+        testGroup.uuid,
+        testUser.uuid,
+        name,
+        desc
+      );
+
+      try {
+        expect(channel.groupId).toBe(testGroup.id);
+        expect(channel.name).toBe(name);
+        expect(channel.desc).toBe(desc);
+      } finally {
+        await channel.destroy();
+      }
+    });
+  });
+
+  describe('GroupVoiceChannel', () => {
+    test('GroupVoiceChannel.createChannel should be ok', async () => {
+      const testUser = await getTestUser();
+      const name = 'test channel';
+      const desc = 'test channel desc';
+      const channel = await GroupVoiceChannel.createVoiceChannel(
         testGroup.uuid,
         testUser.uuid,
         name,
