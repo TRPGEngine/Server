@@ -87,12 +87,6 @@ export default class Group extends BasePackage {
     this.regSocketEvent('getGroupStatus', event.getGroupStatus);
     this.regSocketEvent('setGroupStatus', event.setGroupStatus);
     this.regSocketEvent('saveGroupDetail', event.saveGroupDetail);
-    this.regSocketEvent('createGroupChannel', event.createGroupChannel);
-    this.regSocketEvent('addGroupChannelMember', event.addGroupChannelMember);
-    this.regSocketEvent(
-      'removeGroupChannelMember',
-      event.removeGroupChannelMember
-    );
     this.regSocketEvent('createGroupPanel', event.createGroupPanel);
 
     // 注册chat的事件

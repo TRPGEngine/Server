@@ -2043,21 +2043,6 @@
                     "field": "desc",
                     "seqType": "Sequelize.STRING"
                 },
-                "visible": {
-                    "defaultValue": {
-                        "value": "all"
-                    },
-                    "field": "visible",
-                    "seqType": "Sequelize.ENUM('all', 'manager', 'assign')"
-                },
-                "members": {
-                    "defaultValue": {
-                        "internal": true,
-                        "value": "Sequelize.Array"
-                    },
-                    "field": "members",
-                    "seqType": "Sequelize.JSON"
-                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -2077,17 +2062,6 @@
                     "onDelete": "SET NULL",
                     "onUpdate": "CASCADE",
                     "field": "groupId",
-                    "seqType": "Sequelize.INTEGER"
-                },
-                "ownerId": {
-                    "allowNull": true,
-                    "references": {
-                        "model": "player_user",
-                        "key": "id"
-                    },
-                    "onDelete": "SET NULL",
-                    "onUpdate": "CASCADE",
-                    "field": "ownerId",
                     "seqType": "Sequelize.INTEGER"
                 }
             },
@@ -3576,5 +3550,5 @@
             "indexes": []
         }
     },
-    "revision": 68
+    "revision": 69
 }
