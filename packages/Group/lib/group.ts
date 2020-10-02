@@ -17,6 +17,9 @@ import panelRouter from './routers/panel';
 import { regGroupPanelHandler } from './panels/reg';
 import { startWriting, stopWriting } from './chatEvent';
 import inviteCodeRouter from './routers/invite-code';
+import GroupVoiceChannelDefinition, {
+  GroupVoiceChannel,
+} from './models/voice-channel';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -32,6 +35,7 @@ export default class Group extends BasePackage {
     this.regModel(GroupChannelDefinition);
     this.regModel(GroupPanelDefinition);
     this.regModel(GroupInviteCodeDefinition);
+    this.regModel(GroupVoiceChannelDefinition);
 
     const app = this.app;
     const db = this.db;
@@ -109,7 +113,7 @@ export default class Group extends BasePackage {
       return groups.map((g) => g.uuid);
     });
 
-    // 文字类型的团面板
+    // 文字频道的团面板
     regGroupPanelHandler('channel', {
       async onCreate(panelInfo) {
         const channel = await GroupChannel.createChannel(
@@ -128,6 +132,32 @@ export default class Group extends BasePackage {
       },
       async onDestroy(panel, options) {
         await GroupChannel.destroy({
+          where: {
+            uuid: panel.target_uuid,
+          },
+          ...options,
+        });
+      },
+    });
+    // 语音频道的团面板
+    regGroupPanelHandler('voicechannel', {
+      async onCreate(panelInfo) {
+        const channel = await GroupVoiceChannel.createVoiceChannel(
+          panelInfo.groupUUID,
+          panelInfo.userUUID,
+          panelInfo.name,
+          panelInfo.name
+        );
+
+        return {
+          targetUUID: channel.uuid,
+          other: {
+            groupChannel: channel,
+          },
+        };
+      },
+      async onDestroy(panel, options) {
+        await GroupVoiceChannel.destroy({
           where: {
             uuid: panel.target_uuid,
           },
