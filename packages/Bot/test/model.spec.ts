@@ -33,6 +33,17 @@ describe('BotMsgToken', () => {
     }
   });
 
+  test('BotMsgToken.createMsgToken should be ok', async () => {
+    const testUser = await getTestUser();
+    const testGroup = await createTestGroup();
+
+    const bot = await createTestBotMsgToken(testGroup.id);
+
+    await BotMsgToken.removeMsgToken(testGroup.uuid, bot.uuid, testUser.uuid);
+
+    expect(await BotMsgToken.findByUUID(bot.uuid)).toBeNull();
+  });
+
   test('BotMsgToken.getMsgTokenList should be ok', async () => {
     const testUser = await getTestUser();
     const testGroup = await createTestGroup();

@@ -25,6 +25,15 @@ msgRouter.post('/msg/token/create', ssoAuth(), async (ctx) => {
   ctx.body = { result: true, bot };
 });
 
+msgRouter.post('/msg/token/delete', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { groupUUID, botUUID } = ctx.request.body;
+
+  await BotMsgToken.removeMsgToken(groupUUID, botUUID, playerUUID);
+
+  ctx.body = { result: true };
+});
+
 msgRouter.get('/msg/token/list', ssoAuth(), async (ctx) => {
   const playerUUID = ctx.state.player.uuid;
   const { groupUUID } = ctx.query;

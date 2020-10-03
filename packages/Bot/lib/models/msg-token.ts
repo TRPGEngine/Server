@@ -16,6 +16,17 @@ export class BotMsgToken extends Model {
   static MSG_SENDER_UUID = 'trpgbot'; // 用于标识发送者的内容
 
   /**
+   * 根据uuid获取机器人
+   */
+  static async findByUUID(uuid: string): Promise<BotMsgToken> {
+    return BotMsgToken.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
+
+  /**
    * 根据token获取机器人
    */
   static async findByToken(token: string): Promise<BotMsgToken> {
@@ -39,6 +50,10 @@ export class BotMsgToken extends Model {
     operatorUserUUID: string
   ): Promise<BotMsgToken> {
     const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(group)) {
+      throw new Error('找不到要操作的团');
+    }
+
     const isManager = group.isManagerOrOwner(operatorUserUUID);
     if (isManager === false) {
       throw new Error('不是团管理员, 没有权限');
@@ -53,6 +68,37 @@ export class BotMsgToken extends Model {
     await BotOperationLog.insertLog('create-msg-token', { bot });
 
     return bot;
+  }
+
+  /**
+   * 移除机器人
+   * @param groupUUID 团UUID
+   * @param botUUID 机器人UUID
+   * @param operatorUserUUID 操作人UUID
+   */
+  static async removeMsgToken(
+    groupUUID: string,
+    botUUID: string,
+    operatorUserUUID: string
+  ) {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(group)) {
+      throw new Error('找不到要操作的团');
+    }
+
+    const isManager = group.isManagerOrOwner(operatorUserUUID);
+    if (isManager === false) {
+      throw new Error('不是团管理员, 没有权限');
+    }
+
+    const bot = await BotMsgToken.findByUUID(botUUID);
+    if (_.isNil(bot)) {
+      throw new Error('机器人不存在');
+    }
+
+    await bot.destroy();
+
+    await BotOperationLog.insertLog('remove-msg-token', { botUUID });
   }
 
   /**
