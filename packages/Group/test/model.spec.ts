@@ -43,6 +43,16 @@ describe('group model function', () => {
       expect(group.toJSON()).toHaveProperty('members_count');
     });
 
+    test('GroupGroup.getGroupFullData should be ok', async () => {
+      const testGroup = await createTestGroup();
+      const group = await GroupGroup.getGroupFullData(testGroup.uuid);
+
+      expect(group.uuid).toBe(testGroup.uuid);
+      expect(group).toHaveProperty('detail');
+      expect(Array.isArray(group.channels)).toBe(true);
+      expect(Array.isArray(group.panels)).toBe(true);
+    });
+
     test('GroupGroup.createGroup should be ok', async () => {
       const testUser = await getTestUser();
       const userUUID = testUser.uuid;
