@@ -76,6 +76,7 @@ export class PlayerUser extends Model {
   sign: string; // 个人签名
   alignment: Alignment;
   banned: boolean; // 是否被封禁
+  role: string; // 用户角色
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
@@ -395,6 +396,11 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
+      role: {
+        type: Sequelize.STRING,
+        defaultValue: 'user',
+        comment: '角色',
+      },
     },
     {
       tableName: 'player_user',
@@ -413,7 +419,7 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
         },
       },
       hooks: {
-        beforeSave: function (user, options) {
+        beforeSave: function(user, options) {
           if (typeof user.last_login === 'string') {
             user.last_login = new Date(user.last_login);
           }

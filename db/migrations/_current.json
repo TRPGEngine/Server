@@ -252,6 +252,14 @@
                     "field": "banned",
                     "seqType": "Sequelize.BOOLEAN"
                 },
+                "role": {
+                    "defaultValue": {
+                        "value": "user"
+                    },
+                    "comment": "角色",
+                    "field": "role",
+                    "seqType": "Sequelize.STRING"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -3600,5 +3608,5 @@
             "indexes": []
         }
     },
-    "revision": 70
+    "revision": 71
 }
