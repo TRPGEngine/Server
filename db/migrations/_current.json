@@ -1236,6 +1236,57 @@
             },
             "indexes": []
         },
+        "chat_converse_ack": {
+            "tableName": "chat_converse_ack",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "user_uuid": {
+                    "allowNull": false,
+                    "field": "user_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "converse_uuid": {
+                    "allowNull": false,
+                    "field": "converse_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "last_log_uuid": {
+                    "allowNull": false,
+                    "field": "last_log_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": {
+                "c2e07372a8f0d9d417d4346b62ba60ea9e64faf8": {
+                    "fields": [
+                        "user_uuid",
+                        "converse_uuid"
+                    ],
+                    "unique": true,
+                    "name": "chat_converse_ack_user_uuid_converse_uuid",
+                    "options": {
+                        "name": "chat_converse_ack_user_uuid_converse_uuid",
+                        "type": "UNIQUE"
+                    }
+                }
+            }
+        },
         "chat_emotion_item": {
             "tableName": "chat_emotion_item",
             "schema": {
@@ -3608,5 +3659,5 @@
             "indexes": []
         }
     },
-    "revision": 71
+    "revision": 72
 }

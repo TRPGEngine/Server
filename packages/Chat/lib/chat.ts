@@ -6,6 +6,7 @@ import ChatConverseDefinition from './models/converse';
 import { ChatMessagePartial } from '../types/message';
 import BasePackage from 'lib/package';
 import { initInterceptors } from './interceptors';
+import ChatConverseAckDefinition from './models/converse-ack';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -25,6 +26,7 @@ export default class Chat extends BasePackage {
   onInit(): void {
     this.regModel(LogDefinition);
     this.regModel(ChatConverseDefinition);
+    this.regModel(ChatConverseAckDefinition);
 
     this.initMethods();
 

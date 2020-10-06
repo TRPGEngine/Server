@@ -2,6 +2,8 @@ import { ChatConverse } from '../lib/models/converse';
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { buildAppContext } from 'test/utils/app';
 import { ChatLog } from '../lib/models/log';
+import { ChatConverseAck } from '../lib/models/converse-ack';
+import { generateChatMsgUUID } from '../lib/utils';
 
 const context = buildAppContext();
 
@@ -45,6 +47,44 @@ describe('chatconverse model', () => {
       expect(converse.name.endsWith('的多人会话')).toBe(true);
     } finally {
       await converse.destroy();
+    }
+  });
+});
+
+describe('ChatConverseAck', () => {
+  test.only('ChatConverseAck.setConverseAck should be ok', async () => {
+    const testUser = await getTestUser();
+    const msgUUID = generateChatMsgUUID();
+    await ChatConverseAck.setConverseAck(testUser.uuid, testUser.uuid, msgUUID);
+
+    const ack: ChatConverseAck = await ChatConverseAck.findOne({
+      where: {
+        user_uuid: testUser.uuid,
+        converse_uuid: testUser.uuid,
+      },
+    });
+
+    try {
+      expect(ack.user_uuid).toBe(testUser.uuid);
+      expect(ack.converse_uuid).toBe(testUser.uuid);
+      expect(ack.last_log_uuid).toBe(msgUUID);
+
+      // 多次调用 测试更新
+      const msgUUID2 = generateChatMsgUUID();
+      await ChatConverseAck.setConverseAck(
+        testUser.uuid,
+        testUser.uuid,
+        msgUUID2
+      );
+      const ack2: ChatConverseAck = await ChatConverseAck.findOne({
+        where: {
+          user_uuid: testUser.uuid,
+          converse_uuid: testUser.uuid,
+        },
+      });
+      expect(ack2.last_log_uuid).toBe(msgUUID2);
+    } finally {
+      await ack.destroy();
     }
   });
 });
