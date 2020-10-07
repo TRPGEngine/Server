@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.33.0](https://github.com/TRPGEngine/Server/compare/v1.32.0...v1.33.0) (2020-10-07)
+
+
+### Features
+
+* **web:** 增加删除机器人列表的功能 ([25e0347](https://github.com/TRPGEngine/Server/commit/25e0347553c9f50a3a19de3917d83011101fbad8))
+
+
+### Bug Fixes
+
+* **group:** 修复加入团以后无法获取面板与频道信息的bug ([3c19989](https://github.com/TRPGEngine/Server/commit/3c19989ce9cf4c2980dfd775b9e81360eb24a217))
+
 ## [1.32.0](https://github.com/TRPGEngine/Server/compare/v1.31.1...v1.32.0) (2020-09-29)
 
 
