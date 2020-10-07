@@ -1,5 +1,5 @@
 import { buildAppContext } from 'test/utils/app';
-import { InfoWebsite } from '../lib/models/Website';
+import { InfoWebsite } from '../lib/models/website';
 import _ from 'lodash';
 
 const context = buildAppContext();

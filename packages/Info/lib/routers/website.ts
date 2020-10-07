@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { InfoWebsite } from '../models/Website';
+import { InfoWebsite } from '../models/website';
 import { TRPGRouter } from 'trpg/core';
 
 const router = new TRPGRouter();

@@ -1,5 +1,5 @@
 import BasePackage from 'lib/package';
-import InfoWebsiteDefinition from './models/Website';
+import InfoWebsiteDefinition from './models/website';
 import WebsiteRouter from './routers/website';
 
 export default class Info extends BasePackage {

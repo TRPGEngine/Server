@@ -19,6 +19,7 @@ import { GroupChannel } from '../lib/models/channel';
 import { GroupPanel } from '../lib/models/panel';
 import { GroupInviteCode } from '../lib/models/invite-code';
 import shortid from 'shortid';
+import { GroupVoiceChannel } from '../lib/models/voice-channel';
 
 const context = buildAppContext();
 
@@ -40,6 +41,16 @@ describe('group model function', () => {
 
       // 获取时应当返回团人数
       expect(group.toJSON()).toHaveProperty('members_count');
+    });
+
+    test('GroupGroup.getGroupFullData should be ok', async () => {
+      const testGroup = await createTestGroup();
+      const group = await GroupGroup.getGroupFullData(testGroup.uuid);
+
+      expect(group.uuid).toBe(testGroup.uuid);
+      expect(group).toHaveProperty('detail');
+      expect(Array.isArray(group.channels)).toBe(true);
+      expect(Array.isArray(group.panels)).toBe(true);
     });
 
     test('GroupGroup.createGroup should be ok', async () => {
@@ -668,10 +679,28 @@ describe('group model function', () => {
         expect(channel.groupId).toBe(testGroup.id);
         expect(channel.name).toBe(name);
         expect(channel.desc).toBe(desc);
-        expect(Array.isArray(channel.members)).toBe(true);
-        expect(channel.visible).toBe('all');
-        expect(channel.members.length).toBeGreaterThan(0);
-        expect(channel.members.includes(testUser.uuid)).toBe(true);
+      } finally {
+        await channel.destroy();
+      }
+    });
+  });
+
+  describe('GroupVoiceChannel', () => {
+    test('GroupVoiceChannel.createChannel should be ok', async () => {
+      const testUser = await getTestUser();
+      const name = 'test channel';
+      const desc = 'test channel desc';
+      const channel = await GroupVoiceChannel.createVoiceChannel(
+        testGroup.uuid,
+        testUser.uuid,
+        name,
+        desc
+      );
+
+      try {
+        expect(channel.groupId).toBe(testGroup.id);
+        expect(channel.name).toBe(name);
+        expect(channel.desc).toBe(desc);
       } finally {
         await channel.destroy();
       }

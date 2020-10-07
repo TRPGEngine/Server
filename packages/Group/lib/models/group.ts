@@ -83,6 +83,36 @@ export class GroupGroup extends Model {
   }
 
   /**
+   * 获取团完整信息(加入后)
+   * 包括详情, 频道, 面板
+   */
+  static async getGroupFullData(uuid: string): Promise<GroupGroup> {
+    const group = await GroupGroup.findOne({
+      where: {
+        uuid,
+      },
+      include: [
+        {
+          model: GroupDetail,
+          as: 'detail',
+        },
+        {
+          model: GroupChannel,
+          as: 'channels',
+        },
+        {
+          model: GroupPanel,
+          as: 'panels',
+          separate: true,
+          order: [['order', GroupPanel.defaultOrder]],
+        },
+      ],
+    });
+
+    return group;
+  }
+
+  /**
    * 根据团UUID获取团UUID列表
    * @param groupUUID 团UUID
    */
@@ -383,7 +413,8 @@ export class GroupGroup extends Model {
     if (app.player) {
       if (await app.player.manager.checkPlayerOnline(user.uuid)) {
         // 检查加入团的成员是否在线, 如果在线则发送一条更新通知要求其更新团信息
-        notifyUserAddGroup(user.uuid, group);
+        const groupFullData = await GroupGroup.getGroupFullData(group.uuid);
+        notifyUserAddGroup(user.uuid, groupFullData);
         app.player.manager.joinRoomWithUUID(group.uuid, user.uuid);
       }
 

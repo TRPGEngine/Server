@@ -252,6 +252,14 @@
                     "field": "banned",
                     "seqType": "Sequelize.BOOLEAN"
                 },
+                "role": {
+                    "defaultValue": {
+                        "value": "user"
+                    },
+                    "comment": "角色",
+                    "field": "role",
+                    "seqType": "Sequelize.STRING"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -1228,6 +1236,57 @@
             },
             "indexes": []
         },
+        "chat_converse_ack": {
+            "tableName": "chat_converse_ack",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "user_uuid": {
+                    "allowNull": false,
+                    "field": "user_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "converse_uuid": {
+                    "allowNull": false,
+                    "field": "converse_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "last_log_uuid": {
+                    "allowNull": false,
+                    "field": "last_log_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": {
+                "c2e07372a8f0d9d417d4346b62ba60ea9e64faf8": {
+                    "fields": [
+                        "user_uuid",
+                        "converse_uuid"
+                    ],
+                    "unique": true,
+                    "name": "chat_converse_ack_user_uuid_converse_uuid",
+                    "options": {
+                        "name": "chat_converse_ack_user_uuid_converse_uuid",
+                        "type": "UNIQUE"
+                    }
+                }
+            }
+        },
         "chat_emotion_item": {
             "tableName": "chat_emotion_item",
             "schema": {
@@ -2043,21 +2102,6 @@
                     "field": "desc",
                     "seqType": "Sequelize.STRING"
                 },
-                "visible": {
-                    "defaultValue": {
-                        "value": "all"
-                    },
-                    "field": "visible",
-                    "seqType": "Sequelize.ENUM('all', 'manager', 'assign')"
-                },
-                "members": {
-                    "defaultValue": {
-                        "internal": true,
-                        "value": "Sequelize.Array"
-                    },
-                    "field": "members",
-                    "seqType": "Sequelize.JSON"
-                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -2077,17 +2121,6 @@
                     "onDelete": "SET NULL",
                     "onUpdate": "CASCADE",
                     "field": "groupId",
-                    "seqType": "Sequelize.INTEGER"
-                },
-                "ownerId": {
-                    "allowNull": true,
-                    "references": {
-                        "model": "player_user",
-                        "key": "id"
-                    },
-                    "onDelete": "SET NULL",
-                    "onUpdate": "CASCADE",
-                    "field": "ownerId",
                     "seqType": "Sequelize.INTEGER"
                 }
             },
@@ -2233,6 +2266,56 @@
                     "allowNull": false,
                     "field": "updatedAt",
                     "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
+        "group_voice_channel": {
+            "tableName": "group_voice_channel",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "desc": {
+                    "field": "desc",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "groupId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "group_group",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "groupId",
+                    "seqType": "Sequelize.INTEGER"
                 }
             },
             "indexes": []
@@ -3576,5 +3659,5 @@
             "indexes": []
         }
     },
-    "revision": 68
+    "revision": 72
 }
