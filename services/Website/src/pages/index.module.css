@@ -48,3 +48,8 @@
   padding: 2rem 1rem;
   border-top: 1px solid #ccc;
 }
+
+.relatedApp > img {
+    width: 96px;
+    height: 96px;
+}

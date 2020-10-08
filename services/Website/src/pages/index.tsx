@@ -149,6 +149,27 @@ function ChromeDownload() {
   );
 }
 
+const RelatedApps: React.FC = () => {
+  return (
+    <div className={styles.simpleSection}>
+      <h2>不止于TRPG Engine</h2>
+      <p>同样拥有很多的优秀的跑团相关App, 同样也可以尝试一下。</p>
+      <p>适合的，才是最好的</p>
+      <div>
+        <a
+          className={styles.relatedApp}
+          title="猫爷TRPG"
+          href="https://maoyetrpg.com/"
+          target="_blank"
+          rel="noopener"
+        >
+          <img src="/img/others/maoyetrpg.jpg" />
+        </a>
+      </div>
+    </div>
+  );
+};
+
 function Index() {
   const context = useDocusaurusContext();
   const { siteConfig } = context;
@@ -174,6 +195,8 @@ function Index() {
           <SimpleDice />
 
           <ChromeDownload />
+
+          <RelatedApps />
         </main>
       </div>
     </Layout>
