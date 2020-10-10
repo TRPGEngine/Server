@@ -68,7 +68,7 @@ export const login: EventFunc<{
       platform
     );
     if (!loginResult) {
-      throw new Error('登录失败: 锁已经被占用');
+      throw new Error('登录失败: 锁已经被占用, 请稍后再试');
     }
     await autoJoinSocketRoom(app, socket);
 
