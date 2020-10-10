@@ -46,7 +46,7 @@ export const getUserChatLog: EventFunc = async function getUserChatLog(
 
   let player = app.player.manager.findPlayer(socket);
   if (!player) {
-    throw new Error('尚未登录');
+    throw new Error('登录状态异常');
   }
   let selfUUID = player.uuid;
   // IDEA: 定义: 获取用户间会话记录时无视掉自身发送的tip类型信息

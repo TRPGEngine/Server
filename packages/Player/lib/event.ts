@@ -16,11 +16,12 @@ export const login: EventFunc<{
   password: string;
   platform: Platform;
   isApp: boolean;
-}> = async function login(data, cb, db) {
+  deviceInfo: {};
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  const { username, password, platform, isApp } = data;
+  const { username, password, platform, isApp, deviceInfo = {} } = data;
   const ip = getSocketIp(socket);
 
   if (!username || !password) {
@@ -30,7 +31,7 @@ export const login: EventFunc<{
 
   const user = await PlayerUser.findByUsernameAndPassword(username, password);
 
-  if (!user) {
+  if (_.isNil(user)) {
     debug('login fail, try to login [%s] and password error', username);
     cb({ result: false, msg: '用户不存在或密码错误' });
     await PlayerLoginLog.create({
@@ -42,6 +43,7 @@ export const login: EventFunc<{
       device_info: {
         userAgent: _.get(socket, 'handshake.headers.user-agent'),
         acceptLanguage: _.get(socket, 'handshake.headers.accept-language'),
+        ...deviceInfo,
       },
       is_success: false,
     });
@@ -92,6 +94,7 @@ export const login: EventFunc<{
       device_info: {
         userAgent: _.get(socket, 'handshake.headers.user-agent'),
         acceptLanguage: _.get(socket, 'handshake.headers.accept-language'),
+        ...deviceInfo,
       },
       is_success: true,
       token: isApp ? user.app_token : user.token,
@@ -105,15 +108,12 @@ export const loginWithToken: EventFunc<{
   platform: Platform;
   isApp: boolean;
   channel: string;
+  deviceInfo?: {};
 }> = async function loginWithToken(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
-  // if(app.player.list.find(socket)) {
-  //   cb({result: false, msg: '您已经登录，请先登出'})
-  // }
-
-  const { uuid, token, platform, isApp, channel } = data;
+  const { uuid, token, platform, isApp, channel, deviceInfo = {} } = data;
   const ip = getSocketIp(socket);
 
   if (!uuid || !token) {
@@ -129,7 +129,7 @@ export const loginWithToken: EventFunc<{
   }
   const user = await PlayerUser.scope('login').findOne({ where: cond });
 
-  if (!user) {
+  if (_.isNil(user)) {
     debug('login with token fail, try to login %s', uuid);
     cb({ result: false, msg: 'TOKEN错误或过期' });
     await db.models.player_login_log.create({
@@ -142,6 +142,7 @@ export const loginWithToken: EventFunc<{
       device_info: {
         userAgent: _.get(socket, 'handshake.headers.user-agent'),
         acceptLanguage: _.get(socket, 'handshake.headers.accept-language'),
+        ...deviceInfo,
       },
       is_success: false,
     });
@@ -178,6 +179,7 @@ export const loginWithToken: EventFunc<{
       device_info: {
         userAgent: _.get(socket, 'handshake.headers.user-agent'),
         acceptLanguage: _.get(socket, 'handshake.headers.accept-language'),
+        ...deviceInfo,
       },
       is_success: true,
       token: isApp ? user.app_token : user.token,
