@@ -31,4 +31,26 @@ describe('interceptors', () => {
   );
 
   // TODO: test ra
+
+  // 命运骰
+  appendInterceptorTest(
+    'roll rf',
+    {
+      message: '.rf',
+    },
+    {
+      message: expect.stringContaining('骰出了命运:'),
+      type: 'tip',
+    }
+  );
+  appendInterceptorTest(
+    'roll rf with reason',
+    {
+      message: '.rf1',
+    },
+    {
+      message: expect.stringContaining('因 1 骰出了命运:'),
+      type: 'tip',
+    }
+  );
 });

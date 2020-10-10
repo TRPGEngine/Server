@@ -25,3 +25,11 @@ export function getStrAfterFirstBlank(str: string): string {
     return rest.join(' ');
   }
 }
+
+/**
+ * 判断输入是否为有值的字符串
+ * @param str 输入
+ */
+export function hasString(str: any): boolean {
+  return _isString(str) && str !== '';
+}
