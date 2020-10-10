@@ -60,7 +60,7 @@ describe('roll express parse', () => {
     for (let i = 0; i < 50; i++) {
       const { value, str } = rollFate();
 
-      expect(_.inRange(value, -4, 4)).toBe(true);
+      expect(value >= -4 && value <= 4).toBe(true);
       expect(str).toMatch(/\[(\+|-|0) (\+|-|0) (\+|-|0) (\+|-|0)\] = -?[0-4]/);
     }
   });
