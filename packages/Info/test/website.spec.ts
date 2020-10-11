@@ -70,8 +70,8 @@ describe('InfoWebsite', () => {
 
     expect(info).toHaveProperty('title', '');
     expect(info).toHaveProperty('content', '');
-    expect(info).toHaveProperty('icon', '');
+    expect(info).toHaveProperty('icon');
 
     expect(await InfoWebsite.findOne({ where: { url } })).not.toBeNull();
-  });
+  }, 10000);
 });
