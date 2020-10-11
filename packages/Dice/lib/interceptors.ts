@@ -85,6 +85,10 @@ export const initInterceptors = _.once(() => {
 
     // .r指令
     if (payload.message.startsWith('.r') === true) {
+      if (payload.message === '.r') {
+        // 一个快捷处理，如果输入内容为.r则直接换成.rd
+        payload.message = '.rd';
+      }
       const rest = payload.message.match(restPattern)[1];
       const arr = rest.split(' ');
       const diceRequest = arr.shift();

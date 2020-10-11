@@ -20,6 +20,17 @@ describe('interceptors', () => {
   );
 
   appendInterceptorTest(
+    'roll dice shortcuts',
+    {
+      message: '.r',
+    },
+    {
+      message: expect.stringContaining('骰出了: d'),
+      type: 'tip',
+    }
+  );
+
+  appendInterceptorTest(
     'roll ww',
     {
       message: '.ww7',
