@@ -4,8 +4,8 @@ import _ from 'lodash';
 
 const context = buildAppContext();
 
-describe('Info website', () => {
-  it('removeWebsiteInfo should be ok', async () => {
+describe('InfoWebsite', () => {
+  test('removeWebsiteInfo should be ok', async () => {
     const url = 'http://testurl.com/';
     const info = await InfoWebsite.create({ url });
 
@@ -23,7 +23,7 @@ describe('Info website', () => {
     }
   });
 
-  it('getWebsiteInfo with og should be ok', async () => {
+  test('getWebsiteInfo with og should be ok', async () => {
     const url = 'https://www.npmjs.com/package/react';
     await InfoWebsite.removeWebsiteInfo(url);
     const info = await InfoWebsite.getWebsiteInfo(url);
@@ -43,7 +43,7 @@ describe('Info website', () => {
     expect(await InfoWebsite.findOne({ where: { url } })).not.toBeNull();
   }, 10000);
 
-  it('getWebsiteInfo with other should be ok', async () => {
+  test('getWebsiteInfo with other should be ok', async () => {
     const url = 'https://www.baidu.com';
     await InfoWebsite.removeWebsiteInfo(url);
     const info = await InfoWebsite.getWebsiteInfo(url);
@@ -62,4 +62,16 @@ describe('Info website', () => {
     // 数据库里应当有数据
     expect(await InfoWebsite.findOne({ where: { url } })).not.toBeNull();
   }, 10000);
+
+  test('getWebsiteInfo with plain text', async () => {
+    const url = 'https://api.github.com/repos/konvajs/konva/pulls/994';
+    await InfoWebsite.removeWebsiteInfo(url);
+    const info = await InfoWebsite.getWebsiteInfo(url);
+
+    expect(info).toHaveProperty('title', '');
+    expect(info).toHaveProperty('content', '');
+    expect(info).toHaveProperty('icon', '');
+
+    expect(await InfoWebsite.findOne({ where: { url } })).not.toBeNull();
+  });
 });

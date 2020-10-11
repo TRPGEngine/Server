@@ -16,6 +16,24 @@ export class InfoWebsite extends Model {
   icon: string;
 
   /**
+   * 创建网址的网站信息
+   * 出错不抛出异常因为没有意义
+   */
+  static async createWebsiteInfo(
+    url: string,
+    title: string,
+    content: string,
+    icon: string
+  ): Promise<void> {
+    await InfoWebsite.create({
+      url,
+      title,
+      content,
+      icon,
+    }).catch((e) => {});
+  }
+
+  /**
    * 移除某个网址的网站信息
    * @param url 网址
    */
@@ -47,47 +65,48 @@ export class InfoWebsite extends Model {
     }
 
     const app = InfoWebsite.getApplication();
-    const body = await app.request.get(url);
-    const $ = cheerio.load(body);
-
-    const title =
-      $('meta[property="og:title"]').attr('content') ||
-      $('title')
-        .first()
-        .text();
-
-    const content =
-      $('meta[property="og:description"]').attr('content') ||
-      $('body')
-        .text()
-        .substr(0, 150)
-        .replace(/\s/g, '');
-
-    let icon =
-      $('meta[property="og:image"]').attr('content') ||
-      $('img[src]:not([src$=".gif"])')
-        .first()
-        .attr('src');
-    if (_.isString(icon)) {
-      icon = urlParser.resolve(url, icon);
-    }
-
     try {
-      await InfoWebsite.create({
-        url,
+      const body = await app.request.get(url);
+      const $ = cheerio.load(body);
+
+      const title =
+        $('meta[property="og:title"]').attr('content') ||
+        $('title')
+          .first()
+          .text();
+
+      const content =
+        $('meta[property="og:description"]').attr('content') ||
+        $('body')
+          .text()
+          .substr(0, 150)
+          .replace(/\s/g, '');
+
+      let icon =
+        $('meta[property="og:image"]').attr('content') ||
+        $('img[src]:not([src$=".gif"])')
+          .first()
+          .attr('src');
+      if (_.isString(icon)) {
+        icon = urlParser.resolve(url, icon);
+      }
+
+      await InfoWebsite.createWebsiteInfo(url, title, content, icon);
+
+      return {
         title,
         content,
         icon,
-      });
-    } catch (e) {
-      // 不处理创建错误
-    }
+      };
+    } catch (err) {
+      await InfoWebsite.createWebsiteInfo(url, '', '', '');
 
-    return {
-      title,
-      content,
-      icon,
-    };
+      return {
+        title: '',
+        content: '',
+        icon: '',
+      };
+    }
   }
 }
 
