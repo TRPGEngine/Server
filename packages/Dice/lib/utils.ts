@@ -34,7 +34,7 @@ export function roll(requestStr: string): RollRes {
   const pattern = /(\d*)\s*d\s*(\d*)/gi;
 
   requestStr = requestStr.replace(/[^\dd\+-\/\*\(\)]+/gi, ''); //去除无效或危险字符
-  const express = requestStr.replace(pattern, function(tag, num, dice) {
+  const express = requestStr.replace(pattern, function (tag, num, dice) {
     num = _.clamp(num || 1, 1, 100); // 个数
     dice = _.clamp(dice || 100, 1, 1000); // 面数
     const res = [];
@@ -55,7 +55,7 @@ export function roll(requestStr: string): RollRes {
 
   const result = eval(express);
   let str = '';
-  if (express !== result) {
+  if (express !== String(result)) {
     str = requestStr + '=' + express + '=' + result;
   } else {
     str = requestStr + '=' + result;
@@ -192,4 +192,39 @@ export function rollWW(requestStr: string, validPoint = 8): RollRes {
     .join('+');
 
   return { value, str: `${str}=${value}` };
+}
+
+/**
+ * 命运骰
+ * 返回4个投骰点数结果
+ * 分别的可能为 + - 0
+ * 四个值相加为结果。
+ *
+ * @example
+ * [+ + + +] = 4
+ * [- - - -] = -4
+ * [0 + 0 -] = 0
+ */
+export function rollFate(): RollRes {
+  const list = Array.from({ length: 4 })
+    .map(() => rollPoint(3)) // 骰点
+    .map((point) => point - 2); // 转化为-1 0 1
+
+  const value = _.sum(list);
+  const listStr = list
+    .map((val) => {
+      switch (val) {
+        case 1:
+          return '+';
+        case -1:
+          return '-';
+        default:
+          return '0';
+      }
+    })
+    .join(' ');
+
+  const str = `[${listStr}] = ${value}`;
+
+  return { value, str };
 }

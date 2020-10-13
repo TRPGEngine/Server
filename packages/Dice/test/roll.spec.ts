@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { rollJudge, rollWW } from '../lib/utils';
+import { rollFate, rollJudge, rollWW } from '../lib/utils';
 
 describe('roll express parse', () => {
   describe('rollJudge', () => {
@@ -41,12 +41,7 @@ describe('roll express parse', () => {
         // 将数据拆分成数组
         const resList = _.head(res.str.split('='))
           .split('+')
-          .map((s) =>
-            s
-              .slice(1, -1)
-              .split(',')
-              .map(Number)
-          );
+          .map((s) => s.slice(1, -1).split(',').map(Number));
         expect(res.value).toBe(_.flatten(resList).filter((x) => x >= 8).length); // 计算有效值
         resList.forEach((val, i, arr) => {
           if (i >= 1) {
@@ -58,5 +53,15 @@ describe('roll express parse', () => {
         });
       }
     });
+  });
+
+  // 命运骰
+  test('rollFate', () => {
+    for (let i = 0; i < 50; i++) {
+      const { value, str } = rollFate();
+
+      expect(value >= -4 && value <= 4).toBe(true);
+      expect(str).toMatch(/\[(\+|-|0) (\+|-|0) (\+|-|0) (\+|-|0)\] = -?[0-4]/);
+    }
   });
 });

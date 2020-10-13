@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.34.0](https://github.com/TRPGEngine/Server/compare/v1.33.0...v1.34.0) (2020-10-13)
+
+
+### Features
+
+* **dice:** 增加命运骰 ([5bc3b62](https://github.com/TRPGEngine/Server/commit/5bc3b622dab10c8758b4101c724acded80787a14))
+* **dice:** 增加骰点shortcut ([2f956ee](https://github.com/TRPGEngine/Server/commit/2f956ee55c3131752b4a163c223aa0c93c06db60))
+* **player:** 登录时允许传输登录设备参数 ([22dea32](https://github.com/TRPGEngine/Server/commit/22dea32025606ec15ef315590ef497727cc03a37))
+
+
+### Bug Fixes
+
+* **core:** 修复在某些情况下报错不能正常抛出的问题 ([91ea001](https://github.com/TRPGEngine/Server/commit/91ea001891cf84397d08eeb3947e0da08b632497))
+* **info:** 修复无法解析html时会出现错误的问题 ([38af41b](https://github.com/TRPGEngine/Server/commit/38af41b9554ddcb00594282972172b08aaa72dd0))
+
 ## [1.33.0](https://github.com/TRPGEngine/Server/compare/v1.32.0...v1.33.0) (2020-10-07)
 
 

@@ -1,10 +1,11 @@
 import _ from 'lodash';
 import { regMsgInterceptor } from 'packages/Chat/lib/interceptors';
-import { roll, rollJudge, rollWW } from './utils';
+import { roll, rollFate, rollJudge, rollWW } from './utils';
 import { DiceLog } from './models/log';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ChatMessagePartial } from 'packages/Chat/types/message';
 import { GroupActor } from 'packages/Group/lib/models/actor';
+import { hasString } from 'lib/helper/string-helper';
 
 const restPattern = /^\.r(.*)$/; // 用于获取.r后面的内容
 const dotRestPattern = /^\.(.*)$/; // 用于获取.后面的内容
@@ -32,7 +33,7 @@ async function getSenderName(payload: ChatMessagePartial) {
 export const initInterceptors = _.once(() => {
   regMsgInterceptor(async (ctx) => {
     const payload = ctx.payload;
-    if (!_.isString(payload.message)) {
+    if (!hasString(payload.message)) {
       return;
     }
 
@@ -68,8 +69,26 @@ export const initInterceptors = _.once(() => {
       return;
     }
 
+    // .rf命运骰
+    if (payload.message.startsWith('.rf') === true) {
+      const restStr = payload.message.substr(3);
+
+      const { str } = rollFate();
+
+      const senderName = await getSenderName(payload);
+      payload.message = `${senderName} ${
+        hasString(restStr) ? `因 ${restStr} ` : ''
+      }骰出了命运: ${str}`;
+      payload.type = 'tip';
+      return;
+    }
+
     // .r指令
     if (payload.message.startsWith('.r') === true) {
+      if (payload.message === '.r') {
+        // 一个快捷处理，如果输入内容为.r则直接换成.rd
+        payload.message = '.rd';
+      }
       const rest = payload.message.match(restPattern)[1];
       const arr = rest.split(' ');
       const diceRequest = arr.shift();
@@ -82,7 +101,7 @@ export const initInterceptors = _.once(() => {
 
       const senderName = await getSenderName(payload);
       payload.message = `${senderName} ${
-        _.isString(restStr) ? `因${restStr} ` : ''
+        hasString(restStr) ? `因 ${restStr} ` : ''
       }骰出了: ${str}`;
       payload.type = 'tip';
 

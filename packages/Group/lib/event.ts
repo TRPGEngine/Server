@@ -509,7 +509,7 @@ export const agreeGroupInvite: EventFunc<{
 export const getGroupInviteDetail: EventFunc<{
   // 团邀请的UUID
   uuid: string;
-}> = async function getGroupInviteDetail(data, cb, db) {
+}> = async function(data, cb, db) {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);

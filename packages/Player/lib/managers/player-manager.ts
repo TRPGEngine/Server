@@ -10,7 +10,10 @@ import {
   SocketManagerOptions,
 } from 'packages/Core/lib/managers/socket-manager';
 import Debug from 'debug';
+import { getLogger } from 'packages/Core/lib/logger';
 const debug = Debug('trpg:component:player:manager');
+
+const appLogger = getLogger('application');
 
 const ONLINE_PLAYER_KEY = 'player:manager:online_player_uuid_list';
 const CHANNEL_KEY = 'player:manager:channel';
@@ -260,6 +263,7 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
     await this.cache.unlock(lockKey);
 
     // 添加到本地的会话管理
+    appLogger.info(`[PlayerManager] add player socket ${socket.id}`);
     this.players[socket.id] = {
       uuid,
       platform,
@@ -324,6 +328,7 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
       return;
     }
     const socket = player.socket;
+    appLogger.info(`[PlayerManager] remove player socket ${socket.id}`);
     delete this.players[socket.id]; // 从本地的会话管理列表中移除
 
     if (socket.connected) {

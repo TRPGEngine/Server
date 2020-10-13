@@ -229,7 +229,7 @@ export default class WebService {
         }
         ctx.body = {
           result: false,
-          msg: e instanceof Error ? e.message : e.toString(),
+          msg: e instanceof Error ? e.message : String(e),
         };
 
         if (!_.isNil(e.code)) {
@@ -250,7 +250,7 @@ export default class WebService {
    */
   initContext() {
     // 渲染方法
-    this.context.render = function (template, data) {
+    this.context.render = function(template, data) {
       this.response.type = 'html';
       this.response.body = template.stream(data);
     };
