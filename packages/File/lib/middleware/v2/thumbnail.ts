@@ -3,7 +3,7 @@ import { TRPGMiddleware } from 'trpg/core';
 import { compressImageBuffer } from '../../utils/jimp';
 import { UploadFileState } from './upload';
 
-export interface ImageInfoState extends UploadFileState {
+export interface ImageThumbnailState extends UploadFileState {
   imageInfo: {
     width: number;
     height: number;
@@ -20,7 +20,7 @@ export interface ImageInfoState extends UploadFileState {
 export function thumbnail(
   maxWidth: number,
   maxHeight: number
-): TRPGMiddleware<ImageInfoState> {
+): TRPGMiddleware<ImageThumbnailState> {
   return async (ctx, next) => {
     const file = ctx.state.file;
     if (_.isNil(file)) {

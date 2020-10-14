@@ -23,7 +23,7 @@ const config = {
     '#e74c3c',
     '#e67e22',
   ],
-  getOfficePreviewUrl: function(fileurl) {
+  getOfficePreviewUrl: function (fileurl) {
     return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(
       fileurl
     )}`;

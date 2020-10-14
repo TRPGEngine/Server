@@ -11,11 +11,14 @@ import path from 'path';
 import sha256File from 'sha256-file';
 import _ from 'lodash';
 
+/**
+ * @deprecated Please use v2 version
+ */
 export default function sha256() {
   return async (ctx: any, next: any) => {
     const { filename, path: filepath } = ctx.req.file;
     if (!filename || !filepath) {
-      throw new Error('File Info Require!');
+      throw new Error('File Info Required in sha256!');
     }
 
     const ext = _.last((filename as string).split('.'));

@@ -763,6 +763,82 @@
             },
             "indexes": []
         },
+        "file_image": {
+            "tableName": "file_image",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "name": {
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "size": {
+                    "allowNull": false,
+                    "field": "size",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "width": {
+                    "field": "width",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "height": {
+                    "field": "height",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "usage": {
+                    "field": "usage",
+                    "seqType": "Sequelize.STRING"
+                },
+                "attach_uuid": {
+                    "field": "attach_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "owner_uuid": {
+                    "field": "owner_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "deletedAt": {
+                    "field": "deletedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
         "file_oss": {
             "tableName": "file_oss",
             "schema": {
@@ -3659,5 +3735,5 @@
             "indexes": []
         }
     },
-    "revision": 72
+    "revision": 73
 }

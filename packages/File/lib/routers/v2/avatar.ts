@@ -2,7 +2,7 @@ import { TRPGRouter } from 'trpg/core';
 import { upload } from '../../middleware/v2/upload';
 import { sha256 } from '../../middleware/v2/sha256';
 import { storage, StorageFileState } from '../../middleware/v2/storage';
-import { ImageInfoState, thumbnail } from '../../middleware/v2/thumbnail';
+import { ImageThumbnailState, thumbnail } from '../../middleware/v2/thumbnail';
 import auth from '../../middleware/auth';
 import allowMIME from '../../middleware/allow-mime';
 import { FileAvatar } from '../../models/avatar';
@@ -10,7 +10,7 @@ import _ from 'lodash';
 
 const avatarV2Router = new TRPGRouter();
 
-type AvatarV2RouterState = ImageInfoState & StorageFileState;
+type AvatarV2RouterState = ImageThumbnailState & StorageFileState;
 
 avatarV2Router.post(
   '/upload',

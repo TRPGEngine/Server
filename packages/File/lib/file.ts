@@ -5,22 +5,23 @@ import filesize from 'filesize';
 import config from './config';
 import { initFileService } from './webservice';
 import { bindAttachUUID, getFileInfo } from './event';
-import FileAvatarDefinition from './models/avatar';
+import FileAvatarDefinition, { FileAvatar } from './models/avatar';
 import FileChatimgDefinition from './models/chatimg';
 import FileFileDefinition from './models/file';
 import FileOSSDefinition from './models/oss';
 import FileDocumentDefinition from './models/document';
 import { TRPGApplication } from 'trpg/core';
+import FileImageDefinition from './models/image';
 
-function deleteall(path) {
+function deleteAll(path: string) {
   var files = [];
   if (fs.existsSync(path)) {
     files = fs.readdirSync(path);
-    files.forEach(function(file, index) {
+    files.forEach(function (file, index) {
       var curPath = path + '/' + file;
       if (fs.statSync(curPath).isDirectory()) {
         // recurse
-        deleteall(curPath);
+        deleteAll(curPath);
       } else {
         // delete file
         fs.unlinkSync(curPath);
@@ -42,6 +43,7 @@ function checkDir() {
   fs.ensureDir('public/uploads/temporary');
   fs.ensureDir('public/uploads/persistence');
   fs.ensureDir('public/avatar/thumbnail');
+  fs.ensureDir('public/image');
 
   let chatimgDir = config.path.chatimgDir;
   debug('聊天图片文件夹路径:', chatimgDir);
@@ -53,19 +55,20 @@ module.exports = function FileComponent(app: TRPGApplication) {
   app.storage.registerModel(FileAvatarDefinition);
   app.storage.registerModel(FileChatimgDefinition);
   app.storage.registerModel(FileFileDefinition);
+  app.storage.registerModel(FileImageDefinition);
   app.storage.registerModel(FileOSSDefinition);
   app.storage.registerModel(FileDocumentDefinition);
 
-  app.on('initCompleted', function(app) {
+  app.on('initCompleted', function (app) {
     // 数据信息统计
     debug('storage has been load 3 file db model');
   });
 
   initFileService(app); // 初始化文件服务
 
-  app.on('resetStorage', function() {
-    deleteall('./public/uploads');
-    deleteall('./public/avatar');
+  app.on('resetStorage', function () {
+    deleteAll('./public/uploads');
+    deleteAll('./public/avatar');
     checkDir();
     debug('file disk storage reset completed!');
   });
@@ -89,7 +92,7 @@ module.exports = function FileComponent(app: TRPGApplication) {
         let ltdate = new Date(
           new Date().setTime(new Date().getTime() - 1000 * 60 * 60 * 1)
         ); // 只找一小时内没有绑定关联uuid的
-        let list = await db.models.file_avatar.findAll({
+        let list = await FileAvatar.findAll({
           where: {
             attach_uuid: null,
             createdAt: { [Op.lt]: ltdate },
@@ -99,7 +102,7 @@ module.exports = function FileComponent(app: TRPGApplication) {
         for (let fi of list) {
           let filename = fi.name;
 
-          let isExistOther = await db.models.file_avatar.findOne({
+          let isExistOther = await FileAvatar.findOne({
             where: {
               name: filename,
               attach_uuid: { [Op.ne]: null },
@@ -155,7 +158,7 @@ module.exports = function FileComponent(app: TRPGApplication) {
   }, 1000 * 60 * 60 * 4);
 
   return {
-    name: 'FileComponent',
-    require: ['PlayerComponent'],
+    name: 'File',
+    require: ['Player'],
   };
 };
