@@ -31,6 +31,43 @@ describe('interceptors', () => {
   );
 
   appendInterceptorTest(
+    'roll dice shortcuts with string',
+    {
+      message: '.r 测试',
+    },
+    {
+      message: expect.stringContaining('因 测试 骰出了: d'),
+      type: 'tip',
+    }
+  );
+
+  appendInterceptorTest(
+    'roll dice oversize',
+    {
+      message: '.r999d99999',
+    },
+    {
+      message: expect.stringContaining(
+        '尝试进行投骰[999d99999]失败: 投骰点数超限, 最大为100d1000'
+      ),
+      type: 'tip',
+    }
+  );
+
+  appendInterceptorTest(
+    'roll dice error string',
+    {
+      message: '.r测试',
+    },
+    {
+      message: expect.stringContaining(
+        '尝试进行投骰[测试]失败: 非法的投骰表达式: 测试'
+      ),
+      type: 'tip',
+    }
+  );
+
+  appendInterceptorTest(
     'roll ww',
     {
       message: '.ww7',
@@ -41,7 +78,7 @@ describe('interceptors', () => {
     }
   );
 
-  // TODO: test ra
+  // TODO: test .ra
 
   // 命运骰
   appendInterceptorTest(
