@@ -10,6 +10,7 @@ import Debug from 'debug';
 import { notifyUpdateMessage } from '../notify';
 import { NoReportError } from 'lib/error';
 import { generateChatMsgUUID } from '../utils';
+import { groupString } from 'lib/helper/string-helper';
 const debug = Debug('trpg:component:chat:model:log');
 
 export class ChatLog extends Model implements ChatMessagePayload {
@@ -191,6 +192,38 @@ export class ChatLog extends Model implements ChatMessagePayload {
   }
 
   /**
+   * 切割聊天日志
+   * 将长文本的聊天消息变成2条
+   * @param logs 聊天日志
+   */
+  private static cutChatLogMessageList(
+    logs: Partial<ChatMessagePayload>[]
+  ): Partial<ChatMessagePayload>[] {
+    const finalList: Partial<ChatMessagePayload>[] = [];
+    for (const log of logs) {
+      if (String(log.message).length > 900) {
+        // 消息长度大于某个值
+        // 则尝试分割
+        const msgGroup = groupString(log.message, 900);
+
+        for (let i = 0; i < msgGroup.length; i++) {
+          const m = msgGroup[i];
+          const newLog = { ...log, message: m };
+          if (i !== 0) {
+            // 如果不是拆开的第一条。则删除uuid让数据库重新生成
+            delete newLog.uuid;
+          }
+          finalList.push(newLog);
+        }
+      } else {
+        finalList.push(log);
+      }
+    }
+
+    return finalList;
+  }
+
+  /**
    * 将缓存的聊天记录推送到数据库中
    */
   public static async dumpCachedChatLog(): Promise<void> {
@@ -200,7 +233,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
       const logs: {}[] = await ChatLog.getCachedChatLog();
       const size = logs.length;
       if (size > 0) {
-        await ChatLog.bulkCreate(logs);
+        await ChatLog.bulkCreate(ChatLog.cutChatLogMessageList(logs));
         // 成功后再清除。否则先不清除了
         await trpgapp.cache.lclear(ChatLog.CACHE_KEY, 0, size);
       }
