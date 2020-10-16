@@ -13,6 +13,7 @@ export const createTestChatlogPayload = async (
     sender_uuid: testUser.uuid,
     message: 'Test Message',
     date: new Date().toISOString(),
+    type: 'tip',
     ...payload,
   };
 };

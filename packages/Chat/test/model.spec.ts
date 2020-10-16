@@ -4,6 +4,8 @@ import { buildAppContext } from 'test/utils/app';
 import { ChatLog } from '../lib/models/log';
 import { ChatConverseAck } from '../lib/models/converse-ack';
 import { generateChatMsgUUID } from '../lib/utils';
+import { createTestChatlogPayload } from './example';
+import { sleep } from 'lib/helper/utils';
 
 const context = buildAppContext();
 
@@ -23,6 +25,44 @@ describe('ChatLog', () => {
     });
 
     await chatlog.destroy();
+  });
+
+  test.todo('ChatLog.getCachedChatLogByUUID');
+  test.todo('ChatLog.appendCachedChatLog');
+  test.todo('ChatLog.updateCachedChatLog');
+
+  describe.only('ChatLog.dumpCachedChatLog', () => {
+    test('long message', async () => {
+      let longMessage = '';
+      for (let i = 0; i < 1000; i++) {
+        longMessage += '12345678';
+      }
+      const payload = await createTestChatlogPayload({
+        message: longMessage,
+      });
+
+      ChatLog.appendCachedChatLog(payload);
+
+      await sleep(100);
+
+      await ChatLog.dumpCachedChatLog();
+
+      const lists: ChatLog[] = await ChatLog.findAll({
+        where: {
+          type: payload.type,
+          date: payload.date,
+        },
+      });
+
+      try {
+        expect(lists[0].uuid).toBe(payload.uuid);
+        expect(lists.map((item) => item.message).join('')).toBe(longMessage);
+      } finally {
+        for (const item of lists) {
+          await item.destroy();
+        }
+      }
+    });
   });
 });
 

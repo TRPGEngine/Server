@@ -33,3 +33,20 @@ export function getStrAfterFirstBlank(str: string): string {
 export function hasString(str: any): boolean {
   return _isString(str) && str !== '';
 }
+
+/**
+ * 字符串根据数量分组
+ * @param str 字符串
+ * @param step 数量
+ */
+export function groupString(str: string, step: number): string[] {
+  const r: string[] = [];
+  function doGroup(s: string) {
+    if (!s) return;
+    r.push(s.substr(0, step));
+    s = s.substr(step);
+    doGroup(s);
+  }
+  doGroup(str);
+  return r;
+}
