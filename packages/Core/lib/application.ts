@@ -156,9 +156,7 @@ export class Application extends events.EventEmitter {
    * 统计信息
    */
   initStatJob() {
-    this.registerScheduleJob('stat-info', '2 * * * * *', async () => {
-      // For Test
-      // this.registerScheduleJob('stat-info', '0 0 2 * * *', async () => {
+    this.registerScheduleJob('stat-info', '0 0 2 * * *', async () => {
       const info: any = {};
       for (let job of this.statInfoJob) {
         const name = job.name;

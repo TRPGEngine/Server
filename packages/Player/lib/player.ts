@@ -258,45 +258,41 @@ export default class Player extends BasePackage {
     });
 
     app.registerStatJob('playerLoginIPParse', async () => {
-      try {
-        const logs = await PlayerLoginLog.findAll({
-          where: {
-            ip_address: null,
-          },
-        });
-        const cacheMap = {}; // 缓存, Key 为IP. 值为地址 仅缓存当次任务的信息记录
-        for (const log of logs) {
-          let ip = log.ip;
-          if (ip.indexOf(':') >= 0) {
-            const tmp = ip.split(':');
-            ip = tmp[tmp.length - 1];
-          }
-
-          if (cacheMap[ip]) {
-            // 如果缓存中已经有记录, 则从缓存中更新地址
-            const ip_address = cacheMap[ip];
-            debug('从缓存中更新ip地址:', ip, ip_address);
-            log.ip_address = ip_address;
-            await log.save();
-            continue;
-          }
-
-          debug('请求ip信息地址:', ip);
-          try {
-            const location = await PlayerLoginLog.requestIpLocation(ip);
-            log.ip_address = location;
-            debug('请求ip地址信息结果:', location);
-            cacheMap[ip] = location;
-            await log.save();
-          } catch (err) {
-            debug('请求ip地址信息失败:', location);
-          }
+      const logs = await PlayerLoginLog.findAll({
+        where: {
+          ip_address: null,
+        },
+      });
+      const cacheMap = {}; // 缓存, Key 为IP. 值为地址 仅缓存当次任务的信息记录
+      for (const log of logs) {
+        let ip = log.ip;
+        if (ip.indexOf(':') >= 0) {
+          const tmp = ip.split(':');
+          ip = tmp[tmp.length - 1];
         }
-        return new Date().valueOf();
-      } catch (error) {
-        debug('parse player login log ip error:', error);
-        app.error(error);
+
+        if (cacheMap[ip]) {
+          // 如果缓存中已经有记录, 则从缓存中更新地址
+          const ip_address = cacheMap[ip];
+          debug('从缓存中更新ip地址:', ip, ip_address);
+          log.ip_address = ip_address;
+          await log.save();
+          continue;
+        }
+
+        debug('请求ip信息地址:', ip);
+        let location: string;
+        try {
+          location = await PlayerLoginLog.requestIpLocation(ip);
+          log.ip_address = location;
+          debug('请求ip地址信息结果:', location);
+          cacheMap[ip] = location;
+          await log.save();
+        } catch (err) {
+          debug(`请求ip地址信息失败: ip: ${ip} location: ${location}`);
+        }
       }
+      return new Date().valueOf();
     });
   }
 }
