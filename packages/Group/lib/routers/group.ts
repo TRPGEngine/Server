@@ -60,7 +60,7 @@ groupRouter.post('/create', ssoAuth(), async (ctx) => {
 });
 
 /**
- * 将普通用户提升为管理员
+ * 将普通成员提升为管理员
  */
 groupRouter.post('/setMemberToManager', ssoAuth(), async (ctx) => {
   const playerUUID = ctx.state.player.uuid;
@@ -71,6 +71,26 @@ groupRouter.post('/setMemberToManager', ssoAuth(), async (ctx) => {
   }
 
   const group = await GroupGroup.setMemberToManager(
+    groupUUID,
+    memberUUID,
+    playerUUID
+  );
+
+  ctx.body = { group };
+});
+
+/**
+ * 将管理员降级为普通成员
+ */
+groupRouter.post('/setManagerToMember', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { groupUUID, memberUUID } = ctx.request.body;
+
+  if (_.isNil(groupUUID) || _.isNil(memberUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  const group = await GroupGroup.setManagerToMember(
     groupUUID,
     memberUUID,
     playerUUID
