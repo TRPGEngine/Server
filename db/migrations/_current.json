@@ -3464,6 +3464,10 @@
                     "field": "content",
                     "seqType": "Sequelize.JSON"
                 },
+                "group_uuid": {
+                    "field": "group_uuid",
+                    "seqType": "Sequelize.STRING"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -3735,5 +3739,5 @@
             "indexes": []
         }
     },
-    "revision": 73
+    "revision": 74
 }

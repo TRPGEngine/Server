@@ -16,8 +16,8 @@ gameReportRouter.get('/game-report/list', ssoAuth(), async (ctx) => {
   ctx.body = { reports };
 });
 
-gameReportRouter.post('/game-report/create', ssoAuth(), async function(ctx) {
-  const { title, cast, content } = ctx.request.body;
+gameReportRouter.post('/game-report/create', ssoAuth(), async function (ctx) {
+  const { title, cast, content, groupUUID } = ctx.request.body;
   const player = ctx.state.player;
 
   if (_.isNil(title)) {
@@ -26,6 +26,7 @@ gameReportRouter.post('/game-report/create', ssoAuth(), async function(ctx) {
 
   const report = await TRPGGameReport.generateGameReport(
     player.uuid,
+    groupUUID,
     title,
     cast,
     content
