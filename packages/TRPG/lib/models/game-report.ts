@@ -30,6 +30,19 @@ export class TRPGGameReport extends Model {
   }
 
   /**
+   * 获取团UUID下所有的战报
+   * @param groupUUID 团UUID
+   */
+  static async findByGroupUUID(groupUUID: string): Promise<TRPGGameReport[]> {
+    return TRPGGameReport.findAll({
+      where: {
+        group_uuid: groupUUID,
+      },
+      attributes: ['uuid', 'title', 'group_uuid'],
+    });
+  }
+
+  /**
    * 生成游戏战报
    * @param playerUUID 创建者UUID
    * @param groupUUID 战报所在团的UUID
