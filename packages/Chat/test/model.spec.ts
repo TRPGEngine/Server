@@ -31,7 +31,9 @@ describe('ChatLog', () => {
   test.todo('ChatLog.appendCachedChatLog');
   test.todo('ChatLog.updateCachedChatLog');
 
-  describe('ChatLog.dumpCachedChatLog', () => {
+  describe('ChatLog.dumpCachedChatLog', (
+  
+  ) => {
     test('long message', async () => {
       let longMessage = '';
       for (let i = 0; i < 1000; i++) {
