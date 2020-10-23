@@ -8,6 +8,7 @@ import htmlToText from 'html-to-text';
 import BotOperationLogDefinition from './models/operation-log';
 import BotMsgTokenDefinition from './models/msg-token';
 import msgRouter from './routers/msg';
+import BotAppDefinition from './models/app';
 const debug = Debug('trpg:component:bot');
 
 export default class Bot extends BasePackage {
@@ -20,6 +21,7 @@ export default class Bot extends BasePackage {
     const enable = this.getConfig('bot.enable', false);
     this.regModel(BotOperationLogDefinition);
     this.regModel(BotMsgTokenDefinition);
+    this.regModel(BotAppDefinition);
 
     this.regRoute(msgRouter);
 

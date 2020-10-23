@@ -3737,7 +3737,82 @@
                 }
             },
             "indexes": []
+        },
+        "bot_app": {
+            "tableName": "bot_app",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "uuid": {
+                    "defaultValue": {
+                        "internal": true,
+                        "value": "Sequelize.UUIDV1"
+                    },
+                    "field": "uuid",
+                    "seqType": "Sequelize.UUID"
+                },
+                "key": {
+                    "allowNull": false,
+                    "field": "key",
+                    "seqType": "Sequelize.UUID"
+                },
+                "secret": {
+                    "allowNull": false,
+                    "field": "secret",
+                    "seqType": "Sequelize.STRING"
+                },
+                "desc": {
+                    "field": "desc",
+                    "seqType": "Sequelize.STRING"
+                },
+                "website": {
+                    "field": "website",
+                    "seqType": "Sequelize.STRING"
+                },
+                "usage": {
+                    "field": "usage",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "is_public": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "is_public",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
+                "ip_whitelist": {
+                    "field": "ip_whitelist",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "userId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "userId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
         }
     },
-    "revision": 74
+    "revision": 75
 }
