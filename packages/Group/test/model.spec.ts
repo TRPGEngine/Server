@@ -266,6 +266,8 @@ describe('group model function', () => {
 
     test.todo('GroupGroup.setMemberToManager');
 
+    test.todo('GroupGroup.setManagerToMember');
+
     test.todo('GroupGroup.tickMember');
 
     test('group.getMemberByUUID should be ok', async () => {

@@ -152,59 +152,30 @@ export class Application extends events.EventEmitter {
     this.rateLimiter = createRateLimiterWithTRPGApplication(this);
   }
 
+  /**
+   * 统计信息
+   */
   initStatJob() {
-    const run = () =>
-      this.cache.lockScope(
-        'core:statjob',
-        async () => {
-          applog('start statistics project info...');
-          const record = await CoreSchedulejobRecord.createRecord(
-            'stat-info',
-            'stat'
-          );
-          try {
-            const info: any = {};
-            for (let job of this.statInfoJob) {
-              const name = job.name;
-              const fn = job.fn;
-              const res = await fn();
-              applog('|- [%s]:%o', name, res);
-              if (res) {
-                info[name] = res;
-              }
-            }
-            info._updated = new Date().getTime();
-            await fs.writeJson(
-              path.resolve(process.cwd(), './stat.json'),
-              info,
-              {
-                spaces: 2,
-              }
-            );
-
-            // 记录结果
-            record.completed = true;
-            record.result = JSON.stringify(info);
-            record.save();
-            applog('statistics completed!');
-          } catch (e) {
-            console.error('statistics error:', e);
-            this.error(e);
-
-            // 记录结果
-            record.completed = false;
-            record.result = String(e);
-            record.save();
-          }
-        },
-        {
-          unlockDelay: 2000,
+    this.registerScheduleJob('stat-info', '0 0 2 * * *', async () => {
+      const info: any = {};
+      for (let job of this.statInfoJob) {
+        const name = job.name;
+        const fn = job.fn;
+        const res = await fn();
+        applog('|- [%s]:%o', name, res);
+        if (res) {
+          info[name] = res;
         }
-      );
+      }
+      info._updated = new Date().getTime();
+      await fs.writeJson(path.resolve(process.cwd(), './stat.json'), info, {
+        spaces: 2,
+      });
 
-    // 每天凌晨2点统计一遍
-    this.job = schedule.scheduleJob('0 0 2 * * *', run);
-    // schedule.scheduleJob('1 * * * * *', run); // just for test
+      applog('statistics completed!');
+
+      return JSON.stringify(info);
+    });
   }
 
   initComponents() {

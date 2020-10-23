@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.35.0](https://github.com/TRPGEngine/Server/compare/v1.34.0...v1.35.0) (2020-10-23)
+
+
+### Features
+
+* **dice:** 增加投骰报错抛出 ([b72edba](https://github.com/TRPGEngine/Server/commit/b72edbaa68102af0243bcc8ee06bb1af4bb94fe7))
+* **file:** 增加图片上传接口 ([48daefa](https://github.com/TRPGEngine/Server/commit/48daefa082fa2b41fcbfe1e4e50057aa937aa752))
+* **group:** 增加团成员降级为普通用户的接口 ([2558b69](https://github.com/TRPGEngine/Server/commit/2558b693d6bfd8ebad2e72a1ee2a0225ecaf38e4))
+* **trpg:** 增加获取团战报列表的接口 ([2bcb96d](https://github.com/TRPGEngine/Server/commit/2bcb96dc77ef88e101dfa592f6fcafb2bcc8d288))
+* **trpg:** 战报增加group_uuid字段 ([c4b8d90](https://github.com/TRPGEngine/Server/commit/c4b8d906e2a4116114cab56d0f62cf5fa4a4a5b6))
+
+
+### Bug Fixes
+
+* 修复长文本消息内容无法正常存到数据库的问题 ([34b8e24](https://github.com/TRPGEngine/Server/commit/34b8e2483cc3106ffcd956d836566914bde98c10))
+* **player:** 修复ip解析失败报错会直接报错的bug ([5847498](https://github.com/TRPGEngine/Server/commit/58474986b925df1eb35f9cd20775a24ad853de48))
+
 ## [1.34.0](https://github.com/TRPGEngine/Server/compare/v1.33.0...v1.34.0) (2020-10-13)
 
 

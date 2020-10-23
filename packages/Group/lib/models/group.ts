@@ -544,7 +544,7 @@ export class GroupGroup extends Model {
       throw new Error('您不是团的所有者');
     }
     if (group.managers_uuid.indexOf(memberUUID) >= 0) {
-      // 操作人不是管理
+      // 成员已经是管理员
       throw new Error('该成员已经是团管理员');
     }
     if (!(await group.hasMember(member))) {
@@ -565,6 +565,67 @@ export class GroupGroup extends Model {
         uuid,
         null,
         `团成员 ${member.getName()} 已被提升为团 [${group.name}] 的管理员`
+      );
+    });
+
+    // 通知更新管理员列表
+    notifyUpdateGroupInfo(group.uuid, {
+      managers_uuid: group.managers_uuid,
+    });
+
+    return res;
+  }
+
+  /**
+   * 将某个团管理员降级为成员
+   * @param groupUUID 团UUID
+   * @param memberUUID 成员UUID
+   * @param operatorUserUUID 操作人员UUID
+   */
+  static async setManagerToMember(
+    groupUUID: string,
+    memberUUID: string,
+    operatorUserUUID: string
+  ): Promise<GroupGroup> {
+    if (operatorUserUUID === memberUUID) {
+      throw new Error('你不能将自己变为普通成员');
+    }
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (!group) {
+      throw new Error('找不到团');
+    }
+    const member = await PlayerUser.findByUUID(memberUUID);
+    if (!member) {
+      throw new Error('找不到该成员');
+    }
+    if (group.owner_uuid !== operatorUserUUID) {
+      // 操作人不是管理
+      throw new Error('您不是团的所有者');
+    }
+    if (group.managers_uuid.indexOf(memberUUID) === 0) {
+      // 成员已经是普通用户
+      throw new Error('该成员不是管理员');
+    }
+    if (!(await group.hasMember(member))) {
+      throw new Error('该团没有该成员');
+    }
+
+    const managerUUIDs = new Set(group.managers_uuid);
+    managerUUIDs.delete(memberUUID);
+    group.managers_uuid = Array.from(managerUUIDs);
+    const res: GroupGroup = await group.save();
+
+    // 发通知
+    ChatLog.sendSimpleSystemMsg(
+      memberUUID,
+      null,
+      `您已不再是团 [${group.name}] 的管理员`
+    );
+    group.getManagerUUIDs().forEach((uuid) => {
+      ChatLog.sendSimpleSystemMsg(
+        uuid,
+        null,
+        `团成员 ${member.getName()} 已不再是团 [${group.name}] 的管理员`
       );
     });
 

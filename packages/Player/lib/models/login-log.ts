@@ -82,7 +82,7 @@ export class PlayerLoginLog extends Model {
         // 如果查询结果正确(即返回结果IP)
         return String(info?.addr ?? '').trim();
       } else {
-        throw new Error(info?.err ?? '查询失败');
+        throw new Error(info?.err || '查询失败');
       }
     }
   );

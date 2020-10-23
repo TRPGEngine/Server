@@ -21,6 +21,9 @@ export function upload(fieldName: string): TRPGMiddleware<UploadFileState> {
   const middleware1 = ins.single(fieldName);
   const middleware2: TRPGMiddleware<UploadFileState> = async (ctx, next) => {
     const file: multer.File = _.get(ctx, 'req.file');
+    if (_.isNil(file)) {
+      throw new Error('上传失败, 无法获取文件');
+    }
 
     const ext = _.last(file.originalname.split('.'));
     const filename = `${Date.now()}.${ext}`;

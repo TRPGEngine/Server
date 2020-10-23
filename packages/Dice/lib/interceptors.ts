@@ -85,27 +85,33 @@ export const initInterceptors = _.once(() => {
 
     // .r指令
     if (payload.message.startsWith('.r') === true) {
-      if (payload.message === '.r') {
-        // 一个快捷处理，如果输入内容为.r则直接换成.rd
-        payload.message = '.rd';
-      }
       const rest = payload.message.match(restPattern)[1];
       const arr = rest.split(' ');
-      const diceRequest = arr.shift();
+      let diceRequest = arr.shift();
+      if (diceRequest === '') {
+        // 一个快捷处理，如果输入内容为.r则直接换成.rd
+        diceRequest = 'd';
+      }
       const restStr = arr.join(' ');
 
-      const { str, value } = roll(diceRequest);
-
-      // 无需同步
-      DiceLog.recordDiceLog(diceRequest, str, value, payload);
-
       const senderName = await getSenderName(payload);
-      payload.message = `${senderName} ${
-        hasString(restStr) ? `因 ${restStr} ` : ''
-      }骰出了: ${str}`;
-      payload.type = 'tip';
+      try {
+        const { str, value } = roll(diceRequest);
+        // 无需同步
+        DiceLog.recordDiceLog(diceRequest, str, value, payload);
 
-      return;
+        payload.message = `${senderName} ${
+          hasString(restStr) ? `因 ${restStr} ` : ''
+        }骰出了: ${str}`;
+        payload.type = 'tip';
+        return;
+      } catch (e) {
+        payload.message = `${senderName} 尝试进行投骰[${diceRequest}]失败: ${String(
+          e.message ?? e
+        )}`;
+        payload.type = 'tip';
+        return;
+      }
     }
 
     // .ww指令

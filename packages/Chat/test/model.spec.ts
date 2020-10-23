@@ -31,7 +31,9 @@ describe('ChatLog', () => {
   test.todo('ChatLog.appendCachedChatLog');
   test.todo('ChatLog.updateCachedChatLog');
 
-  describe.only('ChatLog.dumpCachedChatLog', () => {
+  describe('ChatLog.dumpCachedChatLog', (
+  
+  ) => {
     test('long message', async () => {
       let longMessage = '';
       for (let i = 0; i < 1000; i++) {
@@ -92,7 +94,7 @@ describe('chatconverse model', () => {
 });
 
 describe('ChatConverseAck', () => {
-  test.only('ChatConverseAck.setConverseAck should be ok', async () => {
+  test('ChatConverseAck.setConverseAck should be ok', async () => {
     const testUser = await getTestUser();
     const msgUUID = generateChatMsgUUID();
     await ChatConverseAck.setConverseAck(testUser.uuid, testUser.uuid, msgUUID);
