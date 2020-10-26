@@ -3,7 +3,7 @@
  * 用于生产临时的缩略图
  */
 
-const images = require('../../../packages/File/node_modules/images');
+const Jimp = require('../../../packages/File/node_modules/jimp');
 const glob = require('glob');
 const path = require('path');
 const _ = require('lodash');
@@ -19,13 +19,15 @@ const gifList = glob('*.gif', {
 const thumbnailList = _.chunk(gifList, 24).map((l) => _.head(l));
 fs.ensureDirSync(path.resolve(mitaomaoDir, './thumbnail'));
 
-for (const fileName of thumbnailList) {
-  const targetName = _.head(fileName.split('.'));
+(async () => {
+  for (const fileName of thumbnailList) {
+    const targetName = _.head(fileName.split('.'));
 
-  console.log('generate file', targetName);
-  images(path.resolve(mitaomaoDir, fileName))
-    .resize(64, 64)
-    .save(path.resolve(mitaomaoDir, './thumbnail', `${targetName}.png`));
-}
+    console.log('generate file', targetName);
+    const image = await Jimp.read(path.resolve(mitaomaoDir, fileName));
+    image.resize(64, 64);
+    image.write(path.resolve(mitaomaoDir, './thumbnail', `${targetName}.png`));
+  }
 
-console.log('completed!');
+  console.log('completed!');
+})()
