@@ -9,6 +9,7 @@ import BotOperationLogDefinition from './models/operation-log';
 import BotMsgTokenDefinition from './models/msg-token';
 import msgRouter from './routers/msg';
 import BotAppDefinition from './models/app';
+import appRouter from './routers/app';
 const debug = Debug('trpg:component:bot');
 
 export default class Bot extends BasePackage {
@@ -23,12 +24,13 @@ export default class Bot extends BasePackage {
     this.regModel(BotMsgTokenDefinition);
     this.regModel(BotAppDefinition);
 
-    this.regRoute(msgRouter);
-
     if (!enable) {
       debug('无法加载Bot组件: 在配置中已关闭');
       return;
     }
+
+    this.regRoute(msgRouter);
+    this.regRoute(appRouter);
 
     this.initListener();
   }

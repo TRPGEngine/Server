@@ -3766,6 +3766,11 @@
                     "field": "secret",
                     "seqType": "Sequelize.STRING"
                 },
+                "name": {
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
                 "desc": {
                     "field": "desc",
                     "seqType": "Sequelize.STRING"
@@ -3775,6 +3780,9 @@
                     "seqType": "Sequelize.STRING"
                 },
                 "usage": {
+                    "defaultValue": {
+                        "value": 0
+                    },
                     "field": "usage",
                     "seqType": "Sequelize.INTEGER"
                 },
@@ -3814,5 +3822,5 @@
             "indexes": []
         }
     },
-    "revision": 75
+    "revision": 76
 }
