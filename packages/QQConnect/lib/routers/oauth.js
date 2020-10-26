@@ -11,8 +11,6 @@ const GET_USER_INFO_URL = 'https://graph.qq.com/user/get_user_info';
 const router = new Router();
 
 router.get('/login', (ctx, next) => {
-  // let state = Math.random();// 生成一个随机数作为state
-  // ctx.session.qqconnectState = state;
   const config = ctx.QQConnectConfig;
   const apihost = ctx.trpgapp.get('apihost');
   let state = ctx.query.platform || 'web';
@@ -50,12 +48,6 @@ router.get('/callback', async (ctx, next) => {
     ctx.body = '缺少信息, 请重试';
     return;
   }
-
-  // TODO
-  // if(state !== ctx.session.qqconnectState) {
-  //   ctx.body = '会话失效, 请重试';
-  //   return;
-  // }
 
   // 获取access_token
   let accessData = await ctx.trpgapp.request.get(GET_ACCESS_TOKEN_URL, {
