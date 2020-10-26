@@ -47,6 +47,19 @@ gameReportRouter.post('/game-report/create', ssoAuth(), async function (ctx) {
   ctx.body = { uuid: report.uuid };
 });
 
+gameReportRouter.post('/game-report/delete', ssoAuth(), async function (ctx) {
+  const { reportUUID, groupUUID } = ctx.request.body;
+  const player = ctx.state.player;
+
+  if (_.isNil(reportUUID)) {
+    throw new Error('缺少必要字段');
+  }
+
+  await TRPGGameReport.deleteGameReport(reportUUID, player.uuid, groupUUID);
+
+  ctx.body = { result: true };
+});
+
 gameReportRouter.get('/game-report/:reportUUID', async (ctx) => {
   const reportUUID = ctx.params.reportUUID;
 
