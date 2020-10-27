@@ -11,12 +11,13 @@ module.exports = {
       ? true
       : false,
   heapdump: false, // debug 内存
+  redisUrl: process.env.REDIS_URL || 'redis://127.0.0.1:6379/8',
   db: {
-    database: 'trpg',
-    username: 'root',
-    password: '',
+    database: process.env.DB_NAME || 'trpg',
+    username: process.env.DB_USER || 'root',
+    password: process.env.DB_PASS || '',
     options: {
-      host: 'localhost',
+      host: process.env.DB_HOST || 'localhost',
       dialect: 'mysql',
       pool: {
         max: 5,
@@ -68,7 +69,6 @@ module.exports = {
       },
     ],
   },
-  redisUrl: '',
   webserviceHomepage: '/dashboard/home',
   file: {
     storage: 'local', // local, qiniu等
