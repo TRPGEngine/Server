@@ -17,7 +17,7 @@ export const login: EventFunc<{
   platform: Platform;
   isApp: boolean;
   deviceInfo: {};
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -78,15 +78,7 @@ export const login: EventFunc<{
 
     cb({ result: true, info: user.getInfo(true) });
 
-    // 更新登录信息
-    user.last_login = new Date();
-    user.last_ip = ip;
-    await user.save();
-
-    // 添加登录记录
-    await PlayerLoginLog.create({
-      user_uuid: user.uuid,
-      user_name: user.username,
+    await user.recordLoginLog({
       type: isApp ? 'app_standard' : 'standard',
       socket_id: socket.id,
       ip,
@@ -96,7 +88,6 @@ export const login: EventFunc<{
         acceptLanguage: _.get(socket, 'handshake.headers.accept-language'),
         ...deviceInfo,
       },
-      is_success: true,
       token: isApp ? user.app_token : user.token,
     });
   }
@@ -162,15 +153,7 @@ export const loginWithToken: EventFunc<{
 
     cb({ result: true, info: user.getInfo(true) });
 
-    // 更新登录信息
-    user.last_login = new Date();
-    user.last_ip = ip;
-    await user.save();
-
-    // 添加登录记录
-    await db.models.player_login_log.create({
-      user_uuid: user.uuid,
-      user_name: user.username,
+    await user.recordLoginLog({
       type: isApp ? 'app_token' : 'token',
       socket_id: socket.id,
       channel,
@@ -181,7 +164,6 @@ export const loginWithToken: EventFunc<{
         acceptLanguage: _.get(socket, 'handshake.headers.accept-language'),
         ...deviceInfo,
       },
-      is_success: true,
       token: isApp ? user.app_token : user.token,
     });
   }
@@ -532,7 +514,7 @@ export const agreeFriendInvite: EventFunc<{
  */
 export const removeFriendInvite: EventFunc<{
   inviteUUID: string;
-}> = async function(data) {
+}> = async function (data) {
   const app = this.app;
   const socket = this.socket;
 
@@ -575,7 +557,7 @@ export const getFriendsInvite: EventFunc = async function getFriendsInvite(
  */
 export const getFriendInviteDetail: EventFunc<{
   uuid: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);
@@ -678,7 +660,7 @@ export const saveSettings: EventFunc<{
  * 获取用户初始数据
  * 用于减少初始的请求
  */
-export const getUserInitData: EventFunc = async function(data, cb, db) {
+export const getUserInitData: EventFunc = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
