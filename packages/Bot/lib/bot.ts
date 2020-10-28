@@ -10,6 +10,7 @@ import BotMsgTokenDefinition from './models/msg-token';
 import msgRouter from './routers/msg';
 import BotAppDefinition from './models/app';
 import appRouter from './routers/app';
+import { appLogin } from './event';
 const debug = Debug('trpg:component:bot');
 
 export default class Bot extends BasePackage {
@@ -31,6 +32,8 @@ export default class Bot extends BasePackage {
 
     this.regRoute(msgRouter);
     this.regRoute(appRouter);
+
+    this.regSocketEvent('appLogin', appLogin);
 
     this.initListener();
   }

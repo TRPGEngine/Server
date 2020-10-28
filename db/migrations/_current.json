@@ -392,7 +392,7 @@
                     "required": true,
                     "allowNull": false,
                     "field": "type",
-                    "seqType": "Sequelize.ENUM('standard', 'token', 'app_standard', 'app_token')"
+                    "seqType": "Sequelize.ENUM('standard', 'token', 'app_standard', 'app_token', 'internal')"
                 },
                 "channel": {
                     "field": "channel",
@@ -3822,5 +3822,5 @@
             "indexes": []
         }
     },
-    "revision": 76
+    "revision": 77
 }

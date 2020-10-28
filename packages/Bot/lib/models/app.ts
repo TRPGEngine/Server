@@ -64,6 +64,8 @@ export class BotApp extends Model {
     }
 
     const appUser = await PlayerUser.registerUser(name, secret, ip);
+    appUser.role = 'bot';
+    await appUser.save();
 
     const app = await BotApp.create({
       uuid,
@@ -77,6 +79,34 @@ export class BotApp extends Model {
     });
 
     return app;
+  }
+
+  /**
+   * 机器人应用登录
+   * @param appKey 应用key
+   * @param appSecret 秘钥
+   */
+  static async findAppUser(
+    appKey: string,
+    appSecret: string
+  ): Promise<PlayerUser> {
+    const botApp = await BotApp.findByKey(appKey);
+    if (_.isNil(botApp)) {
+      throw new Error('找不到应用, 请检查appkey');
+    }
+
+    if (botApp.secret !== appSecret) {
+      throw new Error('应用秘钥不正确');
+    }
+
+    const userId = botApp.userId;
+    if (_.isNil(userId)) {
+      throw new Error('找不到关联用户, 请联系管理员');
+    }
+
+    const user = await PlayerUser.findByPk(userId);
+
+    return user;
   }
 }
 

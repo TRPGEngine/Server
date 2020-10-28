@@ -1,4 +1,4 @@
-export type Platform = 'web' | 'app';
+export type Platform = 'web' | 'app' | 'cli';
 
 export interface PlayerJWTPayload {
   uuid: string;

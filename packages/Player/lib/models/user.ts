@@ -14,6 +14,7 @@ import { fn, col } from 'sequelize';
 import {
   PlayerJWTPayload,
   PlayerInfoObject,
+  Platform,
 } from 'packages/Player/types/player';
 import Debug from 'debug';
 import { NoReportError } from 'lib/error';
@@ -22,16 +23,17 @@ import {
   RateLimiter,
 } from 'packages/Core/lib/utils/rate-limit';
 import { PlayerLoginLog } from './login-log';
+import { PlayerLoginLogType } from 'packages/Player/types/login-log';
 const debug = Debug('trpg:component:player:model');
 
 interface RecordLoginLogInfo {
   ip: string;
-  type: string;
+  type: PlayerLoginLogType;
   socket_id: string;
   channel?: string;
-  platform: string;
+  platform: Platform;
   device_info: object;
-  token: string;
+  token?: string;
 }
 
 // 阵营九宫格
