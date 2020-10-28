@@ -16,6 +16,7 @@ export class BotApp extends Model {
   ip_whitelist: string; // ip列表白名单, 用逗号分隔
   usage: number; // 被使用次数, 发起邀请并同意则视为使用了一次。自增1
 
+  ownerId: number; // 拥有者用户id
   userId: number; // 相关用户的id
 
   /**
@@ -45,7 +46,7 @@ export class BotApp extends Model {
     website: string = '',
     ip_whitelist: string = ''
   ): Promise<BotApp> {
-    const user = PlayerUser.findByUUID(userUUID);
+    const user = await PlayerUser.findByUUID(userUUID);
     if (_.isNil(user)) {
       throw new Error('找不到创建用户信息');
     }
@@ -54,7 +55,7 @@ export class BotApp extends Model {
     const key = md5Encrypt(userUUID + uuid);
     const secret = sha1Encrypt(userUUID + Math.random() + uuid);
 
-    const isExist = BotApp.findOne({
+    const isExist = await BotApp.findOne({
       where: {
         name,
       },
@@ -76,6 +77,7 @@ export class BotApp extends Model {
       website,
       ip_whitelist,
       userId: appUser.id,
+      ownerId: user.id,
     });
 
     return app;
@@ -123,12 +125,32 @@ export default function BotAppDefinition(Sequelize: Orm, db: DBInstance) {
       is_public: { type: Sequelize.BOOLEAN, defaultValue: false },
       ip_whitelist: { type: Sequelize.STRING },
     },
-    { tableName: 'bot_app', sequelize: db }
+    {
+      tableName: 'bot_app',
+      sequelize: db,
+      hooks: {
+        async afterDestroy(botApp, options) {
+          const userId = botApp.userId;
+          await PlayerUser.destroy({
+            where: {
+              id: userId,
+            },
+            force: options.force,
+            limit: 1,
+          });
+        },
+      },
+    }
   );
 
   BotApp.belongsTo(PlayerUser, {
     foreignKey: 'userId',
     as: 'user',
+  });
+
+  BotApp.belongsTo(PlayerUser, {
+    foreignKey: 'ownerId',
+    as: 'owner',
   });
 
   return BotApp;

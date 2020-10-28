@@ -3817,10 +3817,21 @@
                     "onUpdate": "CASCADE",
                     "field": "userId",
                     "seqType": "Sequelize.INTEGER"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
                 }
             },
             "indexes": []
         }
     },
-    "revision": 77
+    "revision": 78
 }

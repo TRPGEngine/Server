@@ -2,12 +2,24 @@ import { createTestGroup } from 'packages/Group/test/example';
 import { getTestUser } from 'packages/Player/test/example';
 import { buildAppContext } from 'test/utils/app';
 import { regAutoClear } from 'test/utils/example';
+import { BotApp } from '../lib/models/app';
 import { BotMsgToken } from '../lib/models/msg-token';
-import { createTestBotMsgToken } from './example';
+import { createTestBotApp, createTestBotMsgToken } from './example';
 
 const context = buildAppContext();
-
 regAutoClear();
+
+describe('BotApp', () => {
+  test('BotApp.findAppUser should be ok', async () => {
+    const testUser = await getTestUser();
+    const testBotApp = await createTestBotApp();
+
+    const user = await BotApp.findAppUser(testBotApp.key, testBotApp.secret);
+
+    expect(user.id).toBe(testBotApp.userId);
+    expect(testUser.id).toBe(testBotApp.ownerId);
+  });
+});
 
 describe('BotMsgToken', () => {
   test('BotMsgToken.createMsgToken should be ok', async () => {
