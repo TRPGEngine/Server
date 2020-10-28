@@ -14,7 +14,7 @@
     "db:migrate:generate": "node ./cli.js generate-migrate",
     "db:migrate:run": "node ./cli.js run-migrate",
     "db:seeder:generate": "node ./cli.js generate-seeder",
-    "db:seeder:run": "node ./cli.js run-seeder",
+    "db:seeder:run": "cross-env TRPG_PORT=23666 node ./cli.js run-seeder",
     "docker:dev:build": "docker build . --tag trpg-server:dev",
     "docker:dev:shell": "docker run -it --rm --name=\"trpg-dev\" trpg-server:dev bash",
     "doc:start": "cd ./packages/Website && npm start",
