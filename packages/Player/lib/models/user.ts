@@ -335,6 +335,7 @@ export class PlayerUser extends Model {
       sex: this.sex,
       sign: this.sign,
       alignment: this.alignment,
+      role: this.role,
       createAt: this.createdAt,
     };
   }

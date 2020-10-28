@@ -17,7 +17,7 @@ export const appLogin: EventFunc<{
 
   const { appKey, appSecret, deviceInfo } = data;
 
-  const user = await BotApp.findAppUser(appKey, appSecret);
+  const { bot, user } = await BotApp.findAppUser(appKey, appSecret);
   if (user.banned === true) {
     throw new Error('您已被封禁');
   }
@@ -34,7 +34,11 @@ export const appLogin: EventFunc<{
 
   await autoJoinSocketRoom(app, socket);
 
-  cb({ result: true, info: user.getInfo(true) });
+  cb({
+    result: true,
+    bot: bot,
+    user: user.getInfo(true),
+  });
 
   const ip = getSocketIp(socket);
   await user.recordLoginLog({

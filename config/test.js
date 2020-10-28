@@ -13,4 +13,11 @@ module.exports = {
   report: {
     enable: false,
   },
+  rateLimit: {
+    register: {
+      // 方便测试
+      points: 99999999,
+      duration: 1
+    },
+  },
 };

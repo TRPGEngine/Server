@@ -18,5 +18,6 @@ export interface PlayerInfoObject {
   sex: string;
   sign: string;
   alignment: string;
+  role: string;
   createAt: Date;
 }

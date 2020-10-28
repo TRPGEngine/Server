@@ -91,7 +91,10 @@ export class BotApp extends Model {
   static async findAppUser(
     appKey: string,
     appSecret: string
-  ): Promise<PlayerUser> {
+  ): Promise<{
+    bot: BotApp;
+    user: PlayerUser;
+  }> {
     const botApp = await BotApp.findByKey(appKey);
     if (_.isNil(botApp)) {
       throw new Error('找不到应用, 请检查appkey');
@@ -108,7 +111,7 @@ export class BotApp extends Model {
 
     const user = await PlayerUser.findByPk(userId);
 
-    return user;
+    return { bot: botApp, user };
   }
 }
 

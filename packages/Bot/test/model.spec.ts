@@ -14,10 +14,14 @@ describe('BotApp', () => {
     const testUser = await getTestUser();
     const testBotApp = await createTestBotApp();
 
-    const user = await BotApp.findAppUser(testBotApp.key, testBotApp.secret);
+    const { user, bot } = await BotApp.findAppUser(
+      testBotApp.key,
+      testBotApp.secret
+    );
 
     expect(user.id).toBe(testBotApp.userId);
     expect(testUser.id).toBe(testBotApp.ownerId);
+    expect(bot.uuid).toBe(testBotApp.uuid);
   });
 });
 
