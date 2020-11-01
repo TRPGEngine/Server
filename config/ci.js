@@ -17,4 +17,7 @@ module.exports = {
   jwt: {
     secret: 'circle-ci-jwt-secret',
   },
+  bot: {
+    enable: true,
+  },
 };
