@@ -22,15 +22,18 @@ export function regMsgInterceptor(interceptor: InterceptorFn) {
 /**
  * 应用消息拦截器
  */
-export async function applyMsgInterceptors<T = ChatMessagePartial>(
-  messagePayload: T
-): Promise<T> {
+export async function applyMsgInterceptors<
+  T extends ChatMessagePartial = ChatMessagePartial
+>(messagePayload: T): Promise<T> {
   const context = { payload: { ...messagePayload } };
   for (const interceptor of msgInterceptorList) {
     try {
       _.isFunction(interceptor) && (await interceptor(context));
     } catch (e) {
-      getGlobalApplication().error(e);
+      getGlobalApplication().errorWithContext(e, {
+        message: context.payload.message,
+        context,
+      });
     }
   }
 
