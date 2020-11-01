@@ -20,4 +20,7 @@ module.exports = {
       duration: 1
     },
   },
+  bot: {
+    enable: true,
+  },
 };
