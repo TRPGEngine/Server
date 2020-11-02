@@ -70,9 +70,10 @@ const applog = (formatter: string, ...args: any[]) => {
   appLogger.info(formatter, ...args);
 };
 
-const ioOpts = {
+const ioOpts: IO.ServerOptions = {
   pingInterval: 20000, // default: 25000
   pingTimeout: 40000, // default: 60000
+  transports: ['websocket'],
 };
 
 // socket.io 服务
