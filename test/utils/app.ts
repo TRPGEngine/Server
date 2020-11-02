@@ -76,12 +76,15 @@ export const buildAppContext = (): TRPGAppInstanceContext => {
     context.db = app.storage.db;
 
     // 创建socket客户端连接
-    const socket = io(`ws://127.0.0.1:${port}`, { autoConnect: false });
+    const socket = io(`ws://127.0.0.1:${port}`, {
+      autoConnect: false,
+      transports: ['websocket'],
+    });
     socket.open();
     const emitEvent = (eventName: string, data?: {}) => {
       // 发送信息测试
       return new Promise((resolve) => {
-        socket.emit(eventName, data, function(_res) {
+        socket.emit(eventName, data, function (_res) {
           resolve(_res);
         });
       });
