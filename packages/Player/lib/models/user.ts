@@ -14,6 +14,7 @@ import { fn, col } from 'sequelize';
 import {
   PlayerJWTPayload,
   PlayerInfoObject,
+  Platform,
 } from 'packages/Player/types/player';
 import Debug from 'debug';
 import { NoReportError } from 'lib/error';
@@ -21,7 +22,19 @@ import {
   createRateLimiterWithTRPGApplication,
   RateLimiter,
 } from 'packages/Core/lib/utils/rate-limit';
+import { PlayerLoginLog } from './login-log';
+import { PlayerLoginLogType } from 'packages/Player/types/login-log';
 const debug = Debug('trpg:component:player:model');
+
+interface RecordLoginLogInfo {
+  ip: string;
+  type: PlayerLoginLogType;
+  socket_id: string;
+  channel?: string;
+  platform: Platform;
+  device_info: object;
+  token?: string;
+}
 
 // 阵营九宫格
 export type Alignment =
@@ -322,6 +335,7 @@ export class PlayerUser extends Model {
       sex: this.sex,
       sign: this.sign,
       alignment: this.alignment,
+      role: this.role,
       createAt: this.createdAt,
     };
   }
@@ -341,6 +355,40 @@ export class PlayerUser extends Model {
     delete data.app_token;
 
     return Object.assign(this, data);
+  }
+
+  /**
+   * 记录登录
+   */
+  async recordLoginLog({
+    ip,
+    type,
+    socket_id,
+    channel,
+    platform,
+    device_info,
+    token,
+  }: RecordLoginLogInfo) {
+    const user = this;
+
+    // 更新登录信息
+    user.last_login = new Date();
+    user.last_ip = ip;
+    await user.save();
+
+    // 添加登录记录
+    await PlayerLoginLog.create({
+      user_uuid: user.uuid,
+      user_name: user.username,
+      type,
+      socket_id,
+      channel,
+      ip,
+      platform,
+      device_info,
+      is_success: true,
+      token,
+    });
   }
 }
 
@@ -419,7 +467,7 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
         },
       },
       hooks: {
-        beforeSave: function(user, options) {
+        beforeSave: function (user, options) {
           if (typeof user.last_login === 'string') {
             user.last_login = new Date(user.last_login);
           }

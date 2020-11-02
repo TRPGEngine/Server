@@ -1,8 +1,22 @@
+import { BotApp } from 'packages/Bot/lib/models/app';
 import { BotMsgToken } from 'packages/Bot/lib/models/msg-token';
 import { GroupGroup } from 'packages/Group/lib/models/group';
 import { getTestUser } from 'packages/Player/test/example';
 import testExampleStack from 'test/utils/example';
 import { generateRandomStr } from 'test/utils/utils';
+
+/**
+ * 创建一个测试机器人应用
+ */
+export async function createTestBotApp(): Promise<BotApp> {
+  const testUser = await getTestUser();
+  const name = generateRandomStr();
+  const bot = await BotApp.createBotApp(testUser.uuid, '127.0.0.1', name);
+
+  testExampleStack.append(bot);
+
+  return bot;
+}
 
 /**
  * 创建一个测试的简易消息机器人

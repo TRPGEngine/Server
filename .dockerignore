@@ -4,6 +4,7 @@ services/**/node_modules
 public/
 logs/
 config/local.js
+services/
 
 npm-debug.log
 Dockerfile*

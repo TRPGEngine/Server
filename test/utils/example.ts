@@ -17,7 +17,7 @@ class TestExampleStack {
 
   async gc(): Promise<void> {
     debug('回收 %d 条测试数据...', this.stack.length);
-    Promise.all(
+    return Promise.all(
       this.stack.map((model) =>
         model
           .destroy({ force: true })

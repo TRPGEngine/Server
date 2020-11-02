@@ -1,4 +1,4 @@
-export type Platform = 'web' | 'app';
+export type Platform = 'web' | 'app' | 'cli';
 
 export interface PlayerJWTPayload {
   uuid: string;
@@ -18,5 +18,6 @@ export interface PlayerInfoObject {
   sex: string;
   sign: string;
   alignment: string;
+  role: string;
   createAt: Date;
 }

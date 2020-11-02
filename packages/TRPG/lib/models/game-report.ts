@@ -5,6 +5,8 @@ import {
   BelongsToManyGetAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
+import { GroupGroup } from 'packages/Group/lib/models/group';
+import _ from 'lodash';
 
 /**
  * 战报汇总
@@ -58,6 +60,19 @@ export class TRPGGameReport extends Model {
     content: {}
   ): Promise<TRPGGameReport> {
     const user = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(user)) {
+      throw new Error('找不到用户');
+    }
+
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(user)) {
+      throw new Error('找不到团');
+    }
+
+    if (!group.isManagerOrOwner(playerUUID)) {
+      throw new Error('创建战报失败, 没有权限。');
+    }
+
     const report = await TRPGGameReport.create({
       title,
       cast,
@@ -67,6 +82,40 @@ export class TRPGGameReport extends Model {
     });
 
     return report;
+  }
+
+  /**
+   * 删除团战报
+   * @param reportUUID 战报UUID
+   * @param playerUUID 操作人UUID
+   * @param groupUUID 操作的团的UUID
+   */
+  static async deleteGameReport(
+    reportUUID: string,
+    playerUUID: string,
+    groupUUID: string
+  ) {
+    const user = await PlayerUser.findByUUID(playerUUID);
+    if (_.isNil(user)) {
+      throw new Error('找不到用户');
+    }
+
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(user)) {
+      throw new Error('找不到团');
+    }
+
+    if (!group.isManagerOrOwner(playerUUID)) {
+      throw new Error('删除战报失败, 没有权限。');
+    }
+
+    await TRPGGameReport.destroy({
+      where: {
+        uuid: reportUUID,
+        group_uuid: groupUUID,
+      },
+      limit: 1,
+    });
   }
 }
 

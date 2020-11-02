@@ -2,6 +2,7 @@ import { Orm, DBInstance, Model } from 'trpg/core';
 import { PlayerLoginLogType } from 'packages/Player/types/login-log';
 import memoizeOne from 'memoize-one';
 import iconv from 'iconv-lite';
+import { Platform } from 'packages/Player/types/player';
 
 export class PlayerLoginLog extends Model {
   id: number;
@@ -12,7 +13,7 @@ export class PlayerLoginLog extends Model {
   socket_id: string;
   ip: string;
   ip_address: string;
-  platform: string;
+  platform: Platform;
   device_info: object;
   is_success: boolean;
   token: string;
@@ -97,7 +98,13 @@ export default function PlayerLoginLogDefinition(
       user_uuid: { type: Sequelize.STRING },
       user_name: { type: Sequelize.STRING },
       type: {
-        type: Sequelize.ENUM('standard', 'token', 'app_standard', 'app_token'),
+        type: Sequelize.ENUM(
+          'standard',
+          'token',
+          'app_standard',
+          'app_token',
+          'internal'
+        ),
         required: true,
       },
       channel: { type: Sequelize.STRING },

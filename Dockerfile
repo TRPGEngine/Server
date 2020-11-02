@@ -1,6 +1,4 @@
-# FROM node:8.11-alpine
-# 因为node-image 不支持linux_musl 因此只能使用完整linux环境
-FROM node:8.11
+FROM node:10.19.0-alpine
 
 LABEL maintainer=moonrailgun
 LABEL description="TRPG Engine Docker Image"
@@ -10,24 +8,35 @@ WORKDIR /usr/src/app
 # 更新到最新版本的npm
 RUN npm install -g npm@latest
 
-# RUN echo "https://mirror.tuna.tsinghua.edu.cn/alpine/v3.4/main/" > /etc/apk/repositories
+RUN echo "https://mirror.tuna.tsinghua.edu.cn/alpine/v3.4/main/" > /etc/apk/repositories
+RUN echo "http://mirrors.aliyun.com/alpine/v3.8/main/" >> /etc/apk/repositories
+RUN echo "http://mirrors.aliyun.com/alpine/v3.8/community/" >> /etc/apk/repositories
 
 # 安装Bash
-# RUN apk update \
-#     && apk upgrade \
-#     && apk add --no-cache bash \
-#       bash-doc \
-#       bash-completion \
-#     && rm -rf /var/cache/apk/* \
-#     && /bin/bash
+RUN apk update \
+    && apk upgrade \
+    && apk add --no-cache bash \
+      bash-doc \
+      bash-completion \
+    && rm -rf /var/cache/apk/* \
+    && /bin/bash
+
+# 安装Python
+RUN apk add --no-cache python2
 
 # 安装git
-# RUN apk add --no-cache git
+RUN apk add --no-cache git
+
+# 安装gcc
+RUN apk add make
+RUN apk add gcc musl-dev g++ zlib-dev
+
 
 # node_module cache
 COPY package.json package-lock.json ./
 COPY packages/foreach.sh ./packages/
 COPY packages/Actor/package.json packages/Actor/package-lock.json ./packages/Actor/
+COPY packages/Bot/package.json packages/Bot/package-lock.json ./packages/Bot/
 COPY packages/Chat/package.json packages/Chat/package-lock.json ./packages/Chat/
 COPY packages/ChatEmotion/package.json packages/ChatEmotion/package-lock.json ./packages/ChatEmotion/
 COPY packages/Core/package.json packages/Core/package-lock.json ./packages/Core/
@@ -45,6 +54,7 @@ COPY packages/Notify/package.json packages/Notify/package-lock.json ./packages/N
 COPY packages/Player/package.json packages/Player/package-lock.json ./packages/Player/
 COPY packages/QQConnect/package.json packages/QQConnect/package-lock.json ./packages/QQConnect/
 COPY packages/Report/package.json packages/Report/package-lock.json ./packages/Report/
+COPY packages/TRPG/package.json packages/TRPG/package-lock.json ./packages/TRPG/
 
 RUN npm install && npm run packages:install
 
