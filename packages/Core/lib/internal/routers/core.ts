@@ -1,3 +1,4 @@
+import os from 'os';
 import fs from 'fs-extra';
 import path from 'path';
 import _ from 'lodash';
@@ -35,12 +36,14 @@ const getServerInfo = memoizeOne(
 router.get('/health', async (ctx) => {
   const serverInfo = await getServerInfo();
   const trpgapp = ctx.trpgapp;
+  const hostname = os.hostname();
 
   ctx.body = {
     version: _.get(serverInfo, 'packageConf.version', ''),
     hash: _.get(serverInfo, 'gitVersion', ''),
     env: trpgapp.get('env'),
     components: trpgapp.installedPackages,
+    hostname,
   };
 });
 

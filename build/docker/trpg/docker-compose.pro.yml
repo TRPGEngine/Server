@@ -9,6 +9,8 @@ services:
       - 23256:23256
     volumes:
       - ./config/local.dev.js:/usr/src/app/config/local.js:ro
+    deploy:
+      replicas: 2
     depends_on:
       - mysql
       - redis
