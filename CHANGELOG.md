@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.36.0](https://github.com/TRPGEngine/Server/compare/v1.35.0...v1.36.0) (2020-11-02)
+
+
+### Features
+
+* **bot:** 增加机器人应用的创建 ([2559b1c](https://github.com/TRPGEngine/Server/commit/2559b1c2988cc96b769af4f7d958818b9de19fc6))
+* **bot:** 机器人应用登录 ([4ce549b](https://github.com/TRPGEngine/Server/commit/4ce549b3b75854ebf3a326624a9bae4a92fb5f5b))
+* **trpg:** 增加战报删除的接口 ([1abbf09](https://github.com/TRPGEngine/Server/commit/1abbf094a5a57ea4c4a82a30e469b92b52151aae))
+
+
+### Bug Fixes
+
+* 修复长文本消息内容无法正常存到数据库的问题 ([8ba9185](https://github.com/TRPGEngine/Server/commit/8ba9185a4ba27153b1dc89271ba9901f52f6252d))
+
 ## [1.35.0](https://github.com/TRPGEngine/Server/compare/v1.34.0...v1.35.0) (2020-10-23)
 
 
