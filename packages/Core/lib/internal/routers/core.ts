@@ -4,6 +4,7 @@ import path from 'path';
 import _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import { TRPGRouter } from 'trpg/core';
+import { checkDBLink, checkRedisLink } from '../../utils/net-helper';
 const router = new TRPGRouter();
 
 const rootDir = path.resolve(__dirname, '../../../../../');
@@ -44,6 +45,27 @@ router.get('/health', async (ctx) => {
     env: trpgapp.get('env'),
     components: trpgapp.installedPackages,
     hostname,
+  };
+});
+
+/**
+ * 检查依赖联通
+ */
+router.get('/dependServiceCheck', async (ctx) => {
+  const hostname = os.hostname();
+
+  const isDBAvailable = await checkDBLink()
+    .then(() => true)
+    .catch(() => false);
+
+  const isRedisAvailable = await checkRedisLink()
+    .then(() => true)
+    .catch(() => false);
+
+  ctx.body = {
+    hostname,
+    isDBAvailable,
+    isRedisAvailable,
   };
 });
 
