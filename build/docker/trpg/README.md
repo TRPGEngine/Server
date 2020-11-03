@@ -11,12 +11,14 @@ docker-compose -f docker-compose.env.yml -f ./docker-compose.dev.yml up -d
 
 ## 首次运行
 
+**注意: 以下操作至少需要2G内存**
+
 ```bash
 # 生成数据库
-docker-compose -f docker-compose.env.yml -f ./docker-compose.dev.yml exec -- trpg-server npm run db:migrate:run
+docker-compose -f docker-compose.env.yml -f ./docker-compose.dev.yml exec trpg-server npm run db:migrate:run
 
 # 生成默认数据
-docker-compose -f docker-compose.env.yml -f ./docker-compose.dev.yml exec -- trpg-server npm run db:seeder:run
+docker-compose -f docker-compose.env.yml -f ./docker-compose.dev.yml exec trpg-server npm run db:seeder:run
 ```
 
 ## 生产环境部署
@@ -33,4 +35,31 @@ docker stack deploy -c docker-compose.env.yml -c docker-compose.pro.yml trpg_eng
 
 #### 如果有现有数据库
 
-TODO
+##### 第一步: 创建overlay类型的网络
+
+```bash
+docker network create -d overlay --attachable trpg_swarm
+```
+
+`--attachable` 表示可以被独立容器连接
+
+##### 第二步: 将已有数据库容器连接到刚刚创建的网络
+
+```bash
+docker network connect trpg_swarm [trpg_mysql_1]
+docker network connect trpg_swarm [trpg_redis_1]
+```
+
+##### 第三步: 编辑配置并启动服务
+
+修改配置文件
+```
+db.options.host => trpg_mysql_1
+
+redisUrl => redis://trpg_redis_1:6379/8
+```
+
+```bash
+docker stack deploy -c docker-compose.pro.yml trpg_engine
+docker service update --network-add trpg_swarm trpg_engine_trpg-server
+```

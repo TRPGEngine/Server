@@ -13,3 +13,6 @@ test/coverage
 test/reports
 .idea/
 .DS_Store
+
+build/docker/trpg/config/local.js
+build/docker/trpg/mysql
