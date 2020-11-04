@@ -5,7 +5,9 @@ import _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import { TRPGRouter } from 'trpg/core';
 import { checkDBLink, checkRedisLink } from '../../utils/net-helper';
+
 const router = new TRPGRouter();
+const hostname = os.hostname();
 
 const rootDir = path.resolve(__dirname, '../../../../../');
 
@@ -37,7 +39,6 @@ const getServerInfo = memoizeOne(
 router.get('/health', async (ctx) => {
   const serverInfo = await getServerInfo();
   const trpgapp = ctx.trpgapp;
-  const hostname = os.hostname();
 
   ctx.body = {
     version: _.get(serverInfo, 'packageConf.version', ''),
