@@ -53,8 +53,6 @@ router.get('/health', async (ctx) => {
  * 检查依赖联通
  */
 router.get('/dependServiceCheck', async (ctx) => {
-  const hostname = os.hostname();
-
   const isDBAvailable = await checkDBLink()
     .then(() => true)
     .catch(() => false);

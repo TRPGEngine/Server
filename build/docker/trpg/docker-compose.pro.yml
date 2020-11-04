@@ -9,6 +9,8 @@ services:
       - 23256:23256
     volumes:
       - ./config/local.js:/usr/src/app/config/local.js:ro
+    networks:
+      - trpg_swarm
     deploy:
       replicas: 2
       restart_policy:
@@ -22,3 +24,7 @@ services:
     links:
       - mysql
       - redis
+
+networks:
+  trpg_swarm:
+    external: true
