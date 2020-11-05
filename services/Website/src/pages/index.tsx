@@ -20,6 +20,12 @@ const features = [
       '在过去的几年中，长久保持高活跃度的开发进行与产品迭代。争取为用户提供最好的体验',
   },
   {
+    title: '拥抱开源',
+    imageUrl: 'img/undraw_open_source.svg',
+    description:
+      'TRPG Engine拥抱开源与变化。你所看到的一切都是开放的！随时接受社区的监督',
+  },
+  {
     title: '便捷',
     imageUrl: 'img/undraw_note_list.svg',
     description:
@@ -31,10 +37,21 @@ const features = [
     description: '不论你在哪，都能和天南海北的伙伴一起享受跑团的乐趣',
   },
   {
+    title: '记录历程',
+    imageUrl: 'img/undraw_Personal_notebook_re_d7dc.svg',
+    description: '优秀的跑团玩家会记录跑团中的一切，好记性不如烂笔头',
+  },
+  {
+    title: '配置自定义',
+    imageUrl: 'img/undraw_personal_settings_kihd.svg',
+    description:
+      'TRPG Engine提供了足够的自定义空间以供玩家来自定义自己的跑团空间',
+  },
+  {
     title: '高度可定制',
     imageUrl: 'img/undraw_code_review.svg',
     description:
-      '创建自己的脚本，人物。 搭建自己专属的团。你能想到的。我们都会为你提供！',
+      '创建自己的脚本，人物。 搭建自己独属于自己专属的团，或者用其他人现成的模板。你能想到的。我们都会为你提供！',
   },
   // {
   //   title: '更多特性',
@@ -87,7 +104,7 @@ function HomeSplash(props) {
             )}
             to="https://trpg.moonrailgun.com/portal/deploy"
           >
-            下载移动版
+            旧版移动端(兼容)
           </Link>
 
           <Link
