@@ -1,7 +1,7 @@
-import { getObjectLeaf } from '../object-helper';
+import { getObjectLeafs } from '../object-helper';
 
 describe('object-helper', () => {
-  describe('getObjectLeaf', () => {
+  describe('getObjectLeafs', () => {
     test.each([
       [
         {
@@ -83,7 +83,7 @@ describe('object-helper', () => {
         ],
       ],
     ])('%o => %p', (input, output: any) => {
-      const leafs = getObjectLeaf(input);
+      const leafs = getObjectLeafs(input);
 
       expect(leafs).toMatchObject(output);
     });
