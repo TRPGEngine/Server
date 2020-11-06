@@ -7,4 +7,7 @@ module.exports = {
     },
   },
   redisUrl: 'redis://redis:6379/8',
+  jwt: {
+    secret: "please_change_it!",
+  },
 };
