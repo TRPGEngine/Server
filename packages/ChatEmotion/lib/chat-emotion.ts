@@ -3,8 +3,9 @@ import fs from 'fs-extra';
 import ChatEmotionItemDefinition from './models/item';
 import ChatEmotionCatalogDefinition from './models/catalog';
 import ChatEmotionSecretSignalDefinition from './models/secret-signal';
-import EmotionRouter from './routers/emotion';
-import UsermapRouter from './routers/usermap';
+import emotionRouter from './routers/emotion';
+import usermapRouter from './routers/usermap';
+import searchRouter from './routers/search';
 import { emotionsDir } from './constant';
 import { getUserEmotionCatalog, addUserEmotionWithSecretSignal } from './event';
 
@@ -21,8 +22,9 @@ export default class ChatEmotion extends BasePackage {
     this.regModel(ChatEmotionSecretSignalDefinition);
 
     // 注册路由组件
-    this.regRoute(EmotionRouter);
-    this.regRoute(UsermapRouter);
+    this.regRoute(emotionRouter);
+    this.regRoute(usermapRouter);
+    this.regRoute(searchRouter);
 
     // 注册socket事件
     this.regSocketEvent('getUserEmotionCatalog', getUserEmotionCatalog);
