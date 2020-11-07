@@ -1,4 +1,4 @@
-const { getBinPath, exec } = require('../utils');
+const { getBinPath, exec } = require('./utils');
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 const config = require('config');

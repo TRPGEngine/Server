@@ -5,6 +5,7 @@ public/
 logs/
 config/local.js
 services/
+build/docker/trpg/
 
 npm-debug.log
 Dockerfile*

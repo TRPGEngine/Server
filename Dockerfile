@@ -33,7 +33,6 @@ RUN apk add gcc musl-dev g++ zlib-dev
 
 
 # node_module cache
-COPY package.json package-lock.json ./
 COPY packages/foreach.sh ./packages/
 COPY packages/Actor/package.json packages/Actor/package-lock.json ./packages/Actor/
 COPY packages/Bot/package.json packages/Bot/package-lock.json ./packages/Bot/
@@ -55,8 +54,11 @@ COPY packages/Player/package.json packages/Player/package-lock.json ./packages/P
 COPY packages/QQConnect/package.json packages/QQConnect/package-lock.json ./packages/QQConnect/
 COPY packages/Report/package.json packages/Report/package-lock.json ./packages/Report/
 COPY packages/TRPG/package.json packages/TRPG/package-lock.json ./packages/TRPG/
+RUN npm run packages:ci
 
-RUN npm install && npm run packages:install
+# 先安装子模块的依赖再安装外部依赖。因为每次升级外部package.json必然会丢失缓存
+COPY package.json package-lock.json ./
+RUN npm install
 
 COPY . .
 # 再更新一遍防止上面没有缓存的包

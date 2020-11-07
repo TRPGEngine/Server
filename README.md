@@ -17,7 +17,7 @@
 ## 配置代码依赖
 ```bash
 # 安装所有环境
-$ npm install && npm run packages:install
+$ npm install && npm run packages:ci
 ```
 
 ## 配置数据库

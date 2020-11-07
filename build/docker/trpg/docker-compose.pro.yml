@@ -2,16 +2,29 @@ version: '3'
 
 services:
   trpg-server:
-    image: trpg-server
+    image: moonrailgun/trpg-server:latest
     environment:
       NODE_ENV: production
     ports:
       - 23256:23256
     volumes:
-      - ./config/local.dev.js:/usr/src/app/config/local.js:ro
+      - ./config/local.js:/usr/src/app/config/local.js:ro
+    networks:
+      - trpg_swarm
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+      labels:
+        - "com.docker.lb.sticky_session_cookie=session"
     depends_on:
       - mysql
       - redis
     links:
       - mysql
       - redis
+
+networks:
+  trpg_swarm:
+    external: true

@@ -2647,7 +2647,7 @@
                     "required": true,
                     "allowNull": false,
                     "field": "message",
-                    "seqType": "Sequelize.STRING"
+                    "seqType": "Sequelize.TEXT"
                 },
                 "stack": {
                     "required": true,
@@ -3833,5 +3833,5 @@
             "indexes": []
         }
     },
-    "revision": 78
+    "revision": 79
 }

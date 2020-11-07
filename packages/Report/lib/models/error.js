@@ -3,7 +3,7 @@ module.exports = function ReportError(Sequelize, db) {
     ip: { type: Sequelize.STRING, required: true },
     ua: { type: Sequelize.TEXT },
     version: { type: Sequelize.STRING },
-    message: { type: Sequelize.STRING, required: true },
+    message: { type: Sequelize.TEXT, required: true },
     stack: { type: Sequelize.TEXT, required: true },
   });
 

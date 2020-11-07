@@ -16,7 +16,7 @@ const exec = (file, args, options) => {
 
 const yargs = require('yargs');
 yargs
-  .commandDir('build/commands', { recurse: true })
+  .commandDir('build/commands')
   // 代码补全
   .completion('completion', function(current, argv) {
     // 'current' is the current command being completed.
