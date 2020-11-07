@@ -11,7 +11,7 @@ const features = [
     title: '现代化',
     imageUrl: 'img/undraw_react.svg',
     description:
-      '代码由现代流行的React打造，不管是开发与使用都能为你带来现代化的用户与开发体验',
+      '代码由现代流行的React打造，不管是开发与使用都能为你带来现代化的用户与体验',
   },
   {
     title: '高度活跃',
