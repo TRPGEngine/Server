@@ -4,7 +4,7 @@ author: moonrailgun
 tags: [版本发布]
 ---
 
-:::tip 发布成功
+:::tip 新UI
 默认UI改为新UI
 如果需要老UI可以在设置页中切换(不建议)
 :::
