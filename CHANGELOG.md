@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.37.0](https://github.com/TRPGEngine/Server/compare/v1.36.0...v1.37.0) (2020-11-07)
+
+
+### Features
+
+* **chatemotion:** 增加表情包搜索功能 ([f4905a6](https://github.com/TRPGEngine/Server/commit/f4905a6b3f464e8d3e13539a4cb0d1457bc36e88))
+
 ## [1.36.0](https://github.com/TRPGEngine/Server/compare/v1.35.0...v1.36.0) (2020-11-02)
 
 
