@@ -1,6 +1,7 @@
 {
   "name": "trpg-report",
   "version": "1.0.0",
+  "private": true,
   "description": "a report generate and gather",
   "main": "index.js",
   "scripts": {

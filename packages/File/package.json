@@ -1,6 +1,7 @@
 {
   "name": "trpg-file",
   "version": "1.0.0",
+  "private": true,
   "description": "file component",
   "main": "index.js",
   "scripts": {

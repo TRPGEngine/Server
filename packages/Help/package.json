@@ -1,6 +1,7 @@
 {
   "name": "trpg-help",
   "version": "1.0.0",
+  "private": true,
   "description": "help module for trpg",
   "main": "index.js",
   "directories": {
