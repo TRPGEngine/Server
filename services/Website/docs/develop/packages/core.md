@@ -1,5 +1,5 @@
 ---
-id: package-core
+id: core
 title: 核心包
 ---
 
