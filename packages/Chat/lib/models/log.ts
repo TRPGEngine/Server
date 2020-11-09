@@ -290,17 +290,22 @@ export class ChatLog extends Model implements ChatMessagePayload {
   }
 
   /**
-   * 发送个人系统消息
+   * 发送系统消息
    */
   public static async sendSystemMsg(
     payload: Pick<
       ChatMessagePayload,
       'to_uuid' | 'converse_uuid' | 'message' | 'type' | 'data'
-    >
+    > & {
+      is_public?: boolean;
+      date?: string;
+    }
   ): Promise<ChatMessagePartial> {
     const { to_uuid, converse_uuid, message, type, data } = payload;
 
     const isPrivateMsg = _.isNil(converse_uuid); // 如果没有会话ID则为私人消息
+
+    const is_public = payload.is_public ?? (isPrivateMsg ? false : true);
 
     const full: ChatMessagePayload = {
       uuid: generateChatMsgUUID(),
@@ -309,11 +314,11 @@ export class ChatLog extends Model implements ChatMessagePayload {
       message,
       converse_uuid,
       // 要么都为true 要么都为false
-      is_public: isPrivateMsg ? false : true,
+      is_public,
       is_group: isPrivateMsg ? false : true,
       type,
       data,
-      date: new Date().toISOString(),
+      date: payload.date ?? new Date().toISOString(),
     };
 
     return await ChatLog.sendMsg(full);
