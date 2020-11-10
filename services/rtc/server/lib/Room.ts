@@ -14,7 +14,7 @@ const logger = new Logger('Room');
  * a protoo Room (for signaling with WebSocket clients) and a mediasoup Router
  * (for sending and receiving media to/from those WebSocket peers).
  */
-class Room extends EventEmitter {
+export class Room extends EventEmitter {
   /**
    * Factory function that creates and returns Room instance.
    *
@@ -140,8 +140,8 @@ class Room extends EventEmitter {
     this._handleAudioLevelObserver();
 
     // For debugging.
-    global.audioLevelObserver = this._audioLevelObserver;
-    global.bot = this._bot;
+    (global as any).audioLevelObserver = this._audioLevelObserver;
+    (global as any).bot = this._bot;
   }
 
   /**
@@ -287,7 +287,12 @@ class Room extends EventEmitter {
    * @type {Object} [device] - Additional info with name, version and flags fields.
    * @type {RTCRtpCapabilities} [rtpCapabilities] - Device RTP capabilities.
    */
-  async createBroadcaster({ id, displayName, device = {}, rtpCapabilities }) {
+  async createBroadcaster({
+    id,
+    displayName,
+    device = {} as any,
+    rtpCapabilities,
+  }) {
     if (typeof id !== 'string' || !id) throw new TypeError('missing body.id');
     else if (typeof displayName !== 'string' || !displayName)
       throw new TypeError('missing body.displayName');
@@ -1334,9 +1339,9 @@ class Room extends EventEmitter {
     }
 
     // Must take the Transport the remote Peer is using for consuming.
-    const transport = Array.from(consumerPeer.data.transports.values()).find(
-      (t) => t.appData.consuming
-    );
+    const transport = Array.from<any>(
+      consumerPeer.data.transports.values()
+    ).find((t) => t.appData.consuming);
 
     // This should not happen.
     if (!transport) {
@@ -1468,7 +1473,7 @@ class Room extends EventEmitter {
     if (!dataConsumerPeer.data.sctpCapabilities) return;
 
     // Must take the Transport the remote Peer is using for consuming.
-    const transport = Array.from(
+    const transport = Array.from<any>(
       dataConsumerPeer.data.transports.values()
     ).find((t) => t.appData.consuming);
 

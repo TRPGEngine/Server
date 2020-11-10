@@ -28,6 +28,9 @@ const dataProducers = new Map();
 const dataConsumers = new Map();
 
 class Interactive {
+  private _socket;
+  private _isTerminalOpen;
+
   constructor(socket) {
     this._socket = socket;
 
@@ -459,8 +462,9 @@ class Interactive {
 
           case 'hs':
           case 'heapsnapshot': {
-            const filename = `${process.env.SNAPSHOT_DIR ||
-              '/tmp'}/${Date.now()}-mediasoup-demo.heapsnapshot`;
+            const filename = `${
+              process.env.SNAPSHOT_DIR || '/tmp'
+            }/${Date.now()}-mediasoup-demo.heapsnapshot`;
 
             // eslint-disable-next-line no-shadow
             heapdump.writeSnapshot(filename, (error, filename) => {
@@ -541,28 +545,28 @@ class Interactive {
 function runMediasoupObserver() {
   mediasoup.observer.on('newworker', (worker) => {
     // Store the latest worker in a global variable.
-    global.worker = worker;
+    (global as any).worker = worker;
 
     workers.set(worker.pid, worker);
     worker.observer.on('close', () => workers.delete(worker.pid));
 
     worker.observer.on('newrouter', (router) => {
       // Store the latest router in a global variable.
-      global.router = router;
+      (global as any).router = router;
 
       routers.set(router.id, router);
       router.observer.on('close', () => routers.delete(router.id));
 
       router.observer.on('newtransport', (transport) => {
         // Store the latest transport in a global variable.
-        global.transport = transport;
+        (global as any).transport = transport;
 
         transports.set(transport.id, transport);
         transport.observer.on('close', () => transports.delete(transport.id));
 
         transport.observer.on('newproducer', (producer) => {
           // Store the latest producer in a global variable.
-          global.producer = producer;
+          (global as any).producer = producer;
 
           producers.set(producer.id, producer);
           producer.observer.on('close', () => producers.delete(producer.id));
@@ -570,7 +574,7 @@ function runMediasoupObserver() {
 
         transport.observer.on('newconsumer', (consumer) => {
           // Store the latest consumer in a global variable.
-          global.consumer = consumer;
+          (global as any).consumer = consumer;
 
           consumers.set(consumer.id, consumer);
           consumer.observer.on('close', () => consumers.delete(consumer.id));
@@ -578,7 +582,7 @@ function runMediasoupObserver() {
 
         transport.observer.on('newdataproducer', (dataProducer) => {
           // Store the latest dataProducer in a global variable.
-          global.dataProducer = dataProducer;
+          (global as any).dataProducer = dataProducer;
 
           dataProducers.set(dataProducer.id, dataProducer);
           dataProducer.observer.on('close', () =>
@@ -588,7 +592,7 @@ function runMediasoupObserver() {
 
         transport.observer.on('newdataconsumer', (dataConsumer) => {
           // Store the latest dataConsumer in a global variable.
-          global.dataConsumer = dataConsumer;
+          (global as any).dataConsumer = dataConsumer;
 
           dataConsumers.set(dataConsumer.id, dataConsumer);
           dataConsumer.observer.on('close', () =>
@@ -600,18 +604,18 @@ function runMediasoupObserver() {
   });
 }
 
-module.exports = async function() {
+module.exports = async function () {
   // Run the mediasoup observer API.
   runMediasoupObserver();
 
   // Make maps global so they can be used during the REPL terminal.
-  global.workers = workers;
-  global.routers = routers;
-  global.transports = transports;
-  global.producers = producers;
-  global.consumers = consumers;
-  global.dataProducers = dataProducers;
-  global.dataConsumers = dataConsumers;
+  (global as any).workers = workers;
+  (global as any).routers = routers;
+  (global as any).transports = transports;
+  (global as any).producers = producers;
+  (global as any).consumers = consumers;
+  (global as any).dataProducers = dataProducers;
+  (global as any).dataConsumers = dataConsumers;
 
   const server = net.createServer((socket) => {
     const interactive = new Interactive(socket);
@@ -627,3 +631,5 @@ module.exports = async function() {
     server.listen(SOCKET_PATH, resolve);
   });
 };
+
+export {};

@@ -2,7 +2,12 @@ const debug = require('debug');
 
 const APP_NAME = 'mediasoup-demo-server';
 
-class Logger {
+export class Logger {
+  private _debug: any;
+  private _info: any;
+  private _warn: any;
+  private _error: any;
+
   constructor(prefix) {
     if (prefix) {
       this._debug = debug(`${APP_NAME}:${prefix}`);
