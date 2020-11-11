@@ -1,5 +1,8 @@
 # Docker Settings mediasoup Server
 
+```bash
+MEDIASOUP_ANNOUNCED_IP=xxx.xxx.xxx.xxx docker-compose up -d
+```
 
 ## ENV Variables
 

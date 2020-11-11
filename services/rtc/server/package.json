@@ -8,7 +8,7 @@
   "main": "lib/index.js",
   "scripts": {
     "lint": "eslint -c .eslintrc.js server.js lib connect.js",
-    "start": "DEBUG=${DEBUG:='*mediasoup* *INFO* *WARN* *ERROR*'} INTERACTIVE=${INTERACTIVE:='true'} ts-node server.js",
+    "start": "DEBUG=${DEBUG:='*mediasoup* *INFO* *WARN* *ERROR*'} INTERACTIVE=${INTERACTIVE:='true'} ts-node server.ts",
     "connect": "ts-node connect.js",
     "docker:build": "sh ./docker/build.sh",
     "docker:run": "sh ./docker/run.sh"

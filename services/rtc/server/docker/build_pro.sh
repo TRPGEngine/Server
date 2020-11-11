@@ -21,7 +21,7 @@ fi
 echo ">>> Running docker build ${EXTRA_ARGS}"
 docker build \
 	${EXTRA_ARGS} \
-	--tag trpg-rtc:dev \
+	--tag moonrailgun/trpg-rtc:latest \
 	.
 
 echo ">>> Image built"

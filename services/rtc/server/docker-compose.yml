@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   rtc-service:
-    image: trpg-rtc:latest
-    build: ./
+    image: moonrailgun/trpg-rtc:latest
+    # build: ./
     init: true
     environment:
       NODE_ENV: production
-      MEDIASOUP_ANNOUNCED_IP: ${MEDIASOUP_ANNOUNCED_IP}
+      MEDIASOUP_ANNOUNCED_IP: ${MEDIASOUP_ANNOUNCED_sIP}
       DEBUG:
       INTERACTIVE:
       DOMAIN:
@@ -26,4 +26,4 @@ services:
       - "${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}:${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}/udp"
     volumes:
       - ${PWD}:/storage
-      - ./certs:/service/certs
+      - ./certs/:/service/certs/

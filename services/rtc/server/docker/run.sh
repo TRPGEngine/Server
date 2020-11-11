@@ -19,7 +19,7 @@ if [ 0"$MEDIASOUP_ANNOUNCED_IP" = "0" ]; then
 fi
 
 docker run \
-	--name=mediasoup-demo \
+	--name=trpg-rtc-dev \
 	-p ${PROTOO_LISTEN_PORT}:${PROTOO_LISTEN_PORT}/tcp \
 	-p ${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}:${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}/udp \
 	-p ${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}:${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}/tcp \
@@ -41,4 +41,4 @@ docker run \
 	-e MEDIASOUP_WORKER_BIN \
 	-it \
 	--rm \
-	mediasoup-demo:latest
+	trpg-rtc:dev
