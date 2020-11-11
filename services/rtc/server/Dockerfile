@@ -13,6 +13,7 @@ RUN npm install --registry=https://registry.npm.taobao.org
 COPY server.js .
 COPY config.js .
 COPY lib lib
-COPY certs certs
+# provide by host
+# COPY certs certs
 
 CMD ["ts-node", "/service/server.js"]

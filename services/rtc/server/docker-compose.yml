@@ -26,3 +26,4 @@ services:
       - "${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}:${MEDIASOUP_MIN_PORT}-${MEDIASOUP_MAX_PORT}/udp"
     volumes:
       - ${PWD}:/storage
+      - ./certs:/service/certs
