@@ -2,7 +2,13 @@ const wiki = require('./docs/wiki/_list.json');
 
 module.exports = {
   docs: {
-    开始: ['introduce', 'quick-start', 'chat-interceptor', 'shortcuts', 'recruit'],
+    开始: [
+      'introduce',
+      'quick-start',
+      'chat-interceptor',
+      'shortcuts',
+      'recruit',
+    ],
     人物: [
       'actor/actor1',
       'actor/actor2',
@@ -30,8 +36,14 @@ module.exports = {
     ],
   },
   develop: {
-    开发: ['develop', 'config'],
-    包: ['package-core'],
+    开发: [
+      'develop/introduce',
+      'develop/config',
+      {
+        架构: ['develop/structure/socket-communicate'],
+      },
+    ],
+    包: ['develop/packages/core'],
   },
   wiki: ['wiki/index', ...wiki],
 };

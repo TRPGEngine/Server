@@ -1,6 +1,7 @@
 {
   "name": "trpg-dice",
   "version": "0.0.1",
+  "private": true,
   "description": "Dice Component",
   "main": "index.js",
   "scripts": {

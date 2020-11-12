@@ -6,6 +6,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ChatMessagePartial } from 'packages/Chat/types/message';
 import { GroupActor } from 'packages/Group/lib/models/actor';
 import { hasString } from 'lib/helper/string-helper';
+import { ChatLog } from 'packages/Chat/lib/models/log';
 
 const restPattern = /^\.r(.*)$/; // 用于获取.r后面的内容
 const dotRestPattern = /^\.(.*)$/; // 用于获取.后面的内容
@@ -81,6 +82,50 @@ export const initInterceptors = _.once(() => {
       }骰出了命运: ${str}`;
       payload.type = 'tip';
       return;
+    }
+
+    // .rh 暗骰
+    if (payload.message.startsWith('.rh') === true) {
+      const rest = payload.message.match(restPattern)[1];
+      const arr = rest.split(' ');
+      let diceRequest = arr.shift();
+      diceRequest = diceRequest.replace(/h/g, '');
+      if (diceRequest === '') {
+        // 一个快捷处理，如果输入内容为.r则直接换成.rd
+        diceRequest = 'd';
+      }
+      const restStr = arr.join(' ');
+
+      const senderName = await getSenderName(payload);
+      try {
+        const { str, value } = roll(diceRequest);
+        // 无需同步
+        DiceLog.recordDiceLog(diceRequest, str, value, payload);
+
+        payload.message = `${senderName} ${
+          hasString(restStr) ? `因 ${restStr} ` : ''
+        }投掷了一个暗骰`;
+        payload.type = 'tip';
+
+        // 发送私聊
+        ChatLog.sendSystemMsg({
+          to_uuid: payload.sender_uuid,
+          message: `(仅自己可见)暗骰投掷结果 ${str}`,
+          converse_uuid: payload.converse_uuid,
+          type: 'tip',
+          data: {},
+          is_public: false,
+          date: new Date(new Date().valueOf() + 100).toISOString(), // 确保投骰的消息时间在提示之后
+        });
+
+        return;
+      } catch (e) {
+        payload.message = `${senderName} 尝试进行投骰[${diceRequest}]失败: ${String(
+          e.message ?? e
+        )}`;
+        payload.type = 'tip';
+        return;
+      }
     }
 
     // .r指令

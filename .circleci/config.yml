@@ -50,7 +50,7 @@ jobs:
 
       - run: echo 'export NODE_ENV=ci' >> $BASH_ENV
       - run: echo 'export JEST_JUNIT_OUTPUT_DIR=test/reports/jest/results.xml' >> $BASH_ENV
-      - run: echo 'export NODE_OPTIONS=--max_old_space_size=2048' >> $BASH_ENV
+      - run: echo 'export NODE_OPTIONS=--max_old_space_size=4096' >> $BASH_ENV
 
       # 更新数据库
       - run: npm run db:migrate:run

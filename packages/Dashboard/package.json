@@ -1,6 +1,7 @@
 {
   "name": "trpg-dashboard",
   "version": "1.0.0",
+  "private": true,
   "description": "admin web panel with TRPG service",
   "main": "index.js",
   "scripts": {

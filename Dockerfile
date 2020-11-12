@@ -54,7 +54,7 @@ COPY packages/Player/package.json packages/Player/package-lock.json ./packages/P
 COPY packages/QQConnect/package.json packages/QQConnect/package-lock.json ./packages/QQConnect/
 COPY packages/Report/package.json packages/Report/package-lock.json ./packages/Report/
 COPY packages/TRPG/package.json packages/TRPG/package-lock.json ./packages/TRPG/
-RUN npm run packages:ci
+RUN bash packages/foreach.sh 'npm ci'
 
 # 先安装子模块的依赖再安装外部依赖。因为每次升级外部package.json必然会丢失缓存
 COPY package.json package-lock.json ./

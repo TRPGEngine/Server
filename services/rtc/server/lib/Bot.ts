@@ -7,7 +7,14 @@ const logger = new Logger('Bot');
 // Set node-sctp default PMTU to 1200.
 sctp.defaults({ PMTU: 1200 });
 
-class Bot {
+export class Bot {
+  private _transport;
+  private _dataProducer;
+  private _mapStreamIdPeer;
+  private _udpSocket;
+  private _sctpSocket;
+  private _sendStream;
+
   static async create({ mediasoupRouter }) {
     // Create a PlainTransport for connecting the bot.
     // Assume no more than 256 participants.
@@ -180,7 +187,7 @@ class Bot {
         );
 
         // Set ppid of type WebRTC DataChannel string.
-        buffer.ppid = sctp.PPID.WEBRTC_STRING;
+        (buffer as any).ppid = sctp.PPID.WEBRTC_STRING;
 
         // Send it.
         sendStream.write(buffer);

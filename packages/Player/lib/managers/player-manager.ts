@@ -313,7 +313,7 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
    * 从在线玩家列表移除玩家
    * @param uuid uuid
    * @param platform 平台
-   * @param retainStatus 是否保留用户登录状态，用于用户自己踢自己
+   * @param retainStatus 是否保留用户登录列表，用于用户自己踢自己
    */
   async removePlayer(
     uuid: string,

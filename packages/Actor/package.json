@@ -1,6 +1,7 @@
 {
   "name": "trpg-actor",
   "version": "1.0.0",
+  "private": true,
   "description": "trpg actor component",
   "main": "index.js",
   "scripts": {

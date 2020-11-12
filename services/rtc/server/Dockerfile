@@ -9,10 +9,13 @@ RUN \
 WORKDIR /service
 
 COPY package.json .
-RUN npm install
-COPY server.js .
+RUN npm install --registry=https://registry.npm.taobao.org
+COPY server.ts .
 COPY config.js .
+COPY tsconfig.json .
 COPY lib lib
-COPY certs certs
 
-CMD ["node", "/service/server.js"]
+# provide by host
+# COPY certs certs
+
+CMD npm run start

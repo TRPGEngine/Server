@@ -101,4 +101,16 @@ describe('interceptors', () => {
       type: 'tip',
     }
   );
+
+  // 暗骰
+  appendInterceptorTest(
+    'roll rh',
+    {
+      message: '.rh',
+    },
+    {
+      message: expect.stringContaining('投掷了一个暗骰'),
+      type: 'tip',
+    }
+  );
 });

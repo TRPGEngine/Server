@@ -150,7 +150,7 @@ async function createExpressApp() {
     if (!rooms.has(roomId)) {
       const error = new Error(`room with id "${roomId}" not found`);
 
-      error.status = 404;
+      (error as any).status = 404;
       throw error;
     }
 
