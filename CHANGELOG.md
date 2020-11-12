@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.38.0](https://github.com/TRPGEngine/Server/compare/v1.37.0...v1.38.0) (2020-11-12)
+
+
+### Features
+
+* **dice:** 增加暗骰 ([0e10d7b](https://github.com/TRPGEngine/Server/commit/0e10d7bf69f390a75471da7f0b0a7eea7c6c26aa))
+
 ## [1.37.0](https://github.com/TRPGEngine/Server/compare/v1.36.0...v1.37.0) (2020-11-07)
 
 
