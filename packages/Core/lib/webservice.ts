@@ -178,17 +178,37 @@ export default class WebService {
 
       const url = ctx.url;
       const status = ctx.status;
+      const header = ctx.request.header;
+      const method = ctx.method;
+      const info: any = {};
+
+      if (method.toLowerCase() === 'post') {
+        info.req = ctx.request.body;
+        info.res = ctx.response.body;
+      }
+
       if (status !== 500) {
-        logger.info({ tags: ['http'] }, status, url, usageTime + 'ms');
+        logger.info(
+          { tags: ['http'] },
+          status,
+          method,
+          url,
+          usageTime + 'ms',
+          header,
+          info
+        );
       } else {
         // 错误日记记录
         // 需要更加详情
         logger.error(
           { tags: ['http'] },
           status,
+          method,
           url,
           usageTime + 'ms',
-          _.get(ctx, 'body.msg')
+          _.get(ctx, 'body.msg'),
+          header,
+          info
         );
       }
     });
