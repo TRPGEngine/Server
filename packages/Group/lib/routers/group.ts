@@ -4,6 +4,7 @@ import { PlayerJWTPayload } from 'packages/Player/types/player';
 import _ from 'lodash';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupGroup } from '../models/group';
+import { GroupRequest } from '../models/request';
 
 const groupRouter = new TRPGRouter<{
   player?: PlayerJWTPayload;
@@ -113,6 +114,22 @@ groupRouter.post('/tickMember', ssoAuth(), async (ctx) => {
   await GroupGroup.tickMember(groupUUID, memberUUID, playerUUID);
 
   ctx.body = { result: true };
+});
+
+/**
+ * 获取团请求列表
+ */
+groupRouter.get('/request/list', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { groupUUID } = ctx.request.query;
+
+  if (_.isNil(groupUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  const list = await GroupRequest.getGroupRequestList(groupUUID, playerUUID);
+
+  ctx.body = { list };
 });
 
 /**

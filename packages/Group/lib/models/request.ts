@@ -12,6 +12,35 @@ export class GroupRequest extends Model {
   is_refuse: boolean;
 
   /**
+   * 获取团请求列表
+   * @param groupUUID 团UUID
+   * @param operatorUUID 操作人UUID
+   */
+  static async getGroupRequestList(
+    groupUUID: string,
+    operatorUUID: string
+  ): Promise<GroupRequest[]> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (_.isNil(group)) {
+      throw new Error('找不到团信息');
+    }
+
+    if (!group.isManagerOrOwner(operatorUUID)) {
+      throw new Error('权限不足，无法获取到团请求列表');
+    }
+
+    const requestList = await GroupRequest.findAll({
+      where: {
+        group_uuid: groupUUID,
+        is_agree: false,
+        is_refuse: false,
+      },
+    });
+
+    return requestList;
+  }
+
+  /**
    * 同意入团请求
    * @param requestUUID 入团请求
    * @param operatorUUID 操作人UUID
