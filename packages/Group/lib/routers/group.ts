@@ -133,6 +133,38 @@ groupRouter.get('/request/list', ssoAuth(), async (ctx) => {
 });
 
 /**
+ * 同意入团请求
+ */
+groupRouter.post('/request/agree', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { requestUUID } = ctx.request.body;
+
+  if (_.isNil(requestUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await GroupRequest.agreeGroupRequest(requestUUID, playerUUID);
+
+  ctx.body = { result: true };
+});
+
+/**
+ * 拒绝入团请求
+ */
+groupRouter.post('/request/refuse', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const { requestUUID } = ctx.request.body;
+
+  if (_.isNil(requestUUID)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await GroupRequest.refuseGroupRequest(requestUUID, playerUUID);
+
+  ctx.body = { result: true };
+});
+
+/**
  * 获取团队一定时间范围内所有的会话记录
  */
 groupRouter.get('/log/:groupUUID/range', ssoAuth(), async (ctx) => {

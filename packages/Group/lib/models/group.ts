@@ -417,10 +417,10 @@ export class GroupGroup extends Model {
         notifyUserAddGroup(user.uuid, groupFullData);
         app.player.manager.joinRoomWithUUID(group.uuid, user.uuid);
       }
-
-      // 通知团其他所有人更新团成员列表
-      notifyGroupAddMember(group.uuid, user.uuid);
     }
+
+    // 通知团其他所有人更新团成员列表
+    notifyGroupAddMember(group.uuid, user.uuid);
 
     // 发送系统消息
     group.sendAddMemberNotify(userUUID);

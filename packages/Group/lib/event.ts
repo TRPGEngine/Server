@@ -156,7 +156,7 @@ export const requestJoinGroup: EventFunc<{
     },
   });
   if (!!requestIsExist) {
-    throw new Error('重复请求');
+    throw new Error('重复请求, 请等待管理员处理');
   }
 
   // 添加团邀请
