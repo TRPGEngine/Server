@@ -730,6 +730,16 @@ export class GroupGroup extends Model {
   }
 
   /**
+   * 获取所有团的UUID
+   */
+  async getAllGroupUUIDs(): Promise<string[]> {
+    const members: PlayerUser[] = await this.getMembers();
+    const memberUUIDs = members.map((i) => i.uuid);
+
+    return memberUUIDs;
+  }
+
+  /**
    * 获取团所有团角色的设置mapping
    * @param selfUUID 用户自己的UUID
    */

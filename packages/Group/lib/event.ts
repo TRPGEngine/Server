@@ -209,55 +209,21 @@ export const agreeGroupRequest: EventFunc<{
     throw new Error('缺少必要参数');
   }
 
-  let request = await GroupRequest.findOne({
-    where: { uuid: request_uuid },
-  });
-  if (!request) {
-    throw new Error('找不到该入团申请');
-  }
-  if (request.is_agree === true) {
-    throw new Error('已同意该请求');
-  }
-
-  const groupUUID = request.group_uuid;
-  const fromUUID = request.from_uuid; // 请求入团的人的UUID
-  const group = await GroupGroup.findByUUID(groupUUID);
-  if (!group) {
-    throw new Error('找不到该团');
-  }
-
-  // 发送入团成功消息
-  const user = await PlayerUser.findByUUID(player.uuid);
-  if (_.isNil(user)) {
-    throw new Error('用户状态异常');
-  }
-
-  await db.transactionAsync(async () => {
-    await GroupGroup.addGroupMember(groupUUID, fromUUID, player.uuid);
-    await request.agreeAsync();
-  });
-
-  const systemMsg = `管理员 ${user.getName()} 已同意您加入团 [${
-    group.name
-  }] ,和大家打个招呼吧!`;
-  app.chat.sendSystemMsg(
-    fromUUID,
-    'groupRequestSuccess',
-    '入团成功',
-    systemMsg,
-    {
-      groupUUID: groupUUID,
-    }
+  const { group } = await GroupRequest.agreeGroupRequest(
+    request_uuid,
+    player.uuid
   );
 
-  const members = await group.getMembers();
-  const membersUUID = members.map((i) => i.uuid);
+  const memberUUIDs = await group.getAllGroupUUIDs();
   return {
     groupUUID: group.uuid,
-    members: membersUUID,
+    members: memberUUIDs,
   };
 };
 
+/**
+ * 拒绝入团申请
+ */
 export const refuseGroupRequest: EventFunc<{
   request_uuid: string;
 }> = async function refuseGroupRequest(data, cb, db) {
@@ -274,38 +240,7 @@ export const refuseGroupRequest: EventFunc<{
     throw new Error('缺少必要参数');
   }
 
-  let request = await db.models.group_request.findOne({
-    where: { uuid: request_uuid },
-  });
-  if (!request) {
-    throw new Error('找不到该入团申请');
-  }
-  if (request.is_agree === true) {
-    return true;
-  }
-
-  let group_uuid = request.group_uuid;
-  let group = await db.models.group_group.findOne({
-    where: { uuid: group_uuid },
-  });
-  if (!group) {
-    throw new Error('找不到该团');
-  }
-
-  await request.refuseAsync();
-  cb({ result: true });
-
-  const user = await PlayerUser.findByUUID(player.uuid);
-  let systemMsg = `管理员 ${user.getName()} 已拒绝您加入团 ${
-    group.name
-  }, 请等待其他管理员的验证。`;
-  app.chat.sendSystemMsg(
-    request.from_uuid,
-    'groupRequestFail',
-    '入团被拒',
-    systemMsg,
-    { groupUUID: group_uuid }
-  );
+  await GroupRequest.refuseGroupRequest(request_uuid, player.uuid);
 };
 
 export const sendGroupInvite: EventFunc<{
