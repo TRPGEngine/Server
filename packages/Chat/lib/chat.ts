@@ -7,6 +7,8 @@ import { ChatMessagePartial } from '../types/message';
 import BasePackage from 'lib/package';
 import { initInterceptors } from './interceptors';
 import ChatConverseAckDefinition from './models/converse-ack';
+import { EVENT_PLAYER_REGISTER } from 'packages/Player/lib/const';
+import _ from 'lodash';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -42,6 +44,7 @@ export default class Chat extends BasePackage {
 
     this.initTimer();
     this.initData();
+    this.initListener();
 
     initInterceptors();
   }
@@ -53,13 +56,13 @@ export default class Chat extends BasePackage {
     this.regPackageData('converses', {}); // 会话信息缓存.用于检测会话是否创建
 
     this.regMethods({
-      addConverse: function(userUUID: string, converseUUID: string) {
+      addConverse: function (userUUID: string, converseUUID: string) {
         let prev = app.chat.converses[userUUID] || [];
         prev.push(converseUUID);
         let next = Array.from(new Set(prev));
         app.chat.converses[userUUID] = next;
       },
-      findMsgAsync: async function(msg_uuid: string) {
+      findMsgAsync: async function (msg_uuid: string) {
         const logList = await ChatLog.getCachedChatLog();
         for (var i = 0; i < logList.length; i++) {
           let log = logList[i];
@@ -76,7 +79,7 @@ export default class Chat extends BasePackage {
       /**
        * @deprecated
        */
-      updateMsgAsync: async function(msg_uuid, payload) {
+      updateMsgAsync: async function (msg_uuid, payload) {
         // payload需要为完整的聊天记录对象
         let notify = () => {
           let isGroup = payload.is_group;
@@ -114,7 +117,7 @@ export default class Chat extends BasePackage {
       /**
        * @deprecated 使用ChatLog.sendMsg
        */
-      sendMsg: function(from_uuid: string, to_uuid: string, info: any) {
+      sendMsg: function (from_uuid: string, to_uuid: string, info: any) {
         // 不检测发送者uuid, 用于系统发送消息
         const {
           converse_uuid,
@@ -162,7 +165,7 @@ export default class Chat extends BasePackage {
       /**
        * @deprecated 使用ChatLog.sendSystemMsg
        */
-      sendSystemMsg: function(
+      sendSystemMsg: function (
         to_uuid: string,
         type: string, // 卡片信息的类型 , 如果为空字符串则为普通信息
         title: string,
@@ -195,10 +198,10 @@ export default class Chat extends BasePackage {
       /**
        * @deprecated 使用ChatLog.sendSimpleSystemMsg
        */
-      sendSystemSimpleMsg: function(to_uuid, msg) {
+      sendSystemSimpleMsg: function (to_uuid, msg) {
         app.chat.sendSystemMsg(to_uuid, '', '', msg, null);
       },
-      saveChatLogAsync: async function() {
+      saveChatLogAsync: async function () {
         try {
           await ChatLog.dumpCachedChatLog();
           debug('save chat log success!');
@@ -207,11 +210,11 @@ export default class Chat extends BasePackage {
           throw err;
         }
       },
-      getChatLogSumAsync: async function() {
+      getChatLogSumAsync: async function () {
         let res = await db.models.chat_log.count();
         return res;
       },
-      getChatLogAsync: async function(page = 1, limit = 10) {
+      getChatLogAsync: async function (page = 1, limit = 10) {
         let res = await db.models.chat_log.findAll({
           limit: limit,
           offset: (page - 1) * limit,
@@ -219,7 +222,7 @@ export default class Chat extends BasePackage {
         return res;
       },
       // 如果为团信息, converseUUID是团uuid, 否则将是一个数组[uuid1, uuid2]来进行相互通知
-      notifyUpdateMsg: function(converseUUID, isGroup, payload) {
+      notifyUpdateMsg: function (converseUUID, isGroup, payload) {
         debug('通知更新聊天内容:', converseUUID, isGroup, payload);
         if (isGroup) {
           // 团聊更新
@@ -259,7 +262,18 @@ export default class Chat extends BasePackage {
     });
   }
 
+  initListener() {
+    const welcomeMsg = this.app.get('welcomeMsg'); // 这是一个低频更新操作，所以一次重启获取一次即可
+    this.app.on(EVENT_PLAYER_REGISTER, (playerUUID: string) => {
+      if (_.isNil(playerUUID)) {
+        return;
+      }
+      ChatLog.sendSimpleSystemMsg(playerUUID, null, welcomeMsg);
+    });
+  }
+
   /**
+   * @deprecated
    * 初始化获取所有的会话列表
    */
   async initData() {
