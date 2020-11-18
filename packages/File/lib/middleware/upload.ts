@@ -3,6 +3,7 @@ import config from '../config';
 import _ from 'lodash';
 
 /**
+ * @deprecated
  * 上传文件中间件
  * @param path 文件上传路径，可以为boolean型， 如果为true则上传到永久目录，如果为false则上传到临时目录， 默认为false
  */

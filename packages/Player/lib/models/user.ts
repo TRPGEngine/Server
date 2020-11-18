@@ -24,6 +24,7 @@ import {
 } from 'packages/Core/lib/utils/rate-limit';
 import { PlayerLoginLog } from './login-log';
 import { PlayerLoginLogType } from 'packages/Player/types/login-log';
+import { EVENT_PLAYER_REGISTER } from '../const';
 const debug = Debug('trpg:component:player:model');
 
 interface RecordLoginLogInfo {
@@ -263,7 +264,7 @@ export class PlayerUser extends Model {
 
     const salt = PlayerUser.genSalt();
 
-    const player = PlayerUser.create({
+    const player: PlayerUser = await PlayerUser.create({
       username,
       password: PlayerUser.genPassword(password, salt), // 存储密码为sha1(md5(md5(realpass)) + salt)
       salt,
@@ -273,6 +274,9 @@ export class PlayerUser extends Model {
       // 整套注册机制扣10点
       await rateLimiter.consume(ip, 9);
     } catch (err) {}
+
+    const trpgapp = PlayerUser.getApplication();
+    trpgapp.emit(EVENT_PLAYER_REGISTER, player.uuid);
 
     return player;
   }

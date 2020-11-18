@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.39.0](https://github.com/TRPGEngine/Server/compare/v1.38.0...v1.39.0) (2020-11-18)
+
+
+### Features
+
+* **group:** 增加同意入团与拒绝入团的接口 ([2c1a1d2](https://github.com/TRPGEngine/Server/commit/2c1a1d28a8229932006ff1f36f7fbb60cc205c24))
+* **group:** 增加请求列表的获取接口 ([cd5c645](https://github.com/TRPGEngine/Server/commit/cd5c645e3cd45af06e0905ede2b806d381acd1df))
+* 注册成功后发送欢迎语 ([cba2103](https://github.com/TRPGEngine/Server/commit/cba2103f5cf1ee4778583fbf8b9ce962a83c70a4))
+
 ## [1.38.0](https://github.com/TRPGEngine/Server/compare/v1.37.0...v1.38.0) (2020-11-12)
 
 
