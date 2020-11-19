@@ -17,5 +17,7 @@
   ],
   "author": "moonrailgun",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "url-regex": "^5.0.0"
+  }
 }

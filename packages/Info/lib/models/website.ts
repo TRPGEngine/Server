@@ -2,6 +2,7 @@ import { Model, DBInstance, Orm } from 'trpg/core';
 import _ from 'lodash';
 import cheerio from 'cheerio';
 import urlParser from 'url';
+import { isUrl } from '../utils';
 
 interface WebsiteInfo {
   title: string;
@@ -66,6 +67,10 @@ export class InfoWebsite extends Model {
 
     const app = InfoWebsite.getApplication();
     try {
+      if (!isUrl(url)) {
+        throw new Error('不是一个合法的Url');
+      }
+
       const body = await app.request.get(url);
       const $ = cheerio.load(body);
 
