@@ -574,7 +574,7 @@ export const getFriendInviteDetail: EventFunc<{
       to_uuid,
     },
   });
-  if (!_.isNil(invite)) {
+  if (_.isNil(invite)) {
     throw new Error('找不到该好友邀请');
   }
 
