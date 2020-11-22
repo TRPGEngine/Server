@@ -5,17 +5,38 @@ import _ from 'lodash';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { GroupGroup } from '../models/group';
 import { GroupRequest } from '../models/request';
+import { GroupDetail } from '../models/detail';
 
 const groupRouter = new TRPGRouter<{
   player?: PlayerJWTPayload;
 }>();
 
+/**
+ * 获取团基本信息
+ */
 groupRouter.get('/:groupUUID/info', async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
 
   const group = await GroupGroup.findByUUID(groupUUID);
 
   ctx.body = { group };
+});
+
+/**
+ * 更新团详细信息
+ */
+groupRouter.post('/:groupUUID/detail/update', ssoAuth(), async (ctx) => {
+  const groupUUID = ctx.params.groupUUID;
+  const playerUUID = ctx.state.player.uuid;
+
+  const { data = {} } = ctx.request.body;
+  if (_.isEmpty(data)) {
+    throw new Error('缺少必要参数');
+  }
+
+  await GroupDetail.saveGroupDetail(groupUUID, playerUUID, data);
+
+  ctx.body = { result: true };
 });
 
 /**
