@@ -3,7 +3,7 @@ id: richeditor-crash
 title: 关于富文本编辑器的问题说明
 ---
 
-为了使`TRPG Engine`的富文本系统(包括笔记系统, 聊天输入框)能够拥有一些比较 coooooool 的特性，开发者基于[`slate`](https://github.com/ianstormtaylor/slate)这套富文本框架进行二次开发。
+为了使`TRPG Engine`的富文本系统(包括笔记系统, 聊天输入框)能够拥有一些比较 **coooooool** 的特性，开发者基于[`slate`](https://github.com/ianstormtaylor/slate)这套富文本框架进行二次开发。
 
 但是这套框架无法对于一些非常低版本的浏览器进行兼容，因此可能会出现一些比较怪异的现象、甚至是崩溃。对于此我只能说非常抱歉，然后期望使用者能使用地上最强浏览器`Chrome`来获得最佳的体验。
 
