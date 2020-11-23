@@ -3,7 +3,6 @@ import { Etcd3 } from 'etcd3';
 import config from 'config';
 import { sleep } from 'test/utils/utils';
 
-// skip: circle 没有 etcd 的镜像
 describe('Etcd3Config', () => {
   const etcdConfig = config.get<any>('etcd');
   if (etcdConfig.enable !== true) {
