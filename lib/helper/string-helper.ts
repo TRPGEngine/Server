@@ -59,3 +59,14 @@ export function groupString(str: string, step: number): string[] {
 export function generateRandomStr(length = 10): string {
   return randomString(length);
 }
+
+/**
+ * 尝试解析json并返回解析后的值
+ */
+export function tryParseJSON(json: string): any {
+  try {
+    return JSON.parse(json);
+  } catch (e) {
+    return json;
+  }
+}

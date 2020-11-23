@@ -20,6 +20,7 @@ jobs:
           MYSQL_DATABASE: trpg_ci
           TZ: Asia/Shanghai
       - image: circleci/redis:5.0.5
+      - image: bitnami/etcd:3.4.13
 
     working_directory: ~/repo
 
