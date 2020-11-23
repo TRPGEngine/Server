@@ -11,7 +11,7 @@ module.exports = {
     },
   },
   etcd: {
-    enable: true,
+    enable: false,
     host: 'http://127.0.0.1:2379',
   },
   redisUrl: 'redis://127.0.0.1:6379',

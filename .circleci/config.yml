@@ -20,16 +20,18 @@ jobs:
           MYSQL_DATABASE: trpg_ci
           TZ: Asia/Shanghai
       - image: circleci/redis:5.0.5
-      - image: bitnami/etcd:3.4.13
-        environment:
-          ETCD_ADVERTISE_CLIENT_URLS: http://127.0.0.1:2379
-          ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
-          ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
-          ETCD_INITIAL_ADVERTISE_PEER_URLS: http://0.0.0.0:2380
-          ALLOW_NONE_AUTHENTICATION: yes
-          ETCD_INITIAL_CLUSTER: node1=http://0.0.0.0:2380
-          ETCD_NAME: node1
-          ETCD_DATA_DIR: /opt/bitnami/etcd/data
+
+      # etcd 不知道为什么在circle上不好测，回头再说
+      # - image: bitnami/etcd:3.4.13
+      #   environment:
+      #     ETCD_ADVERTISE_CLIENT_URLS: http://127.0.0.1:2379
+      #     ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+      #     ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+      #     ETCD_INITIAL_ADVERTISE_PEER_URLS: http://0.0.0.0:2380
+      #     ALLOW_NONE_AUTHENTICATION: yes
+      #     ETCD_INITIAL_CLUSTER: node1=http://0.0.0.0:2380
+      #     ETCD_NAME: node1
+      #     ETCD_DATA_DIR: /opt/bitnami/etcd/data
 
 
     working_directory: ~/repo

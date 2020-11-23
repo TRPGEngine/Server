@@ -3,7 +3,7 @@ import { Etcd3 } from 'etcd3';
 import config from 'config';
 import { sleep } from 'test/utils/utils';
 
-describe('Etcd3Config', () => {
+describe.skip('Etcd3Config', () => {
   const etcdConfig = config.get<any>('etcd');
   if (etcdConfig.enable !== true) {
     return;
