@@ -70,6 +70,19 @@ describe('interceptors', () => {
   appendInterceptorTest(
     'roll ww',
     {
+      message: '.ww',
+    },
+    {
+      message: expect.stringContaining(
+        '尝试进行投骰[ww]失败: 不合法的表达式:ww, 请输入骰数如.ww5'
+      ),
+      type: 'tip',
+    }
+  );
+
+  appendInterceptorTest(
+    'roll ww7',
+    {
       message: '.ww7',
     },
     {
