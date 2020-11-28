@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.39.0",
+  "version": "1.40.0",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "db:seeder:run": "cross-env TRPG_PORT=23666 node ./cli.js db run-seeder",
     "docker:dev:build": "docker build . --tag trpg-server:dev",
     "docker:dev:shell": "docker run -it --rm --name=\"trpg-dev\" trpg-server:dev bash",
-    "doc:start": "cd ./packages/Website && npm start",
+    "doc:start": "cd ./services/Website && npm start",
     "playground": "cross-env TRPG_PORT=23275 node ./playground/playground.js --experimental-repl-await",
     "bench": "node ./test/bench/index.js && cat ./test/bench/out.log",
     "test": "jest --config=./test/jest.config.js --runInBand",

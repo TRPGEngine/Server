@@ -17,7 +17,7 @@ export const login: EventFunc<{
   platform: Platform;
   isApp: boolean;
   deviceInfo: {};
-}> = async function (data, cb, db) {
+}> = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -514,7 +514,7 @@ export const agreeFriendInvite: EventFunc<{
  */
 export const removeFriendInvite: EventFunc<{
   inviteUUID: string;
-}> = async function (data) {
+}> = async function(data) {
   const app = this.app;
   const socket = this.socket;
 
@@ -557,7 +557,7 @@ export const getFriendsInvite: EventFunc = async function getFriendsInvite(
  */
 export const getFriendInviteDetail: EventFunc<{
   uuid: string;
-}> = async function (data, cb, db) {
+}> = async function(data, cb, db) {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);
@@ -574,6 +574,9 @@ export const getFriendInviteDetail: EventFunc<{
       to_uuid,
     },
   });
+  if (_.isNil(invite)) {
+    throw new Error('找不到该好友邀请');
+  }
 
   return { invite };
 };
@@ -660,7 +663,7 @@ export const saveSettings: EventFunc<{
  * 获取用户初始数据
  * 用于减少初始的请求
  */
-export const getUserInitData: EventFunc = async function (data, cb, db) {
+export const getUserInitData: EventFunc = async function(data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 

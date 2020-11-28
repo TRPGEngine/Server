@@ -162,15 +162,22 @@ export const initInterceptors = _.once(() => {
     // .ww指令
     if (payload.message.startsWith('.ww') === true) {
       const diceRequest = payload.message.match(dotRestPattern)[1];
-      const { str, value } = rollWW(diceRequest);
-
-      DiceLog.recordDiceLog(diceRequest, str, value, payload);
-
       const senderName = await getSenderName(payload);
-      payload.message = `${senderName} 骰出了: ${diceRequest}=${str}`;
-      payload.type = 'tip';
+      try {
+        const { str, value } = rollWW(diceRequest);
 
-      return;
+        DiceLog.recordDiceLog(diceRequest, str, value, payload);
+
+        payload.message = `${senderName} 骰出了: ${diceRequest}=${str}`;
+        payload.type = 'tip';
+      } catch (e) {
+        payload.message = `${senderName} 尝试进行投骰[${diceRequest}]失败: ${String(
+          e.message ?? e
+        )}`;
+        payload.type = 'tip';
+      } finally {
+        return;
+      }
     }
   });
 });

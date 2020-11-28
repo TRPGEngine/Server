@@ -183,7 +183,7 @@ export function rollWW(requestStr: string, validPoint = 8): RollRes {
 
   const numMatch = requestStr.match(wwRE);
   if (_.isNil(numMatch)) {
-    throw new Error('不合法的表达式:' + requestStr);
+    throw new Error('不合法的表达式:' + requestStr + ', 请输入骰数如.ww5');
   }
   const num = Number(numMatch[1]); // 初始骰数
   const rerollPoint = _.isNil(numMatch[2])

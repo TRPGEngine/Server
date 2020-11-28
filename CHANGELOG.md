@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.40.0](https://github.com/TRPGEngine/Server/compare/v1.39.0...v1.40.0) (2020-11-28)
+
+
+### Features
+
+* **group:** 增加保存团详细信息的接口 ([3f07e3f](https://github.com/TRPGEngine/Server/commit/3f07e3f9d8d4b6e8bd97e18dce884a80af11c462))
+
 ## [1.39.0](https://github.com/TRPGEngine/Server/compare/v1.38.0...v1.39.0) (2020-11-18)
 
 
