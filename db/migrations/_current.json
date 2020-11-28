@@ -2113,6 +2113,14 @@
                     "field": "disable_check_actor",
                     "seqType": "Sequelize.BOOLEAN"
                 },
+                "disable_check_actor_in_chat": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "comment": "是否禁止查看会话中人物卡, 用于秘密团",
+                    "field": "disable_check_actor_in_chat",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
                 "background_image_url": {
                     "field": "background_image_url",
                     "seqType": "Sequelize.STRING"
@@ -3833,5 +3841,5 @@
             "indexes": []
         }
     },
-    "revision": 79
+    "revision": 80
 }
