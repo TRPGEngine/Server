@@ -35,6 +35,9 @@ module.exports = {
         label: 'Playground',
       },
     ],
+    扮演: [
+      'roleplay/alignment'
+    ],
   },
   develop: {
     开发: [
