@@ -2,6 +2,7 @@
 id: quick-start
 title: 3分钟快速入门
 description: 3分钟带你快速入门 TRPG Engine 的基本流程
+hide_table_of_contents: true
 ---
 
 > 如果登录后处于旧版UI 在登录后点击此处切换到新版UI  
