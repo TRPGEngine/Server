@@ -168,6 +168,27 @@
             },
             "indexes": []
         },
+        "core_stats": {
+            "tableName": "core_stats",
+            "schema": {
+                "key": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "field": "key",
+                    "seqType": "Sequelize.STRING"
+                },
+                "value": {
+                    "allowNull": false,
+                    "field": "value",
+                    "seqType": "Sequelize.JSON"
+                },
+                "remark": {
+                    "field": "remark",
+                    "seqType": "Sequelize.STRING"
+                }
+            },
+            "indexes": []
+        },
         "player_user": {
             "tableName": "player_user",
             "schema": {
@@ -3841,5 +3862,5 @@
             "indexes": []
         }
     },
-    "revision": 80
+    "revision": 81
 }
