@@ -270,7 +270,7 @@ export default class WebService {
    */
   initContext() {
     // 渲染方法
-    this.context.render = function(template, data) {
+    this.context.render = function (template, data) {
       this.response.type = 'html';
       this.response.body = template.stream(data);
     };
@@ -297,11 +297,6 @@ export default class WebService {
         ctx.body = 'server is running!';
       });
     }
-
-    // stat
-    router.get('/api/stat', async (ctx) => {
-      ctx.body = await fs.readJson(path.resolve(process.cwd(), './stat.json'));
-    });
 
     // api
     for (let apiPath in this.webApi) {

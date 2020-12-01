@@ -5,6 +5,7 @@ import _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import { TRPGRouter } from 'trpg/core';
 import { checkDBLink, checkRedisLink } from '../../utils/net-helper';
+import { CoreStats } from '../models/stats';
 
 const router = new TRPGRouter();
 const hostname = os.hostname();
@@ -36,6 +37,9 @@ const getServerInfo = memoizeOne(
   }
 );
 
+/**
+ * 健康检查
+ */
 router.get('/health', async (ctx) => {
   const serverInfo = await getServerInfo();
   const trpgapp = ctx.trpgapp;
@@ -47,6 +51,14 @@ router.get('/health', async (ctx) => {
     components: trpgapp.installedPackages,
     hostname,
   };
+});
+
+/**
+ * 获取统计信息
+ */
+router.get('/stats', async (ctx) => {
+  const stats = await CoreStats.getAllStats();
+  ctx.body = { stats };
 });
 
 /**
