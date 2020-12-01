@@ -2,6 +2,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import { buildAppContext } from 'test/utils/app';
 import { regAutoClear } from 'test/utils/example';
+import { Op } from 'trpg/core';
 import { CoreMetrics } from '../lib/internal/models/metrics';
 import { CoreStats } from '../lib/internal/models/stats';
 
@@ -39,10 +40,9 @@ describe('internal module', () => {
 
         const all: CoreStats[] = await CoreStats.findAll();
         expect(
-          _.orderBy(
-            all.map((x) => x.toJSON()),
-            'key'
-          )
+          _.orderBy(all, 'key')
+            .filter((item) => ['number', 'string'].includes(item.key))
+            .map((item) => item.toJSON())
         ).toMatchObject([
           {
             key: 'number',
@@ -55,7 +55,11 @@ describe('internal module', () => {
         ]);
       } finally {
         await CoreStats.destroy({
-          truncate: true,
+          where: {
+            key: {
+              [Op.or]: ['string', 'number'],
+            },
+          },
         });
       }
     });
@@ -74,7 +78,9 @@ describe('internal module', () => {
         });
       } finally {
         await CoreStats.destroy({
-          truncate: true,
+          where: {
+            key: 'test',
+          },
         });
       }
     });
