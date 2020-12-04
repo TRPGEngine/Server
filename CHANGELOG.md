@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.41.0](https://github.com/TRPGEngine/Server/compare/v1.40.0...v1.41.0) (2020-12-04)
+
+
+### Features
+
+* **core:** 增加stats表用于替代原来的json存储 ([8f8a144](https://github.com/TRPGEngine/Server/commit/8f8a1441ebdcfea98004e4f028931b59e5a7f507))
+* **group:** 增加配置项用于隐藏聊天框中查看人物卡 ([55c30f9](https://github.com/TRPGEngine/Server/commit/55c30f9a23b8d5759cff2faeb17e0af5eabc7f2b))
+
 ## [1.40.0](https://github.com/TRPGEngine/Server/compare/v1.39.0...v1.40.0) (2020-11-28)
 
 
