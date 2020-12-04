@@ -20,7 +20,8 @@ declare module './group' {
 export class GroupDetail extends Model {
   id: number;
   master_name: string; // 主持人称呼: 守密人， 地下城主, ...
-  disable_check_actor: boolean; // 是否禁止普通用户查看团人物卡信息
+  disable_check_actor: boolean; // 是否禁止普通用户查看团人物卡信息(所有人物卡)
+  disable_check_actor_in_chat: boolean; // 是否禁止普通用户查看聊天界面中出现的团人物卡
   background_image_url: string; // 团聊天背景URL
   welcome_msg_payload: ChatMessagePayload; // 新用户欢迎信息
   disable_quick_dice: boolean;
@@ -81,6 +82,11 @@ export default function GroupDetailDefinition(Sequelize: Orm, db: DBInstance) {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         comment: '是否禁止查看人物卡, 用于秘密团',
+      },
+      disable_check_actor_in_chat: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        comment: '是否禁止查看会话中人物卡, 用于秘密团',
       },
       background_image_url: {
         type: Sequelize.STRING,

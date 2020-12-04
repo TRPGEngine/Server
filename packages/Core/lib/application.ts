@@ -22,6 +22,7 @@ import {
   createRateLimiterWithTRPGApplication,
 } from './utils/rate-limit';
 import { setupHeapDumps } from './utils/heap-dumps';
+import { CoreStats } from './internal/models/stats';
 
 type AppSettings = {
   [key: string]: string | number | {};
@@ -168,9 +169,7 @@ export class Application extends events.EventEmitter {
         }
       }
       info._updated = new Date().getTime();
-      await fs.writeJson(path.resolve(process.cwd(), './stat.json'), info, {
-        spaces: 2,
-      });
+      await CoreStats.setStats(info);
 
       applog('statistics completed!');
 

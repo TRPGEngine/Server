@@ -10,6 +10,7 @@ import CoreRouter from './routers/core';
 import MetricsRouter from './routers/metrics';
 import GraphQLRouter from './routers/graphql';
 import { getGlobalConfig, health } from './event';
+import CoreStatsDefinition from './models/stats';
 
 const SOCKET_PREFIX = 'metrics:socket:event:';
 const WEBSERVICE_PREFIX = 'metrics:webservice:route:';
@@ -29,6 +30,7 @@ export default class Core extends BasePackage {
     this.regModel(CoreGlobalConfigDefinition);
     this.regModel(CoreMetricsDefinition);
     this.regModel(CoreSchedulejobHistoryDefinition);
+    this.regModel(CoreStatsDefinition);
 
     this.regRoute(CoreRouter);
     this.regRoute(MetricsRouter);
