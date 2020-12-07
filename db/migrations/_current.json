@@ -281,6 +281,10 @@
                     "field": "role",
                     "seqType": "Sequelize.STRING"
                 },
+                "qq_number": {
+                    "field": "qq_number",
+                    "seqType": "Sequelize.STRING"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -3862,5 +3866,5 @@
             "indexes": []
         }
     },
-    "revision": 81
+    "revision": 82
 }

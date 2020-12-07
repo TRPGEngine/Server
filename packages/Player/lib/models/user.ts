@@ -91,6 +91,7 @@ export class PlayerUser extends Model {
   alignment: Alignment;
   banned: boolean; // 是否被封禁
   role: string; // 用户角色
+  qq_number: string; // QQ号
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
@@ -340,6 +341,7 @@ export class PlayerUser extends Model {
       sign: this.sign,
       alignment: this.alignment,
       role: this.role,
+      qq_number: this.qq_number,
       createAt: this.createdAt,
     };
   }
@@ -455,6 +457,9 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
         type: Sequelize.STRING,
         defaultValue: 'user',
         comment: '角色',
+      },
+      qq_number: {
+        type: Sequelize.STRING,
       },
     },
     {
