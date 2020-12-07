@@ -345,10 +345,11 @@ export class PlayerUser extends Model {
   }
 
   /**
+   * TODO: 检测用户信息合法性(如禁止敏感字符作为昵称)
    * 更新用户数据。保护数据不更新一些敏感数据
    * @param data 用户数据
    */
-  updateInfo(data) {
+  async updateInfo(data: any): Promise<void> {
     // 数据保护
     delete data.id;
     delete data.username;
@@ -358,7 +359,9 @@ export class PlayerUser extends Model {
     delete data.token;
     delete data.app_token;
 
-    return Object.assign(this, data);
+    Object.assign(this, data);
+
+    await this.save();
   }
 
   /**

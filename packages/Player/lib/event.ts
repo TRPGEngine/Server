@@ -17,7 +17,7 @@ export const login: EventFunc<{
   platform: Platform;
   isApp: boolean;
   deviceInfo: {};
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -249,9 +249,8 @@ export const updateInfo: EventFunc = async function updateInfo(data, cb, db) {
   }
 
   const user = await PlayerUser.findByUUID(player.uuid);
-  // TODO: 检测用户信息合法性(如禁止敏感字符作为昵称)
-  user.updateInfo(data);
-  await user.save();
+
+  await user.updateInfo(data);
   return { user: user.getInfo(true) };
 };
 
@@ -514,7 +513,7 @@ export const agreeFriendInvite: EventFunc<{
  */
 export const removeFriendInvite: EventFunc<{
   inviteUUID: string;
-}> = async function(data) {
+}> = async function (data) {
   const app = this.app;
   const socket = this.socket;
 
@@ -557,7 +556,7 @@ export const getFriendsInvite: EventFunc = async function getFriendsInvite(
  */
 export const getFriendInviteDetail: EventFunc<{
   uuid: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);
@@ -663,7 +662,7 @@ export const saveSettings: EventFunc<{
  * 获取用户初始数据
  * 用于减少初始的请求
  */
-export const getUserInitData: EventFunc = async function(data, cb, db) {
+export const getUserInitData: EventFunc = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
