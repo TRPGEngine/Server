@@ -91,6 +91,7 @@ export class PlayerUser extends Model {
   alignment: Alignment;
   banned: boolean; // 是否被封禁
   role: string; // 用户角色
+  qq_number: string; // QQ号
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
@@ -340,15 +341,17 @@ export class PlayerUser extends Model {
       sign: this.sign,
       alignment: this.alignment,
       role: this.role,
+      qq_number: this.qq_number,
       createAt: this.createdAt,
     };
   }
 
   /**
+   * TODO: 检测用户信息合法性(如禁止敏感字符作为昵称)
    * 更新用户数据。保护数据不更新一些敏感数据
    * @param data 用户数据
    */
-  updateInfo(data) {
+  async updateInfo(data: any): Promise<void> {
     // 数据保护
     delete data.id;
     delete data.username;
@@ -358,7 +361,9 @@ export class PlayerUser extends Model {
     delete data.token;
     delete data.app_token;
 
-    return Object.assign(this, data);
+    Object.assign(this, data);
+
+    await this.save();
   }
 
   /**
@@ -452,6 +457,9 @@ export default function PlayerUserDefinition(Sequelize: Orm, db: DBInstance) {
         type: Sequelize.STRING,
         defaultValue: 'user',
         comment: '角色',
+      },
+      qq_number: {
+        type: Sequelize.STRING,
       },
     },
     {

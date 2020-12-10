@@ -19,5 +19,6 @@ export interface PlayerInfoObject {
   sign: string;
   alignment: string;
   role: string;
+  qq_number: string;
   createAt: Date;
 }
