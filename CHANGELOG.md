@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.42.0](https://github.com/TRPGEngine/Server/compare/v1.41.0...v1.42.0) (2020-12-10)
+
+
+### Features
+
+* **db:** 个人信息增加qq号 ([ee3beb5](https://github.com/TRPGEngine/Server/commit/ee3beb579153300386b58e7b25b5ea60e4b0a42c))
+
 ## [1.41.0](https://github.com/TRPGEngine/Server/compare/v1.40.0...v1.41.0) (2020-12-04)
 
 
