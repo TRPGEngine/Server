@@ -18,7 +18,7 @@
     "@docusaurus/plugin-pwa": "^2.0.0-alpha.66",
     "@docusaurus/preset-classic": "^2.0.0-alpha.66",
     "classnames": "^2.2.6",
-    "highlight.js": "^9.18.1",
+    "highlight.js": "^10.4.1",
     "lodash": "^4.17.15",
     "lz-string": "^1.4.4",
     "rc-tooltip": "^5.0.1",
