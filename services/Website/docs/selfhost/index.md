@@ -3,6 +3,8 @@ id: selfhost
 title: 自部署服务
 ---
 
+## 准备工作
+
 下载两个`TRPG Engine`的前端两个项目:
 
 - [TRPGEngine/Client](https://github.com/TRPGEngine/Client)
@@ -75,9 +77,35 @@ docker-compose -f docker-compose.env.yml -f ./docker-compose.pro.yml down
 
 ## 编译前端代码
 
-<!-- TODO -->
+```bash
+cd Client
+```
 
-<!-- 修改前端配置以指向到自己的服务端地址
-```typescript
+### 安装前端依赖
 
-``` -->
+```bash
+npm install
+```
+
+### 编译前端文件
+
+```bash
+NODE_ENV=production TRPG_HOST=127.0.0.1:23256 npm run build:main
+```
+
+环境变量说明:
+
+- `NODE_ENV`: 编译环境, 可以为`develop`和`production`
+- `TRPG_HOST`: 对应服务端地址
+
+
+编译完毕后可以在`dist`目录中看到编译出的文件。
+
+#### 使用http-server启动一个简单的静态服务
+
+```bash
+npm install -g http-server
+http-server -p 4000 ./dist
+```
+
+打开浏览器, 访问`http://127.0.0.1:4000`即可

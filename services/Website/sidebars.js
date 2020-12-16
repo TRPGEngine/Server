@@ -38,6 +38,9 @@ module.exports = {
     扮演: [
       'roleplay/alignment'
     ],
+    自部署: [
+      'selfhost/selfhost'
+    ]
   },
   develop: {
     开发: [
