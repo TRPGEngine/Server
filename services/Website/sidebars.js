@@ -35,12 +35,8 @@ module.exports = {
         label: 'Playground',
       },
     ],
-    扮演: [
-      'roleplay/alignment'
-    ],
-    自部署: [
-      'selfhost/selfhost'
-    ]
+    扮演: ['roleplay/alignment'],
+    自部署: ['selfhost/selfhost', 'selfhost/faq'],
   },
   develop: {
     开发: [
