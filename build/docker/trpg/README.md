@@ -30,7 +30,7 @@ docker-compose -f docker-compose.env.yml -f ./docker-compose.dev.yml exec trpg-s
 #### 如果没有现有数据库
 
 ```bash
-docker stack deploy -c docker-compose.env.yml -c docker-compose.pro.yml trpg_engine
+docker stack deploy -c docker-compose.env.yml -c docker-compose.swarm.yml trpg_engine
 ```
 
 #### 如果有现有数据库
@@ -60,6 +60,6 @@ redisUrl => redis://trpg_redis_1:6379/8
 ```
 
 ```bash
-docker stack deploy -c docker-compose.pro.yml trpg_engine
+docker stack deploy -c docker-compose.swarm.yml trpg_engine
 docker service update --network-add trpg_swarm trpg_engine_trpg-server
 ```
