@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.42.1](https://github.com/TRPGEngine/Server/compare/v1.42.0...v1.42.1) (2020-12-18)
+
+
+### Bug Fixes
+
+* **core:** 修复无法正确返回404的情况 ([3dc9ed5](https://github.com/TRPGEngine/Server/commit/3dc9ed55579e074c8bcd8de3429c3c50f5e51c7e))
+
 ## [1.42.0](https://github.com/TRPGEngine/Server/compare/v1.41.0...v1.42.0) (2020-12-10)
 
 
