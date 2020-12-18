@@ -14,6 +14,8 @@
 - Redis
 - MySQL
 
+前端项目: [TRPGEngine/Client](https://github.com/TRPGEngine/Client)
+
 ## 配置代码依赖
 ```bash
 # 安装所有环境

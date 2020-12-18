@@ -237,6 +237,7 @@ export default class WebService {
             msg = 'Unknown Error';
           }
 
+          ctx.status = ctx.status;
           ctx.body = {
             result: false,
             msg,

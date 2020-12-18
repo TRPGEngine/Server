@@ -5,6 +5,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import classnames from 'classnames';
 import styles from './index.module.css';
+import Tooltip from 'rc-tooltip';
+import 'rc-tooltip/assets/bootstrap.css';
 
 const features = [
   {
@@ -173,15 +175,36 @@ const RelatedApps: React.FC = () => {
       <p>同样拥有很多优秀的跑团相关App, 同样也可以尝试一下。</p>
       <p>适合的，才是最好的</p>
       <div>
-        <a
-          className={styles.relatedApp}
-          title="猫爷TRPG"
-          href="https://maoyetrpg.com/"
-          target="_blank"
-          rel="noopener"
+        <Tooltip placement="top" overlay={'猫爷TRPG'}>
+          <a
+            className={styles.relatedApp}
+            href="https://maoyetrpg.com/"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="/img/others/maoyetrpg.jpg" />
+          </a>
+        </Tooltip>
+
+        <Tooltip
+          placement="top"
+          overlay={
+            <>
+              <div>活字引擎: 数千用户选择的超好用跑团Replay制作器</div>
+              <div>自动配音，把对话记录做成Replay视频只要十分钟</div>
+              <div>下载交流群：1132302303</div>
+            </>
+          }
         >
-          <img src="/img/others/maoyetrpg.jpg" />
-        </a>
+          <a
+            className={styles.relatedApp}
+            href="https://weibo.com/6505580910/J5fKndecW?type=comment"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="/img/others/hzyq.jpg" />
+          </a>
+        </Tooltip>
       </div>
     </div>
   );
