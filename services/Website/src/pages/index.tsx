@@ -205,6 +205,17 @@ const RelatedApps: React.FC = () => {
             <img src="/img/others/hzyq.jpg" />
           </a>
         </Tooltip>
+
+        <Tooltip placement="top" overlay={'脑洞: 超有趣的创作社交平台'}>
+          <a
+            className={styles.relatedApp}
+            href="https://www.naodong.fun"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="/img/others/naodong.png" />
+          </a>
+        </Tooltip>
       </div>
     </div>
   );
