@@ -18,9 +18,11 @@ SSORouter.post('/sso/login', async (ctx) => {
   }
 
   const jwt = await PlayerUser.signJWT(player.uuid);
+  const info = player.getInfo(true);
 
   ctx.body = {
     jwt,
+    info,
   };
 });
 
