@@ -8,6 +8,7 @@ SSORouter.post('/sso/login', async (ctx) => {
   const username = _.get(ctx.request, 'body.username');
   const password = _.get(ctx.request, 'body.password');
 
+  // TODO: record sso login
   const player = await PlayerUser.findByUsernameAndPassword(username, password);
   if (_.isNil(player)) {
     throw new Error('用户不存在或密码错误');
