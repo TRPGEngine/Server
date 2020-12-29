@@ -20,6 +20,7 @@ import { GroupPanel } from '../lib/models/panel';
 import { GroupInviteCode } from '../lib/models/invite-code';
 import shortid from 'shortid';
 import { GroupVoiceChannel } from '../lib/models/voice-channel';
+import { GroupPanelData } from '../lib/models/panel-data';
 
 const context = buildAppContext();
 
@@ -808,6 +809,106 @@ describe('group model function', () => {
 
       expect(newPanel.uuid).toBe(panel.uuid);
       expect(newPanel.name).toBe(targetName);
+    });
+  });
+
+  describe('GroupPanelData', () => {
+    describe('set data', () => {
+      test('once', async () => {
+        const testUUID = 'set-test';
+
+        await GroupPanelData.setGroupPanelData(testUUID, {
+          test: 1,
+        });
+
+        try {
+          const ret = await GroupPanelData.findOne({
+            where: {
+              group_uuid: testUUID,
+            },
+          });
+
+          expect(ret).not.toBeNull();
+          expect(ret.group_uuid).toBe(testUUID);
+          expect(ret.data).toMatchObject({
+            test: 1,
+          });
+        } finally {
+          await GroupPanelData.destroy({
+            where: {
+              group_uuid: testUUID,
+            },
+          });
+        }
+      });
+
+      test('one more times', async () => {
+        const testUUID = 'set-test1';
+
+        await GroupPanelData.setGroupPanelData(testUUID, {
+          test: 1,
+        });
+
+        try {
+          const ret = await GroupPanelData.findOne({
+            where: {
+              group_uuid: testUUID,
+            },
+          });
+
+          expect(ret).not.toBeNull();
+          expect(ret.group_uuid).toBe(testUUID);
+          expect(ret.data).toMatchObject({
+            test: 1,
+          });
+
+          await GroupPanelData.setGroupPanelData(testUUID, {
+            test: 2,
+          });
+
+          const ret2 = await GroupPanelData.findOne({
+            where: {
+              group_uuid: testUUID,
+            },
+          });
+
+          expect(ret2).not.toBeNull();
+          expect(ret2.group_uuid).toBe(testUUID);
+          expect(ret2.data).toMatchObject({
+            test: 2,
+          });
+        } finally {
+          await GroupPanelData.destroy({
+            where: {
+              group_uuid: testUUID,
+            },
+          });
+        }
+      });
+    });
+
+    test('get data', async () => {
+      const testUUID = 'get-test';
+
+      await GroupPanelData.create({
+        group_uuid: testUUID,
+        data: {
+          str: 'any',
+        },
+      });
+
+      try {
+        const data = await GroupPanelData.getGroupPanelData(testUUID);
+        expect(data).toMatchObject({
+          str: 'any',
+        });
+      } finally {
+        await GroupPanelData.destroy({
+          where: {
+            group_uuid: testUUID,
+          },
+        });
+      }
     });
   });
 
