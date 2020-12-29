@@ -2336,10 +2336,10 @@
                     "field": "id",
                     "seqType": "Sequelize.INTEGER"
                 },
-                "group_uuid": {
+                "group_panel_uuid": {
                     "allowNull": false,
                     "unique": true,
-                    "field": "group_uuid",
+                    "field": "group_panel_uuid",
                     "seqType": "Sequelize.STRING"
                 },
                 "data": {
@@ -2354,10 +2354,6 @@
                 "updatedAt": {
                     "allowNull": false,
                     "field": "updatedAt",
-                    "seqType": "Sequelize.DATE"
-                },
-                "deletedAt": {
-                    "field": "deletedAt",
                     "seqType": "Sequelize.DATE"
                 },
                 "panelId": {
@@ -3914,5 +3910,5 @@
             "indexes": []
         }
     },
-    "revision": 83
+    "revision": 84
 }

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { GroupGroup } from 'packages/Group/lib/models/group';
 import {
   Model,
   Orm,
@@ -20,13 +21,35 @@ export class GroupPanelData extends Model {
   /**
    * 设置团面板数据
    */
+  /**
+   * 设置团面板数据
+   * @param groupUUID
+   * @param data
+   * @param operatorUUID
+   */
   static async setGroupPanelData(
-    groupUUID: string,
-    data: object
+    groupPanelUUID: string,
+    data: object,
+    operatorUUID: string
   ): Promise<void> {
+    const groupPanel = await GroupPanel.findByUUID(groupPanelUUID);
+    if (_.isNil(groupPanel)) {
+      throw new Error('未找到要修改数据的面板');
+    }
+
+    const group: GroupGroup = await groupPanel.getGroup();
+    if (_.isNil(group)) {
+      throw new Error('未找到要修改面板数据的团');
+    }
+
+    if (!group.isManagerOrOwner(operatorUUID)) {
+      throw new Error('没有修改权限');
+    }
+
     await GroupPanelData.upsert({
-      group_uuid: groupUUID,
+      group_panel_uuid: groupPanelUUID,
       data,
+      panelId: groupPanel.id,
     });
   }
 
@@ -36,7 +59,7 @@ export class GroupPanelData extends Model {
   static async getGroupPanelData(groupUUID: string): Promise<object> {
     const ret = await GroupPanelData.findOne({
       where: {
-        group_uuid: groupUUID,
+        group_panel_uuid: groupUUID,
       },
     });
 
@@ -50,13 +73,16 @@ export default function GroupPanelDataDefinition(
 ) {
   GroupPanelData.init(
     {
-      group_uuid: { type: Sequelize.STRING, allowNull: false, unique: true },
+      group_panel_uuid: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
       data: { type: Sequelize.JSON },
     },
     {
       tableName: 'group_panel_data',
       sequelize: db,
-      paranoid: true,
     }
   );
 

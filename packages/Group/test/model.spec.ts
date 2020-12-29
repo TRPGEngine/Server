@@ -815,72 +815,90 @@ describe('group model function', () => {
   describe('GroupPanelData', () => {
     describe('set data', () => {
       test('once', async () => {
-        const testUUID = 'set-test';
+        const testGroup = await createTestGroup();
+        const testGroupPanel = await createTestGroupPanel(testGroup.id);
+        const testUser = await getTestUser();
+        const testUUID = testGroupPanel.uuid;
 
-        await GroupPanelData.setGroupPanelData(testUUID, {
-          test: 1,
-        });
+        await GroupPanelData.setGroupPanelData(
+          testUUID,
+          {
+            test: 1,
+          },
+          testUser.uuid
+        );
 
         try {
           const ret = await GroupPanelData.findOne({
             where: {
-              group_uuid: testUUID,
+              group_panel_uuid: testUUID,
             },
           });
 
           expect(ret).not.toBeNull();
-          expect(ret.group_uuid).toBe(testUUID);
+          expect(ret.group_panel_uuid).toBe(testUUID);
           expect(ret.data).toMatchObject({
             test: 1,
           });
         } finally {
           await GroupPanelData.destroy({
             where: {
-              group_uuid: testUUID,
+              group_panel_uuid: testUUID,
             },
           });
         }
       });
 
       test('one more times', async () => {
-        const testUUID = 'set-test1';
+        const testGroup = await createTestGroup();
+        const testGroupPanel = await createTestGroupPanel(testGroup.id);
+        const testUser = await getTestUser();
+        const testUUID = testGroupPanel.uuid;
 
-        await GroupPanelData.setGroupPanelData(testUUID, {
-          test: 1,
-        });
+        await GroupPanelData.setGroupPanelData(
+          testUUID,
+          {
+            test: 1,
+          },
+          testUser.uuid
+        );
 
         try {
           const ret = await GroupPanelData.findOne({
             where: {
-              group_uuid: testUUID,
+              group_panel_uuid: testUUID,
             },
           });
 
           expect(ret).not.toBeNull();
-          expect(ret.group_uuid).toBe(testUUID);
+          expect(ret.group_panel_uuid).toBe(testUUID);
           expect(ret.data).toMatchObject({
             test: 1,
           });
 
-          await GroupPanelData.setGroupPanelData(testUUID, {
-            test: 2,
-          });
+          await GroupPanelData.setGroupPanelData(
+            testUUID,
+            {
+              test: 2,
+            },
+            testUser.uuid
+          );
 
           const ret2 = await GroupPanelData.findOne({
             where: {
-              group_uuid: testUUID,
+              group_panel_uuid: testUUID,
             },
           });
 
           expect(ret2).not.toBeNull();
-          expect(ret2.group_uuid).toBe(testUUID);
+          expect(ret2.group_panel_uuid).toBe(testUUID);
           expect(ret2.data).toMatchObject({
             test: 2,
           });
         } finally {
           await GroupPanelData.destroy({
             where: {
-              group_uuid: testUUID,
+              group_panel_uuid: testUUID,
             },
           });
         }
@@ -891,7 +909,7 @@ describe('group model function', () => {
       const testUUID = 'get-test';
 
       await GroupPanelData.create({
-        group_uuid: testUUID,
+        group_panel_uuid: testUUID,
         data: {
           str: 'any',
         },
@@ -905,7 +923,7 @@ describe('group model function', () => {
       } finally {
         await GroupPanelData.destroy({
           where: {
-            group_uuid: testUUID,
+            group_panel_uuid: testUUID,
           },
         });
       }
