@@ -43,10 +43,11 @@ export const initInterceptors = _.once(() => {
       const rest = payload.message.match(restPattern)[1];
 
       // 仅为群会话时查找会话成员UUID
+      const groupUUID = payload.group_uuid ?? payload.converse_uuid;
       const contextData =
-        payload.is_group && !_.isNil(payload.converse_uuid)
+        payload.is_group && !_.isNil(groupUUID)
           ? await GroupActor.getGroupActorDataFromConverse(
-              payload.converse_uuid,
+              groupUUID,
               payload.sender_uuid
             )
           : {};

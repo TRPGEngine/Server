@@ -20,6 +20,8 @@ import inviteCodeRouter from './routers/invite-code';
 import GroupVoiceChannelDefinition, {
   GroupVoiceChannel,
 } from './models/voice-channel';
+import GroupPanelDataDefinition from './models/panel-data';
+import panelDataRouter from './routers/panel-data';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -34,13 +36,14 @@ export default class Group extends BasePackage {
     this.regModel(GroupDetailDefinition);
     this.regModel(GroupChannelDefinition);
     this.regModel(GroupPanelDefinition);
+    this.regModel(GroupPanelDataDefinition);
     this.regModel(GroupInviteCodeDefinition);
     this.regModel(GroupVoiceChannelDefinition);
 
     const app = this.app;
     const db = this.db;
     this.regMethods({
-      getGroupManagersUUIDAsync: async function(groupUUID) {
+      getGroupManagersUUIDAsync: async function (groupUUID) {
         try {
           let group = await (db.models.group_group as any).findOne({
             uuid: groupUUID,
@@ -101,6 +104,7 @@ export default class Group extends BasePackage {
     this.regRoute(groupRouter);
     this.regRoute(panelRouter);
     this.regRoute(inviteCodeRouter);
+    this.regRoute(panelDataRouter);
 
     this.regStatJob('groupCount', async () => {
       let res = await db.models.group_group.count();
