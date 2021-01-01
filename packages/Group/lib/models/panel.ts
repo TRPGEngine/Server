@@ -37,7 +37,7 @@ export type GroupPanelType =
   | 'test'; // 测试类型
 
 export class GroupPanel extends Model {
-  id: string;
+  id: number;
   uuid: string;
   name: string;
   type: GroupPanelType;

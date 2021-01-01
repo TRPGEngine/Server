@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.43.0](https://github.com/TRPGEngine/Server/compare/v1.42.2...v1.43.0) (2021-01-01)
+
+
+### Features
+
+* **group:** add common group panel data model ([6aaa6cd](https://github.com/TRPGEngine/Server/commit/6aaa6cd748b0a252cff90cbce753e87c99bc027a))
+* 增加通用的面板数据变更与获取接口 ([9adfa38](https://github.com/TRPGEngine/Server/commit/9adfa38304cfb7bda5b2d415f0fb7696dbb817bf))
+
+
+### Bug Fixes
+
+* **dice:** 修复了子频道无法正常进行ra判定的bug ([0f72e80](https://github.com/TRPGEngine/Server/commit/0f72e8051d82d55ff26d12ffd0d253f565cc9e17))
+
 ### [1.42.2](https://github.com/TRPGEngine/Server/compare/v1.42.1...v1.42.2) (2020-12-25)
 
 ### [1.42.1](https://github.com/TRPGEngine/Server/compare/v1.42.0...v1.42.1) (2020-12-18)
