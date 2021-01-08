@@ -56,12 +56,18 @@ export class GroupPanelData extends Model {
   /**
    * 获取团面板数据
    */
-  static async getGroupPanelData(groupPanelUUID: string): Promise<object> {
+  static async getGroupPanelData(
+    groupPanelUUID: string
+  ): Promise<object | null> {
     const ret = await GroupPanelData.findOne({
       where: {
         group_panel_uuid: groupPanelUUID,
       },
     });
+
+    if (_.isNil(ret)) {
+      return null;
+    }
 
     return ret.data;
   }
