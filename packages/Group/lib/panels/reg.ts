@@ -1,5 +1,6 @@
 import { GroupPanelType, GroupPanel } from '../models/panel';
 import _ from 'lodash';
+import { builtinPanel } from './builtin-panel';
 
 const panels = new Map<GroupPanelType, GroupPanelHandler>();
 
@@ -71,6 +72,10 @@ export async function handleGroupPanelCreate(
       return {};
     }
 
+    if (builtinPanel.includes(type)) {
+      return {};
+    }
+
     throw new Error(`未知的面板: ${type}`);
   }
 
@@ -86,6 +91,10 @@ export async function handleGroupPanelDestroy(
 
   if (_.isNull(groupPanelHandler)) {
     if (type === 'test') {
+      return;
+    }
+
+    if (builtinPanel.includes(type)) {
       return;
     }
 
