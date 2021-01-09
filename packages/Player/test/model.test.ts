@@ -202,6 +202,7 @@ describe('PlayerLoginLog', () => {
     const logs = await PlayerLoginLog.getPublicPlayerLoginLog(testUser.uuid);
 
     expect(logs.length).toBeLessThanOrEqual(10);
+    expect(_.get(logs, '0.id')).toBeTruthy();
     expect(_.get(logs, '0.socket_id')).toBeFalsy();
     expect(_.get(logs, '0.ip')).toBeFalsy();
     expect(_.get(logs, '0.token')).toBeFalsy();
@@ -212,6 +213,7 @@ describe('PlayerLoginLog', () => {
     const logs = await PlayerLoginLog.getPrivatePlayerLoginLog(testUser.uuid);
 
     expect(logs.length).toBeLessThanOrEqual(10);
+    expect(_.get(logs, '0.id')).toBeTruthy();
     expect(_.get(logs, '0.token')).toBeFalsy();
   });
 
