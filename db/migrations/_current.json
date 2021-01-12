@@ -3505,6 +3505,66 @@
             },
             "indexes": []
         },
+        "oauth_app": {
+            "tableName": "oauth_app",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "appid": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "appid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "appsecret": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "appsecret",
+                    "seqType": "Sequelize.STRING"
+                },
+                "name": {
+                    "required": true,
+                    "allowNull": false,
+                    "field": "name",
+                    "seqType": "Sequelize.STRING"
+                },
+                "icon": {
+                    "field": "icon",
+                    "seqType": "Sequelize.STRING"
+                },
+                "website": {
+                    "field": "website",
+                    "seqType": "Sequelize.STRING"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "ownerId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "ownerId",
+                    "seqType": "Sequelize.INTEGER"
+                }
+            },
+            "indexes": []
+        },
         "trpg_game_report": {
             "tableName": "trpg_game_report",
             "schema": {
@@ -3910,5 +3970,5 @@
             "indexes": []
         }
     },
-    "revision": 84
+    "revision": 85
 }
