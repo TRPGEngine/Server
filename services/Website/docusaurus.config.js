@@ -179,7 +179,7 @@ const siteConfig = {
     [
       '@docusaurus/plugin-pwa',
       {
-        debug: false,
+        debug: true,
         offlineModeActivationStrategies: ['appInstalled', 'queryString'],
         pwaHead: [
           {
@@ -198,6 +198,7 @@ const siteConfig = {
             content: '#8C6244',
           },
         ],
+        // swCustom: undefined
       },
     ],
   ],
