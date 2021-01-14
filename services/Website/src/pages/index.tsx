@@ -149,6 +149,22 @@ const RelatedApps: React.FC = () => {
             <img src="/img/others/naodong.png" />
           </a>
         </Tooltip>
+
+        <Tooltip
+          placement="top"
+          overlay={
+            '魔都创建于2008年，是地球上第一家收集并提供纯中文模组的网站。'
+          }
+        >
+          <a
+            className={styles.relatedApp}
+            href="https://www.cnmods.net/"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="/img/others/cnmods.jpg" />
+          </a>
+        </Tooltip>
       </div>
     </div>
   );
