@@ -8,6 +8,7 @@ import styles from './index.module.css';
 import Tooltip from 'rc-tooltip';
 import 'rc-tooltip/assets/bootstrap.css';
 import { Features } from '../components/Features';
+import { InfoTooltip } from '../components/InfoTooltip';
 
 function HomeSplash(props) {
   const { siteConfig, language = '' } = props;
@@ -108,7 +109,7 @@ const RelatedApps: React.FC = () => {
       <p>同样拥有很多优秀的跑团相关App, 同样也可以尝试一下。</p>
       <p>适合的，才是最好的</p>
       <div>
-        <Tooltip placement="top" overlay={'猫爷TRPG'}>
+        <InfoTooltip text={'猫爷TRPG'}>
           <a
             className={styles.relatedApp}
             href="https://maoyetrpg.com/"
@@ -117,11 +118,10 @@ const RelatedApps: React.FC = () => {
           >
             <img src="/img/others/maoyetrpg.jpg" />
           </a>
-        </Tooltip>
+        </InfoTooltip>
 
-        <Tooltip
-          placement="top"
-          overlay={
+        <InfoTooltip
+          text={
             <>
               <div>活字引擎: 数千用户选择的超好用跑团Replay制作器</div>
               <div>自动配音，把对话记录做成Replay视频只要十分钟</div>
@@ -137,9 +137,9 @@ const RelatedApps: React.FC = () => {
           >
             <img src="/img/others/hzyq.jpg" />
           </a>
-        </Tooltip>
+        </InfoTooltip>
 
-        <Tooltip placement="top" overlay={'脑洞: 超有趣的创作社交平台'}>
+        <InfoTooltip text={'脑洞: 超有趣的创作社交平台'}>
           <a
             className={styles.relatedApp}
             href="https://www.naodong.fun"
@@ -148,13 +148,10 @@ const RelatedApps: React.FC = () => {
           >
             <img src="/img/others/naodong.png" />
           </a>
-        </Tooltip>
+        </InfoTooltip>
 
-        <Tooltip
-          placement="top"
-          overlay={
-            '魔都创建于2008年，是地球上第一家收集并提供纯中文模组的网站。'
-          }
+        <InfoTooltip
+          text={'魔都创建于2008年，是地球上第一家收集并提供纯中文模组的网站。'}
         >
           <a
             className={styles.relatedApp}
@@ -164,7 +161,7 @@ const RelatedApps: React.FC = () => {
           >
             <img src="/img/others/cnmods.jpg" />
           </a>
-        </Tooltip>
+        </InfoTooltip>
       </div>
     </div>
   );
