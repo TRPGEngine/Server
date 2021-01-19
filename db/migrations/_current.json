@@ -3516,20 +3516,19 @@
                     "seqType": "Sequelize.INTEGER"
                 },
                 "appid": {
-                    "required": true,
                     "allowNull": false,
+                    "unique": true,
                     "field": "appid",
                     "seqType": "Sequelize.STRING"
                 },
                 "appsecret": {
-                    "required": true,
                     "allowNull": false,
                     "field": "appsecret",
                     "seqType": "Sequelize.STRING"
                 },
                 "name": {
-                    "required": true,
                     "allowNull": false,
+                    "unique": true,
                     "field": "name",
                     "seqType": "Sequelize.STRING"
                 },
@@ -3970,5 +3969,5 @@
             "indexes": []
         }
     },
-    "revision": 85
+    "revision": 86
 }

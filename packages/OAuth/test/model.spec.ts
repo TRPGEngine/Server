@@ -1,3 +1,4 @@
+import { getTestUser } from 'packages/Player/test/example';
 import { buildAppContext } from 'test/utils/app';
 import { regAutoClear } from 'test/utils/example';
 import { OAuthApp } from '../lib/models/app';
@@ -16,5 +17,21 @@ describe('OAuthApp', () => {
 
     expect(data).toHaveProperty('appid');
     expect(data).not.toHaveProperty('appsecret');
+  });
+
+  test('OAuthApp.createApp should be ok', async () => {
+    const testUser = await getTestUser();
+    const app = await OAuthApp.createApp(
+      {
+        name: 'test',
+      },
+      testUser.uuid
+    );
+
+    try {
+      expect(app.name).toBe('test');
+    } finally {
+      await app.destroy();
+    }
   });
 });

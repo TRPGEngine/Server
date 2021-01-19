@@ -1,5 +1,6 @@
 import _isUUID from 'is-uuid';
 import _isString from 'lodash/isString';
+import randomString from 'crypto-random-string';
 
 export function isUUID(str: string): boolean {
   return _isUUID.anyNonNil(str);
@@ -49,4 +50,12 @@ export function groupString(str: string, step: number): string[] {
   }
   doGroup(str);
   return r;
+}
+
+/**
+ * 生成随机字符串
+ * @param length 随机字符串长度
+ */
+export function generateRandomStr(length = 10): string {
+  return randomString(length);
 }
