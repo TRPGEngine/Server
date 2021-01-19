@@ -9,8 +9,8 @@ oauthRouter.get('/authorize', (ctx) => {
   // TODO
 });
 
-oauthRouter.get('/oauth/app/:appid/info', async (ctx) => {
-  const appid = ctx.params;
+oauthRouter.get('/app/:appid/info', async (ctx) => {
+  const appid = ctx.params.appid;
 
   const appInfo = await OAuthApp.getAppInfo(appid);
 

@@ -1,10 +1,13 @@
 import { generateRandomStr } from 'lib/helper/string-helper';
+import _ from 'lodash';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { Model, Orm, DBInstance } from 'trpg/core';
 
 /**
  * OAuth 接入应用
  */
+
+type AppPublicFieldType = typeof OAuthApp.APP_PUBLIC_FIELD[number];
 
 export class OAuthApp extends Model {
   appid: string;
@@ -13,20 +16,26 @@ export class OAuthApp extends Model {
   icon?: string;
   website?: string;
 
+  static APP_PUBLIC_FIELD = ['appid', 'name', 'icon', 'website'] as const;
+
   /**
    * 获取OAuth应用信息
    * @param appid 应用ID
    */
-  static async getAppInfo(appid: string): Promise<Omit<OAuthApp, 'appsecret'>> {
+  static async getAppInfo(
+    appid: string
+  ): Promise<Pick<OAuthApp, AppPublicFieldType> | null> {
     const app = await OAuthApp.findOne({
       where: {
         appid,
       },
     });
 
-    delete app.appsecret;
+    if (_.isNil(app)) {
+      return null;
+    }
 
-    return app;
+    return _.pick(app, OAuthApp.APP_PUBLIC_FIELD);
   }
 
   /**
