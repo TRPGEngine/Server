@@ -2,6 +2,7 @@ import { getTestUser } from 'packages/Player/test/example';
 import { buildAppContext } from 'test/utils/app';
 import { regAutoClear } from 'test/utils/example';
 import { OAuthApp } from '../lib/models/app';
+import { OAuthCode } from '../lib/models/code';
 import { createTestOAuthApp } from './example';
 
 const context = buildAppContext();
@@ -13,7 +14,7 @@ describe('OAuthApp', () => {
     const testApp = await createTestOAuthApp();
     const app = await OAuthApp.getAppInfo(testApp.appid);
 
-    const data = app.toJSON();
+    const data = app;
 
     expect(data).toHaveProperty('appid');
     expect(data).not.toHaveProperty('appsecret');
@@ -32,6 +33,24 @@ describe('OAuthApp', () => {
       expect(app.name).toBe('test');
     } finally {
       await app.destroy();
+    }
+  });
+});
+
+describe('OAuthCode', () => {
+  test('OAuthCode.createCode should be ok', async () => {
+    const testApp = await createTestOAuthApp();
+
+    const code = await OAuthCode.createCode(testApp.appid, ['public']);
+
+    try {
+      expect(typeof code).toBe('string');
+    } finally {
+      await OAuthCode.destroy({
+        where: {
+          code,
+        },
+      });
     }
   });
 });

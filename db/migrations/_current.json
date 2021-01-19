@@ -3564,6 +3564,50 @@
             },
             "indexes": []
         },
+        "oauth_code": {
+            "tableName": "oauth_code",
+            "schema": {
+                "id": {
+                    "allowNull": false,
+                    "primaryKey": true,
+                    "autoIncrement": true,
+                    "field": "id",
+                    "seqType": "Sequelize.INTEGER"
+                },
+                "appid": {
+                    "allowNull": false,
+                    "field": "appid",
+                    "seqType": "Sequelize.STRING"
+                },
+                "code": {
+                    "allowNull": false,
+                    "field": "code",
+                    "seqType": "Sequelize.STRING"
+                },
+                "scope": {
+                    "defaultValue": {
+                        "value": "public"
+                    },
+                    "field": "scope",
+                    "seqType": "Sequelize.STRING"
+                },
+                "expiredAt": {
+                    "field": "expiredAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "createdAt": {
+                    "allowNull": false,
+                    "field": "createdAt",
+                    "seqType": "Sequelize.DATE"
+                },
+                "updatedAt": {
+                    "allowNull": false,
+                    "field": "updatedAt",
+                    "seqType": "Sequelize.DATE"
+                }
+            },
+            "indexes": []
+        },
         "trpg_game_report": {
             "tableName": "trpg_game_report",
             "schema": {
@@ -3969,5 +4013,5 @@
             "indexes": []
         }
     },
-    "revision": 86
+    "revision": 87
 }

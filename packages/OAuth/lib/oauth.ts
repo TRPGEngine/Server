@@ -1,5 +1,6 @@
 import BasePackage from 'lib/package';
 import OAuthAppDefinition from './models/app';
+import OAuthCodeDefinition from './models/code';
 import oauthRouter from './routers/oauth';
 import thirdPartyRouter from './routers/third-party';
 
@@ -11,6 +12,7 @@ export default class OAuth extends BasePackage {
 
   onInit(): void {
     this.regModel(OAuthAppDefinition);
+    this.regModel(OAuthCodeDefinition);
 
     this.regRoute(thirdPartyRouter);
     this.regRoute(oauthRouter);

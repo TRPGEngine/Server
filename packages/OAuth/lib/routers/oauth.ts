@@ -1,13 +1,9 @@
 import _ from 'lodash';
 import { TRPGRouter } from 'trpg/core';
 import { OAuthApp } from '../models/app';
+import { OAuthCode } from '../models/code';
 
 const oauthRouter = new TRPGRouter();
-
-// 授权页面
-oauthRouter.get('/authorize', (ctx) => {
-  // TODO
-});
 
 oauthRouter.get('/app/:appid/info', async (ctx) => {
   const appid = ctx.params.appid;
@@ -16,6 +12,20 @@ oauthRouter.get('/app/:appid/info', async (ctx) => {
 
   ctx.body = {
     appInfo,
+  };
+});
+
+/**
+ * 授权
+ */
+oauthRouter.post('/app/:appid/authorize', async (ctx) => {
+  const appid = ctx.params.appid;
+  const { scope } = ctx.body;
+
+  const code = await OAuthCode.createCode(appid, scope);
+
+  ctx.body = {
+    code,
   };
 });
 
