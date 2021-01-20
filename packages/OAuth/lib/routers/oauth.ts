@@ -34,4 +34,18 @@ oauthRouter.post('/app/:appid/authorize', ssoAuth(), async (ctx) => {
   };
 });
 
+/**
+ * 获取用户的公共信息
+ */
+oauthRouter.post('/app/:appid/info/scope/public', async (ctx) => {
+  const appid = ctx.params.appid;
+  const { appsecret, code } = ctx.request.body;
+
+  const user = await OAuthCode.getUserPublicScope(appid, appsecret, code);
+
+  ctx.body = {
+    user,
+  };
+});
+
 export default oauthRouter;

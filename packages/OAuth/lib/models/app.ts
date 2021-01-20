@@ -18,6 +18,25 @@ export class OAuthApp extends Model {
 
   static APP_PUBLIC_FIELD = ['appid', 'name', 'icon', 'website'] as const;
 
+  static async findByAppId(
+    appid: string,
+    options?: { includeSecret?: boolean }
+  ): Promise<OAuthApp | null> {
+    if (options?.includeSecret === true) {
+      return OAuthApp.scope().findOne({
+        where: {
+          appid,
+        },
+      });
+    } else {
+      return OAuthApp.findOne({
+        where: {
+          appid,
+        },
+      });
+    }
+  }
+
   /**
    * 获取OAuth应用信息
    * @param appid 应用ID

@@ -3,7 +3,7 @@ import { buildAppContext } from 'test/utils/app';
 import { regAutoClear } from 'test/utils/example';
 import { OAuthApp } from '../lib/models/app';
 import { OAuthCode } from '../lib/models/code';
-import { createTestOAuthApp } from './example';
+import { createTestOAuthApp, createTestOAuthCode } from './example';
 
 const context = buildAppContext();
 
@@ -57,5 +57,40 @@ describe('OAuthCode', () => {
         },
       });
     }
+  });
+
+  test('OAuth.verifyCode should be ok', async () => {
+    const testUser = await getTestUser();
+    const testOAuthApp = await createTestOAuthApp();
+    const testOAuthCode = await createTestOAuthCode(
+      testOAuthApp.appid,
+      testUser.id
+    );
+
+    const verifiedCode = await OAuthCode.verifyCode(
+      testOAuthApp.appid,
+      testOAuthApp.appsecret,
+      testOAuthCode.code
+    );
+    expect(verifiedCode.appid).toBe(testOAuthCode.appid);
+    expect(verifiedCode.appid).toBe(testOAuthApp.appid);
+  });
+
+  test('OAuth.getUserPublicScope should be ok', async () => {
+    const testUser = await getTestUser();
+    const testOAuthApp = await createTestOAuthApp();
+    const testOAuthCode = await createTestOAuthCode(
+      testOAuthApp.appid,
+      testUser.id
+    );
+
+    const user = await OAuthCode.getUserPublicScope(
+      testOAuthApp.appid,
+      testOAuthApp.appsecret,
+      testOAuthCode.code
+    );
+
+    expect(user.id).toBe(testUser.id);
+    expect(user.username).toBe(testUser.username);
   });
 });
