@@ -1,5 +1,6 @@
 import { generateRandomStr } from 'lib/helper/string-helper';
 import _ from 'lodash';
+import { PlayerUser } from 'packages/Player/lib/models/user';
 import { Model, Orm, DBInstance } from 'trpg/core';
 
 /**
@@ -7,10 +8,17 @@ import { Model, Orm, DBInstance } from 'trpg/core';
  */
 
 export class OAuthCode extends Model {
-  static async createCode(appid: string, scope: string[]): Promise<string> {
+  static async createCode(
+    appid: string,
+    scope: string[],
+    playerUUID: string
+  ): Promise<string> {
+    const user = await PlayerUser.findByUUID(playerUUID);
+
     const res = await OAuthCode.create({
       appid,
       scope: scope.join(','),
+      userId: user.id,
     });
 
     return res.code;
@@ -43,6 +51,11 @@ export default function OAuthCodeDefinition(Sequelize: Orm, db: DBInstance) {
       sequelize: db,
     }
   );
+
+  OAuthCode.belongsTo(PlayerUser, {
+    foreignKey: 'userId',
+    as: 'user',
+  });
 
   return OAuthCode;
 }

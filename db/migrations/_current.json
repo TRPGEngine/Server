@@ -3604,6 +3604,17 @@
                     "allowNull": false,
                     "field": "updatedAt",
                     "seqType": "Sequelize.DATE"
+                },
+                "userId": {
+                    "allowNull": true,
+                    "references": {
+                        "model": "player_user",
+                        "key": "id"
+                    },
+                    "onDelete": "SET NULL",
+                    "onUpdate": "CASCADE",
+                    "field": "userId",
+                    "seqType": "Sequelize.INTEGER"
                 }
             },
             "indexes": []
@@ -4013,5 +4024,5 @@
             "indexes": []
         }
     },
-    "revision": 87
+    "revision": 88
 }

@@ -39,9 +39,14 @@ describe('OAuthApp', () => {
 
 describe('OAuthCode', () => {
   test('OAuthCode.createCode should be ok', async () => {
+    const testUser = await getTestUser();
     const testApp = await createTestOAuthApp();
 
-    const code = await OAuthCode.createCode(testApp.appid, ['public']);
+    const code = await OAuthCode.createCode(
+      testApp.appid,
+      ['public'],
+      testUser.uuid
+    );
 
     try {
       expect(typeof code).toBe('string');
