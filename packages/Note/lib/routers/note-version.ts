@@ -1,6 +1,4 @@
 import { TRPGRouter } from 'trpg/core';
-import { NoteNote } from '../models/note';
-import { PlayerUser } from 'packages/Player/lib/models/user';
 import { PlayerJWTPayload } from 'packages/Player/types/player';
 import { ssoAuth } from 'packages/Player/lib/middleware/auth';
 import _ from 'lodash';

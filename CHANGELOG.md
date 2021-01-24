@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.44.0](https://github.com/TRPGEngine/Server/compare/v1.43.2...v1.44.0) (2021-01-24)
+
+
+### Features
+
+* **oauth:** OAuth应用与应用信息 ([49f9e86](https://github.com/TRPGEngine/Server/commit/49f9e86c4fbe016794d568ed9e04f4666a708be5))
+* **oauth:** 增加code模型与授权逻辑 ([836a078](https://github.com/TRPGEngine/Server/commit/836a078863416e1499f6acc58b258a76cd51f4cf))
+* **oauth:** 增加OAuth应用创建的逻辑 ([9787473](https://github.com/TRPGEngine/Server/commit/9787473e4d6ff82de273e20fd4c4e31ed32c6586))
+* **oauth:** 增加用户公共授权信息获取 ([62ec595](https://github.com/TRPGEngine/Server/commit/62ec595983f930638eb73f846f2186b1bcbb1ea4))
+
 ### [1.43.2](https://github.com/TRPGEngine/Server/compare/v1.43.1...v1.43.2) (2021-01-13)
 
 ### [1.43.1](https://github.com/TRPGEngine/Server/compare/v1.43.0...v1.43.1) (2021-01-08)
