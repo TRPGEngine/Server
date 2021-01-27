@@ -1,5 +1,6 @@
-const Router = require('koa-router');
-const router = new Router();
+import { TRPGRouter } from 'trpg/core';
+
+const router = new TRPGRouter();
 
 router.get('/validate/_bind', async (ctx, next) => {
   const template = require('../views/bind-result');

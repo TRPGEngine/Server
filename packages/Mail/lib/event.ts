@@ -1,6 +1,7 @@
-const debug = require('debug')('trpg:component:mail:event');
-const querystring = require('querystring');
-const utils = require('./utils');
+import { EventFunc } from 'trpg/core';
+import Debug from 'debug';
+const debug = Debug('trpg:component:mail:event');
+import querystring from 'querystring';
 
 function getHost(socket) {
   const defaultHost = 'trpgapi.moonrailgun.com';
@@ -25,7 +26,7 @@ function generateMailHash(mailListObj) {
   );
 }
 
-exports.bindMail = async function bindMail(data, cb, db) {
+export const bindMail: EventFunc = async function bindMail(data, cb, db) {
   const { app, socket } = this;
   const fromMail = app.get('mail.smtp.auth.user');
 
@@ -44,9 +45,11 @@ exports.bindMail = async function bindMail(data, cb, db) {
     throw new Error('缺少参数');
   }
 
-  let isExists = await db.models.mail_list.existsAsync({
-    user_uuid: userUUID,
-    enabled: true,
+  const isExists = await db.models.mail_list.findOne({
+    where: {
+      user_uuid: userUUID,
+      enabled: true,
+    },
   });
   if (isExists) {
     throw new Error('已绑定邮箱, 如需绑定新邮箱请先解绑');
@@ -57,7 +60,7 @@ exports.bindMail = async function bindMail(data, cb, db) {
   const user = await db.models.player_user.findOne({
     where: { uuid: userUUID },
   });
-  let mail = await db.models.mail_list.createAsync({
+  const mail = await db.models.mail_list.create({
     user_uuid: userUUID,
     email_address: address,
     ownerId: user.id,
@@ -78,7 +81,7 @@ exports.bindMail = async function bindMail(data, cb, db) {
     link,
   });
 
-  let res = await app.mail.sendAsync(
+  const res = await app.mail.sendAsync(
     userUUID,
     fromMail,
     mail.email_address,
