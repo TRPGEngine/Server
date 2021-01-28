@@ -3,6 +3,10 @@ import { Etcd3 } from 'etcd3';
 import config from 'config';
 import { sleep } from 'test/utils/utils';
 
+test('placeholder', () => {
+  expect(1 + 1).toBe(2);
+});
+
 describe.skip('Etcd3Config', () => {
   const etcdConfig = config.get<any>('etcd');
   if (etcdConfig.enable !== true) {
