@@ -2,5 +2,6 @@ build
 # generated files
 .docusaurus
 .cache-loader
+.env
 
 .vercel

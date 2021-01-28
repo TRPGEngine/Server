@@ -6,6 +6,8 @@
  */
 const copyright = `Copyright © 2017 - ${new Date().getFullYear()} moonrailgun`;
 
+const posthogApikey = process.env.POSTHOG_API; // posthog 的key
+
 // 用于内部渲染的用户
 const users = [
   {
@@ -15,6 +17,37 @@ const users = [
     imageUrl: 'img/moonrailgun.png',
   },
 ];
+
+// 插件
+const plugins = [[
+  '@docusaurus/plugin-pwa',
+  {
+    debug: true,
+    offlineModeActivationStrategies: ['appInstalled', 'queryString'],
+    pwaHead: [
+      {
+        tagName: 'link',
+        rel: 'icon',
+        href: '/img/trpg_logo.png',
+      },
+      {
+        tagName: 'link',
+        rel: 'manifest',
+        href: '/manifest.json', // your PWA manifest
+      },
+      {
+        tagName: 'meta',
+        name: 'theme-color',
+        content: '#8C6244',
+      },
+    ],
+    // swCustom: undefined
+  },
+],]
+
+if(typeof posthogApikey === 'string') {
+  plugins.push('posthog-docusaurus')
+}
 
 const siteConfig = {
   title: 'TRPG Engine',
@@ -136,6 +169,11 @@ const siteConfig = {
       indexName: 'moonrailgun_trpgdoc',
       algoliaOptions: {}, // Optional, if provided by Algolia
     },
+    posthog: {
+      apiKey: posthogApikey,
+      appUrl: 'https://app.posthog.com',
+      enableInDevelopment: false,
+    },
   },
 
   favicon: 'img/favicon.ico',
@@ -175,33 +213,7 @@ const siteConfig = {
     ],
   ],
 
-  plugins: [
-    [
-      '@docusaurus/plugin-pwa',
-      {
-        debug: true,
-        offlineModeActivationStrategies: ['appInstalled', 'queryString'],
-        pwaHead: [
-          {
-            tagName: 'link',
-            rel: 'icon',
-            href: '/img/trpg_logo.png',
-          },
-          {
-            tagName: 'link',
-            rel: 'manifest',
-            href: '/manifest.json', // your PWA manifest
-          },
-          {
-            tagName: 'meta',
-            name: 'theme-color',
-            content: '#8C6244',
-          },
-        ],
-        // swCustom: undefined
-      },
-    ],
-  ],
+  plugins,
 };
 
 module.exports = siteConfig;

@@ -2,6 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/TRPGEngine/Server.svg?style=svg)](https://circleci.com/gh/TRPGEngine/Server)
 [![codecov](https://codecov.io/gh/TRPGEngine/Server/branch/master/graph/badge.svg)](https://codecov.io/gh/TRPGEngine/Server)
+![deploy doc website](https://github.com/TRPGEngine/Server/workflows/deploy%20doc%20website/badge.svg?branch=docs)
 
 ## 安装环境
 
