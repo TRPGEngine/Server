@@ -77,6 +77,8 @@ export default class WebService {
   jwtConfig: JWTConfig;
 
   constructor(opts: WebServiceOpts) {
+    this._app.proxy = true; // 支持通过代理的IP头来接受反向代理传来的ip信息
+
     this.trpgapp = this.context.trpgapp = opts.app;
     this.sessionOpt = {
       key: 'koa:trpg:sess',
