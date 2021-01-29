@@ -14,6 +14,8 @@ import {
   handleGroupPanelCreate,
   handleGroupPanelDestroy,
 } from '../panels/reg';
+import { builtinPanel } from '../panels/builtin-panel';
+import { GroupPanelData } from './panel-data';
 
 /**
  * 团面板
@@ -108,6 +110,17 @@ export class GroupPanel extends Model {
       order: maxOrder + 1, // 确保新加的panel顺序在最后
       groupId,
     });
+
+    if (builtinPanel.includes(type) && !_.isEmpty(extra)) {
+      // 如果是前端内建的面板, 且参数不为空。创建时就生成数据
+      await GroupPanelData.setGroupPanelData(
+        groupPanel.uuid,
+        {
+          ...extra,
+        },
+        userUUID
+      );
+    }
 
     await notifyUpdateGroupPanel(group);
 
