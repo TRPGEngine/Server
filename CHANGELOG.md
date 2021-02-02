@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.45.0](https://github.com/TRPGEngine/Server/compare/v1.44.1...v1.45.0) (2021-02-02)
+
+
+### Features
+
+* **group:** add website panel ([37778af](https://github.com/TRPGEngine/Server/commit/37778afc95f90b7934d9b93e29583d500625c17a))
+
+
+### Bug Fixes
+
+* 修复线上注册操作获取的IP地址不正确的bug ([f057e3c](https://github.com/TRPGEngine/Server/commit/f057e3c73bbdf915b46674132cd8c9131052b912))
+* 修复线上注册操作获取的IP地址不正确的bug ([e7e424a](https://github.com/TRPGEngine/Server/commit/e7e424a981944b3d0f8c2ed743d48a11fa55e51b))
+
 ### [1.44.1](https://github.com/TRPGEngine/Server/compare/v1.44.0...v1.44.1) (2021-01-28)
 
 ## [1.44.0](https://github.com/TRPGEngine/Server/compare/v1.43.2...v1.44.0) (2021-01-24)
