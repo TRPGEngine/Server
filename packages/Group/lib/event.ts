@@ -319,7 +319,7 @@ export const sendGroupInvite: EventFunc<{
 export const sendGroupInviteBatch: EventFunc<{
   group_uuid: string;
   target_uuids: string[];
-}> = async function(data) {
+}> = async function (data) {
   const { app, socket } = this;
   const player = app.player.manager.findPlayer(socket);
   if (!player) {
@@ -444,7 +444,7 @@ export const agreeGroupInvite: EventFunc<{
 export const getGroupInviteDetail: EventFunc<{
   // 团邀请的UUID
   uuid: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);
@@ -564,7 +564,7 @@ export const getGroupActors: EventFunc<{
  */
 export const getGroupActorMapping: EventFunc<{
   groupUUID: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -611,7 +611,7 @@ export const addGroupActor: EventFunc<{
 export const removeGroupActor: EventFunc<{
   groupUUID: string;
   groupActorUUID: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -649,7 +649,7 @@ export const removeGroupActor: EventFunc<{
   }
 
   // 清空选择角色
-  await db.transactionAsync(async function() {
+  await db.transactionAsync(async function () {
     await db.models.group_actor.destroy({
       where: {
         uuid: groupActorUUID,
@@ -777,6 +777,9 @@ export const setPlayerSelectedGroupActor: EventFunc<{
   };
 };
 
+/**
+ * 获取团指定用户当前团角色
+ */
 export const getPlayerSelectedGroupActor: EventFunc<{
   groupUUID: string;
   groupMemberUUID: string;
@@ -873,8 +876,9 @@ export const dismissGroup: EventFunc<{
 
   // 系统通知
   const members: PlayerUser[] = await group.getMembers();
-  const systemMsg = `您所在的团 ${group.name} 解散了, ${members.length -
-    1} 只小鸽子无家可归`;
+  const systemMsg = `您所在的团 ${group.name} 解散了, ${
+    members.length - 1
+  } 只小鸽子无家可归`;
   members.forEach((member) => {
     let uuid = member.uuid;
     if (uuid !== group.owner_uuid) {
@@ -898,7 +902,7 @@ export const dismissGroup: EventFunc<{
 export const tickMember: EventFunc<{
   groupUUID: string;
   memberUUID: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -1004,7 +1008,7 @@ export const setGroupStatus: EventFunc<{
 export const saveGroupDetail: EventFunc<{
   groupUUID: string;
   detailData: {};
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);
@@ -1024,7 +1028,7 @@ export const createGroupPanel: EventFunc<{
   name: string;
   type: GroupPanelType;
   extra: object;
-}> = async function(data) {
+}> = async function (data) {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);
@@ -1053,7 +1057,7 @@ export const createGroupPanel: EventFunc<{
  */
 export const getGroupInitData: EventFunc<{
   groupUUID: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);
