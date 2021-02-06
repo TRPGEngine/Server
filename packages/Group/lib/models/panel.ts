@@ -16,6 +16,7 @@ import {
 } from '../panels/reg';
 import { builtinPanel } from '../panels/builtin-panel';
 import { GroupPanelData } from './panel-data';
+import { NoPermissionError } from 'lib/error';
 
 /**
  * 团面板
@@ -192,6 +193,30 @@ export class GroupPanel extends Model {
    */
   static async getPanelByGroup(group: GroupGroup): Promise<GroupPanel[]> {
     const panels: GroupPanel[] = await group.getPanels();
+
+    return _.orderBy(panels, 'order', GroupPanel.defaultOrder);
+  }
+
+  /**
+   * 获取某种类型的团面板
+   * @param groupUUID 团UUID
+   * @param panelType 面板类型
+   * @param operatorUUID 操作人UUID
+   */
+  static async getGroupPanelsByType(
+    groupUUID: string,
+    panelType: GroupPanelType,
+    operatorUUID: string
+  ): Promise<GroupPanel[]> {
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (!group.isMember(operatorUUID)) {
+      throw new NoPermissionError('获取失败, 没有相关权限');
+    }
+    const panels: GroupPanel[] = await group.getPanels({
+      where: {
+        type: panelType,
+      },
+    });
 
     return _.orderBy(panels, 'order', GroupPanel.defaultOrder);
   }
