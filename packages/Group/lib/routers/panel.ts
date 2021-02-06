@@ -25,7 +25,7 @@ panelRouter.get(
       playerUUID
     );
 
-    return panels;
+    ctx.body = { panels };
   }
 );
 
