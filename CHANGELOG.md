@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.46.0](https://github.com/TRPGEngine/Server/compare/v1.45.0...v1.46.0) (2021-02-07)
+
+
+### Features
+
+* **core:** add availableSocketEvents api ([52402a1](https://github.com/TRPGEngine/Server/commit/52402a16d2c7f02a1c7b00dc03031b70bfd3b1d9))
+* **group:** 增加接口用于获取团指定类型的面板 ([24eee0e](https://github.com/TRPGEngine/Server/commit/24eee0e2372c8ea23de72dea34d982d5917eb9af))
+
+
+### Bug Fixes
+
+* 修复coc7本职技能信息不同步的问题 ([3df79da](https://github.com/TRPGEngine/Server/commit/3df79da922f2fed04499116c5aa8d64acc26b067))
+
 ## [1.45.0](https://github.com/TRPGEngine/Server/compare/v1.44.1...v1.45.0) (2021-02-02)
 
 
