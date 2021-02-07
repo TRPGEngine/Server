@@ -10,6 +10,26 @@ const panelRouter = new TRPGRouter<{
 }>();
 
 /**
+ * 获取团面板中文字频道列表
+ */
+panelRouter.get(
+  '/:groupUUID/panel/textChannel/list',
+  ssoAuth(),
+  async (ctx) => {
+    const groupUUID = ctx.params.groupUUID;
+    const playerUUID = ctx.state.player.uuid;
+
+    const panels = await GroupPanel.getGroupPanelsByType(
+      groupUUID,
+      'channel',
+      playerUUID
+    );
+
+    ctx.body = { panels };
+  }
+);
+
+/**
  * 创建团列表的接口
  */
 panelRouter.post('/:groupUUID/panel/create', ssoAuth(), async (ctx) => {

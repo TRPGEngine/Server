@@ -760,6 +760,30 @@ describe('group model function', () => {
       expect(panels.map((p) => p.id)).toMatchObject([panel1.id, panel2.id]);
     });
 
+    test('GroupPanel.getGroupPanelsByType should be ok', async () => {
+      const testUser = await getTestUser();
+      const testGroup = await createTestGroup();
+      const testPanel = await createTestGroupPanel(testGroup.id);
+
+      const panels = await GroupPanel.getGroupPanelsByType(
+        testGroup.uuid,
+        'test' as any,
+        testUser.uuid
+      );
+
+      expect(Array.isArray(panels)).toBe(true);
+      expect(panels.length).toBe(1);
+      expect(panels.map((p) => p.id)).toMatchObject([testPanel.id]);
+
+      const panels2 = await GroupPanel.getGroupPanelsByType(
+        testGroup.uuid,
+        'other' as any,
+        testUser.uuid
+      );
+      expect(Array.isArray(panels2)).toBe(true);
+      expect(panels2.length).toBe(0);
+    });
+
     test('GroupPanel.updateGroupPanelOrder should be ok', async () => {
       const testUser = await getTestUser();
       const group = await createTestGroup();

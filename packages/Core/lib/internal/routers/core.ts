@@ -92,4 +92,9 @@ router.get('/dependServiceCheck', async (ctx) => {
   };
 });
 
+router.get('/availableSocketEvents', (ctx) => {
+  const trpgapp = ctx.trpgapp;
+  ctx.body = trpgapp.socketservice.events.map((e) => e.name);
+});
+
 export default router;

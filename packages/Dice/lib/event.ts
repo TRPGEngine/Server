@@ -2,10 +2,19 @@ import Debug from 'debug';
 import { EventFunc } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ChatLog } from 'packages/Chat/lib/models/log';
+import { DiceLog } from './models/log';
 const debug = Debug('trpg:component:dice:event');
 
-const rolldiceAsync = async function(data) {
-  let app = this;
+interface RollDiceRequestData {
+  sender_uuid: string;
+  to_uuid: string;
+  converse_uuid: string;
+  is_group: boolean;
+  is_private: boolean;
+  dice_request: string;
+}
+const rolldiceAsync = async function (data: RollDiceRequestData) {
+  const app = this;
   let {
     sender_uuid,
     to_uuid,
@@ -15,9 +24,9 @@ const rolldiceAsync = async function(data) {
     dice_request,
   } = data;
 
-  let dice = app.dice.roll(dice_request);
-  let dice_expression = dice.str;
-  let dice_result = dice.value;
+  const dice = app.dice.roll(dice_request);
+  const dice_expression = dice.str;
+  const dice_result = dice.value;
   to_uuid = is_group ? converse_uuid : to_uuid;
   debug(
     'user[%s] roll dice in [%s]:\n%s',
@@ -26,8 +35,7 @@ const rolldiceAsync = async function(data) {
     dice_expression
   );
 
-  let db = app.storage.db;
-  let log = await db.models.dice_log.create({
+  const log = await DiceLog.create({
     sender_uuid,
     to_uuid,
     is_group,
@@ -43,19 +51,12 @@ export const roll: EventFunc = async function roll(data, cb) {
   const app = this.app;
   const socket = this.socket;
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw new Error('用户不存在，请检查登录状态');
   }
 
-  let { is_group, to_uuid } = data;
-  let log = await rolldiceAsync.call(app, data);
-
-  if (is_group) {
-    socket.broadcast.to(to_uuid).emit('dice::roll', log);
-  } else {
-    socket.broadcast.emit('dice::roll', log);
-  }
+  const log = await rolldiceAsync.call(app, data);
 
   return { log };
 };

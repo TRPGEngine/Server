@@ -2,6 +2,7 @@ export const errorCode = {
   LIMITED: 10001, // 请求受限
   EXPIRED: 10002, // 已过期
   NOT_FOUND: 10003, // 找不到
+  NO_PERMISSION: 10004, // 无许可
 };
 
 /**
@@ -33,4 +34,12 @@ export class ExpiredError extends NoReportError {
 export class NotFoundError extends NoReportError {
   name = 'NotFoundError';
   code = errorCode.NOT_FOUND;
+}
+
+/**
+ * 没有许可的错误
+ */
+export class NoPermissionError extends Error {
+  name = 'NoPermissionError';
+  code = errorCode.NO_PERMISSION;
 }
