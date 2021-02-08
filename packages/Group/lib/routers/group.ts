@@ -191,13 +191,14 @@ groupRouter.post('/request/refuse', ssoAuth(), async (ctx) => {
 groupRouter.get('/log/:groupUUID/range', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
   const playerUUID = ctx.state.player.uuid;
-  const { from, to } = ctx.request.query;
+  const { from, to, converseUUID = groupUUID } = ctx.request.query;
   if (_.isNil(from) || _.isNil(to)) {
     throw new Error('缺少必要参数');
   }
 
   const logs = await GroupGroup.getGroupRangeChatLog(
     groupUUID,
+    converseUUID,
     playerUUID,
     from,
     to
