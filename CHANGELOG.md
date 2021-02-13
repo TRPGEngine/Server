@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.47.0](https://github.com/TRPGEngine/Server/compare/v1.46.0...v1.47.0) (2021-02-13)
+
+
+### Features
+
+* **group:** 聊天消息日志增加频道日志获取 ([eaafaec](https://github.com/TRPGEngine/Server/commit/eaafaecfeaae0c6078caa6e7f67ef852939e7710))
+
 ## [1.46.0](https://github.com/TRPGEngine/Server/compare/v1.45.0...v1.46.0) (2021-02-07)
 
 

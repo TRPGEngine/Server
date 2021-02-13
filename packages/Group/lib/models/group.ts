@@ -26,7 +26,7 @@ import { GroupDetail } from './detail';
 import { GroupChannel } from './channel';
 import Debug from 'debug';
 import { GroupPanel } from './panel';
-import { NoReportError } from 'lib/error';
+import { NoPermissionError, NoReportError, NotFoundError } from 'lib/error';
 const debug = Debug('trpg:component:group:model:group');
 
 type GroupType = 'group' | 'channel' | 'test';
@@ -305,25 +305,26 @@ export class GroupGroup extends Model {
    */
   static async getGroupRangeChatLog(
     groupUUID: string,
+    converseUUID: string,
     playerUUID: string,
     from: string,
     to: string
   ): Promise<ChatLog[]> {
     const user = await PlayerUser.findByUUID(playerUUID);
     if (_.isNil(user)) {
-      throw new Error('用户不存在');
+      throw new NotFoundError('用户不存在');
     }
 
     const group = await GroupGroup.findByUUID(groupUUID);
     if (_.isNil(user)) {
-      throw new Error('团不存在');
+      throw new NotFoundError('团不存在');
     }
 
     if (!(await group.hasMember(user))) {
-      throw new Error('不是团成员');
+      throw new NoPermissionError('不是团成员无法获取团日志');
     }
 
-    return ChatLog.findRangeConverseLog(groupUUID, from, to);
+    return ChatLog.findRangeConverseLog(converseUUID ?? groupUUID, from, to);
   }
 
   /**
