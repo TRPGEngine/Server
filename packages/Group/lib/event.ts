@@ -592,7 +592,7 @@ export const getGroupActorMapping: EventFunc<{
 export const addGroupActor: EventFunc<{
   groupUUID: string;
   actorUUID: string;
-}> = async function addGroupActor(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 

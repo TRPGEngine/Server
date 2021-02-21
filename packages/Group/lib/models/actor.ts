@@ -266,6 +266,12 @@ export class GroupActor extends Model {
     // 通知用户增加
     notifyAddGroupActor(group.uuid, groupActorData);
 
+    // 发送团系统提示
+    ChatLog.sendConverseSystemMsg(
+      group.uuid,
+      `${user.getName()} 提交了新的人物卡 ${groupActor.name}`
+    );
+
     return groupActorData;
   }
 
