@@ -27,8 +27,8 @@ module.exports = {
       },
     },
   },
-  // 欢迎信息，支持bbcode语法
-  welcomeMsg: '欢迎注册使用TRPG Engine, [url=https://trpgdoc.moonrailgun.com/docs/quick-start]三分钟快速学习[/url]或者自行摸索。如果您觉得这个应用还不错，欢迎推荐给您的好友哦。\n祝你游戏愉快。',
+  // 欢迎信息，支持部分客户端支持的bbcode语法
+  welcomeMsg: '欢迎注册使用 TRPG Engine, [url=https://trpgdoc.moonrailgun.com/docs/quick-start]三分钟快速学习[/url]或者自行摸索, 如果遇到什么问题或有什么好的建议, 欢迎进入[url=https://trpg.moonrailgun.com/portal/help/txc]反馈中心[/url]进行反馈。如果您觉得这个应用还不错，欢迎推荐给您的好友哦。\n祝您游戏愉快。',
   rateLimit: {
     points: 400, // 请求点数 可以看做是单位时间请求数
     duration: 20, // 单位时间 单位为秒
