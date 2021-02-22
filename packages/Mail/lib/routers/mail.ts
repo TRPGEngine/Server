@@ -1,4 +1,5 @@
 import { TRPGRouter } from 'trpg/core';
+import { MailRecord } from '../models/record';
 
 const mailRouter = new TRPGRouter();
 
@@ -85,6 +86,15 @@ mailRouter.get('/validate/_bind', async (ctx, next) => {
     });
     ctx.status = 500;
   }
+});
+
+mailRouter.get('/check', async (ctx) => {
+  const status = await MailRecord.verifyMailService();
+
+  ctx.status = status === true ? 200 : 500;
+  ctx.body = {
+    result: status,
+  };
 });
 
 export default mailRouter;

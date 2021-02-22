@@ -1,4 +1,5 @@
 import { Model, Orm, DBInstance } from 'trpg/core';
+import nodemailer, { Transporter } from 'nodemailer';
 
 export class MailRecord extends Model {
   user_uuid: string;
@@ -12,6 +13,32 @@ export class MailRecord extends Model {
   is_success: boolean;
   data: any;
   error: string;
+
+  /**
+   * 创建邮件发送实例
+   */
+  static createMailerTransporter(): Transporter {
+    const app = this.getApplication();
+    const smtpConfig = app.get('mail.smtp');
+    const transporter = nodemailer.createTransport(smtpConfig);
+
+    return transporter;
+  }
+
+  /**
+   * 检查邮件服务是否可用
+   */
+  static async verifyMailService(): Promise<boolean> {
+    try {
+      const transporter = MailRecord.createMailerTransporter();
+
+      const verify = await transporter.verify();
+      return verify;
+    } catch (e) {
+      this.getApplication().error(e);
+      return false;
+    }
+  }
 }
 
 export default function MailRecordDefinition(Sequelize: Orm, db: DBInstance) {
