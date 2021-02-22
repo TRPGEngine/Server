@@ -25,7 +25,7 @@
     "debug": "^3.1.0",
     "koa-router": "^7.4.0",
     "marko": "^4.13.5",
-    "nodemailer": "^4.6.8"
+    "nodemailer": "^6.4.18"
   },
   "devDependencies": {
     "@types/nodemailer": "^6.4.0"

@@ -1,8 +1,8 @@
 import { TRPGRouter } from 'trpg/core';
 
-const router = new TRPGRouter();
+const mailRouter = new TRPGRouter();
 
-router.get('/validate/_bind', async (ctx, next) => {
+mailRouter.get('/validate/_bind', async (ctx, next) => {
   const template = require('../views/bind-result');
   const trpgapp = ctx.trpgapp;
 
@@ -87,4 +87,4 @@ router.get('/validate/_bind', async (ctx, next) => {
   }
 });
 
-module.exports = router;
+export default mailRouter;
