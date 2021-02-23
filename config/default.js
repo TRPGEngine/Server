@@ -115,6 +115,7 @@ module.exports = {
   },
   mail: {
     aeskey: '', // 32位秘钥
+    senderName: 'TRPG Engine 官方', // 发邮件者显示名称
     smtp: {
       host: '',
       port: 465,

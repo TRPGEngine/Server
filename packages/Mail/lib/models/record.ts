@@ -51,19 +51,23 @@ export class MailRecord extends Model {
   static async sendMail(mailOptions: Mail.Options) {
     debug('sendMail:', mailOptions);
     const app = this.getApplication();
-    const fromMail = app.get('mail.smtp.auth.user');
+    const fromMailName = app.get('mail.senderName');
+    const fromMailAddress = app.get('mail.smtp.auth.user');
 
     try {
       const transporter = MailRecord.createMailerTransporter();
       const info = await transporter.sendMail({
-        from: fromMail,
+        from: {
+          name: fromMailName,
+          address: fromMailAddress,
+        },
         ...mailOptions,
       });
 
       logger.log('sendMailSuccess:', info);
       return info;
     } catch (err) {
-      logger.error('sendMailError:', err);
+      app.error(err);
       throw err;
     }
   }
