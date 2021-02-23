@@ -39,14 +39,14 @@ export default class Mail extends BasePackage {
           throw new Error('邮件发送错误, 缺少参数');
         }
 
-        let mailOptions = {
+        const mailOptions = {
           from,
           to,
           subject,
           html,
         };
 
-        let recordData = {
+        const recordData = {
           user_uuid: userUUID,
           from,
           to,
@@ -59,7 +59,7 @@ export default class Mail extends BasePackage {
 
         // 发送邮件
         try {
-          let info = await sendMail.call(app, mailOptions);
+          let info = await MailRecord.sendMail(mailOptions);
           recordData.is_success = true;
           recordData.data = info;
         } catch (e) {
@@ -68,7 +68,6 @@ export default class Mail extends BasePackage {
         }
 
         // 存储记录
-        const db = app.storage.db;
         await MailRecord.create(recordData);
 
         return recordData;
@@ -89,24 +88,4 @@ export default class Mail extends BasePackage {
   initRouters() {
     this.regRoute(mailRouter);
   }
-}
-
-function sendMail(mailOptions) {
-  const app = this;
-  const smtpConfig = app.get('mail.smtp');
-
-  return new Promise(function (resolve, reject) {
-    let transporter = nodemailer.createTransport(smtpConfig);
-    debug('sendMail:', mailOptions);
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        debug('sendMailError:', error);
-        reject(error);
-      } else {
-        debug('sendMailSuccess:', info);
-        resolve(info);
-      }
-    });
-  });
 }

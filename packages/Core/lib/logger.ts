@@ -97,3 +97,37 @@ export function closeLogger(): Promise<void> {
     });
   });
 }
+
+/**
+ * 获取固定tags的日志
+ */
+export function getLoggerWithTags(tags: string[]) {
+  const logger = getLogger();
+
+  return {
+    log(...args: any) {
+      logger.log(
+        {
+          tags,
+        },
+        ...args
+      );
+    },
+    warn(...args: any) {
+      logger.warn(
+        {
+          tags,
+        },
+        ...args
+      );
+    },
+    error(...args: any) {
+      logger.error(
+        {
+          tags,
+        },
+        ...args
+      );
+    },
+  };
+}

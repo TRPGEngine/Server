@@ -1,5 +1,10 @@
 import { Model, Orm, DBInstance } from 'trpg/core';
 import nodemailer, { Transporter } from 'nodemailer';
+import Debug from 'debug';
+import Mail from 'nodemailer/lib/mailer';
+import { getLoggerWithTags } from 'packages/Core/lib/logger';
+const debug = Debug('trpg:component:mail:record');
+const logger = getLoggerWithTags(['mail']);
 
 export class MailRecord extends Model {
   user_uuid: string;
@@ -37,6 +42,29 @@ export class MailRecord extends Model {
     } catch (e) {
       this.getApplication().error(e);
       return false;
+    }
+  }
+
+  /**
+   * 发送邮件
+   */
+  static async sendMail(mailOptions: Mail.Options) {
+    debug('sendMail:', mailOptions);
+    const app = this.getApplication();
+    const fromMail = app.get('mail.smtp.auth.user');
+
+    try {
+      const transporter = MailRecord.createMailerTransporter();
+      const info = await transporter.sendMail({
+        from: fromMail,
+        ...mailOptions,
+      });
+
+      logger.log('sendMailSuccess:', info);
+      return info;
+    } catch (err) {
+      logger.error('sendMailError:', err);
+      throw err;
     }
   }
 }
