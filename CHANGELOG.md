@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.48.0](https://github.com/TRPGEngine/Server/compare/v1.47.0...v1.48.0) (2021-02-26)
+
+
+### Features
+
+* **group:** 增加了一个异步提示用户提交人物卡后向团发送系统提示 ([2fa2a30](https://github.com/TRPGEngine/Server/commit/2fa2a30e3aafa6250839ca47893f336c04206dd4))
+* **mail:** 发送邮件增加自定义显示名 ([3353ced](https://github.com/TRPGEngine/Server/commit/3353ced1dd6e60227fb3a334361c504451f30d56))
+* **mail:** 增加接口用于检验邮件服务可用性 ([163cb6b](https://github.com/TRPGEngine/Server/commit/163cb6b0e0e6f45521aea280ca8b7b1a45116475))
+
 ## [1.47.0](https://github.com/TRPGEngine/Server/compare/v1.46.0...v1.47.0) (2021-02-13)
 
 
