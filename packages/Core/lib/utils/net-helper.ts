@@ -9,7 +9,7 @@ import url from 'url';
  * @param port 端口
  */
 export async function portAvailableCheck(host: string, port: number) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const client = net.connect({
       host,
       port,

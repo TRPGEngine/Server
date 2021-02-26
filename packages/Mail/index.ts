@@ -1,1 +1,3 @@
-module.exports = require('./lib/mail');
+import Mail from './lib/mail';
+
+module.exports = Mail;

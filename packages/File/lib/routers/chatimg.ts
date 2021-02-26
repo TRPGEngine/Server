@@ -89,7 +89,7 @@ router.post('/forward', (ctx) => {
     throw new Error('未配置转发服务');
   }
 
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const imagesReq = request.post(
       imagesUrl,
       {

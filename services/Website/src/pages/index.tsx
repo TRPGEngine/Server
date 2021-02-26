@@ -32,8 +32,10 @@ function HomeSplash(props) {
           >
             立即体验
           </Link>
+
           {/* <Button href={useBaseUrl('/download')}>下载桌面版</Button> */}
-          <Link
+
+          {/* <Link
             className={classnames(
               'button button--outline button--primary button--lg',
               styles.homeButton
@@ -41,7 +43,7 @@ function HomeSplash(props) {
             to="https://trpg.moonrailgun.com/portal/deploy"
           >
             旧版移动端(兼容)
-          </Link>
+          </Link> */}
 
           <Link
             className={classnames(

@@ -136,6 +136,11 @@ const siteConfig = {
               href:
                 'https://shang.qq.com/wpa/qunwpa?idkey=7be5cfe70436a65c965ae9c86d9e6cfc36c16258634a42897724dce026accf3d',
             },
+            {
+              label: '反馈中心',
+              href:
+                'https://trpg.moonrailgun.com/portal/help/txc',
+            },
           ],
         },
         {
