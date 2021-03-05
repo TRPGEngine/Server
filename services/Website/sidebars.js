@@ -8,6 +8,7 @@ module.exports = {
       'chat-interceptor',
       'shortcuts',
       'recruit',
+      'mobile',
       'richeditor-crash',
     ],
     人物: [
