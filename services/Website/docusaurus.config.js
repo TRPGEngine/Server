@@ -83,8 +83,8 @@ const siteConfig = {
         { to: 'blog', label: '博客', position: 'left' },
         { to: 'docs/wiki/index', label: 'Wiki', position: 'left' },
         {
-          href: 'https://github.com/orgs/TRPGEngine/',
-          label: 'Github',
+          href: 'https://trpg.moonrailgun.com/portal/help/txc',
+          label: '反馈中心',
           position: 'right',
         },
         {
