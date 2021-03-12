@@ -69,6 +69,14 @@ docker-compose -f docker-compose.env.yml -f ./docker-compose.pro.yml restart
 
 重启后生效
 
+### 自定义配置文件
+
+`TRPG Engine` 的配置基于 [config](https://github.com/lorenwest/node-config) 实现
+
+具体配置可以参考这个文件: [default.js](https://github.com/TRPGEngine/Server/blob/master/config/default.js)
+
+在同级目录下创建一个`local.js`即可
+
 ### 关闭服务端
 
 ```bash
