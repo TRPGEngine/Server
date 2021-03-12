@@ -1,8 +1,8 @@
 import { TRPGRouter } from 'trpg/core';
 import { ReportError } from '../models/error';
-const router = new TRPGRouter();
+const reportRouter = new TRPGRouter();
 
-router.post('/error', async (ctx) => {
+reportRouter.post('/error', async (ctx) => {
   let ip = ctx.request.headers['x-real-ip'] || ctx.request.ip;
   let ua = ctx.request.headers['user-agent'];
   let { message = '', stack = '', version } = ctx.request.body;
@@ -20,4 +20,4 @@ router.post('/error', async (ctx) => {
   ctx.body = '提交成功';
 });
 
-module.exports = router;
+export default reportRouter;
