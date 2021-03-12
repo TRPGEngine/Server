@@ -1,5 +1,6 @@
-const Router = require('koa-router');
-const router = new Router();
+import { TRPGRouter } from 'trpg/core';
+import { ReportError } from '../models/error';
+const router = new TRPGRouter();
 
 router.post('/error', async (ctx) => {
   let ip = ctx.request.headers['x-real-ip'] || ctx.request.ip;
@@ -8,7 +9,7 @@ router.post('/error', async (ctx) => {
 
   const db = ctx.trpgapp.storage.db;
   console.log('report err from', ip, 'stack', stack);
-  await db.models.report_error.createAsync({
+  await ReportError.create({
     ip,
     ua,
     message,

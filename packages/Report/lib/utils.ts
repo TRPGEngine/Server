@@ -1,4 +1,7 @@
-exports.generateReportModels = function generateReportModels(
+/**
+ * 生成Report模型
+ */
+export function  generateReportModels(
   name,
   struct,
   options

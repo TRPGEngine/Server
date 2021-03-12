@@ -1,6 +1,6 @@
-const utils = require('../utils');
+import { generateReportModels } from '../utils';
 
-module.exports = utils.generateReportModels(
+module.exports = generateReportModels(
   'report_login_times',
   (Sequelize) => ({
     login_count: { type: Sequelize.INTEGER, required: true },

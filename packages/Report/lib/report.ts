@@ -1,9 +1,11 @@
-const Router = require('koa-router');
-const debug = require('debug')('trpg:component:report');
-const schedule = require('node-schedule');
-const reports = require('./reports');
+import Debug from 'debug';
+import { TRPGRouter } from 'trpg/core';
+const debug = Debug('trpg:component:report');
+import schedule from 'node-schedule';
+import reports from './reports';
+import ReportErrorDefinition from './models/error';
 
-module.exports = function ReportComponent(app) {
+export default function ReportComponent(app) {
   initStorage.call(app);
   initRouters.call(app);
   initTimer.call(app);
@@ -11,12 +13,12 @@ module.exports = function ReportComponent(app) {
   return {
     name: 'ReportComponent',
   };
-};
+}
 
 function initStorage() {
-  let app = this;
-  let storage = app.storage;
-  let registerAll = (model) => {
+  const app = this;
+  const storage = app.storage;
+  const registerAll = (model) => {
     // 将所有对象都注册到app.storage中
     let i = 0;
     for (let k in model) {
@@ -26,13 +28,13 @@ function initStorage() {
     return i; // 返回注册数
   };
 
-  storage.registerModel(require('./models/error'));
+  storage.registerModel(ReportErrorDefinition);
   let count = 1;
   count += registerAll(require('./models/register'));
   count += registerAll(require('./models/chatlog'));
   count += registerAll(require('./models/login-times'));
 
-  app.on('initCompleted', function(app) {
+  app.on('initCompleted', function (app) {
     // 数据信息统计
     debug(`storage has been load ${count} report db model`);
   });
@@ -41,7 +43,7 @@ function initStorage() {
 function initRouters() {
   const app = this;
   const webservice = app.webservice;
-  const router = new Router();
+  const router = new TRPGRouter();
 
   const report = require('./routers/report');
 
@@ -57,8 +59,8 @@ function initTimer() {
     // 每日2点
     let end = new Date();
     end.setHours(0, 0, 0, 0);
-    let start = new Date(end - 1000 * 60 * 60 * 24);
-    debug('run daily report: [%s, %s]', start, end);
+    let start = new Date(end.valueOf() - 1000 * 60 * 60 * 24);
+    debug('run daily report: [%s, %s]', start.toISOString(), end.toISOString());
 
     const db = app.storage.db;
     for (let k in reports) {
@@ -75,7 +77,7 @@ function initTimer() {
     // 每周一2点
     let end = new Date();
     end.setHours(0, 0, 0, 0);
-    let start = new Date(end - 1000 * 60 * 60 * 24 * 7);
+    let start = new Date(end.valueOf() - 1000 * 60 * 60 * 24 * 7);
     debug('run weekly report: [%s, %s]', start, end);
 
     const db = app.storage.db;
@@ -109,11 +111,11 @@ function initTimer() {
     }
   });
 
-  debug('next daily report', dailyReport.nextInvocation());
-  debug('next weekly report', weeklyReport.nextInvocation());
-  debug('next monthly report', monthlyReport.nextInvocation());
+  debug('next daily report:', dailyReport.nextInvocation().toISOString());
+  debug('next weekly report:', weeklyReport.nextInvocation().toISOString());
+  debug('next monthly report:', monthlyReport.nextInvocation().toISOString());
 
-  app.on('close', function() {
+  app.on('close', function () {
     dailyReport.cancel();
     weeklyReport.cancel();
     monthlyReport.cancel();
