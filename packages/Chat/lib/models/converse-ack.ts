@@ -5,6 +5,10 @@ import { Model, Orm, DBInstance } from 'trpg/core';
  */
 export class ChatConverseAck extends Model {
   user_uuid: string;
+
+  /**
+   * 可以是用户UUID也可以是频道UUID
+   */
   converse_uuid: string;
   last_log_uuid: string;
 

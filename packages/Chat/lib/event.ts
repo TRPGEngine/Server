@@ -9,6 +9,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import { isUUID } from 'lib/helper/string-helper';
 import { applyMsgInterceptors } from './interceptors';
 import { ChatConverse } from './models/converse';
+import { ChatConverseAck } from './models/converse-ack';
 
 /**
  * 增加聊天消息
@@ -508,4 +509,23 @@ export const updateCardChatData: EventFunc = async function updateCardChatData(
   log.data = Object.assign({}, log.data, newData);
   await log.save();
   return { log };
+};
+
+/**
+ * 设置会话已收到
+ */
+export const setConverseAck: EventFunc = async function converseAck(data) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
+  }
+
+  const { converseUUID, lastLogUUID } = data;
+
+  await ChatConverseAck.setConverseAck(player.uuid, converseUUID, lastLogUUID);
+
+  return true;
 };
