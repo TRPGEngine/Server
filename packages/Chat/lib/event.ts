@@ -8,6 +8,7 @@ import { EventFunc } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { isUUID } from 'lib/helper/string-helper';
 import { applyMsgInterceptors } from './interceptors';
+import { ChatConverse } from './models/converse';
 
 /**
  * 增加聊天消息
@@ -36,25 +37,25 @@ export const getUserChatLog: EventFunc = async function getUserChatLog(
   const socket = this.socket;
 
   const Op = app.storage.Op;
-  let userUUID = data.user_uuid;
-  let offsetDate = data.offsetDate || '';
-  let limit = data.limit || 10;
+  const userUUID = data.user_uuid;
+  const offsetDate = data.offsetDate || '';
+  const limit = data.limit || 10;
 
   if (!userUUID) {
     throw new Error('缺少必要参数');
   }
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw new Error('登录状态异常');
   }
-  let selfUUID = player.uuid;
+  const selfUUID = player.uuid;
   // IDEA: 定义: 获取用户间会话记录时无视掉自身发送的tip类型信息
   // NOTICE:
   // 这里会造成一个问题。就是如果使用消息拦截器进行投骰时因为是系统消息类型
   // 因此会产生刷新后无法看见自己发送的投骰信息的问题
   // TODO: 看看能不能想办法改造成允许查看自己的tip信息
-  let where = {
+  const where = {
     converse_uuid: null,
     [Op.or]: [
       { sender_uuid: userUUID, to_uuid: selfUUID },
@@ -66,7 +67,7 @@ export const getUserChatLog: EventFunc = async function getUserChatLog(
   let nomore = false;
   if (!offsetDate) {
     // 初始获取聊天记录
-    let logs = await db.models.chat_log.findAll({
+    const logs = await ChatLog.findAll({
       where,
       limit,
       order: [['date', 'DESC']],
@@ -94,7 +95,7 @@ export const getUserChatLog: EventFunc = async function getUserChatLog(
     where['date'] = {
       [Op.lte]: new Date(offsetDate),
     };
-    let logs = await db.models.chat_log.findAll({
+    const logs = await ChatLog.findAll({
       where,
       limit,
       order: [['date', 'DESC']],
@@ -119,22 +120,22 @@ export const getConverseChatLog: EventFunc = async function getConverseChatLog(
   const app = this.app;
   const socket = this.socket;
   const Op = app.storage.Op;
-  let converse_uuid = data.converse_uuid;
-  let offsetDate = data.offsetDate || '';
-  let limit = data.limit || 10;
+  const converse_uuid = data.converse_uuid;
+  const offsetDate = data.offsetDate || '';
+  const limit = data.limit || 10;
   if (!converse_uuid) {
     throw new Error('缺少必要参数');
   }
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw new Error('尚未登录');
   }
-  let selfUUID = player.uuid;
+  const selfUUID = player.uuid;
 
   let list = [];
   let nomore = false;
-  let where = {
+  const where = {
     converse_uuid,
     [Op.or]: [
       // 只会获取非私聊，或者会话中私聊给自己的信息
@@ -145,7 +146,7 @@ export const getConverseChatLog: EventFunc = async function getConverseChatLog(
   };
   if (!offsetDate) {
     // 初始获取聊天记录
-    let logs = await db.models.chat_log.findAll({
+    let logs = await ChatLog.findAll({
       where,
       limit,
       order: [['date', 'DESC']],
@@ -170,7 +171,7 @@ export const getConverseChatLog: EventFunc = async function getConverseChatLog(
     where['date'] = {
       [Op.lte]: new Date(offsetDate),
     };
-    let logs = await db.models.chat_log.findAll({
+    let logs = await ChatLog.findAll({
       where,
       limit,
       order: [['date', 'DESC']],
@@ -219,28 +220,24 @@ export const getAllUserConverse: EventFunc = async function getAllUserConverse(
     }
   }
 
-  let ret1 = await db.models.chat_log
-    .aggregate('sender_uuid' as any, 'DISTINCT', {
-      where: {
-        sender_uuid: { [Op.notLike]: 'trpg%' },
-        to_uuid: player.uuid,
-        converse_uuid: null,
-        is_group: false,
-      },
-      plain: false,
-    })
-    .then((list) => list.map((item) => item['DISTINCT']));
-  let ret2 = await db.models.chat_log
-    .aggregate('to_uuid' as any, 'DISTINCT', {
-      where: {
-        sender_uuid: player.uuid,
-        to_uuid: { [Op.notLike]: 'trpg%' },
-        converse_uuid: null,
-        is_group: false,
-      },
-      plain: false,
-    })
-    .then((list) => list.map((item) => item['DISTINCT']));
+  const ret1 = await ChatLog.aggregate('sender_uuid' as any, 'DISTINCT', {
+    where: {
+      sender_uuid: { [Op.notLike]: 'trpg%' },
+      to_uuid: player.uuid,
+      converse_uuid: null,
+      is_group: false,
+    },
+    plain: false,
+  }).then((list) => list.map((item) => item['DISTINCT']));
+  const ret2 = await ChatLog.aggregate('to_uuid' as any, 'DISTINCT', {
+    where: {
+      sender_uuid: player.uuid,
+      to_uuid: { [Op.notLike]: 'trpg%' },
+      converse_uuid: null,
+      is_group: false,
+    },
+    plain: false,
+  }).then((list) => list.map((item) => item['DISTINCT']));
   senders = [...senders, ...ret1, ...ret2];
   // 数组去重与过滤
   senders = Array.from(new Set(senders)).filter(Boolean);
@@ -255,12 +252,12 @@ export const getOfflineUserConverse: EventFunc = async function getOfflineUserCo
   const app = this.app;
   const socket = this.socket;
   const Op = app.storage.Op;
-  let lastLoginDate = data.lastLoginDate;
+  const lastLoginDate = data.lastLoginDate;
   if (!lastLoginDate) {
     throw new Error('缺少必要参数');
   }
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw new Error('尚未登录');
   }
@@ -288,31 +285,27 @@ export const getOfflineUserConverse: EventFunc = async function getOfflineUserCo
     }
   }
 
-  let dateCond = { [Op.gte]: new Date(lastLoginDate) };
-  let ret1 = await db.models.chat_log
-    .aggregate('sender_uuid' as any, 'DISTINCT', {
-      where: {
-        sender_uuid: { [Op.notLike]: 'trpg%' },
-        to_uuid: player.uuid,
-        converse_uuid: null,
-        date: dateCond,
-        is_group: false,
-      },
-      plain: false,
-    })
-    .then((list) => list.map((item) => item['DISTINCT']));
-  let ret2 = await db.models.chat_log
-    .aggregate('to_uuid' as any, 'DISTINCT', {
-      where: {
-        sender_uuid: player.uuid,
-        to_uuid: { [Op.notLike]: 'trpg%' },
-        converse_uuid: null,
-        date: dateCond,
-        is_group: false,
-      },
-      plain: false,
-    })
-    .then((list) => list.map((item) => item['DISTINCT']));
+  const dateCond = { [Op.gte]: new Date(lastLoginDate) };
+  const ret1 = await ChatLog.aggregate('sender_uuid' as any, 'DISTINCT', {
+    where: {
+      sender_uuid: { [Op.notLike]: 'trpg%' },
+      to_uuid: player.uuid,
+      converse_uuid: null,
+      date: dateCond,
+      is_group: false,
+    },
+    plain: false,
+  }).then((list) => list.map((item) => item['DISTINCT']));
+  const ret2 = await ChatLog.aggregate('to_uuid' as any, 'DISTINCT', {
+    where: {
+      sender_uuid: player.uuid,
+      to_uuid: { [Op.notLike]: 'trpg%' },
+      converse_uuid: null,
+      date: dateCond,
+      is_group: false,
+    },
+    plain: false,
+  }).then((list) => list.map((item) => item['DISTINCT']));
   senders = [...senders, ...ret1, ...ret2];
   // 数组去重与过滤
   senders = Array.from(new Set(senders)).filter(Boolean);
@@ -403,25 +396,28 @@ export const revokeMsg: EventFunc<{
   return true;
 };
 
+/**
+ * 删除会话
+ */
 export const removeConverse: EventFunc = async function removeConverse(
   data,
   cb,
   db
 ) {
-  let app = this.app;
-  let socket = this.socket;
+  const app = this.app;
+  const socket = this.socket;
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
   }
   const user = await PlayerUser.findByUUID(player.uuid);
-  let converse_uuid = data.converseUUID;
+  const converse_uuid = data.converseUUID;
   if (!converse_uuid) {
     throw new Error('缺少必要字段');
   }
 
-  let converse = await db.models.chat_converse.findOne({
+  const converse = await ChatConverse.findOne({
     where: {
       ownerId: user.id,
       uuid: converse_uuid,
@@ -443,21 +439,19 @@ export const getConverses: EventFunc = async function getConverses(
   cb,
   db
 ) {
-  let app = this.app;
-  let socket = this.socket;
+  const app = this.app;
+  const socket = this.socket;
 
   if (!app.player) {
     throw new Error('[ChatComponent] require component [PlayerComponent]');
   }
 
-  let player = app.player.manager.findPlayer(socket);
+  const player = app.player.manager.findPlayer(socket);
   if (!player) {
     throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
   }
-  let user = await db.models.player_user.findOne({
-    where: { uuid: player.uuid },
-  });
-  let converses = await user.getConverses();
+  const user = await PlayerUser.findByUUID(player.uuid);
+  const converses = await user.getConverses();
   return { list: converses };
 };
 
@@ -499,7 +493,7 @@ export const updateCardChatData: EventFunc = async function updateCardChatData(
   }
 
   // 在数据库中查找
-  log = await db.models.chat_log.findOne({
+  log = await ChatLog.findOne({
     where: {
       uuid: chatUUID,
       type: 'card',

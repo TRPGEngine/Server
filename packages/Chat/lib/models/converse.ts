@@ -16,6 +16,12 @@ export type ChatConverseType =
   | 'system'
   | 'multiuser'; // 多用户
 
+declare module 'packages/Player/lib/models/user' {
+  interface PlayerUser {
+    getConverses?: BelongsToManyGetAssociationsMixin<ChatConverse>;
+  }
+}
+
 /**
  * 多人会话的模型
  */
