@@ -235,6 +235,8 @@ export default class WebService {
             msg = 'Forbidden';
           } else if (ctx.status === 401) {
             msg = 'Unauthorized';
+          } else if (ctx.status === 405) {
+            msg = 'Not Allowed';
           } else {
             msg = 'Unknown Error';
           }

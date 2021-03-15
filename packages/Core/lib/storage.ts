@@ -167,7 +167,7 @@ function redefineDb(db: DBInstance) {
   };
 
   let originDefine = db.define;
-  db.define = function(name, attributes, options) {
+  db.define = function (name, attributes, options) {
     // 增加required
     for (let field in attributes) {
       let attr = attributes[field];
@@ -178,8 +178,8 @@ function redefineDb(db: DBInstance) {
 
     // 增加类方法别名，使用闭包防止访问到不正确的对象
     let originModelCls = originDefine.call(db, name, attributes, options);
-    originModelCls.oneAsync = (function(_) {
-      return function(where) {
+    originModelCls.oneAsync = (function (_) {
+      return function (where) {
         return _.findOne({ where });
       };
     })(originModelCls);
