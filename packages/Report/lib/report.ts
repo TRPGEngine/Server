@@ -4,11 +4,14 @@ import reports from './reports';
 import ReportErrorDefinition from './models/error';
 import BasePackage from 'lib/package';
 import reportRouter from './routers/report';
+import ReportChatlogAllDefinition from './models/chatlog';
+import ReportLoginTimesAllDefinition from './models/login-times';
+import ReportRegisterAllDefinition from './models/register';
 
 export default class Report extends BasePackage {
   public name: string = 'Report';
   public require: string[] = ['Player', 'Chat'];
-  public desc: string = '统计模块';
+  public desc: string = '统计与汇报模块';
 
   onInit() {
     this.initStorage();
@@ -25,9 +28,9 @@ export default class Report extends BasePackage {
     };
 
     this.regModel(ReportErrorDefinition);
-    registerAll(require('./models/register'));
-    registerAll(require('./models/chatlog'));
-    registerAll(require('./models/login-times'));
+    registerAll(ReportRegisterAllDefinition);
+    registerAll(ReportChatlogAllDefinition);
+    registerAll(ReportLoginTimesAllDefinition);
   }
 
   initRouters() {
@@ -37,7 +40,6 @@ export default class Report extends BasePackage {
   initTimer() {
     const app = this.app;
 
-    // TODO: 需要将其注册到app里而不是单独弄一套计划任务
     const dailyReport = app.registerScheduleJob(
       'report::daily',
       '0 0 2 * * *',

@@ -31,7 +31,7 @@ export interface TRPGDbOptions {
   options: Options;
 }
 
-interface TRPGModelAttributes {
+export interface TRPGModelAttributes {
   [name: string]:
     | DataType
     | (ModelAttributeColumnOptions & {

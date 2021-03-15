@@ -25,7 +25,7 @@ reportRouter.post('/error', async (ctx) => {
 /**
  * 获取日统计信息
  */
-reportRouter.get('/statis/daily', async (ctx) => {
+reportRouter.get('/stats/daily', async (ctx) => {
   const date = ctx.query.date;
 
   if (_.isNil(date)) {
