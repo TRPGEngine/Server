@@ -7,7 +7,6 @@ reportRouter.post('/error', async (ctx) => {
   let ua = ctx.request.headers['user-agent'];
   let { message = '', stack = '', version } = ctx.request.body;
 
-  const db = ctx.trpgapp.storage.db;
   console.log('report err from', ip, 'stack', stack);
   await ReportError.create({
     ip,
