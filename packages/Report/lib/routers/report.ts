@@ -3,9 +3,9 @@ import { ReportError } from '../models/error';
 const reportRouter = new TRPGRouter();
 
 reportRouter.post('/error', async (ctx) => {
-  let ip = ctx.request.headers['x-real-ip'] || ctx.request.ip;
-  let ua = ctx.request.headers['user-agent'];
-  let { message = '', stack = '', version } = ctx.request.body;
+  const ip = ctx.request.headers['x-real-ip'] || ctx.request.ip;
+  const ua = ctx.request.headers['user-agent'];
+  const { message = '', stack = '', version } = ctx.request.body;
 
   console.log('report err from', ip, 'stack', stack);
   await ReportError.create({
