@@ -204,6 +204,24 @@ export const register: EventFunc<{
   return { results };
 };
 
+/**
+ * 检查鉴权状态
+ */
+export const checkAuthStatus: EventFunc = async function checkLoginStatus() {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  const isAuth = !_.isNil(player);
+
+  return {
+    isAuth,
+  };
+};
+
+/**
+ * 获取用户信息
+ */
 export const getInfo: EventFunc<{
   type: 'self' | 'user';
   uuid: string;

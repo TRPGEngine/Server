@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.49.0](https://github.com/TRPGEngine/Server/compare/v1.48.1...v1.49.0) (2021-03-17)
+
+
+### Features
+
+* **chat:** 增加接口用于保存已读记录 ([1117678](https://github.com/TRPGEngine/Server/commit/1117678a0e2f1e6b991bdbb10aad3ee9f996d408))
+* **player:** add checkAuthStatus event ([1f1fe77](https://github.com/TRPGEngine/Server/commit/1f1fe77cdc5dc2b52f77a937c2dce26e63d92f28))
+* **report:** 增加每日统计接口 ([166e087](https://github.com/TRPGEngine/Server/commit/166e087f8bd6a5869f1bd838a5f04444f15ec11a))
+
 ### [1.48.1](https://github.com/TRPGEngine/Server/compare/v1.48.0...v1.48.1) (2021-03-10)
 
 ## [1.48.0](https://github.com/TRPGEngine/Server/compare/v1.47.0...v1.48.0) (2021-02-26)

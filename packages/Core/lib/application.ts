@@ -272,7 +272,11 @@ export class Application extends events.EventEmitter {
    * @param rule 计划任务执行规则
    * @param fn 计划任务方法
    */
-  registerScheduleJob(name: string, rule: string, fn: ScheduleJobFn) {
+  registerScheduleJob(
+    name: string,
+    rule: string,
+    fn: ScheduleJobFn
+  ): ScheduleJob {
     for (let s of this.scheduleJob) {
       if (s.name === name) {
         applog(`schedule job [${name}] has been registered`);
@@ -313,10 +317,14 @@ export class Application extends events.EventEmitter {
       name,
       job.nextInvocation()
     );
-    this.scheduleJob.push({
+
+    const newScheduleJob: ScheduleJob = {
       name,
       job,
-    });
+    };
+    this.scheduleJob.push(newScheduleJob);
+
+    return newScheduleJob;
   }
 
   /**

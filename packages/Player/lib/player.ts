@@ -94,7 +94,7 @@ export default class Player extends BasePackage {
           where: { uuid: userUUID },
         });
       },
-      makeFriendAsync: async function(uuid1, uuid2, db) {
+      makeFriendAsync: async function (uuid1, uuid2, db) {
         if (!uuid1 || !uuid2) {
           debug('make friend need 2 uuid: receive %o', { uuid1, uuid2 });
           return;
@@ -113,7 +113,7 @@ export default class Player extends BasePackage {
           throw err;
         }
       },
-      getFriendsAsync: async function(uuid, db) {
+      getFriendsAsync: async function (uuid, db) {
         let user = await PlayerUser.findOne({
           where: { uuid },
         });
@@ -121,7 +121,7 @@ export default class Player extends BasePackage {
         let friends = await user.getFriend();
         return friends;
       },
-      joinSocketRoom: async function(userUUID: string, roomUUID: string) {
+      joinSocketRoom: async function (userUUID: string, roomUUID: string) {
         try {
           const isOnline = await app.player.manager.checkPlayerOnline(userUUID);
           if (isOnline) {
@@ -133,11 +133,11 @@ export default class Player extends BasePackage {
           console.error('加入房间失败:', e);
         }
       },
-      leaveSocketRoom: async function(userUUID: string, roomUUID: string) {
+      leaveSocketRoom: async function (userUUID: string, roomUUID: string) {
         await app.player.manager.leaveRoomWithUUID(roomUUID, userUUID);
       },
       // 服务端直接创建用户
-      createNewAsync: async function(username, password, options) {
+      createNewAsync: async function (username, password, options) {
         const modelUser = PlayerUser;
         const salt = modelUser.genSalt();
         let data = Object.assign(
@@ -153,7 +153,7 @@ export default class Player extends BasePackage {
         return player;
       },
       // 记录用户离线时间
-      recordUserOfflineDate: async function(socket: Socket) {
+      recordUserOfflineDate: async function (socket: Socket) {
         if (isTestEnv()) {
           // 测试环境不记录用户离线时间
           return;
@@ -201,6 +201,7 @@ export default class Player extends BasePackage {
     this.regSocketEvent('player::loginWithToken', event.loginWithToken);
     this.regSocketEvent('player::getWebToken', event.getWebToken);
     this.regSocketEvent('player::register', event.register);
+    this.regSocketEvent('player::checkAuthStatus', event.checkAuthStatus);
     this.regSocketEvent('player::getInfo', event.getInfo);
     this.regSocketEvent('player::updateInfo', event.updateInfo);
     this.regSocketEvent('player::changePassword', event.changePassword);
@@ -223,7 +224,7 @@ export default class Player extends BasePackage {
 
     // TODO:需要考虑到断线重连的问题
     const app = this.app;
-    app.on('disconnect', function(socket) {
+    app.on('disconnect', function (socket) {
       const player = app.player.manager.findPlayer(socket);
 
       if (player) {
