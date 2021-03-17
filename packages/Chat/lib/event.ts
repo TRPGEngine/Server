@@ -514,7 +514,10 @@ export const updateCardChatData: EventFunc = async function updateCardChatData(
 /**
  * 设置会话已收到
  */
-export const setConverseAck: EventFunc = async function converseAck(data) {
+export const setConverseAck: EventFunc<{
+  converseUUID: string;
+  lastLogUUID: string;
+}> = async function converseAck(data) {
   const app = this.app;
   const socket = this.socket;
 
