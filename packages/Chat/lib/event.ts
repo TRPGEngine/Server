@@ -517,6 +517,7 @@ export const updateCardChatData: EventFunc = async function updateCardChatData(
 export const setConverseAck: EventFunc<{
   converseUUID: string;
   lastLogUUID: string;
+  groupUUID?: string;
 }> = async function converseAck(data) {
   const app = this.app;
   const socket = this.socket;
@@ -526,9 +527,14 @@ export const setConverseAck: EventFunc<{
     throw new Error('发生异常，无法获取到用户信息，请检查您的登录状态');
   }
 
-  const { converseUUID, lastLogUUID } = data;
+  const { converseUUID, lastLogUUID, groupUUID } = data;
 
-  await ChatConverseAck.setConverseAck(player.uuid, converseUUID, lastLogUUID);
+  await ChatConverseAck.setConverseAck(
+    player.uuid,
+    converseUUID,
+    lastLogUUID,
+    groupUUID
+  );
 
   return true;
 };

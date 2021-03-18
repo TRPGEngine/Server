@@ -7,9 +7,17 @@ export class ChatConverseAck extends Model {
   user_uuid: string;
 
   /**
+   * 会话UUID
    * 可以是用户UUID也可以是频道UUID
    */
   converse_uuid: string;
+
+  /**
+   * 团UUID
+   * 如果是私人消息则可以为空
+   */
+  group_uuid?: string;
+
   last_log_uuid: string;
 
   /**
@@ -20,7 +28,8 @@ export class ChatConverseAck extends Model {
   static async setConverseAck(
     userUUID: string,
     converseUUID: string,
-    lastLogUUID: string
+    lastLogUUID: string,
+    groupUUID: string = null
   ) {
     const ack: ChatConverseAck = await ChatConverseAck.findOne({
       where: {
@@ -31,12 +40,17 @@ export class ChatConverseAck extends Model {
     if (ack) {
       // 已存在
       ack.last_log_uuid = lastLogUUID;
+      if (ack.group_uuid !== groupUUID) {
+        // 该逻辑确保groupUUID正确
+        ack.group_uuid = groupUUID;
+      }
       await ack.save();
     } else {
       await ChatConverseAck.create({
         user_uuid: userUUID,
         converse_uuid: converseUUID,
         last_log_uuid: lastLogUUID,
+        group_uuid: groupUUID,
       });
     }
   }
@@ -55,6 +69,9 @@ export default function ChatConverseAckDefinition(
       converse_uuid: {
         type: Sequelize.UUID,
         allowNull: false,
+      },
+      group_uuid: {
+        type: Sequelize.UUID,
       },
       last_log_uuid: {
         type: Sequelize.UUID,

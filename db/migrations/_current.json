@@ -1357,6 +1357,10 @@
                     "field": "converse_uuid",
                     "seqType": "Sequelize.UUID"
                 },
+                "group_uuid": {
+                    "field": "group_uuid",
+                    "seqType": "Sequelize.UUID"
+                },
                 "last_log_uuid": {
                     "allowNull": false,
                     "field": "last_log_uuid",
@@ -4024,5 +4028,5 @@
             "indexes": []
         }
     },
-    "revision": 88
+    "revision": 89
 }
