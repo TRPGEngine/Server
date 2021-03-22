@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.49.1](https://github.com/TRPGEngine/Server/compare/v1.49.0...v1.49.1) (2021-03-22)
+
 ## [1.49.0](https://github.com/TRPGEngine/Server/compare/v1.48.1...v1.49.0) (2021-03-17)
 
 
