@@ -11,6 +11,7 @@ import { notifyUpdateMessage } from '../notify';
 import { NoReportError } from 'lib/error';
 import { generateChatMsgUUID } from '../utils';
 import { groupString } from 'lib/helper/string-helper';
+
 const debug = Debug('trpg:component:chat:model:log');
 
 export class ChatLog extends Model implements ChatMessagePayload {
@@ -467,6 +468,26 @@ export class ChatLog extends Model implements ChatMessagePayload {
 
     // 通知所有用户可以看得到消息的人已撤回
     notifyUpdateMessage(msgUUID, { ...msg, ...updatedMsgPayload });
+  }
+
+  /**
+   * 在数据库中搜索团消息
+   */
+  public static async searchGroupChatLogInDatabaseByMessage(
+    groupUUID: string,
+    messageSnippet: string
+  ): Promise<ChatLog[]> {
+    const res: ChatLog[] = await ChatLog.findAll({
+      where: {
+        group_uuid: groupUUID,
+        message: {
+          [Op.like]: `%${messageSnippet}%`,
+        },
+      },
+      limit: 50,
+    });
+
+    return res;
   }
 }
 

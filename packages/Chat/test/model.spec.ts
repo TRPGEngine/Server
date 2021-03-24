@@ -4,8 +4,9 @@ import { buildAppContext } from 'test/utils/app';
 import { ChatLog } from '../lib/models/log';
 import { ChatConverseAck } from '../lib/models/converse-ack';
 import { generateChatMsgUUID } from '../lib/utils';
-import { createTestChatlogPayload } from './example';
+import { createTestChatlog, createTestChatlogPayload } from './example';
 import { sleep } from 'lib/helper/utils';
+import { generateRandomStr } from 'lib/helper/string-helper';
 
 const context = buildAppContext();
 
@@ -31,9 +32,7 @@ describe('ChatLog', () => {
   test.todo('ChatLog.appendCachedChatLog');
   test.todo('ChatLog.updateCachedChatLog');
 
-  describe('ChatLog.dumpCachedChatLog', (
-  
-  ) => {
+  describe('ChatLog.dumpCachedChatLog', () => {
     test('long message', async () => {
       let longMessage = '';
       for (let i = 0; i < 1000; i++) {
@@ -65,6 +64,30 @@ describe('ChatLog', () => {
         }
       }
     });
+  });
+
+  test.only('ChatLog.searchGroupChatLogInDatabaseByMessage should be ok', async () => {
+    const testGroupUUID = generateRandomStr();
+
+    const chatlog = await createTestChatlog({
+      group_uuid: testGroupUUID,
+      is_group: true,
+      message: 'the brown fox jumps over the lazy dog',
+    });
+
+    const logUUID = chatlog.uuid;
+
+    const res1 = await ChatLog.searchGroupChatLogInDatabaseByMessage(
+      testGroupUUID,
+      'fox'
+    );
+    expect(res1.findIndex((x) => x.uuid === logUUID)).toBeGreaterThanOrEqual(0);
+
+    const res2 = await ChatLog.searchGroupChatLogInDatabaseByMessage(
+      testGroupUUID,
+      'r t'
+    );
+    expect(res2.findIndex((x) => x.uuid === logUUID)).toBeGreaterThanOrEqual(0);
   });
 });
 
