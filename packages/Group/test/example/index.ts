@@ -6,6 +6,7 @@ import testExampleStack from 'test/utils/example';
 import { generateRandomStr } from 'test/utils/utils';
 import { GroupDetail } from 'packages/Group/lib/models/detail';
 import { GroupPanel } from 'packages/Group/lib/models/panel';
+import { GroupInvite } from 'packages/Group/lib/models/invite';
 
 export const createTestGroup = async (): Promise<GroupGroup> => {
   const testUser = await getTestUser();
@@ -77,3 +78,23 @@ export const createTestGroupPanel = async (
 
   return groupPanel;
 };
+
+export async function createTestGroupInvite(
+  to_uuid: string,
+  others: PartialModelField<GroupInvite> = {}
+): Promise<GroupInvite> {
+  const testUser = await getTestUser();
+  const testGroup = await createTestGroup();
+  const invite = await GroupInvite.create({
+    group_uuid: testGroup.uuid,
+    from_uuid: testUser.uuid,
+    to_uuid,
+    is_agree: false,
+    is_refuse: false,
+    ...others,
+  });
+
+  testExampleStack.append(invite);
+
+  return invite;
+}

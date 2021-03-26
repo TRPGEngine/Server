@@ -54,6 +54,24 @@ export class GroupInvite extends Model {
     return invites;
   }
 
+  /**
+   * 获取所有未处理的团邀请列表
+   * 未处理的定义: 未同意且未拒绝
+   */
+  static async getAllPendingInvites(
+    playerUUID: string
+  ): Promise<GroupInvite[]> {
+    const invites = await GroupInvite.findAll({
+      where: {
+        to_uuid: playerUUID,
+        is_agree: false,
+        is_refuse: false,
+      },
+    });
+
+    return invites;
+  }
+
   async agreeAsync() {
     this.is_agree = true;
     this.is_refuse = false;

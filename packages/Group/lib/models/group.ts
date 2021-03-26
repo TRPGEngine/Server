@@ -27,6 +27,7 @@ import { GroupChannel } from './channel';
 import Debug from 'debug';
 import { GroupPanel } from './panel';
 import { NoPermissionError, NoReportError, NotFoundError } from 'lib/error';
+
 const debug = Debug('trpg:component:group:model:group');
 
 type GroupType = 'group' | 'channel' | 'test';

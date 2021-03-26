@@ -482,14 +482,9 @@ export const getGroupInvite: EventFunc<{}> = async function getGroupInvite(
     throw new Error('用户状态异常');
   }
 
-  let uuid = player.uuid;
-  let res = await db.models.group_invite.findAll({
-    where: {
-      to_uuid: uuid,
-      is_agree: false,
-      is_refuse: false,
-    },
-  });
+  const uuid = player.uuid;
+
+  const res = GroupInvite.getAllPendingInvites(uuid);
 
   return { res };
 };

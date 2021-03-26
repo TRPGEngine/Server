@@ -10,6 +10,7 @@ import {
   createTestGroupDetail,
   testGroupActorInfo,
   createTestGroupPanel,
+  createTestGroupInvite,
 } from './example';
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
@@ -21,6 +22,7 @@ import { GroupInviteCode } from '../lib/models/invite-code';
 import shortid from 'shortid';
 import { GroupVoiceChannel } from '../lib/models/voice-channel';
 import { GroupPanelData } from '../lib/models/panel-data';
+import { GroupInvite } from '../lib/models/invite';
 
 const context = buildAppContext();
 
@@ -951,6 +953,22 @@ describe('group model function', () => {
           },
         });
       }
+    });
+  });
+
+  describe('GroupInvite', () => {
+    test('GroupInvite.getAllPendingInvites should be ok', async () => {
+      const testUser = await getOtherTestUser('admin9');
+      const invite1 = await createTestGroupInvite(testUser.uuid);
+      const invite2 = await createTestGroupInvite(testUser.uuid);
+      const invite3 = await createTestGroupInvite(testUser.uuid);
+
+      const inviteList = await GroupInvite.getAllPendingInvites(testUser.uuid);
+      const inviteListUUIDs = inviteList.map((x) => x.uuid);
+
+      expect(inviteListUUIDs.includes(invite1.uuid)).toBe(true);
+      expect(inviteListUUIDs.includes(invite2.uuid)).toBe(true);
+      expect(inviteListUUIDs.includes(invite3.uuid)).toBe(true);
     });
   });
 
