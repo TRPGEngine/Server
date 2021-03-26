@@ -69,7 +69,7 @@ export class GroupInvite extends Model {
       },
     });
 
-    return invites;
+    return invites ?? [];
   }
 
   /**

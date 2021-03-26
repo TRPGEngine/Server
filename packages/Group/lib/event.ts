@@ -454,7 +454,7 @@ export const getGroupInvite: EventFunc<{}> = async function getGroupInvite(
 
   const uuid = player.uuid;
 
-  const res = GroupInvite.getAllPendingInvites(uuid);
+  const res = await GroupInvite.getAllPendingInvites(uuid);
 
   return { res };
 };
