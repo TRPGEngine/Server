@@ -18,4 +18,28 @@ inviteRouter.get('/invite/all', ssoAuth(), async (ctx) => {
   ctx.body = { invites };
 });
 
+/**
+ * 同意团邀请
+ */
+inviteRouter.post('/invite/:inviteUUID/agree', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const inviteUUID: string = ctx.params.inviteUUID;
+
+  await GroupInvite.agreeInvite(inviteUUID, playerUUID);
+
+  ctx.body = { result: true };
+});
+
+/**
+ * 拒绝团邀请
+ */
+inviteRouter.post('/invite/:inviteUUID/refuse', ssoAuth(), async (ctx) => {
+  const playerUUID = ctx.state.player.uuid;
+  const inviteUUID: string = ctx.params.inviteUUID;
+
+  await GroupInvite.refuseInvite(inviteUUID, playerUUID);
+
+  ctx.body = { result: true };
+});
+
 export default inviteRouter;

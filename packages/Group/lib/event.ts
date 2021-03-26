@@ -377,19 +377,8 @@ export const refuseGroupInvite: EventFunc<{
     throw new Error('缺少必要参数');
   }
 
-  let invite = await db.models.group_invite.findOne({
-    where: {
-      uuid: inviteUUID,
-      to_uuid: playerUUID,
-    },
-  });
+  const invite = await GroupInvite.refuseInvite(inviteUUID, playerUUID);
 
-  if (!invite) {
-    throw new Error('拒绝失败: 该请求不存在');
-  }
-
-  invite.is_refuse = true;
-  await invite.save();
   return { res: invite };
 };
 
@@ -414,26 +403,7 @@ export const agreeGroupInvite: EventFunc<{
     throw new Error('缺少必要参数');
   }
 
-  const invite: GroupInvite = await GroupInvite.findOne({
-    where: {
-      uuid: inviteUUID,
-      to_uuid: playerUUID,
-    },
-  });
-  if (_.isNil(invite)) {
-    throw new Error('该邀请不存在');
-  }
-  const groupUUID = invite.group_uuid;
-  const group = await GroupGroup.findByUUID(groupUUID);
-  if (!group) {
-    throw new Error('该团不存在');
-  }
-
-  await db.transactionAsync(async () => {
-    await GroupGroup.addGroupMember(groupUUID, playerUUID);
-    await invite.agreeAsync();
-    _.set(invite, 'dataValues.group', group);
-  });
+  const invite = await GroupInvite.agreeInvite(inviteUUID, playerUUID);
 
   return { res: invite };
 };

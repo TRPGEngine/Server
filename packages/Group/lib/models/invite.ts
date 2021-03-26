@@ -72,6 +72,67 @@ export class GroupInvite extends Model {
     return invites;
   }
 
+  /**
+   * 同意团邀请
+   * @param inviteUUID 邀请UUID
+   * @param operatorUUID 操作人UUID
+   */
+  static async agreeInvite(
+    inviteUUID: string,
+    operatorUUID: string
+  ): Promise<GroupInvite> {
+    const invite: GroupInvite = await GroupInvite.findOne({
+      where: {
+        uuid: inviteUUID,
+        to_uuid: operatorUUID,
+      },
+    });
+    if (_.isNil(invite)) {
+      throw new Error('同意邀请失败: 该邀请不存在');
+    }
+    const groupUUID = invite.group_uuid;
+    const group = await GroupGroup.findByUUID(groupUUID);
+    if (!group) {
+      throw new Error('同意邀请失败: 该团不存在');
+    }
+
+    const trpgapp = GroupInvite.getApplication();
+    const db = trpgapp.storage.db;
+    await db.transactionAsync(async () => {
+      await GroupGroup.addGroupMember(groupUUID, operatorUUID);
+      await invite.agreeAsync();
+      _.set(invite, 'dataValues.group', group); // 这个是为了socket的返回值
+    });
+
+    return invite;
+  }
+
+  /**
+   * 拒绝团邀请
+   * @param inviteUUID 邀请UUID
+   * @param operatorUUID 操作人UUID
+   */
+  static async refuseInvite(
+    inviteUUID: string,
+    operatorUUID: string
+  ): Promise<GroupInvite> {
+    const invite: GroupInvite = await GroupInvite.findOne({
+      where: {
+        uuid: inviteUUID,
+        to_uuid: operatorUUID,
+      },
+    });
+    if (_.isNil(invite)) {
+      throw new Error('拒绝邀请失败: 该邀请不存在');
+    }
+
+    // 不检测团是否存在，直接拒绝
+
+    await invite.refuseAsync();
+
+    return invite;
+  }
+
   async agreeAsync() {
     this.is_agree = true;
     this.is_refuse = false;

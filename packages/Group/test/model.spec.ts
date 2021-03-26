@@ -956,7 +956,7 @@ describe('group model function', () => {
     });
   });
 
-  describe('GroupInvite', () => {
+  describe.only('GroupInvite', () => {
     test('GroupInvite.getAllPendingInvites should be ok', async () => {
       const testUser = await getOtherTestUser('admin9');
       const invite1 = await createTestGroupInvite(testUser.uuid);
@@ -969,6 +969,36 @@ describe('group model function', () => {
       expect(inviteListUUIDs.includes(invite1.uuid)).toBe(true);
       expect(inviteListUUIDs.includes(invite2.uuid)).toBe(true);
       expect(inviteListUUIDs.includes(invite3.uuid)).toBe(true);
+    });
+
+    test('GroupInvite.agreeInvite should be ok', async () => {
+      const testUser = await getOtherTestUser('admin9');
+      const invite = await createTestGroupInvite(testUser.uuid);
+
+      await GroupInvite.agreeInvite(invite.uuid, testUser.uuid);
+
+      const res: GroupInvite | null = await GroupInvite.findOne({
+        where: { uuid: invite.uuid },
+      });
+
+      expect(res).not.toBeNull();
+      expect(res.is_agree).toBe(true);
+      expect(res.is_refuse).toBe(false);
+    });
+
+    test('GroupInvite.refuseInvite should be ok', async () => {
+      const testUser = await getOtherTestUser('admin9');
+      const invite = await createTestGroupInvite(testUser.uuid);
+
+      await GroupInvite.refuseInvite(invite.uuid, testUser.uuid);
+
+      const res: GroupInvite | null = await GroupInvite.findOne({
+        where: { uuid: invite.uuid },
+      });
+
+      expect(res).not.toBeNull();
+      expect(res.is_agree).toBe(false);
+      expect(res.is_refuse).toBe(true);
     });
   });
 
