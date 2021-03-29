@@ -3,6 +3,7 @@ import SequelizeStatic, {
   ModelAttributes,
   InitOptions,
   Op,
+  literal,
 } from 'sequelize';
 export {
   DBInstance,
@@ -12,4 +13,4 @@ export {
 } from '../lib/storage';
 
 export type Orm = typeof SequelizeStatic;
-export { Op };
+export { Op, literal as ModelLiteral };

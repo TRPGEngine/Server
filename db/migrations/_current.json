@@ -2407,6 +2407,13 @@
                     "field": "expiredAt",
                     "seqType": "Sequelize.DATE"
                 },
+                "usage": {
+                    "defaultValue": {
+                        "value": 0
+                    },
+                    "field": "usage",
+                    "seqType": "Sequelize.INTEGER"
+                },
                 "times": {
                     "defaultValue": {
                         "value": -1
@@ -4028,5 +4035,5 @@
             "indexes": []
         }
     },
-    "revision": 89
+    "revision": 90
 }

@@ -22,6 +22,7 @@ import GroupVoiceChannelDefinition, {
 } from './models/voice-channel';
 import GroupPanelDataDefinition from './models/panel-data';
 import panelDataRouter from './routers/panel-data';
+import inviteRouter from './routers/invite';
 
 export default class Group extends BasePackage {
   public name: string = 'Group';
@@ -103,6 +104,7 @@ export default class Group extends BasePackage {
     this.regRoute(actorRouter);
     this.regRoute(groupRouter);
     this.regRoute(panelRouter);
+    this.regRoute(inviteRouter);
     this.regRoute(inviteCodeRouter);
     this.regRoute(panelDataRouter);
 

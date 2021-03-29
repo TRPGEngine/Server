@@ -52,7 +52,7 @@ docker network connect trpg_swarm [trpg_redis_1]
 
 ##### 第三步: 编辑配置并启动服务
 
-修改配置文件
+修改配置文件(`Server/build/docker/trpg/config/local.js`)
 ```
 db.options.host => trpg_mysql_1
 
@@ -62,4 +62,12 @@ redisUrl => redis://trpg_redis_1:6379/8
 ```bash
 docker stack deploy -c docker-compose.swarm.yml trpg_engine
 docker service update --network-add trpg_swarm trpg_engine_trpg-server
+```
+
+## 更新版本
+
+#### 拉取新镜像
+```
+docker pull moonrailgun/trpg-server:latest
+docker stack deploy -c docker-compose.swarm.yml trpg_engine
 ```

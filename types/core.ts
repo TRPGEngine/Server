@@ -5,6 +5,7 @@ export {
   Model,
   ModelFn,
   Op,
+  ModelLiteral,
   TRPGModelAttributes,
 } from 'packages/Core/types/storage';
 export { SocketEventFn, EventFunc, Socket } from 'packages/Core/types/socket';

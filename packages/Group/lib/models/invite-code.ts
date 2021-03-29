@@ -18,6 +18,7 @@ export class GroupInviteCode extends Model {
   group_uuid: string;
   from_uuid: string;
   expiredAt: Date;
+  usage: number;
   times: number;
 
   /**
@@ -78,6 +79,7 @@ export class GroupInviteCode extends Model {
       throw new Error('找不到邀请信息');
     }
     const groupUUID = invite.group_uuid;
+    await invite.increment(['usage']); // 使用次数增加1
     await GroupGroup.addGroupMember(groupUUID, userUUID);
   }
 }
@@ -97,7 +99,8 @@ export default function GroupInviteCodeDefinition(
       group_uuid: { type: Sequelize.UUID, required: true },
       from_uuid: { type: Sequelize.UUID, required: true },
       expiredAt: { type: Sequelize.DATE },
-      times: { type: Sequelize.INTEGER, defaultValue: -1 },
+      usage: { type: Sequelize.INTEGER, defaultValue: 0 }, // 使用次数
+      times: { type: Sequelize.INTEGER, defaultValue: -1 }, // 一共可用次数
     },
     {
       tableName: 'group_invite_code',
