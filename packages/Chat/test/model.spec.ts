@@ -66,7 +66,7 @@ describe('ChatLog', () => {
     });
   });
 
-  test.only('ChatLog.searchGroupChatLogInDatabaseByMessage should be ok', async () => {
+  test('ChatLog.searchGroupChatLogInDatabaseByMessage should be ok', async () => {
     const testGroupUUID = generateRandomStr();
 
     const chatlog = await createTestChatlog({
