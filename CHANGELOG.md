@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.50.0](https://github.com/TRPGEngine/Server/compare/v1.49.1...v1.50.0) (2021-03-29)
+
+
+### Features
+
+* **group:** invite code add usage field ([ccb7ace](https://github.com/TRPGEngine/Server/commit/ccb7aceeb695f4f25d18f533fd6a2416ea8455c2))
+* **group:** 增加getAllPendingInvites接口用于获取所有未处理的团邀请 ([20c5e79](https://github.com/TRPGEngine/Server/commit/20c5e79d49e4da82c0893900525f52555dd812dc))
+* **group:** 增加团同意与拒绝的接口 ([74aa8ad](https://github.com/TRPGEngine/Server/commit/74aa8ad2482193dba87954707b261be6ff758914))
+
 ### [1.49.1](https://github.com/TRPGEngine/Server/compare/v1.49.0...v1.49.1) (2021-03-22)
 
 ## [1.49.0](https://github.com/TRPGEngine/Server/compare/v1.48.1...v1.49.0) (2021-03-17)
