@@ -9,9 +9,9 @@ const chatlogRouter = new TRPGRouter<{
 }>();
 
 /**
- * 用户添加表情包
+ * 搜索群组聊天记录
  */
-chatlogRouter.get('/log/:groupUUID', ssoAuth(), async (ctx) => {
+chatlogRouter.get('/log/group/:groupUUID/search', ssoAuth(), async (ctx) => {
   const playerUUID = ctx.state.player.uuid;
   const groupUUID = ctx.params.groupUUID;
   const keyword = ctx.query.keyword;
