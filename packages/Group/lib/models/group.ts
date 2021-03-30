@@ -337,6 +337,7 @@ export class GroupGroup extends Model {
    */
   static async getGroupChatLog(
     groupUUID: string,
+    converseUUID: string,
     playerUUID: string,
     page = 1,
     size = 10
@@ -347,7 +348,7 @@ export class GroupGroup extends Model {
     }
 
     const group = await GroupGroup.findByUUID(groupUUID);
-    if (_.isNil(user)) {
+    if (_.isNil(group)) {
       throw new Error('团不存在');
     }
 
@@ -360,7 +361,8 @@ export class GroupGroup extends Model {
       count,
     }: { rows: ChatLog[]; count: number } = await ChatLog.findAndCountAll({
       where: {
-        converse_uuid: groupUUID,
+        converse_uuid: converseUUID,
+        group_uuid: groupUUID,
         revoke: false, // 获取范围聊天记录时不返回撤回的消息
       },
       offset: (page - 1) * size,

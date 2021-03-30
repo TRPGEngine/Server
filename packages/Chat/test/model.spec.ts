@@ -66,7 +66,7 @@ describe('ChatLog', () => {
     });
   });
 
-  test('ChatLog.searchGroupChatLogInDatabaseByMessage should be ok', async () => {
+  test('ChatLog.searchConverseChatLogInDatabaseByMessage should be ok', async () => {
     const testGroupUUID = generateRandomStr();
 
     const chatlog = await createTestChatlog({
@@ -77,13 +77,13 @@ describe('ChatLog', () => {
 
     const logUUID = chatlog.uuid;
 
-    const res1 = await ChatLog.searchGroupChatLogInDatabaseByMessage(
+    const res1 = await ChatLog.searchConverseChatLogInDatabaseByMessage(
       testGroupUUID,
       'fox'
     );
     expect(res1.findIndex((x) => x.uuid === logUUID)).toBeGreaterThanOrEqual(0);
 
-    const res2 = await ChatLog.searchGroupChatLogInDatabaseByMessage(
+    const res2 = await ChatLog.searchConverseChatLogInDatabaseByMessage(
       testGroupUUID,
       'r t'
     );

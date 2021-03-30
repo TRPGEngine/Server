@@ -472,14 +472,15 @@ export class ChatLog extends Model implements ChatMessagePayload {
 
   /**
    * 在数据库中搜索团消息
+   * TODO: 缺少权限校验
    */
-  public static async searchGroupChatLogInDatabaseByMessage(
-    groupUUID: string,
+  public static async searchConverseChatLogInDatabaseByMessage(
+    converseUUID: string,
     messageSnippet: string
   ): Promise<ChatLog[]> {
     const res: ChatLog[] = await ChatLog.findAll({
       where: {
-        group_uuid: groupUUID,
+        converse_uuid: converseUUID,
         message: {
           [Op.like]: `%${messageSnippet}%`,
         },
