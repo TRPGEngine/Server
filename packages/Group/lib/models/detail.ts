@@ -17,6 +17,13 @@ declare module './group' {
   }
 }
 
+/**
+ * 生成团详细信息的UUID
+ * @param uuid 团UUID
+ */
+export const genGroupDetailCacheKey = (uuid: string): string =>
+  `group:detail:info:${uuid}`;
+
 export class GroupDetail extends Model {
   id: number;
   master_name: string; // 主持人称呼: 守密人， 地下城主, ...
@@ -37,7 +44,7 @@ export class GroupDetail extends Model {
   static async saveGroupDetail(
     groupUUID: string,
     playerUUID: string,
-    data: {}
+    data: PartialModelField<GroupDetail>
   ): Promise<GroupDetail> {
     if (_.isEmpty(data)) {
       throw new Error('缺少数据');
@@ -62,9 +69,37 @@ export class GroupDetail extends Model {
 
     await detail.save();
 
+    const trpgapp = GroupDetail.getApplication();
+    const cacheKey = genGroupDetailCacheKey(groupUUID);
+    await trpgapp.cache.set(cacheKey, detail); // 设置缓存
+
     notifyUpdateGroupInfo(groupUUID, group);
 
     return detail;
+  }
+
+  /**
+   * 获取团详细信息
+   */
+  static async getGroupDetail(groupUUID: string): Promise<GroupDetail> {
+    const cacheKey = genGroupDetailCacheKey(groupUUID);
+    const trpgapp = GroupDetail.getApplication();
+    const cacheVal = await trpgapp.cache.get(cacheKey);
+
+    if (_.isObject(cacheVal) && !_.isEmpty(cacheVal)) {
+      // 应用缓存
+      return new GroupDetail(cacheVal, {
+        isNewRecord: false,
+      });
+    } else {
+      const group = await GroupGroup.findByUUID(groupUUID);
+      const detail: GroupDetail = await group.getDetail();
+      if (!_.isNil(detail)) {
+        // 仅不为空的时候记录缓存
+        await trpgapp.cache.set(cacheKey, detail); // 设置缓存
+      }
+      return detail;
+    }
   }
 }
 
