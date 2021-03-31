@@ -4,6 +4,7 @@ import {
   Model,
   HasOneGetAssociationMixin,
   BelongsToCreateAssociationMixin,
+  PartialModelField,
 } from 'trpg/core';
 import { ChatMessagePayload } from 'packages/Chat/types/message';
 import { GroupGroup } from './group';
