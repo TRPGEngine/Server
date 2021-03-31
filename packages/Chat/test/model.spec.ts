@@ -70,6 +70,7 @@ describe('ChatLog', () => {
     const testGroupUUID = generateRandomStr();
 
     const chatlog = await createTestChatlog({
+      converse_uuid: testGroupUUID,
       group_uuid: testGroupUUID,
       is_group: true,
       message: 'the brown fox jumps over the lazy dog',
