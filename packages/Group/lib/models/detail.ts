@@ -89,7 +89,9 @@ export class GroupDetail extends Model {
     const cacheKey = genGroupDetailCacheKey(groupUUID);
     await trpgapp.cache.set(cacheKey, detail); // 设置缓存
 
-    notifyUpdateGroupInfo(groupUUID, group);
+    notifyUpdateGroupInfo(groupUUID, {
+      detail,
+    });
 
     return detail;
   }

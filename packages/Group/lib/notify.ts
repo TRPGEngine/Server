@@ -5,6 +5,7 @@ import { GroupPanel } from './models/panel';
 
 /**
  * 通知更新团信息
+ * groupInfo可以是一部分信息
  */
 export async function notifyUpdateGroupInfo(
   groupUUID: string,
