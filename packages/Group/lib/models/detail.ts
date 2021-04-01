@@ -5,6 +5,7 @@ import {
   HasOneGetAssociationMixin,
   BelongsToCreateAssociationMixin,
   PartialModelField,
+  ExtractModelField,
 } from 'trpg/core';
 import { ChatMessagePayload } from 'packages/Chat/types/message';
 import { GroupGroup } from './group';
@@ -28,11 +29,25 @@ export const genGroupDetailCacheKey = (uuid: string): string =>
 export class GroupDetail extends Model {
   id: number;
   master_name: string; // 主持人称呼: 守密人， 地下城主, ...
-  disable_check_actor: boolean; // 是否禁止普通用户查看团人物卡信息(所有人物卡)
-  disable_check_actor_in_chat: boolean; // 是否禁止普通用户查看聊天界面中出现的团人物卡
+
+  /**
+   * 是否禁止普通用户查看团人物卡信息(所有人物卡)
+   * 用于秘密团
+   */
+  disable_check_actor: boolean;
+  /**
+   * 是否禁止普通用户查看聊天界面中出现的团人物卡
+   * 用于秘密团
+   */
+  disable_check_actor_in_chat: boolean;
   background_image_url: string; // 团聊天背景URL
   welcome_msg_payload: ChatMessagePayload; // 新用户欢迎信息
   disable_quick_dice: boolean;
+  /**
+   * 是否禁止在角色卡更新时显示系统消息通知
+   * 用于秘密团
+   */
+  disable_system_notify_on_actor_updated: boolean;
 
   groupId?: number;
 
@@ -98,9 +113,33 @@ export class GroupDetail extends Model {
       if (!_.isNil(detail)) {
         // 仅不为空的时候记录缓存
         await trpgapp.cache.set(cacheKey, detail); // 设置缓存
+      } else {
+        // 数据为空。创建新的团详情
+        const group = await GroupGroup.findByUUID(groupUUID);
+        const newDetail = await group.createDetail({});
+        return newDetail;
       }
       return detail;
     }
+  }
+
+  /**
+   * 获取团详情的具体字段的值
+   * 是 GroupDetail.getGroupDetail 的简单封装
+   * @param groupUUID 团UUID
+   * @param fieldName 详情的字段名
+   * @param defaultValue 默认值
+   */
+  static async getGroupDetailField<
+    T extends Exclude<ExtractModelField<GroupDetail>, 'id' | 'groupId'>
+  >(
+    groupUUID: string,
+    fieldName: T,
+    defaultValue?: GroupDetail[T]
+  ): Promise<GroupDetail[T]> {
+    const detail = await GroupDetail.getGroupDetail(groupUUID);
+
+    return detail[fieldName] ?? defaultValue;
   }
 }
 
@@ -131,6 +170,10 @@ export default function GroupDetailDefinition(Sequelize: Orm, db: DBInstance) {
         type: Sequelize.JSON,
       },
       disable_quick_dice: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      disable_system_notify_on_actor_updated: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },

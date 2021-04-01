@@ -2165,6 +2165,13 @@
                     "field": "disable_quick_dice",
                     "seqType": "Sequelize.BOOLEAN"
                 },
+                "disable_system_notify_on_actor_updated": {
+                    "defaultValue": {
+                        "value": false
+                    },
+                    "field": "disable_system_notify_on_actor_updated",
+                    "seqType": "Sequelize.BOOLEAN"
+                },
                 "createdAt": {
                     "allowNull": false,
                     "field": "createdAt",
@@ -4035,5 +4042,5 @@
             "indexes": []
         }
     },
-    "revision": 90
+    "revision": 91
 }

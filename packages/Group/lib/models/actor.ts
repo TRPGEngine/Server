@@ -19,6 +19,7 @@ import {
 } from '../notify';
 import { GroupChannel } from './channel';
 import Debug from 'debug';
+import { GroupDetail } from './detail';
 const debug = Debug('trpg:component:group:model:actor');
 
 declare module './group' {
@@ -130,15 +131,26 @@ export class GroupActor extends Model {
     // 通知房间所有用户更新团人物信息
     notifyUpdateGroupActorInfo(group.uuid, groupActor);
 
-    // 异步发送团消息更新角色信息
-    (async () => {
-      const user = await PlayerUser.findByUUID(playerUUID);
-      const operationName = user.getName();
-      ChatLog.sendConverseSystemMsg(
-        group.uuid,
-        `${operationName} 更新了人物卡 ${groupActor.name} 的信息`
+    // 如果配置没有禁止(默认情况) 则异步发送团消息更新角色信息
+    const disable_system_notify_on_actor_updated = await GroupDetail.getGroupDetailField(
+      group.uuid,
+      'disable_system_notify_on_actor_updated',
+      false
+    );
+    if (disable_system_notify_on_actor_updated === false) {
+      console.log(
+        'disable_system_notify_on_actor_updated',
+        disable_system_notify_on_actor_updated
       );
-    })();
+      (async () => {
+        const user = await PlayerUser.findByUUID(playerUUID);
+        const operationName = user.getName();
+        ChatLog.sendConverseSystemMsg(
+          group.uuid,
+          `${operationName} 更新了人物卡 ${groupActor.name} 的信息`
+        );
+      })();
+    }
 
     return groupActor;
   }
