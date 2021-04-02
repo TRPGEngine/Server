@@ -23,6 +23,8 @@ export class NoteNote extends Model {
   content: string;
   data: object; // 前端slate的结构化数据
 
+  createdAt: Date;
+  updatedAt: Date;
   getOwner?: BelongsToGetAssociationMixin<PlayerUser>;
 
   /**
@@ -137,8 +139,39 @@ export class NoteNote extends Model {
     return note;
   }
 
+  /**
+   * 获取笔记的完整信息
+   * @param noteUUID 笔记UUID
+   */
+  static async getNoteFullInfo(noteUUID: string) {
+    const note = await NoteNote.findByUUID(noteUUID);
+    const owner: PlayerUser = await note.getOwner();
+
+    const uuid = note.uuid;
+    const title = note.title;
+    const content = note.content;
+    const data = note.data;
+    const createdAt = note.createdAt;
+    const updatedAt = note.updatedAt;
+    const summary = note.getSummary();
+    const cover = note.getCoverImage();
+    const authorName = owner.getName();
+
+    return {
+      uuid,
+      title,
+      content,
+      data,
+      createdAt,
+      updatedAt,
+      summary,
+      cover,
+      authorName,
+    };
+  }
+
   getCoverImage() {
-    let content = this.content;
+    let content = this.content ?? '';
     let imgIndex = content.indexOf('<img');
     if (imgIndex >= 0) {
       let match = content.match(/<img.*?src="(.*?)".*?>/);
