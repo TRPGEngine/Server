@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.51.0](https://github.com/TRPGEngine/Server/compare/v1.50.0...v1.51.0) (2021-04-06)
+
+
+### Features
+
+* **chat:** 增加服务端搜索聊天记录接口 ([9c2081d](https://github.com/TRPGEngine/Server/commit/9c2081dcb1a9c461123de47da8381ff2f96dbf6e))
+* **group:** add disable_system_notify_on_actor_updated 用于更新人物卡时不发系统提示 ([091a7d5](https://github.com/TRPGEngine/Server/commit/091a7d5d0a907322dd0bfbdc086cc5a774d1a250))
+
+
+### Bug Fixes
+
+* **group:** 修复团设置修改后无法立即通知所有成员的bug ([20c56ed](https://github.com/TRPGEngine/Server/commit/20c56eda7351c05624e035c1d0ef4954a97caf95))
+
 ## [1.50.0](https://github.com/TRPGEngine/Server/compare/v1.49.1...v1.50.0) (2021-03-29)
 
 

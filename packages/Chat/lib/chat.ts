@@ -9,6 +9,7 @@ import { initInterceptors } from './interceptors';
 import ChatConverseAckDefinition from './models/converse-ack';
 import { EVENT_PLAYER_REGISTER } from 'packages/Player/lib/const';
 import _ from 'lodash';
+import chatlogRouter from './routers/log';
 
 // 注入方法声明
 declare module 'packages/Core/lib/application' {
@@ -42,6 +43,8 @@ export default class Chat extends BasePackage {
     this.regSocketEvent('getOfflineUserConverse', event.getOfflineUserConverse);
     this.regSocketEvent('updateCardChatData', event.updateCardChatData);
     this.regSocketEvent('setConverseAck', event.setConverseAck);
+
+    this.regRoute(chatlogRouter);
 
     this.initTimer();
     this.initData();

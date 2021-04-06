@@ -35,7 +35,7 @@ noteRouter.get('/:noteUUID', async (ctx) => {
 noteRouter.get('/:noteUUID/info', async (ctx) => {
   const noteUUID = ctx.params.noteUUID;
 
-  const note = await NoteNote.findByUUID(noteUUID);
+  const note = await NoteNote.getNoteFullInfo(noteUUID);
 
   ctx.body = {
     note,

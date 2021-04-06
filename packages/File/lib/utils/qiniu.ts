@@ -86,7 +86,7 @@ export interface QiniuFileStatBody {
  */
 export function statFile(key: string): Promise<QiniuFileStatBody> {
   return new Promise((resolve, reject) => {
-    bucketManager.stat(bucket, key, function(err, respBody, respInfo) {
+    bucketManager.stat(bucket, key, function (err, respBody, respInfo) {
       if (err) {
         reject(err);
       } else {

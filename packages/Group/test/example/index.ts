@@ -7,6 +7,7 @@ import { generateRandomStr } from 'test/utils/utils';
 import { GroupDetail } from 'packages/Group/lib/models/detail';
 import { GroupPanel } from 'packages/Group/lib/models/panel';
 import { GroupInvite } from 'packages/Group/lib/models/invite';
+import { PartialModelField } from 'trpg/core';
 
 export const createTestGroup = async (): Promise<GroupGroup> => {
   const testUser = await getTestUser();

@@ -210,13 +210,15 @@ groupRouter.get('/log/:groupUUID/range', ssoAuth(), async (ctx) => {
 /**
  * 获取团队会话记录
  */
-groupRouter.get('/log/:groupUUID', ssoAuth(), async (ctx) => {
+groupRouter.get('/chatlog/:groupUUID/:converseUUID', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
+  const converseUUID = ctx.params.converseUUID;
   const playerUUID = ctx.state.player.uuid;
   const { page = 1, size = 10 } = ctx.request.query;
 
   const { logs, count } = await GroupGroup.getGroupChatLog(
     groupUUID,
+    converseUUID,
     playerUUID,
     Number(page),
     Number(size)

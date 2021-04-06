@@ -15,7 +15,7 @@ import {
 import { getTestUser, getOtherTestUser } from 'packages/Player/test/example';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { regAutoClear } from 'test/utils/example';
-import { GroupDetail } from '../lib/models/detail';
+import { genGroupDetailCacheKey, GroupDetail } from '../lib/models/detail';
 import { GroupChannel } from '../lib/models/channel';
 import { GroupPanel } from '../lib/models/panel';
 import { GroupInviteCode } from '../lib/models/invite-code';
@@ -23,6 +23,7 @@ import shortid from 'shortid';
 import { GroupVoiceChannel } from '../lib/models/voice-channel';
 import { GroupPanelData } from '../lib/models/panel-data';
 import { GroupInvite } from '../lib/models/invite';
+import { generateRandomStr } from 'lib/helper/string-helper';
 
 const context = buildAppContext();
 
@@ -666,6 +667,68 @@ describe('group model function', () => {
 
       await detail.destroy();
     });
+
+    describe('GroupDetail.getGroupDetail', () => {
+      let testGroup: GroupGroup;
+      let testGroupDetail: GroupDetail;
+
+      beforeAll(async () => {
+        testGroup = await createTestGroup();
+        testGroupDetail = await createTestGroupDetail(testGroup.id);
+      });
+
+      beforeEach(async () => {
+        await context.app.cache.remove(genGroupDetailCacheKey(testGroup.uuid));
+      });
+
+      afterEach(async () => {
+        await context.app.cache.remove(genGroupDetailCacheKey(testGroup.uuid));
+      });
+
+      test('GroupDetail.getGroupDetail should be ok', async () => {
+        const detail = await GroupDetail.getGroupDetail(testGroup.uuid);
+        expect(detail.id).toBe(testGroupDetail.id);
+      });
+
+      test('GroupDetail.getGroupDetail should have cache', async () => {
+        const testGroupUUID = testGroup.uuid;
+
+        const detail = await GroupDetail.getGroupDetail(testGroupUUID);
+        expect(detail.id).toBe(testGroupDetail.id);
+
+        const cache = await context.app.cache.get(
+          genGroupDetailCacheKey(testGroupUUID)
+        );
+        expect(_.get(cache, 'id')).toBe(testGroupDetail.id);
+
+        const detail2 = await GroupDetail.getGroupDetail(testGroupUUID);
+        expect(detail2.id).toBe(testGroupDetail.id);
+      });
+
+      test('GroupDetail.getGroupDetail should be update cache if modify', async () => {
+        const testGroupUUID = testGroup.uuid;
+
+        const detail = await GroupDetail.getGroupDetail(testGroupUUID);
+        expect(detail.id).toBe(testGroupDetail.id);
+
+        const cache = await context.app.cache.get(
+          genGroupDetailCacheKey(testGroupUUID)
+        );
+        expect(_.get(cache, 'id')).toBe(testGroupDetail.id);
+
+        // 修改数据, 应当清空缓存
+        const testPlayer = await getTestUser();
+        const randomMasterName = generateRandomStr();
+        await GroupDetail.saveGroupDetail(testGroupUUID, testPlayer.uuid, {
+          master_name: randomMasterName,
+        });
+
+        const cache2 = await context.app.cache.get(
+          genGroupDetailCacheKey(testGroupUUID)
+        );
+        expect(_.get(cache2, 'master_name')).toBe(randomMasterName);
+      });
+    });
   });
 
   describe('GroupChannel', () => {
@@ -956,7 +1019,7 @@ describe('group model function', () => {
     });
   });
 
-  describe.only('GroupInvite', () => {
+  describe('GroupInvite', () => {
     test('GroupInvite.getAllPendingInvites should be ok', async () => {
       const testUser = await getOtherTestUser('admin9');
       const invite1 = await createTestGroupInvite(testUser.uuid);

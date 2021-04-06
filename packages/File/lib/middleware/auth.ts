@@ -1,6 +1,9 @@
 import { TRPGMiddleware } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 
+/**
+ * @deprecated 使用ssoAuth
+ */
 export default function auth(): TRPGMiddleware {
   return async (ctx, next) => {
     const trpgapp = ctx.trpgapp;

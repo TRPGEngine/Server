@@ -1,6 +1,6 @@
 import { buildAppContext } from 'test/utils/app';
 import path from 'path';
-import { getTestUser } from 'packages/Player/test/example';
+import { genTestPlayerJWT, getTestUser } from 'packages/Player/test/example';
 import { createTestActor } from 'packages/Actor/test/example';
 import testExampleStack from 'test/utils/example';
 import { FileAvatar } from 'packages/File/lib/models/avatar';
@@ -80,6 +80,7 @@ describe('avatar router v2', () => {
       'user-uuid': testUser.uuid,
       'avatar-type': 'actor',
       'attach-uuid': testActor.uuid,
+      'X-Token': await genTestPlayerJWT(),
     };
     const { body } = await context.request.upload(
       '/file/v2/avatar/upload',

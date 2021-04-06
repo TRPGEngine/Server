@@ -4,7 +4,8 @@
     "logs",
     "packages/Dashboard/app/",
     "*.marko.js",
-    "*.spec.ts"
+    "*.spec.ts",
+    "*.spec.tsx"
   ],
   "env": {
     "NODE_ENV": "development"

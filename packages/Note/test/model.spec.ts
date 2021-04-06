@@ -75,6 +75,8 @@ describe('NoteNote', () => {
     }
   });
 
+  test.todo('NoteNote.getNoteFullInfo should be ok');
+
   test('NoteNote.getUserNotes should be ok', async () => {
     const testUser = await getTestUser();
     const note = await createTestNote(testUser.id);

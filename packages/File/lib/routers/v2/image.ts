@@ -33,7 +33,7 @@ imageV2Router.post(
     const imageInfo = state.imageInfo;
 
     if (_.isNil(file)) {
-      throw new Error('处理头像失败: 没有发现文件');
+      throw new Error('处理图片失败: 没有发现文件');
     }
 
     const usage = ctx.header['usage'] ?? '';
