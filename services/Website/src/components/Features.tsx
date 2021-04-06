@@ -8,7 +8,7 @@ const features = [
     title: '现代化',
     imageUrl: 'img/undraw_react.svg',
     description:
-      '代码由现代流行的React打造，不管是开发与使用都能为你带来现代化的用户与体验',
+      '代码由现代流行的 React 打造，不管是开发与使用都能为你带来现代化的用户与体验',
   },
   {
     title: '高度活跃',
@@ -20,7 +20,7 @@ const features = [
     title: '拥抱开源',
     imageUrl: 'img/undraw_open_source.svg',
     description:
-      'TRPG Engine拥抱开源与变化。你所看到的一切都是开放的！随时接受社区的监督',
+      'TRPG Engine 拥抱开源与变化。你所看到的一切都是开放的！随时接受社区的监督',
   },
   {
     title: '便捷',
@@ -42,13 +42,18 @@ const features = [
     title: '配置自定义',
     imageUrl: 'img/undraw_personal_settings_kihd.svg',
     description:
-      'TRPG Engine提供了足够的自定义空间以供玩家来自定义自己的跑团空间',
+      'TRPG Engine 提供了足够的自定义空间以供玩家来自定义自己的跑团空间',
   },
   {
     title: '高度可定制',
     imageUrl: 'img/undraw_code_review.svg',
     description:
       '创建自己的脚本，人物。 搭建自己独属于自己专属的团，或者用其他人现成的模板。你能想到的。我们都会为你提供！',
+  },
+  {
+    title: '聊天机器人',
+    imageUrl: 'img/undraw_Chat_bot_re_e2gj.svg',
+    description: '支持多种方式的机器人接入。通过机器人来拓展你的跑团平台！',
   },
   // {
   //   title: '更多特性',
