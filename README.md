@@ -1,5 +1,6 @@
 # Server
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2a3869db168e4af6ac0f7cdc5308a350)](https://app.codacy.com/gh/TRPGEngine/Server?utm_source=github.com&utm_medium=referral&utm_content=TRPGEngine/Server&utm_campaign=Badge_Grade_Settings)
 [![CircleCI](https://circleci.com/gh/TRPGEngine/Server.svg?style=svg)](https://circleci.com/gh/TRPGEngine/Server)
 [![codecov](https://codecov.io/gh/TRPGEngine/Server/branch/master/graph/badge.svg)](https://codecov.io/gh/TRPGEngine/Server)
 ![deploy doc website](https://github.com/TRPGEngine/Server/workflows/deploy%20doc%20website/badge.svg?branch=docs)
