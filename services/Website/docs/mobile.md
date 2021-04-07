@@ -5,7 +5,7 @@ title: 安装移动版
 
 ## 准备
 
-需要一个可以安装PWA的手机浏览器。如 `Chrome Mobile`, `Safari` 等。
+需要一个可以安装 PWA 的手机浏览器。如 `Chrome Mobile`, `Safari` 等。
 应用地址: [https://trpg.moonrailgun.com](https://trpg.moonrailgun.com)
 
 你可以在 [https://caniuse.com/web-app-manifest](https://caniuse.com/web-app-manifest) 查看你的浏览器是否支持

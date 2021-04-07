@@ -9,5 +9,5 @@ tags: [版本发布]
 
 <!--truncate-->
 
-- 修复Launch页面自动跳转不正确的bug
+- 修复 Launch 页面自动跳转不正确的 bug
 - 使用`@loadable/component`替换原来`react-loadable`

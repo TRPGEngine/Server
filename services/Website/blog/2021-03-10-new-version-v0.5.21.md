@@ -4,7 +4,7 @@ author: moonrailgun
 tags: [版本发布]
 ---
 
-- COC7 机器人v1.2.0
+- COC7 机器人 v1.2.0
 - 更新文档
   - 增加移动版
   - COC7 机器人新命令

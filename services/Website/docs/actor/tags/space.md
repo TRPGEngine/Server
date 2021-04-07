@@ -17,10 +17,10 @@ title: <Space />
 
 ## API
 
-| 名称      | 类型                                       | 说明     | 默认值       | 
-| --------- | ------------------------------------------ | -------- | ------------ | 
-| size      | `small` \| `middle` \| `large` \| `number` | 间距大小 | `small`      | 
-| direction | `vertical` \| `horizontal`                 | 间距方向 | `horizontal` | 
+| 名称      | 类型                                       | 说明     | 默认值       |
+| --------- | ------------------------------------------ | -------- | ------------ |
+| size      | `small` \| `middle` \| `large` \| `number` | 间距大小 | `small`      |
+| direction | `vertical` \| `horizontal`                 | 间距方向 | `horizontal` |
 
 :::note
 该容器不应该用于作为`Foreach/CustomList`组件的父级

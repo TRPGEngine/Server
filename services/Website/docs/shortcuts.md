@@ -3,7 +3,7 @@ id: shortcuts
 title: 快捷键
 ---
 
-*本文仅适用于旧版UI*
+_本文仅适用于旧版 UI_
 
 `TRPG Engine` 的网页版提供了一些快捷键，来方便用户的操作
 

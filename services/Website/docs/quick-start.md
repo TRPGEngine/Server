@@ -5,9 +5,9 @@ description: 3分钟带你快速入门 TRPG Engine 的基本流程
 hide_table_of_contents: true
 ---
 
-> 如果登录后处于旧版UI 在登录后点击此处切换到新版UI  
+> 如果登录后处于旧版 UI 在登录后点击此处切换到新版 UI  
 > ![](/img/blog/20201009202755.png)  
-> 或者在设置中切换到新版UI  
+> 或者在设置中切换到新版 UI
 
 首先我们来快速认识一下`TRPG Engine`的界面
 
@@ -18,7 +18,6 @@ hide_table_of_contents: true
 在`TRPG Engine` 你可以使用官方提供的现成的人物卡模板，或者搜索玩家自己上传的人物卡模板。不管是什么样的模板都要和主持人商量好哦
 
 ![](/img/blog/20201009204129.png)
-
 
 填写人物信息，选择自己喜欢的头像
 
@@ -31,7 +30,6 @@ hide_table_of_contents: true
 恭喜你，收获了第一张属于自己的人物卡。现在去找个团吧！
 
 ![](/img/blog/20201009205017.png)
-
 
 ## 加入团
 

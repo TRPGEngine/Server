@@ -11,19 +11,20 @@ title: <Select />
 
 ## API
 
-| 名称 | 类型 | 描述 | 默认值 |
-| ---- | ---- | ---- | ---- | 
-| name | string | 变量名，唯一标识 |  |
-| options | string \| string[] \| { name: string; items: string[] }[] | 下拉选项 | |
-| desc | string | 变量描述 | |
-| showSearch | boolean | 是否允许搜索 | false |
-| default | string | 默认值 | |
-| strict | boolean | 是否开启严格模式, 如果开启严格模式且当值在数据中不存在时, 显示一个警告 | false |
-| allowCustom | boolean | 是否允许增加自定义 | |
+| 名称        | 类型                                                      | 描述                                                                   | 默认值 |
+| ----------- | --------------------------------------------------------- | ---------------------------------------------------------------------- | ------ |
+| name        | string                                                    | 变量名，唯一标识                                                       |        |
+| options     | string \| string[] \| { name: string; items: string[] }[] | 下拉选项                                                               |        |
+| desc        | string                                                    | 变量描述                                                               |        |
+| showSearch  | boolean                                                   | 是否允许搜索                                                           | false  |
+| default     | string                                                    | 默认值                                                                 |        |
+| strict      | boolean                                                   | 是否开启严格模式, 如果开启严格模式且当值在数据中不存在时, 显示一个警告 | false  |
+| allowCustom | boolean                                                   | 是否允许增加自定义                                                     |        |
 
 ### 示例
 
 #### 简单下拉框
+
 ```xml
 <Select name="下拉选择" options="选项A,选项B,选项C" />
 ```
@@ -41,9 +42,10 @@ title: <Select />
 <Select name="下拉选择严格模式" options="选项A,选项B,选项C" strict="true" />
 ```
 
-使用`Computed`组件填入变量的值。此时Select匹配的数据为`选项D`。 因为此时的值不为设定的`选项A`,`选项B`,`选项C`中任意一项，因此会出现黄色警告
+使用`Computed`组件填入变量的值。此时 Select 匹配的数据为`选项D`。 因为此时的值不为设定的`选项A`,`选项B`,`选项C`中任意一项，因此会出现黄色警告
 
 #### 自定义
+
 ```xml
 <Select name="下拉选择允许自定义" options="选项A,选项B,选项C" :allowCustom="true" />
 ```

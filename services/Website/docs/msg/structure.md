@@ -22,7 +22,7 @@ title: 消息结构
 }
 ```
 
------------------
+---
 
 消息额外信息:
 
@@ -31,14 +31,14 @@ title: 消息结构
   name?: string; // 覆盖显示消息发送者名
   avatar?: string; // 覆盖显示消息发送者头像地址
   groupActorUUID?: string; // 相关团角色UUID
-  
+
   // 回复消息相关
   replyMsg?: {
     uuid: string;
     message: string;
     sender_uuid: string;
   };
-  
+
   // 机器人相关
   bot?: {
     uuid: string; // 机器人UUID
