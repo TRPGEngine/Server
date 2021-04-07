@@ -15,13 +15,17 @@ title: 安装移动版
 此处以`Chrome Mobile`为例
 
 打开 TRPG Engine 应用网站:
+
 <img src="/img/docs/20210305221750.jpg" />
 
 点击右上角, 选择`添加到主屏幕`:
+
 <img src="/img/docs/20210305221810.jpg" />
 
 点击确定:
+
 <img src="/img/docs/20210305221824.jpg" />
 
 然后就能在桌面上直接打开`TRPG Engine`应用了:
+
 <img src="/img/docs/20210305222528.jpg" />

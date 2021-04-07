@@ -25,7 +25,7 @@
     {
       "files": "*.md",
       "options": {
-        "parser": "markdown"
+        "parser": "mdx"
       }
     }
   ]
