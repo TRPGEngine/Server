@@ -11,14 +11,14 @@ title: 关于富文本编辑器的问题说明
 
 ## 如何查看自己的使用浏览器的版本号
 
-以QQ浏览器为例:
+以 QQ 浏览器为例:
 
-*右上角按钮* -> 帮助 -> 关于
+_右上角按钮_ -> 帮助 -> 关于
 
 ![](/img/docs/20201121155841.png)
 
-## 如何下载地上最强浏览器Chrome
+## 如何下载地上最强浏览器 Chrome
 
 强烈建议在官网上进行下载，请不要在一些奇怪的地方下载。
 
-Chrome下载地址: [https://www.google.cn/chrome/](https://www.google.cn/chrome/)
+Chrome 下载地址: [https://www.google.cn/chrome/](https://www.google.cn/chrome/)

@@ -80,13 +80,17 @@ describe('ChatLog', () => {
 
     const res1 = await ChatLog.searchConverseChatLogInDatabaseByMessage(
       testGroupUUID,
-      'fox'
+      'fox',
+      1,
+      10
     );
     expect(res1.findIndex((x) => x.uuid === logUUID)).toBeGreaterThanOrEqual(0);
 
     const res2 = await ChatLog.searchConverseChatLogInDatabaseByMessage(
       testGroupUUID,
-      'r t'
+      'r t',
+      1,
+      10
     );
     expect(res2.findIndex((x) => x.uuid === logUUID)).toBeGreaterThanOrEqual(0);
   });

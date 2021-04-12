@@ -476,7 +476,9 @@ export class ChatLog extends Model implements ChatMessagePayload {
    */
   public static async searchConverseChatLogInDatabaseByMessage(
     converseUUID: string,
-    messageSnippet: string
+    messageSnippet: string,
+    page: number,
+    size: number
   ): Promise<ChatLog[]> {
     const res: ChatLog[] = await ChatLog.findAll({
       where: {
@@ -485,7 +487,8 @@ export class ChatLog extends Model implements ChatMessagePayload {
           [Op.like]: `%${messageSnippet}%`,
         },
       },
-      limit: 50,
+      limit: size,
+      offset: (page - 1) * size,
     });
 
     return res;

@@ -112,13 +112,7 @@ export const loginWithToken: EventFunc<{
     throw new Error('缺少必要参数');
   }
 
-  let cond = { uuid };
-  if (isApp) {
-    cond['app_token'] = token;
-  } else {
-    cond['token'] = token;
-  }
-  const user = await PlayerUser.scope('login').findOne({ where: cond });
+  const user = await PlayerUser.findByUserUUIDAndToken(uuid, token);
 
   if (_.isNil(user)) {
     debug('login with token fail, try to login %s', uuid);

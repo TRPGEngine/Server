@@ -6,26 +6,26 @@ tags: [版本发布]
 
 版本发布`v0.3.0` 更新说明:
 
-- 增加了地图系统(Alpha内测版本)
-- 增加了WW骰
-- 上线了TRPG Engine官网: [https://trpgdoc.moonrailgun.com](https://trpgdoc.moonrailgun.com/)
+- 增加了地图系统(Alpha 内测版本)
+- 增加了 WW 骰
+- 上线了 TRPG Engine 官网: [https://trpgdoc.moonrailgun.com](https://trpgdoc.moonrailgun.com/)
 - 修复文本中带有中括号无法正常显示的问题
-- 调整了coc7人物卡, 调换了`已加职业点数`与`已加职业点数`的顺序
+- 调整了 coc7 人物卡, 调换了`已加职业点数`与`已加职业点数`的顺序
 - 增加了图片声明
 - 更新了免责声明
 
 ## 网页端
 
-- 增加了CDN线路优化，国内用户各个地区访问会更加快速
+- 增加了 CDN 线路优化，国内用户各个地区访问会更加快速
 - 增加了内测用户的切换
 - 在主面板增加了异常网络状态与版本号
 - 修复了在某些情况下当没有设置图片头像时会无法正常显示字母头像的问题
 - 优化了编译配置。减少更新后重复的请求, 优化用户体验
 
-## Portal端
+## Portal 端
 
 - 优化了战报预览的性能问题。改为异步加载
-- 优化了Portal端的错误提示
+- 优化了 Portal 端的错误提示
 
 :::note
 

@@ -11,7 +11,6 @@ title: 接入OAuth
 
 [https://en.wikipedia.org/wiki/OAuth](https://en.wikipedia.org/wiki/OAuth)
 
-
 ### 创建应用
 
 [创建应用](./create)
@@ -23,12 +22,12 @@ sequenceDiagram
   participant C as Client
   participant S as Server
   participant T as TRPG Engine
-  
+
   S ->> T: 创建应用
   T ->> S: 生成一组appid和appsecret
-  
+
   Note over C: 开始授权
-  
+
   C ->> S: 期望使用TRPG Engine登录
   S -->> C: 跳转到TRPG Engine的授权页
   C ->> T: 登录TRPG Engine账号

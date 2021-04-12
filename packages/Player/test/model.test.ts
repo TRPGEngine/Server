@@ -96,6 +96,34 @@ describe('PlayerUser', () => {
     });
   });
 
+  describe('PlayerUser.findByUserUUIDAndToken', () => {
+    test('can find by token', async () => {
+      const testUser9 = await getOtherTestUser('admin9');
+      testUser9.token = generateRandomStr();
+      await testUser9.save();
+
+      const res = await PlayerUser.findByUserUUIDAndToken(
+        testUser9.uuid,
+        testUser9.token
+      );
+      expect(res).not.toBeNull();
+      expect(res.uuid).toBe(testUser9.uuid);
+    });
+
+    test('can find by app_token', async () => {
+      const testUser9 = await getOtherTestUser('admin9');
+      testUser9.app_token = generateRandomStr();
+      await testUser9.save();
+
+      const res = await PlayerUser.findByUserUUIDAndToken(
+        testUser9.uuid,
+        testUser9.app_token
+      );
+      expect(res).not.toBeNull();
+      expect(res.uuid).toBe(testUser9.uuid);
+    });
+  });
+
   describe('PlayerUser.registerUser', () => {
     // 存储密码
     const clientTransPassword = md5Encrypt(generateRandomStr(20));

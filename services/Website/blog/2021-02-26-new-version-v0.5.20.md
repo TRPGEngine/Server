@@ -13,5 +13,5 @@ tags: [版本发布]
 
 <!--truncate-->
 
-- 升级了服务端的typescript版本
-- 增加了Portal端部分翻译
+- 升级了服务端的 typescript 版本
+- 增加了 Portal 端部分翻译

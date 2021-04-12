@@ -10,7 +10,7 @@ import {
 } from 'trpg/core';
 import config from 'config';
 import _ from 'lodash';
-import { fn, col } from 'sequelize';
+import { fn, col, Op } from 'sequelize';
 import {
   PlayerJWTPayload,
   PlayerInfoObject,
@@ -220,6 +220,30 @@ export class PlayerUser extends Model {
       where: {
         username,
         password: fn('SHA1', fn('CONCAT', fn('MD5', password), col('salt'))),
+      },
+    });
+  }
+
+  /**
+   * 根据用户UUID和Token查找用户
+   * @param userUUID 用户UUID
+   * @param token Token
+   */
+  static findByUserUUIDAndToken(
+    userUUID: string,
+    token: string
+  ): Promise<PlayerUser | null> {
+    return PlayerUser.scope('login').findOne({
+      where: {
+        uuid: userUUID,
+        [Op.or]: [
+          {
+            token: token,
+          },
+          {
+            app_token: token,
+          },
+        ],
       },
     });
   }

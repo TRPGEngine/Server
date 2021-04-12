@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.52.0](https://github.com/TRPGEngine/Server/compare/v1.51.0...v1.52.0) (2021-04-12)
+
+
+### Features
+
+* **player:** 增加token登录的api ([7540813](https://github.com/TRPGEngine/Server/commit/754081384e0e1ddac3e775e74b00de953c047e57))
+
 ## [1.51.0](https://github.com/TRPGEngine/Server/compare/v1.50.0...v1.51.0) (2021-04-06)
 
 

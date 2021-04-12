@@ -9,11 +9,14 @@ const userRouter = new TRPGRouter<{
   player?: PlayerJWTPayload;
 }>();
 
+/**
+ * 返回用户信息
+ */
 userRouter.get('/info/:uuid', async (ctx) => {
   const playerUUID = ctx.params.uuid;
   const user = await PlayerUser.findByUUID(playerUUID);
 
-  ctx.body = { user };
+  ctx.body = { user: user.getInfo(false) };
 });
 
 userRouter.post('/register', async (ctx) => {

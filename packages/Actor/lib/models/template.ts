@@ -16,7 +16,11 @@ export class ActorTemplate extends Model {
   name: string;
   desc: string;
   avatar: string;
-  info: string; // 这个字段目前没用。看情况是否要删除
+
+  /**
+   * @deprecated 这个字段目前没用。看情况是否要删除
+   */
+  info: string;
   layout: string;
   built_in: boolean;
   is_public: boolean;

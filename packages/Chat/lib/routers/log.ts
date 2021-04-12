@@ -20,6 +20,9 @@ chatlogRouter.get(
     const converseUUID = ctx.params.converseUUID;
     const keyword = ctx.query.keyword;
 
+    const page = Number(ctx.query.page ?? 1);
+    const size = Number(ctx.query.size ?? 10);
+
     if (_.isNil(converseUUID)) {
       throw new Error('缺少必要参数');
     }
@@ -30,7 +33,9 @@ chatlogRouter.get(
 
     const logs = await ChatLog.searchConverseChatLogInDatabaseByMessage(
       converseUUID,
-      keyword
+      keyword,
+      page,
+      size
     );
 
     ctx.body = { logs };

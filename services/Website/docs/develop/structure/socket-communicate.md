@@ -3,14 +3,14 @@ id: socket-communicate
 title: 分布式消息沟通
 ---
 
-`PlayerManager` 多实例Socket通讯架构:
+`PlayerManager` 多实例 Socket 通讯架构:
 
 ```mermaid
 flowchart TD
   redis[(Redis)]
   service1((Service1))
   service2((Service2))
-  
+
   user1 --> service1
   user2 --> service1
   user3 --> service2
@@ -30,7 +30,7 @@ sequenceDiagram
   participant Redis
 
   服务端->>Redis: 初始化, 订阅频道 player:manager:channel
-  
+
   用户->>服务端: 发送登录请求
   服务端->>Redis: 请求将当前用户的uuid与平台代号增加到在线列表 player:manager:online_player_uuid_list
   alt 已存在:
@@ -39,12 +39,12 @@ sequenceDiagram
     Redis->>服务端: 在线列表增加
   end
   Note right of 服务端: 当前服务器内存记录Socket信息
-  
+
   用户->>服务端: 加入房间
   服务端->>Redis: 由房间号构造的列表增加一条SocketId用来记录当前房间连接的SocketId
   Note right of 服务端: 内存中记录在房间中的SocketId
   服务端->>用户: 加入成功
-  
+
   par 单播
     用户->>服务端: 发送单播消息
     服务端->>Redis: 向频道 player:manager:channel 发送一条消息, 带上需要消费的SocketId

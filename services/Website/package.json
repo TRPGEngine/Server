@@ -6,7 +6,8 @@
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "sidebar": "ts-node ./script/buildSidebar.ts",
-    "wiki": "ts-node ./script/buildWiki.ts"
+    "wiki": "ts-node ./script/buildWiki.ts",
+    "prettier:all": "prettier --write \"./{blog,docs}/**/*.md\""
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^2.0.0-alpha.70",
