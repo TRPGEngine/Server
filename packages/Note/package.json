@@ -22,7 +22,6 @@
   "homepage": "https://github.com/TRPGEngine/Note#readme",
   "dependencies": {
     "debug": "^3.1.0",
-    "koa-router": "^7.4.0",
     "marko": "^4.13.5",
     "striptags": "^3.1.1",
     "xss": "^1.0.3"

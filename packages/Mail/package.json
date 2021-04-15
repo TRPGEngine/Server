@@ -23,7 +23,6 @@
   "homepage": "https://github.com/TRPGEngine/Mail#readme",
   "dependencies": {
     "debug": "^3.1.0",
-    "koa-router": "^7.4.0",
     "marko": "^4.13.5",
     "nodemailer": "^6.4.18"
   },
