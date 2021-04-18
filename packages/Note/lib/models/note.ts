@@ -10,6 +10,7 @@ import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
 import createUUID from 'uuid/v1';
 import { isUUID } from 'lib/helper/string-helper';
+import { NotFoundError } from 'lib/error';
 
 declare module 'packages/Player/lib/models/user' {
   interface PlayerUser {
@@ -145,6 +146,9 @@ export class NoteNote extends Model {
    */
   static async getNoteFullInfo(noteUUID: string) {
     const note = await NoteNote.findByUUID(noteUUID);
+    if (_.isNil(note)) {
+      throw new NotFoundError('笔记未找到');
+    }
     const owner: PlayerUser = await note.getOwner();
 
     const uuid = note.uuid;
