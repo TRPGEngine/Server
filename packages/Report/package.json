@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/TRPGEngine/Report#readme",
   "dependencies": {
-    "debug": "^3.1.0",
-    "koa-router": "^7.4.0"
+    "debug": "^3.1.0"
   }
 }

@@ -280,7 +280,6 @@ export class PlayerUser extends Model {
 
     const user = await PlayerUser.findOne({
       where: { username },
-      limit: 1,
     });
     if (!!user) {
       debug(`register failed!user ${user.username} has been existed`);

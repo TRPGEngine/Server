@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { PlayerLoginLog } from '../models/login-log';
 import { PlayerJWTPayload } from 'packages/Player/types/player';
 import { ssoAuth } from '../middleware/auth';
+import { NotFoundError } from 'lib/error';
 
 const userRouter = new TRPGRouter<{
   player?: PlayerJWTPayload;
@@ -15,6 +16,9 @@ const userRouter = new TRPGRouter<{
 userRouter.get('/info/:uuid', async (ctx) => {
   const playerUUID = ctx.params.uuid;
   const user = await PlayerUser.findByUUID(playerUUID);
+  if (_.isNil(user)) {
+    throw new NotFoundError('该用户不存在');
+  }
 
   ctx.body = { user: user.getInfo(false) };
 });

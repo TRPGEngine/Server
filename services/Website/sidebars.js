@@ -37,7 +37,7 @@ module.exports = {
       },
     ],
     扮演: ['roleplay/alignment'],
-    机器人: ['robot/coc7'],
+    机器人: ['robot/coc7', 'robot/360sd'],
     自部署: ['selfhost/selfhost', 'selfhost/faq'],
     第三方接入: ['develop/oauth/create', 'develop/oauth/usage'],
   },
