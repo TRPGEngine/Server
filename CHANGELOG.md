@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.52.1](https://github.com/TRPGEngine/Server/compare/v1.52.0...v1.52.1) (2021-04-19)
+
+
+### Bug Fixes
+
+* 修复一些报错信息 ([c3c4521](https://github.com/TRPGEngine/Server/commit/c3c452125ddda3cf01a7b972ef996edfa562b487))
+
 ## [1.52.0](https://github.com/TRPGEngine/Server/compare/v1.51.0...v1.52.0) (2021-04-12)
 
 
