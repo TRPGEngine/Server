@@ -172,7 +172,7 @@ const RelatedApps: React.FC = () => {
             target="_blank"
             rel="noopener"
           >
-            <img src="/img/others/syxw.jpg" />
+            <img src="/img/others/syxw.png" />
           </a>
         </InfoTooltip>
       </div>
