@@ -118,7 +118,7 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
 
     for (const player of waitToSendPlayers) {
       // 循环发送消息
-      if (this.internalFn[eventName]) {
+      if (typeof this.internalFn[eventName] === 'function') {
         // 如果有内部处理方法
         this.internalFn[eventName].call(this, player, data);
       } else {
