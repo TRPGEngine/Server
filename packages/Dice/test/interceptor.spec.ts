@@ -20,6 +20,17 @@ describe('interceptors', () => {
   );
 
   appendInterceptorTest(
+    'roll dice (support chinese 。)',
+    {
+      message: '。r1d100',
+    },
+    {
+      message: expect.stringContaining('骰出了: 1d100'),
+      type: 'tip',
+    }
+  );
+
+  appendInterceptorTest(
     'roll dice shortcuts',
     {
       message: '.r',
@@ -81,6 +92,19 @@ describe('interceptors', () => {
   );
 
   appendInterceptorTest(
+    'roll ww (support chinese 。)',
+    {
+      message: '.ww',
+    },
+    {
+      message: expect.stringContaining(
+        '尝试进行投骰[ww]失败: 不合法的表达式:ww, 请输入骰数如.ww5'
+      ),
+      type: 'tip',
+    }
+  );
+
+  appendInterceptorTest(
     'roll ww7',
     {
       message: '.ww7',
@@ -90,8 +114,6 @@ describe('interceptors', () => {
       type: 'tip',
     }
   );
-
-  // TODO: test .ra
 
   // 命运骰
   appendInterceptorTest(
@@ -115,11 +137,34 @@ describe('interceptors', () => {
     }
   );
 
+  appendInterceptorTest(
+    'roll rf (support chinese 。)',
+    {
+      message: '。rf',
+    },
+    {
+      message: expect.stringContaining('骰出了命运:'),
+      type: 'tip',
+    }
+  );
+
   // 暗骰
   appendInterceptorTest(
     'roll rh',
     {
       message: '.rh',
+    },
+    {
+      message: expect.stringContaining('投掷了一个暗骰'),
+      type: 'tip',
+    }
+  );
+
+  // 暗骰
+  appendInterceptorTest(
+    'roll rh (support chinese 。)',
+    {
+      message: '。rh',
     },
     {
       message: expect.stringContaining('投掷了一个暗骰'),

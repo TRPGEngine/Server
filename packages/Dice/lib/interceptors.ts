@@ -8,8 +8,8 @@ import { GroupActor } from 'packages/Group/lib/models/actor';
 import { hasString } from 'lib/helper/string-helper';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 
-const restPattern = /^\.r(.*)$/; // 用于获取.r后面的内容
-const dotRestPattern = /^\.(.*)$/; // 用于获取.后面的内容
+const restPattern = /^[\.。]r(.*)$/; // 用于获取.r后面的内容
+const dotRestPattern = /^[\.。](.*)$/; // 用于获取.后面的内容
 
 /**
  * 获取消息的发送者
@@ -39,7 +39,10 @@ export const initInterceptors = _.once(() => {
     }
 
     // .ra 指令
-    if (payload.message.startsWith('.ra') === true) {
+    if (
+      payload.message.startsWith('.ra') === true ||
+      payload.message.startsWith('。ra') === true
+    ) {
       const rest = payload.message.match(restPattern)[1];
 
       // 仅为群会话时查找会话成员UUID
@@ -72,7 +75,10 @@ export const initInterceptors = _.once(() => {
     }
 
     // .rf命运骰
-    if (payload.message.startsWith('.rf') === true) {
+    if (
+      payload.message.startsWith('.rf') === true ||
+      payload.message.startsWith('。rf') === true
+    ) {
       const restStr = payload.message.substr(3);
 
       const { str } = rollFate();
@@ -86,7 +92,10 @@ export const initInterceptors = _.once(() => {
     }
 
     // .rh 暗骰
-    if (payload.message.startsWith('.rh') === true) {
+    if (
+      payload.message.startsWith('.rh') === true ||
+      payload.message.startsWith('。rh') === true
+    ) {
       const rest = payload.message.match(restPattern)[1];
       const arr = rest.split(' ');
       let diceRequest = arr.shift();
@@ -130,7 +139,10 @@ export const initInterceptors = _.once(() => {
     }
 
     // .r指令
-    if (payload.message.startsWith('.r') === true) {
+    if (
+      payload.message.startsWith('.r') === true ||
+      payload.message.startsWith('。r') === true
+    ) {
       const rest = payload.message.match(restPattern)[1];
       const arr = rest.split(' ');
       let diceRequest = arr.shift();
@@ -161,7 +173,10 @@ export const initInterceptors = _.once(() => {
     }
 
     // .ww指令
-    if (payload.message.startsWith('.ww') === true) {
+    if (
+      payload.message.startsWith('.ww') === true ||
+      payload.message.startsWith('。ww') === true
+    ) {
       const diceRequest = payload.message.match(dotRestPattern)[1];
       const senderName = await getSenderName(payload);
       try {
