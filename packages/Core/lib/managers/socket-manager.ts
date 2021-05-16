@@ -10,7 +10,6 @@ const debug = Debug('trpg:socket-manager');
 const logger = getLogger();
 
 export interface SocketManagerOptions {
-  redisUrl: string;
   cache: ICache;
 }
 
@@ -52,15 +51,8 @@ export abstract class SocketManager<
   constructor(public channelKey: string, options: SocketManagerOptions) {
     super();
 
-    const redisUrl = options.redisUrl;
-    if (!redisUrl) {
-      throw new Error(
-        '[SocketManager] require redisUrl to build pub/sub service'
-      );
-    }
-
     this.cache = options.cache;
-    this.channel = getMQChannel(channelKey, redisUrl);
+    this.channel = getMQChannel(channelKey);
     this.initListener();
   }
 
@@ -72,7 +64,6 @@ export abstract class SocketManager<
       throw new Error('[SocketManager] Channel Key is Empty!');
     }
     this.channel.consume((message) => {
-      console.log('message', message);
       try {
         const payload: SocketMsgPayload = JSON.parse(message);
         this.handleMessage(payload);
@@ -234,6 +225,24 @@ export abstract class SocketManager<
    */
   onMessage(listener: (payload: SocketMsgPayload) => void) {
     this.on('message', listener);
+  }
+
+  /**
+   * 等待合适的事件被触发
+   * 触发后执行继续执行promise
+   */
+  async waitForMessage(
+    matchFn: (payload: SocketMsgPayload) => boolean
+  ): Promise<void> {
+    return new Promise((resolve) => {
+      const onCallTargetMessage = (payload: SocketMsgPayload) => {
+        if (matchFn(payload) === true) {
+          this.off('message', onCallTargetMessage);
+          resolve();
+        }
+      };
+      this.on('message', onCallTargetMessage);
+    });
   }
 
   /**

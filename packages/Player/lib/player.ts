@@ -68,7 +68,6 @@ export default class Player extends BasePackage {
     const app = this.app;
 
     const manager = getPlayerManager({
-      redisUrl: app.get('redisUrl'),
       cache: app.cache,
     });
     this.regCloseTask(() => manager.close());

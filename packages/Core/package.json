@@ -25,6 +25,7 @@
     "@log4js-node/loggly": "^1.0.0",
     "@sentry/node": "^5.15.5",
     "@types/jsonwebtoken": "^8.3.2",
+    "amqplib": "^0.7.1",
     "apollo-server-koa": "^2.6.9",
     "fs-extra": "^5.0.0",
     "graphql": "^14.4.2",
@@ -48,6 +49,7 @@
     "socket.io": "^2.0.2"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.5.17",
     "@types/graphql": "^14.2.2",
     "@types/koa": "^2.11.7",
     "@types/koa-bodyparser": "^4.3.0",

@@ -8,10 +8,10 @@ export interface BaseMQChannel {
   /**
    * 注册消费事件的回调
    */
-  consume(cb: (message: string) => void): void;
+  consume(cb: (message: string) => void): void | Promise<void>;
 
   /**
    * 主动关闭MQ服务
    */
-  close(): void;
+  close(): void | Promise<void>;
 }

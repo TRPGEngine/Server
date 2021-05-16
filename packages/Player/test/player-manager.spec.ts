@@ -25,7 +25,7 @@ describe('player-manager class test', () => {
 
   beforeAll(() => {
     cache = new RedisCache({ url: redisUrl });
-    playerManager = getPlayerManager({ redisUrl, cache });
+    playerManager = getPlayerManager({ cache });
 
     return sleep(5000);
   }, 10000);

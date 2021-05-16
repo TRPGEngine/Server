@@ -55,7 +55,6 @@ export default class TRPG extends BasePackage {
     if (enable) {
       // 地图管理器
       const mapManager = getMapManager({
-        redisUrl: app.get('redisUrl'),
         cache: app.cache,
       });
       this.regValue('mapManager', mapManager);

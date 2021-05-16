@@ -429,7 +429,7 @@ export class RedisCache implements ICache {
   async smembers(key: string): Promise<CacheValue[]> {
     key = this.genKey(key);
     const members = await this.redis.smembers(key);
-    debug('[redis]', `smembers ${key}: ${JSON.stringify(members)}`);
+    debug('[redis]', `smembers [${key}]: ${JSON.stringify(members)}`);
     return members.map(this.parseVal);
   }
 
@@ -437,7 +437,7 @@ export class RedisCache implements ICache {
     key = this.genKey(key);
 
     const ret = await this.redis.sismember(key, this.normalizeVal(value));
-    debug('[redis]', `sismember ${key}: ${ret}`);
+    debug('[redis]', `[${value}] sismember [${key}]: [${ret}]`);
     return Boolean(ret);
   }
 
