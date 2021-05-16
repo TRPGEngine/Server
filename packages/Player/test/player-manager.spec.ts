@@ -11,7 +11,9 @@ import { sleep, generateRandomStr } from 'test/utils/utils';
 import _ from 'lodash';
 import { Socket } from 'trpg/core';
 import { createFakeSocket } from 'test/utils/socket';
+import { buildAppContext } from 'test/utils/app';
 
+const context = buildAppContext();
 const redisUrl = Config.get<string>('redisUrl');
 
 describe('player-manager class test', () => {
