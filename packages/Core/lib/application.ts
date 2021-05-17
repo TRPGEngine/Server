@@ -23,6 +23,7 @@ import {
 } from './utils/rate-limit';
 import { setupHeapDumps } from './utils/heap-dumps';
 import { CoreStats } from './internal/models/stats';
+import { AppConfig, getConfigService } from './config';
 
 type AppSettings = {
   [key: string]: string | number | {};
@@ -49,7 +50,7 @@ export type ScheduleJobFn = (
 ) => Promise<ScheduleJobFnRet> | ScheduleJobFnRet;
 
 export class Application extends events.EventEmitter {
-  settings: AppSettings = {}; // 设置配置列表
+  configService: AppConfig = null; // 设置服务
   storage: Storage = null; // 数据库服务列表
   cache: ICache = null; // 缓存服务
   rateLimiter: RateLimiter | null = null;
@@ -77,7 +78,11 @@ export class Application extends events.EventEmitter {
     this.init();
   }
 
-  init() {
+  async init() {
+    // 先执行configservice, 初始化完毕后再往下走
+    this.configService = getConfigService();
+    await this.configService.init();
+
     this.setMaxListeners(20); // 设置事件监听数量
     this.initReportService();
     this.initWebService();
@@ -106,7 +111,7 @@ export class Application extends events.EventEmitter {
 
   initWebService() {
     try {
-      let port = Number(this.set('port'));
+      let port = Number(this.get('port'));
       this.webservice = new WebService({
         app: this,
         port,
@@ -479,25 +484,13 @@ export class Application extends events.EventEmitter {
     debug('close completed!');
   }
 
-  set(setting, val?) {
-    if (arguments.length === 1) {
-      return this.settings[setting];
-    }
-
-    applog('set "%s" to %o', setting, val);
-
-    this.settings[setting] = val;
-
-    return this;
-  }
-
   /**
    * 支持get('xxx.xxx')获取
    * @param path 路径
    * @param defaultValue 默认值, 默认为''
    */
   get<T = string | number | any>(path: string, defaultValue: any = ''): T {
-    return _.get<any, any, T>(this.settings, path, defaultValue);
+    return this.configService.get(path, defaultValue);
   }
 
   enabled(setting: string) {

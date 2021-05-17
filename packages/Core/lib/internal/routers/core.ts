@@ -50,6 +50,7 @@ router.get('/health', async (ctx) => {
     env: trpgapp.get('env'),
     components: trpgapp.installedPackages,
     hostname,
+    configType: trpgapp.configService.type,
   };
 });
 

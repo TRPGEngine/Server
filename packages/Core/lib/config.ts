@@ -8,17 +8,24 @@ import { getLogger } from './logger';
 import { tryParseJSON } from 'lib/helper/string-helper';
 const logger = getLogger();
 
-// TODO: 尚未实装
-
-class AppConfig {
+export abstract class AppConfig {
   protected config: { [key: string]: any };
+  type = 'unknown';
+
+  async init() {}
 
   get<T = string | number | any>(path: string, defaultValue: any = ''): T {
     return _.get<any, any, T>(this.config, path, defaultValue);
   }
 }
 
-export class Etcd3Config extends AppConfig {
+class LocalConfig extends AppConfig {
+  type = 'local';
+  config = localConfig.util.toObject(localConfig);
+}
+
+class Etcd3Config extends AppConfig {
+  type = 'etcd3';
   private client: Etcd3;
   private prefix = _.get(localConfig, ['etcd', 'prefix']);
 
@@ -26,7 +33,7 @@ export class Etcd3Config extends AppConfig {
     super();
     this.client = new Etcd3({
       // etcd host
-      hosts: 'http://127.0.0.1:2379',
+      hosts: _.get(localConfig, ['etcd', 'host']),
     });
   }
 
@@ -40,7 +47,7 @@ export class Etcd3Config extends AppConfig {
    * @param defaultConfig 默认配置
    */
   checkAndApplyDefault = _.once(
-    async (defaultConfig: any): Promise<number> => {
+    async (defaultConfig: {}): Promise<number> => {
       this.config = defaultConfig;
       const configLeafs = getObjectLeafs(defaultConfig);
 
@@ -48,7 +55,8 @@ export class Etcd3Config extends AppConfig {
         configLeafs.map(async (leaf) => {
           const str = await this.remoteGet(leaf.path);
           if (str === null) {
-            await this.remoteSet(leaf.path, leaf.value);
+            // 将本地配置同步到远程
+            this.remoteSet(leaf.path, leaf.value); // 不在乎返回结果
             return true;
           } else {
             _.set(this.config, leaf.path, tryParseJSON(str)); // 应用远程配置
@@ -60,6 +68,7 @@ export class Etcd3Config extends AppConfig {
       const count = pl.filter(Boolean).length;
 
       logger.info(`配置应用完毕, 应用 ${count} 条默认配置`);
+      debug('配置信息: %O', this.config);
 
       return count;
     }
@@ -76,18 +85,18 @@ export class Etcd3Config extends AppConfig {
         try {
           const key = String(kv.key).replace(this.prefix, '');
           const value = String(kv.value);
-          debug(`[etcd] update ${key}: ${value}`);
+          debug(`[etcd3]: update ${key}: ${value}`);
 
           _.set(this.config, key, tryParseJSON(value));
         } catch (err) {
-          logger.error('etcd update', err);
+          logger.error('etcd update error:', err);
         }
       });
   });
 
   stopWatch = _.once(async () => {
     if (_.isNil(this._watcher)) {
-      logger.info('[etcd] Cannot find watcher');
+      logger.info('[etcd3]: Cannot find watcher');
       return;
     }
     await this._watcher.cancel();
@@ -99,20 +108,34 @@ export class Etcd3Config extends AppConfig {
   }
 
   async remoteGetAll() {
+    debug(`[etcd3]: getAll`);
     const allConfig = await this.client.getAll().prefix(this.prefix).strings();
 
     return allConfig;
   }
 
   async remoteGet(key: string): Promise<string | null> {
-    debug(`get ${this.prefix + key}`);
+    debug(`[etcd3]: get ${this.prefix + key}`);
     const data = await this.client.get(this.prefix + key).string();
 
     return data;
   }
 
   async remoteSet(key: string, value: any) {
-    debug(`set ${this.prefix + key}`);
+    debug(`[etcd3]: set ${this.prefix + key}`);
     await this.client.put(this.prefix + key).value(JSON.stringify(value));
   }
+}
+
+/**
+ * 根据配置返回config服务
+ */
+export function getConfigService(): AppConfig {
+  if (_.get(localConfig, ['etcd', 'enable']) === true) {
+    debug('Using etcd3 config');
+    return new Etcd3Config();
+  }
+
+  debug('Using local config');
+  return new LocalConfig();
 }
