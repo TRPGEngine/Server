@@ -23,7 +23,7 @@ import {
 } from './utils/rate-limit';
 import { setupHeapDumps } from './utils/heap-dumps';
 import { CoreStats } from './internal/models/stats';
-import { AppConfig, getConfigService } from './config';
+import { AppConfig, getConfigService, getLocalConfigService } from './config';
 
 type AppSettings = {
   [key: string]: string | number | {};
@@ -75,14 +75,33 @@ export class Application extends events.EventEmitter {
 
   run() {
     // TODO 启动检测，如果为第一次启动则初始化。如果非第一次启动则重新开启（保留之前配置）
-    this.init();
+    if (process.env.NODE_ENV !== 'test') {
+      this.init();
+    } else {
+      this.initTestEnv();
+    }
   }
 
+  /**
+   * 初始化环境
+   */
   async init() {
-    // 先执行configservice, 初始化完毕后再往下走
+    // 阻塞执行configservice, 初始化完毕后再往下走
     this.configService = getConfigService();
     await this.configService.init();
 
+    this.initAllService();
+  }
+
+  /**
+   * 初始化测试环境
+   */
+  initTestEnv() {
+    this.configService = getLocalConfigService();
+    this.initAllService();
+  }
+
+  initAllService() {
     this.setMaxListeners(20); // 设置事件监听数量
     this.initReportService();
     this.initWebService();
@@ -99,7 +118,7 @@ export class Application extends events.EventEmitter {
     this.webservice.listen();
   }
 
-  initReportService() {
+  initReportService = _.once(() => {
     try {
       this.reportservice = new ReportService(this);
       applog('create report service success!');
@@ -107,9 +126,9 @@ export class Application extends events.EventEmitter {
       console.error('create report error:');
       throw err;
     }
-  }
+  });
 
-  initWebService() {
+  initWebService = _.once(() => {
     try {
       let port = Number(this.get('port'));
       this.webservice = new WebService({
@@ -123,9 +142,9 @@ export class Application extends events.EventEmitter {
       console.error('create webservice error:');
       throw err;
     }
-  }
+  });
 
-  initSocketService() {
+  initSocketService = _.once(() => {
     const socketservice = new SocketService(this);
     socketservice.use(
       IOSessionMiddleware(this.webservice.app, this.webservice.sessionOpt)
@@ -138,30 +157,30 @@ export class Application extends events.EventEmitter {
       // 离线时移除之前的iosession
       socket.iosession.destroy();
     });
-  }
+  });
 
-  initStorage() {
+  initStorage = _.once(() => {
     const dbconfig = this.get('db') as TRPGDbOptions;
     this.storage = new Storage(dbconfig, this);
-  }
+  });
 
-  initCache() {
+  initCache = _.once(() => {
     const redisUrl = this.get('redisUrl').toString();
     if (redisUrl) {
       this.cache = new RedisCache({ url: redisUrl });
     } else {
       this.cache = new Cache();
     }
-  }
+  });
 
-  initRateLimit() {
+  initRateLimit = _.once(() => {
     this.rateLimiter = createRateLimiterWithTRPGApplication(this);
-  }
+  });
 
   /**
    * 统计信息
    */
-  initStatJob() {
+  initStatJob = _.once(() => {
     this.registerScheduleJob('stat-info', '0 0 2 * * *', async () => {
       const info: any = {};
       for (let job of this.statInfoJob) {
@@ -180,9 +199,9 @@ export class Application extends events.EventEmitter {
 
       return JSON.stringify(info);
     });
-  }
+  });
 
-  initComponents() {
+  initComponents = _.once(() => {
     for (let component of this.components) {
       try {
         const isNewPackage = component instanceof BasePackage; // 检测是否为新版包
@@ -209,13 +228,13 @@ export class Application extends events.EventEmitter {
         throw e;
       }
     }
-  }
+  });
 
-  initHeapDumps() {
+  initHeapDumps = _.once(() => {
     if (this.get('heapdump') === true) {
       setupHeapDumps();
     }
-  }
+  });
 
   // eventFn is async/await fn
   register(appEventName: string, eventFn: InternalEventFunc) {

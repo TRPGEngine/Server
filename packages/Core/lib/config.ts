@@ -139,3 +139,11 @@ export function getConfigService(): AppConfig {
   debug('Using local config');
   return new LocalConfig();
 }
+
+/**
+ * 强制返回本地配置
+ * 用于测试环境
+ */
+export function getLocalConfigService() {
+  return new LocalConfig();
+}
