@@ -27,7 +27,7 @@
     "@types/jsonwebtoken": "^8.3.2",
     "amqplib": "^0.7.1",
     "apollo-server-koa": "^2.6.9",
-    "etcd3": "^1.0.2",
+    "etcd3": "^1.1.0",
     "fs-extra": "^5.0.0",
     "graphql": "^14.4.2",
     "graphql-relay": "^0.6.0",
