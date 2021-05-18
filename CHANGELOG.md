@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.53.0](https://github.com/TRPGEngine/Server/compare/v1.52.1...v1.53.0) (2021-05-18)
+
+
+### Features
+
+* **core:** 增加了rabbitmq作为消息队列的解决方案 ([9f711de](https://github.com/TRPGEngine/Server/commit/9f711de2379a8f93ad58abd9890188280f9a219a))
+* **core:** 实装etcd3作为配置中心 ([8a5d71e](https://github.com/TRPGEngine/Server/commit/8a5d71e488243a82000cbfa667fa3aefaae353f1))
+* **dice:** interceptor support chinese 。prefix ([7328879](https://github.com/TRPGEngine/Server/commit/732887943b3cbe76d210990495177a81d6ac6d88))
+
 ### [1.52.1](https://github.com/TRPGEngine/Server/compare/v1.52.0...v1.52.1) (2021-04-19)
 
 
