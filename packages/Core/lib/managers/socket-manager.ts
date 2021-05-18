@@ -232,12 +232,31 @@ export abstract class SocketManager<
    * 触发后执行继续执行promise
    */
   async waitForMessage(
-    matchFn: (payload: SocketMsgPayload) => boolean
+    matchFn: (payload: SocketMsgPayload) => boolean,
+    options: {
+      /**
+       * 超时时间, 默认没有超时设置
+       * 单位: 毫秒
+       */
+      timeout: number;
+    } = { timeout: -1 }
   ): Promise<void> {
     return new Promise((resolve) => {
+      let timer = null;
+      if (options.timeout > 0) {
+        timer = setTimeout(() => {
+          debug('Trigger [waitForMessage] Timeout!');
+          resolve();
+        }, options.timeout);
+      }
+
       const onCallTargetMessage = (payload: SocketMsgPayload) => {
         if (matchFn(payload) === true) {
           this.off('message', onCallTargetMessage);
+
+          if (!_.isNil(timer)) {
+            clearTimeout(timer);
+          }
           resolve();
         }
       };
