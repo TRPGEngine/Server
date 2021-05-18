@@ -164,6 +164,17 @@ const RelatedApps: React.FC = () => {
             <img src="/img/others/cnmods.jpg" />
           </a>
         </InfoTooltip>
+
+        <InfoTooltip text={'深渊小屋'}>
+          <a
+            className={styles.relatedApp}
+            href="https://deepwood.wang/"
+            target="_blank"
+            rel="noopener"
+          >
+            <img src="/img/others/syxw.png" />
+          </a>
+        </InfoTooltip>
       </div>
     </div>
   );

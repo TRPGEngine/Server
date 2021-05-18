@@ -9,7 +9,7 @@ interface LeafItem {
  * 获取一个对象的所有叶子节点
  * @param obj 数据
  */
-export function getObjectLeaf(obj: any, prefix = ''): LeafItem[] {
+export function getObjectLeafs(obj: any, prefix = ''): LeafItem[] {
   if (typeof obj !== 'object') {
     if (prefix === '') {
       return [
@@ -29,7 +29,7 @@ export function getObjectLeaf(obj: any, prefix = ''): LeafItem[] {
       _.toPairs(obj).map(([key, value]) => {
         const _key = prefix === '' ? key : [prefix, key].join('.');
 
-        return getObjectLeaf(value, _key);
+        return getObjectLeafs(value, _key);
       })
     );
   }

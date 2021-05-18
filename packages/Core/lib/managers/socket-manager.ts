@@ -1,15 +1,15 @@
 import { EventEmitter } from 'events';
-import Redis from 'ioredis';
 import _ from 'lodash';
 import { ICache } from '../cache';
 import { getLogger } from '../logger';
 import { Socket } from 'socket.io';
 import Debug from 'debug';
+import { getMQChannel } from './mq-channel';
+import { BaseMQChannel } from './mq-channel/interface';
 const debug = Debug('trpg:socket-manager');
 const logger = getLogger();
 
 export interface SocketManagerOptions {
-  redisUrl: string;
   cache: ICache;
 }
 
@@ -43,8 +43,7 @@ export abstract class SocketManager<
     `socket:manager:extra:${socketId}`;
 
   cache: ICache;
-  pubClient: Redis.Redis;
-  subClient: Redis.Redis;
+  channel: BaseMQChannel;
 
   sockets: Socket[] = []; // 记录管理的socket连接列表
   rooms: { [roomUUID: string]: string[] } = {}; // 当前实例管理的rooms列表
@@ -52,43 +51,26 @@ export abstract class SocketManager<
   constructor(public channelKey: string, options: SocketManagerOptions) {
     super();
 
-    const redisUrl = options.redisUrl;
-    if (!redisUrl) {
-      throw new Error(
-        '[SocketManager] require redisUrl to build pub/sub service'
-      );
-    }
-
     this.cache = options.cache;
-    this.pubClient = new Redis(redisUrl);
-    this.subClient = new Redis(redisUrl);
-
+    this.channel = getMQChannel(channelKey);
     this.initListener();
   }
 
   /**
-   * 初始化监听器
-   * 通过redis作为一个MQ系统来获取分布式通信
+   * 初始化消费者操作
    */
   initListener() {
     if (_.isEmpty(this.channelKey)) {
       throw new Error('[SocketManager] Channel Key is Empty!');
     }
-    this.subClient.subscribe(this.channelKey);
-    this.subClient.on('message', (channel, message) => {
-      if (channel === this.channelKey) {
-        try {
-          const payload: SocketMsgPayload = JSON.parse(message);
-          this.handleMessage(payload);
+    this.channel.consume((message) => {
+      try {
+        const payload: SocketMsgPayload = JSON.parse(message);
+        this.handleMessage(payload);
 
-          this.emit('message', payload); // 将所有接受到的payload都转发到监听
-        } catch (e) {
-          logger.error(
-            'receive redis sub message error with %s :%o',
-            message,
-            e
-          );
-        }
+        this.emit('message', payload); // 将所有接受到的payload都转发到监听
+      } catch (e) {
+        logger.error('receive redis sub message error with %s :%o', message, e);
       }
     });
   }
@@ -246,11 +228,29 @@ export abstract class SocketManager<
   }
 
   /**
+   * 等待合适的事件被触发
+   * 触发后执行继续执行promise
+   */
+  async waitForMessage(
+    matchFn: (payload: SocketMsgPayload) => boolean
+  ): Promise<void> {
+    return new Promise((resolve) => {
+      const onCallTargetMessage = (payload: SocketMsgPayload) => {
+        if (matchFn(payload) === true) {
+          this.off('message', onCallTargetMessage);
+          resolve();
+        }
+      };
+      this.on('message', onCallTargetMessage);
+    });
+  }
+
+  /**
    * 向公用通道发送socket消息
    * @param payload 消息体
    */
   async emitMessage(payload: BaseSocketMsgPayload): Promise<void> {
-    await this.pubClient.publish(this.channelKey, JSON.stringify(payload));
+    await this.channel.produce(JSON.stringify(payload));
   }
 
   /**
@@ -342,10 +342,8 @@ export abstract class SocketManager<
       });
       debug('清理Socket房间记录成功');
 
-      debug('正在关闭订阅服务..');
-      _.invoke(this.subClient, 'disconnect');
-      debug('正在关闭发布服务');
-      _.invoke(this.pubClient, 'disconnect');
+      debug('正在关闭消息队列服务..');
+      this.channel.close();
     } catch (err) {
       console.error('[SocketManager] 关闭失败', err);
     }

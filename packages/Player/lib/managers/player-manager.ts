@@ -118,7 +118,7 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
 
     for (const player of waitToSendPlayers) {
       // 循环发送消息
-      if (this.internalFn[eventName]) {
+      if (typeof this.internalFn[eventName] === 'function') {
         // 如果有内部处理方法
         this.internalFn[eventName].call(this, player, data);
       } else {
@@ -255,7 +255,15 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
     const isExist = await this.cache.sismember(ONLINE_PLAYER_KEY, uuidKey);
     if (isExist) {
       // 如果已存在则踢掉用户
-      await this.tickPlayer(uuid, platform, 'self');
+      this.tickPlayer(uuid, platform, 'self');
+
+      // 确保在之前的用户被执行踢出操作以后再继续执行后续代码
+      await this.waitForMessage((payload) => {
+        return (
+          payload.eventName === TICK_PLAYER_EVENTNAME &&
+          payload.target === this.getUUIDKey(uuid, platform)
+        );
+      });
     } else {
       // 不存在则新增
       await this.cache.sadd(ONLINE_PLAYER_KEY, uuidKey);

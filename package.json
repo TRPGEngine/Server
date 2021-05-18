@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.52.1",
+  "version": "1.53.0",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -21,10 +21,10 @@
     "doc:start": "cd ./services/Website && npm start",
     "playground": "cross-env TRPG_PORT=23275 node ./playground/playground.js --experimental-repl-await",
     "bench": "node ./test/bench/index.js && cat ./test/bench/out.log",
-    "test": "jest --config=./test/jest.config.js --runInBand",
-    "test:coverage": "jest --config=./test/jest.config.js --runInBand --coverage",
-    "test:noserver": "npm run test --noserver",
-    "test:watch": "jest --config=./test/jest.config.js --runInBand --watch",
+    "test": "jest --config=./test/jest.config.js --runInBand --passWithNoTests",
+    "test:coverage": "npm run test -- --coverage",
+    "test:noserver": "npm run test -- --noserver",
+    "test:watch": "npm run test -- --watch",
     "test:ci": "npm run test:coverage -- --ci --reporters=default --reporters=jest-junit --detectOpenHandles",
     "release": "standard-version -a"
   },

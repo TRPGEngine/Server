@@ -88,7 +88,7 @@ const siteConfig = {
           position: 'right',
         },
         {
-          href: 'https://trpgstatus.moonrailgun.com/',
+          href: 'https://stats.uptimerobot.com/zqDOKHRGKK',
           label: '服务状态',
           position: 'right',
         },
