@@ -258,12 +258,18 @@ class PlayerManager extends SocketManager<PlayerMsgPayload> {
       this.tickPlayer(uuid, platform, 'self');
 
       // 确保在之前的用户被执行踢出操作以后再继续执行后续代码
-      await this.waitForMessage((payload) => {
-        return (
-          payload.eventName === TICK_PLAYER_EVENTNAME &&
-          payload.target === this.getUUIDKey(uuid, platform)
-        );
-      });
+      await this.waitForMessage(
+        (payload) => {
+          return (
+            payload.eventName === TICK_PLAYER_EVENTNAME &&
+            payload.target === this.getUUIDKey(uuid, platform)
+          );
+        },
+        {
+          // 5秒后不返回结果则不等待后续
+          timeout: 5000,
+        }
+      );
     } else {
       // 不存在则新增
       await this.cache.sadd(ONLINE_PLAYER_KEY, uuidKey);
