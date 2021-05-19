@@ -48,7 +48,7 @@ jobs:
             - v1-dependencies-
 
       # 在ci中额外安装jest-junit用于生成Test Summary
-      - run: npm install -D jest-junit
+      - run: yarn add -D jest-junit
 
       # 安装完整依赖。放在后面防止低版本npm把git下载的包覆盖
       - run: npm install
@@ -66,11 +66,11 @@ jobs:
       - run: echo 'export NODE_OPTIONS=--max_old_space_size=4096' >> $BASH_ENV
 
       # 更新数据库
-      - run: npm run db:migrate:run
-      - run: npm run db:seeder:run
+      - run: yarn run db:migrate:run
+      - run: yarn run db:seeder:run
 
       # run tests!
-      - run: npm run test:ci
+      - run: yarn run test:ci
 
       - run: npx codecov
 
