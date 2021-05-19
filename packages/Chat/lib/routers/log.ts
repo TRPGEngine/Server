@@ -18,7 +18,7 @@ chatlogRouter.get(
   async (ctx) => {
     const playerUUID = ctx.state.player.uuid;
     const converseUUID = ctx.params.converseUUID;
-    const keyword = ctx.query.keyword;
+    const keyword = ctx.query.keyword as string;
 
     const page = Number(ctx.query.page ?? 1);
     const size = Number(ctx.query.size ?? 10);

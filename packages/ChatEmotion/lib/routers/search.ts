@@ -8,7 +8,7 @@ const buildEmotionSearchCacheKey = (keyword: string) =>
   `chat-emotion:search:${keyword}`;
 
 searchRouter.get('/search', async (ctx) => {
-  const keyword = ctx.request.query.keyword;
+  const keyword = ctx.request.query.keyword as string;
   if (!keyword) {
     throw new Error('缺少必要字段');
   }

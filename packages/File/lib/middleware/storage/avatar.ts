@@ -18,7 +18,7 @@ export default function avatarStorage(): TRPGMiddleware {
     const has_thumbnail = _.get(ctx.req, 'file.has_thumbnail', false);
     const { width, height } = ctx.header;
     const type = ctx.header['avatar-type'] || 'actor';
-    const attach_uuid: string = ctx.header['attach-uuid'] || null;
+    const attach_uuid: string = ctx.header['attach-uuid'] as string || null;
     await trpgapp.storage.transaction('uploadAvatar', async (transaction) => {
       if (attach_uuid) {
         // attach_uuid应唯一:一个用户只能有一个对应的头像文件、一个角色只能有一个对应的图片

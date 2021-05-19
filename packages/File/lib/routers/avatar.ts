@@ -68,23 +68,24 @@ avatarRouter.post('/bindAttachUUID', ssoAuth(), async (ctx) => {
 });
 
 avatarRouter.get('/svg', async (ctx, next) => {
-  let name = ctx.query.name;
+  const name = ctx.query.name as string;
   if (!name) {
     ctx.body = 'need name';
     return;
   }
-  let nameid = encodeStr2Int(name);
-  let shortName = name[0].toUpperCase();
-  let width = 100;
-  let height = 100;
-  let color = config.svgBg[nameid % config.svgBg.length];
+  const nameid = encodeStr2Int(name);
+  const shortName = name[0].toUpperCase();
+  const width = 100;
+  const height = 100;
+  const color = config.svgBg[nameid % config.svgBg.length];
   ctx.set('Cache-Control', 'max-age=604800'); // 缓存7天
   ctx.type = 'image/svg+xml';
   ctx.body = `<?xml version="1.0" encoding="UTF-8"?>
   <svg width="${width}px" height="${height}px" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <rect width="${width}" height="${height}" fill="${color}"/>
-    <text x="${width / 2}px" y="${height / 2 +
-    4}px" fill="#fff" style="font-size: 46px;" text-anchor="middle" dominant-baseline="middle">${shortName}</text>
+    <text x="${width / 2}px" y="${
+    height / 2 + 4
+  }px" fill="#fff" style="font-size: 46px;" text-anchor="middle" dominant-baseline="middle">${shortName}</text>
   </svg>`;
 });
 
