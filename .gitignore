@@ -13,6 +13,12 @@ test/coverage
 test/reports
 .idea/
 .DS_Store
+package-lock.json
 
 build/docker/trpg/config/local.js
 build/docker/trpg/mysql
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -42,7 +42,10 @@ msgRouter.get('/msg/token/list', ssoAuth(), async (ctx) => {
     throw new Error('缺少必要参数');
   }
 
-  const list = await BotMsgToken.getMsgTokenList(groupUUID, playerUUID);
+  const list = await BotMsgToken.getMsgTokenList(
+    groupUUID as string,
+    playerUUID
+  );
 
   ctx.body = { list };
 });
@@ -54,7 +57,7 @@ msgRouter.get('/msg/send', async (ctx) => {
     throw new Error('缺少必要参数');
   }
 
-  await BotMsgToken.sendMsgWithToken(token, msg);
+  await BotMsgToken.sendMsgWithToken(token as string, msg as string);
 
   ctx.body = { result: true, msg: '消息发送成功' };
 });
@@ -67,7 +70,7 @@ msgRouter.post('/msg/send', async (ctx) => {
     throw new Error('缺少必要参数');
   }
 
-  await BotMsgToken.sendMsgWithToken(token, msg, data);
+  await BotMsgToken.sendMsgWithToken(token as string, msg, data);
 
   ctx.body = { result: true, msg: '消息发送成功' };
 });

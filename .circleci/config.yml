@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/node:10.19.0
+      - image: circleci/node:14.15.1
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -48,7 +48,7 @@ jobs:
             - v1-dependencies-
 
       # 在ci中额外安装jest-junit用于生成Test Summary
-      - run: npm install -D jest-junit
+      - run: yarn add -D jest-junit
 
       # 安装完整依赖。放在后面防止低版本npm把git下载的包覆盖
       - run: npm install
@@ -59,18 +59,18 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # - run: npm run packages:install
-      - run: bash packages/foreach.sh 'npm install'
+      - run: bash packages/foreach.sh 'yarn install'
 
       - run: echo 'export NODE_ENV=ci' >> $BASH_ENV
       - run: echo 'export JEST_JUNIT_OUTPUT_DIR=test/reports/jest/results.xml' >> $BASH_ENV
       - run: echo 'export NODE_OPTIONS=--max_old_space_size=4096' >> $BASH_ENV
 
       # 更新数据库
-      - run: npm run db:migrate:run
-      - run: npm run db:seeder:run
+      - run: yarn run db:migrate:run
+      - run: yarn run db:seeder:run
 
       # run tests!
-      - run: npm run test:ci
+      - run: yarn run test:ci
 
       - run: npx codecov
 

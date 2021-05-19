@@ -192,9 +192,9 @@ actorRouter.get('/findSharedActor', async (ctx) => {
   const { templateUUID = '', page = 1, limit = 10 } = ctx.query;
 
   const { count, list } = await ActorActor.findSharedActor(
-    templateUUID,
-    page,
-    limit
+    templateUUID as string,
+    Number(page),
+    Number(limit)
   );
 
   ctx.body = {

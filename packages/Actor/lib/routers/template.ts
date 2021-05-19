@@ -11,7 +11,7 @@ const templateRouter = new TRPGRouter<{
 templateRouter.get('/template/list', async (ctx) => {
   const { page = 1 } = ctx.query;
 
-  const templates = await ActorTemplate.getList(page);
+  const templates = await ActorTemplate.getList(Number(page));
 
   ctx.body = { list: templates };
 });

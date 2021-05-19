@@ -8,7 +8,7 @@ const router = new TRPGRouter();
  * 用户添加表情包
  */
 router.get('/website/info', async (ctx) => {
-  const url = ctx.query.url;
+  const url = ctx.query.url as string;
   if (!url) {
     throw new Error('缺少URL');
   }
