@@ -4,10 +4,10 @@
 
 "@types/hashids@^1.0.30":
   version "1.0.32"
-  resolved "http://npm.gllue.net/@types%2fhashids/-/hashids-1.0.32.tgz#deebcad14b54310bbcc74c947f5dea09a2a5fa83"
+  resolved "https://registry.npm.taobao.org/@types%2fhashids/-/hashids-1.0.32.tgz#deebcad14b54310bbcc74c947f5dea09a2a5fa83"
   integrity sha1-3uvK0UtUMQu8x0yUf13qCaKl+oM=
 
 hashids@^1.2.2:
   version "1.2.2"
-  resolved "http://npm.gllue.net/hashids/-/hashids-1.2.2.tgz#28635c7f2f7360ba463686078eee837479e8eafb"
+  resolved "https://registry.npm.taobao.org/hashids/-/hashids-1.2.2.tgz#28635c7f2f7360ba463686078eee837479e8eafb"
   integrity sha1-KGNcfy9zYLpGNoYHju6DdHno6vs=

@@ -19,7 +19,7 @@ describe('groupString', () => {
     ['word', 3, ['wor', 'd']],
     ['word', 4, ['word']],
     ['word', 5, ['word']],
-  ])('%s, %d => %s', (str: string, step: number, output: string) => {
+  ])('%s, %d => %s', (str: string, step: number, output: string[]) => {
     expect(groupString(str, step)).toMatchObject(output);
   });
 });

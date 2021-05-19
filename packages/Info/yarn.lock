@@ -4,17 +4,17 @@
 
 ip-regex@^4.1.0:
   version "4.3.0"
-  resolved "http://npm.gllue.net/ip-regex/-/ip-regex-4.3.0.tgz#687275ab0f57fa76978ff8f4dddc8a23d5990db5"
+  resolved "https://registry.npm.taobao.org/ip-regex/-/ip-regex-4.3.0.tgz#687275ab0f57fa76978ff8f4dddc8a23d5990db5"
   integrity sha1-aHJ1qw9X+naXj/j03dyKI9WZDbU=
 
 tlds@^1.203.0:
   version "1.221.1"
-  resolved "http://npm.gllue.net/tlds/-/tlds-1.221.1.tgz#6cf6bff5eaf30c5618c5801c3f425a6dc61ca0ad"
+  resolved "https://registry.npm.taobao.org/tlds/-/tlds-1.221.1.tgz#6cf6bff5eaf30c5618c5801c3f425a6dc61ca0ad"
   integrity sha1-bPa/9erzDFYYxYAcP0JabcYcoK0=
 
 url-regex@^5.0.0:
   version "5.0.0"
-  resolved "http://npm.gllue.net/url-regex/-/url-regex-5.0.0.tgz#8f5456ab83d898d18b2f91753a702649b873273a"
+  resolved "https://registry.npm.taobao.org/url-regex/-/url-regex-5.0.0.tgz#8f5456ab83d898d18b2f91753a702649b873273a"
   integrity sha1-j1RWq4PYmNGLL5F1OnAmSbhzJzo=
   dependencies:
     ip-regex "^4.1.0"

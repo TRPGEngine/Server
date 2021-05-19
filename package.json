@@ -9,7 +9,7 @@
     "pro": "cross-env NODE_ENV=production npm run run:standard",
     "run:standard": "node standard.js",
     "run:nodemon": "nodemon standard.js",
-    "packages:install": "bash packages/foreach.sh 'yarn install'",
+    "packages:install": "bash packages/foreach.sh 'yarn install --registry https://registry.npm.taobao.org'",
     "prettier:all": "prettier --write \"./packages/**/*.{js,ts}\" && prettier --write \"./db/**/*.xml\"",
     "db:migrate:generate": "node ./cli.js db generate-migrate",
     "db:migrate:run": "node ./cli.js db run-migrate",
