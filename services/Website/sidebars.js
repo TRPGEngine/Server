@@ -10,6 +10,7 @@ module.exports = {
       'recruit',
       'mobile',
       'richeditor-crash',
+      'faq',
     ],
     人物: [
       'actor/actor1',
