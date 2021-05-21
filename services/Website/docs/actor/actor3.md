@@ -20,7 +20,7 @@ title: 进阶能力
 
 比如如下配置, 实现了一个根据选择的城市动态生成区域选项的逻辑
 
-```xml
+```xml layoutTemplate
 <?xml version="1.0" encoding="utf-8" ?>
 <Template>
   <Static name="city" value="{'北京': ['朝阳区'], '上海': ['黄浦区', '虹口区']}" />
