@@ -15,6 +15,7 @@ module.exports = {
     人物: [
       'actor/actor1',
       'actor/actor2',
+      'actor/actor3',
       {
         标签: [
           'actor/tags/template',
