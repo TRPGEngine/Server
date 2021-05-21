@@ -17,7 +17,7 @@ userRouter.get('/info/:uuid', async (ctx) => {
   const playerUUID = ctx.params.uuid;
   const user = await PlayerUser.findByUUID(playerUUID);
   if (_.isNil(user)) {
-    throw new NotFoundError('该用户不存在');
+    throw new NotFoundError(`该用户不存在: ${playerUUID}`);
   }
 
   ctx.body = { user: user.getInfo(false) };
