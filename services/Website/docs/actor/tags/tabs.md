@@ -30,3 +30,16 @@ title: <Tabs />
 | 名称  | 类型   | 描述               | 默认值 |
 | ----- | ------ | ------------------ | ------ |
 | label | string | 标签页卡头显示文字 | ''     |
+
+### 示例
+
+```xml layoutTemplate
+<?xml version="1.0" encoding="utf-8" ?>
+<Template>
+  <Tabs>
+    <Tab label="选项卡1">内容1</Tab>
+    <Tab label="选项卡2">内容2</Tab>
+    <Tab label="选项卡3">内容3</Tab>
+  </Tabs>
+</Template>
+```
