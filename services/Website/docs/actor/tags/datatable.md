@@ -22,17 +22,17 @@ title: <DataTable>
 如果 rows 传入的数据不是一个数组的话。会视为空数组
 :::
 
-## 示例
+### 示例
 
-### 紧凑表格
+#### 紧凑表格
 
-```xml
+```xml layoutTemplate
 <DataTable title="紧凑表格" size="small" :rows="[['表头1','表头2','表头3'], ['内容1','内容2','内容3']]" />
 ```
 
-### 大量数据表格
+#### 大量数据表格
 
-```xml
+```xml layoutTemplate
 <Var name="tableExample" value="_range(100).map((x) => _range(3).map(y => `内容${x}-${y}`))" />
 <DataTable title="大量数据" height="200" :rows="[['表头1','表头2','表头3'], ...tableExample]" />
 ```

@@ -15,3 +15,14 @@ title: <Divider />
 | ----------- | ---------------- | ----------------------------- | ------------ |
 | orientation | 分割线标题的位置 | `left` \| `right` \| `center` | `center`     |
 | type        | 水平还是垂直类型 | `horizontal` \| `vertical`    | `horizontal` |
+
+### 示例
+
+```xml layoutTemplate
+<?xml version="1.0" encoding="utf-8" ?>
+<Template>
+  <div>上面</div>
+  <Divider />
+  <div>下面</div>
+</Template>
+```

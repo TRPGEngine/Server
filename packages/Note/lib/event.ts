@@ -1,4 +1,4 @@
-import xss from 'xss';
+import { filterXSS } from 'xss';
 import Debug from 'debug';
 import { EventFunc } from 'trpg/core';
 import { NoteNote } from './models/note';
@@ -67,7 +67,7 @@ export const save: EventFunc<{
     throw new Error('缺少参数');
   }
 
-  noteContent = xss.filterXSS(noteContent); // 进行防xss处理
+  noteContent = filterXSS(noteContent); // 进行防xss处理
 
   const { id } = await PlayerUser.findOne({
     where: { uuid: player.uuid },
@@ -98,7 +98,7 @@ export const save: EventFunc<{
 /**
  * 获取用户的所有笔记
  */
-export const getUserNotes: EventFunc = async function() {
+export const getUserNotes: EventFunc = async function () {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);
@@ -115,7 +115,7 @@ export const getUserNotes: EventFunc = async function() {
  * 新版创建笔记
  * 是没有参数版本的保存笔记
  */
-export const createNote: EventFunc = async function() {
+export const createNote: EventFunc = async function () {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);
@@ -135,7 +135,7 @@ export const saveNote: EventFunc<{
   uuid: string;
   title: string;
   data: object;
-}> = async function(eventData) {
+}> = async function (eventData) {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);
@@ -155,7 +155,7 @@ export const saveNote: EventFunc<{
  */
 export const deleteNote: EventFunc<{
   uuid: string;
-}> = async function(eventData) {
+}> = async function (eventData) {
   const { app, socket } = this;
 
   const player = app.player.manager.findPlayer(socket);

@@ -37,7 +37,7 @@ imageV2Router.post(
     }
 
     const usage = ctx.header['usage'] ?? '';
-    const attach_uuid: string = ctx.header['attach-uuid'] ?? null;
+    const attach_uuid: string = (ctx.header['attach-uuid'] as string) ?? null;
 
     const user = await PlayerUser.findByUUID(playerUUID);
     const image: FileImage = await FileImage.create({

@@ -18,13 +18,13 @@
 
 前端项目: [TRPGEngine/Client](https://github.com/TRPGEngine/Client)
 
-## 配置代码依赖
+## 安装依赖
 ```bash
 # 安装所有环境
-$ npm install && npm run packages:ci
+$ yarn install && yarn run packages:install
 ```
 
-## 配置数据库
+## 配置文件
 本项目基于[config](https://www.npmjs.com/package/config)作为配置管理方案
 
 创建`config/local.js`文件, 参考`config/default.js`的内容进行配置的覆写
@@ -51,20 +51,20 @@ module.exports = {
 
 写入数据库结构
 ```bash
-$ npm run db:migrate:run
+$ yarn run db:migrate:run
 ```
 
 写入默认数据
 ```bash
-$ npm run db:seeder:run
+$ yarn run db:seeder:run
 ```
 
 ## 运行服务器
 
 ```bash
-$ npm run dev
+$ yarn run dev
 # or 
-$ npm run pro
+$ yarn run pro
 ```
 
 ## 数据库编码

@@ -13,7 +13,7 @@ class UnauthorizedError extends Error {
 export const ssoAuth = (): TRPGMiddleware<{
   player?: PlayerJWTPayload;
 }> => async (ctx, next) => {
-  const token: string = ctx.headers['x-token'] || '';
+  const token: string = (ctx.headers['x-token'] as string) || '';
   try {
     if (_.isEmpty(token)) {
       throw new UnauthorizedError('Token 不存在');

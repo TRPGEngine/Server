@@ -25,27 +25,33 @@ title: <Select />
 
 #### 简单下拉框
 
-```xml
+```xml layoutTemplate
 <Select name="下拉选择" options="选项A,选项B,选项C" />
+```
+
+#### 动态下拉框
+
+```xml layoutTemplate
+<Select name="下拉选择" :options="['选项A','选项B','选项C']" />
 ```
 
 #### 下拉框分组
 
-```xml
+```xml layoutTemplate
 <Select name="下拉选择分组" :options="[{name: '组1', items: ['选项A', '选项B']}, {name: '组2', items: ['选项C']}]" />
 ```
 
 #### 严格模式
 
-```xml
+```xml layoutTemplate
 <Computed target="下拉选择严格模式" expression="'选项D'" />
 <Select name="下拉选择严格模式" options="选项A,选项B,选项C" strict="true" />
 ```
 
-使用`Computed`组件填入变量的值。此时 Select 匹配的数据为`选项D`。 因为此时的值不为设定的`选项A`,`选项B`,`选项C`中任意一项，因此会出现黄色警告
+使用`Computed`组件填入变量的值。此时 Select 匹配的数据为`选项D`。 因为此时的值不为设定的`选项A`,`选项B`,`选项C`中任意一项，因此会出现黄色警告。
 
 #### 自定义
 
-```xml
+```xml layoutTemplate
 <Select name="下拉选择允许自定义" options="选项A,选项B,选项C" :allowCustom="true" />
 ```

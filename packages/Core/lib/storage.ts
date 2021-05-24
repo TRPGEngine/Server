@@ -31,10 +31,12 @@ export interface TRPGDbOptions {
   options: Options;
 }
 
-export interface TRPGModelAttributes {
+export interface TRPGModelAttributes<
+  M extends Model<any, any> = Model<any, any>
+> {
   [name: string]:
     | DataType
-    | (ModelAttributeColumnOptions & {
+    | (ModelAttributeColumnOptions<M> & {
         /**
          * alias of allowNull
          */
@@ -211,7 +213,7 @@ export interface TRPGModelInitOptions<M extends Model<any, any> = Model>
 export abstract class TRPGModel extends Model {
   public static init<M extends TRPGModel = TRPGModel>(
     this: { new (): M } & typeof Model,
-    attributes: TRPGModelAttributes,
+    attributes: TRPGModelAttributes<M>,
     options: TRPGModelInitOptions<M>
   ) {
     // 增加required

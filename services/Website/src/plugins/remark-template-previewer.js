@@ -5,7 +5,12 @@ const LZString = require('lz-string');
 
 const transformNode = (node) => {
   const xml = node.value;
-  const hash = `#code/${LZString.compressToEncodedURIComponent(xml)}`;
+  let fullXML = xml
+  if(fullXML.indexOf('<Template>') === -1) {
+    // 没有被template包裹
+    fullXML = `<?xml version="1.0" encoding="utf-8" ?><Template>${xml}</Template>`
+  }
+  const hash = `#code/${LZString.compressToEncodedURIComponent(fullXML)}`;
   const previewerUrl = `https://trpg.moonrailgun.com/playground/preview/${hash}`;
   return [
     {

@@ -7,7 +7,7 @@ COC 机器人是为了解决一些通用平台上无法支持或者不适合支�
 
 下载地址:
 
-[https://wwa.lanzous.com/b0bx4zc0b](https://wwa.lanzous.com/b0bx4zc0b)
+[https://wwa.lanzoui.com/b0bx4zc0b](https://wwa.lanzoui.com/b0bx4zc0b)
 密码:2k0v
 
 ## 使用方式

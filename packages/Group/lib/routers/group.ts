@@ -148,7 +148,10 @@ groupRouter.get('/request/list', ssoAuth(), async (ctx) => {
     throw new Error('缺少必要参数');
   }
 
-  const list = await GroupRequest.getGroupRequestList(groupUUID, playerUUID);
+  const list = await GroupRequest.getGroupRequestList(
+    groupUUID as string,
+    playerUUID
+  );
 
   ctx.body = { list };
 });
@@ -198,10 +201,10 @@ groupRouter.get('/log/:groupUUID/range', ssoAuth(), async (ctx) => {
 
   const logs = await GroupGroup.getGroupRangeChatLog(
     groupUUID,
-    converseUUID,
+    converseUUID as string,
     playerUUID,
-    from,
-    to
+    from as string,
+    to as string
   );
 
   ctx.body = { logs };

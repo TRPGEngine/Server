@@ -10,10 +10,12 @@ module.exports = {
       'recruit',
       'mobile',
       'richeditor-crash',
+      'faq',
     ],
     人物: [
       'actor/actor1',
       'actor/actor2',
+      'actor/actor3',
       {
         标签: [
           'actor/tags/template',
@@ -21,8 +23,9 @@ module.exports = {
           'actor/tags/col',
           'actor/tags/baseinfo',
           'actor/tags/baseattr',
-          'actor/tags/tabs',
+          'actor/tags/input',
           'actor/tags/select',
+          'actor/tags/tabs',
           'actor/tags/datatable',
           'actor/tags/divider',
           'actor/tags/bar',
