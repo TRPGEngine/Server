@@ -12,3 +12,4 @@ TRPG 的很多规则是一个很灵活的东西。很多东西都是口头描述
 有用的资源:
 
 - [Playground](https://trpg.moonrailgun.com/playground/)
+- [创建模板链接(临时用)](https://trpg.moonrailgun.com/portal/template/create)
