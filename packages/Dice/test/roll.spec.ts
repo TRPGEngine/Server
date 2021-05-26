@@ -1,7 +1,14 @@
 import _ from 'lodash';
-import { rollFate, rollJudge, rollWW } from '../lib/utils';
+import { roll, rollFate, rollJudge, rollWW } from '../lib/utils';
 
 describe('roll express parse', () => {
+  describe('roll', () => {
+    test('r2d6', () => {
+      const res = roll('2d6');
+      expect(/2d6=\([1-6]\+[1-6]\)=\d/.test(res.str)).toBe(true);
+    });
+  });
+
   describe('rollJudge', () => {
     test.each([
       ['a', {}, 50],
