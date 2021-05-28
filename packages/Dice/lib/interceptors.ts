@@ -8,8 +8,8 @@ import { GroupActor } from 'packages/Group/lib/models/actor';
 import { hasString } from 'lib/helper/string-helper';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 
-const restPattern = /^[\.。]r(.*)$/; // 用于获取.r后面的内容
-const dotRestPattern = /^[\.。](.*)$/; // 用于获取.后面的内容
+const restPattern = /^[\.。]r(.*)/; // 用于获取.r后面的内容
+const dotRestPattern = /^[\.。](.*)/; // 用于获取.后面的内容
 
 /**
  * 获取消息的发送者
