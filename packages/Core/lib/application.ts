@@ -75,7 +75,7 @@ export class Application extends events.EventEmitter {
 
   run() {
     // TODO 启动检测，如果为第一次启动则初始化。如果非第一次启动则重新开启（保留之前配置）
-    if (['test', 'ci'].includes(process.env.NODE_ENV)) {
+    if (['test', 'ci', 'migration'].includes(process.env.NODE_ENV)) {
       this.initTestEnv();
     } else {
       this.init();
