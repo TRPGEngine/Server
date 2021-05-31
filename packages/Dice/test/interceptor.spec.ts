@@ -54,6 +54,17 @@ describe('interceptors', () => {
     );
 
     appendInterceptorTest(
+      'roll dice shortcuts with multi-lines string',
+      {
+        message: '.r 测试\n第二行',
+      },
+      {
+        message: expect.stringContaining('因 测试 骰出了: d'),
+        type: 'tip',
+      }
+    );
+
+    appendInterceptorTest(
       'roll dice oversize',
       {
         message: '.r999d99999',

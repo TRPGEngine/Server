@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'migration';
 const app = require('../standard');
 
 const db = {
