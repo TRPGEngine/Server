@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.53.3](https://github.com/TRPGEngine/Server/compare/v1.53.2...v1.53.3) (2021-05-31)
+
+
+### Bug Fixes
+
+* **core:** [#113](https://github.com/TRPGEngine/Server/issues/113) 修复migration获取远程配置导致的时序性问题 ([281d3d6](https://github.com/TRPGEngine/Server/commit/281d3d6b274f0b9c5fa37cd8ed5fc5678228e96c))
+* **dice:** 修复输入多行会报错的bug ([a1b3d83](https://github.com/TRPGEngine/Server/commit/a1b3d83b8aeb8056e6a6bbedea587ea4fdf3277c))
+
 ### [1.53.2](https://github.com/TRPGEngine/Server/compare/v1.53.1...v1.53.2) (2021-05-24)
 
 ### [1.53.1](https://github.com/TRPGEngine/Server/compare/v1.53.0...v1.53.1) (2021-05-18)
