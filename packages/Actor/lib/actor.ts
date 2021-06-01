@@ -6,15 +6,17 @@ import ActorDefinition from './models/actor';
 import BasePackage from 'lib/package';
 import actorRouter from './routers/actor';
 import templateRouter from './routers/template';
+import ActorTemplateDraftDefinition from './models/template_draft';
 
 export default class Actor extends BasePackage {
   public name: string = 'Actor';
   public require: string[] = ['Player', 'File'];
-  public desc: string = '角色与模板管理';
+  public desc: string = '角色卡与模板管理';
 
   onInit(): void {
     this.regModel(ActorDefinition);
     this.regModel(ActorTemplateDefinition);
+    this.regModel(ActorTemplateDraftDefinition);
 
     this.app.actor = {};
 
