@@ -49,6 +49,8 @@ export class FileOSS extends Model {
         mimetype: file.mimeType,
         extra_data: { imageInfo: file.imageInfo },
       });
+    } else {
+      throw new Error('未知的存储目标');
     }
   }
 

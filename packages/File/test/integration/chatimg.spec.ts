@@ -3,7 +3,7 @@ import { buildAppContext } from 'test/utils/app';
 const context = buildAppContext();
 
 describe('chatimg router', () => {
-  it('/file/chatimg/upload/info', async () => {
+  it.skip('/file/chatimg/upload/info', async () => {
     const { body } = await context.request.get('/file/chatimg/upload/info');
 
     expect(body).toHaveProperty('result');
