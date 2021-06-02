@@ -1,4 +1,4 @@
-import File from './lib/File';
+import File from './lib/file';
 
 module.exports = File;
 
