@@ -12,7 +12,7 @@ const matchRE = new RegExp(
 
 export function processRoll(rawStr: string) {
   const matchs = rawStr.match(matchRE);
-  console.log('matchs', matchs);
+  // console.log('matchs', matchs);
   if (_.isArray(matchs)) {
     // TODO: #前的操作待实现
     // let rollCount = 1;

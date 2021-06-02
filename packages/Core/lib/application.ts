@@ -568,6 +568,7 @@ export class Application extends events.EventEmitter {
   }
 
   /**
+   * 不建议使用，已弃用
    * @deprecated
    */
   async reset({ force = false } = {}) {

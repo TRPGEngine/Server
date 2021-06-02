@@ -1,4 +1,7 @@
-process.env.NODE_ENV = 'migration';
+if(process.env.NODE_ENV !== 'ci') {
+  // 仅非ci环境生效
+  process.env.NODE_ENV = 'migration';
+}
 const app = require('../standard');
 
 const db = {
