@@ -4,11 +4,12 @@ import _ from 'lodash';
 import { ActorTemplate } from './models/template';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ActorActor } from './models/actor';
+import { FileAvatar } from 'packages/File/lib/models/avatar';
 const debug = Debug('trpg:component:actor:event');
 
 export const getTemplate: EventFunc<{
   uuid: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -33,7 +34,7 @@ export const getTemplate: EventFunc<{
 /**
  * 获取推荐角色模板
  */
-export const getSuggestTemplate: EventFunc<{}> = async function(data, cb, db) {
+export const getSuggestTemplate: EventFunc<{}> = async function (data, cb, db) {
   const templates = await ActorTemplate.getRecommendList();
 
   return { templates };
@@ -41,7 +42,7 @@ export const getSuggestTemplate: EventFunc<{}> = async function(data, cb, db) {
 
 export const findTemplate: EventFunc<{
   name: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -76,7 +77,7 @@ export const createTemplate: EventFunc<{
   desc?: string;
   avatar?: string;
   info: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -107,7 +108,7 @@ export const updateTemplate: EventFunc<{
   desc: string;
   avatar: string;
   info: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -152,7 +153,7 @@ export const updateTemplate: EventFunc<{
 
 export const removeTemplate: EventFunc<{
   uuid: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -182,7 +183,7 @@ export const createActor: EventFunc<{
   desc: string;
   info: {};
   template_uuid: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -202,7 +203,7 @@ export const createActor: EventFunc<{
 
   let actor = null;
   await db.transactionAsync(async () => {
-    actor = await db.models.actor_actor.create({
+    actor = await ActorActor.create({
       name,
       avatar,
       desc,
@@ -212,8 +213,9 @@ export const createActor: EventFunc<{
     const user = await PlayerUser.findByUUID(player.uuid);
     await actor.setOwner(user);
     if (!!avatar) {
+      // 如果头像已存在
       let tmp = avatar.split('/');
-      let avatarModel = await db.models.file_avatar.findOne({
+      let avatarModel = await FileAvatar.findOne({
         where: {
           name: tmp[tmp.length - 1],
         },
@@ -234,7 +236,7 @@ export const createActor: EventFunc<{
 
 export const getActor: EventFunc<{
   uuid: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -261,7 +263,7 @@ export const getActor: EventFunc<{
  */
 export const removeActor: EventFunc<{
   uuid: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -285,7 +287,7 @@ export const updateActor: EventFunc<{
   avatar: string;
   desc: string;
   info: {};
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -309,7 +311,7 @@ export const updateActor: EventFunc<{
   }
 
   return await db.transactionAsync(async () => {
-    let actor = await db.models.actor_actor.findOne({
+    let actor = await ActorActor.findOne({
       where: { uuid, ownerId: userId },
     });
     if (_.isNil(actor)) {
@@ -323,14 +325,14 @@ export const updateActor: EventFunc<{
     actor.info = info;
     let saveActor = await actor.save();
 
-    if (db.models.file_avatar && oldAvatar && oldAvatar !== avatar) {
+    if (FileAvatar && oldAvatar && oldAvatar !== avatar) {
       // 更新avatar的attach
 
       const user = await PlayerUser.findByUUID(player.uuid);
       let oldtmp = oldAvatar.split('/');
       let tmp = avatar.split('/');
       let userId = user.id;
-      let oldAvatarInstance = await db.models.file_avatar.findOne({
+      let oldAvatarInstance = await FileAvatar.findOne({
         where: {
           name: oldtmp[oldtmp.length - 1],
           ownerId: userId,
@@ -342,7 +344,7 @@ export const updateActor: EventFunc<{
         await oldAvatarInstance.save();
       }
 
-      let avatarInstance = await db.models.file_avatar.findOne({
+      const avatarInstance = await FileAvatar.findOne({
         where: {
           name: tmp[tmp.length - 1],
           ownerId: userId,
@@ -362,7 +364,7 @@ export const updateActor: EventFunc<{
  */
 export const shareActor: EventFunc<{
   actorUUID: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -386,7 +388,7 @@ export const shareActor: EventFunc<{
  */
 export const unshareActor: EventFunc<{
   actorUUID: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 
@@ -410,7 +412,7 @@ export const unshareActor: EventFunc<{
  */
 export const forkActor: EventFunc<{
   targetActorUUID: string;
-}> = async function(data, cb, db) {
+}> = async function (data, cb, db) {
   const app = this.app;
   const socket = this.socket;
 

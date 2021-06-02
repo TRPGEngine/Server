@@ -44,34 +44,33 @@ export default class Bot extends BasePackage {
       // 仅有ID时生效
       if (target.type === 'private' || target.type === 'group') {
         // 监听创建招募操作并发送到QQ机器人
-        TRPGRecruit.createTRPGRecruit = buildWatchFunctionWrapAsync(
-          TRPGRecruit.createTRPGRecruit,
-          (ctx) => {
-            const result: TRPGRecruit = ctx.result;
-            const { title, content, author } = result;
-
-            const message = recruitMsg(
-              title,
-              htmlToText.fromString(content, {
-                wordwrap: false,
-                singleNewLineParagraphs: true,
-              }),
-              author
-            );
-
-            if (target.type === 'private') {
-              requestCQHttp('/send_private_msg_rate_limited', {
-                user_id: target.id,
-                message,
-              });
-            } else if (target.type === 'group') {
-              requestCQHttp('/send_group_msg_rate_limited', {
-                group_id: target.id,
-                message,
-              });
-            }
-          }
-        );
+        // 暂时弃用, 因为酷Q机器人不好用了
+        // TRPGRecruit.createTRPGRecruit = buildWatchFunctionWrapAsync(
+        //   TRPGRecruit.createTRPGRecruit,
+        //   (ctx) => {
+        //     const result: TRPGRecruit = ctx.result;
+        //     const { title, content, author } = result;
+        //     const message = recruitMsg(
+        //       title,
+        //       htmlToText.fromString(content, {
+        //         wordwrap: false,
+        //         singleNewLineParagraphs: true,
+        //       }),
+        //       author
+        //     );
+        //     if (target.type === 'private') {
+        //       requestCQHttp('/send_private_msg_rate_limited', {
+        //         user_id: target.id,
+        //         message,
+        //       });
+        //     } else if (target.type === 'group') {
+        //       requestCQHttp('/send_group_msg_rate_limited', {
+        //         group_id: target.id,
+        //         message,
+        //       });
+        //     }
+        //   }
+        // );
       }
     }
   }

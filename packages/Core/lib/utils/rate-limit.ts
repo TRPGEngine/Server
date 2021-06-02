@@ -11,10 +11,11 @@ import config from 'config';
 import { errorCode, LimitedError } from 'lib/error';
 import { RedisCache } from '../cache';
 
-const rateLimit = config.get<{
-  points: number;
-  duration: number;
-}>('rateLimit');
+const rateLimit =
+  config.get<{
+    points: number;
+    duration: number;
+  }>('rateLimit');
 
 export interface RateLimiter extends RateLimiterAbstract {}
 

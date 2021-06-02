@@ -14,32 +14,6 @@ import { TRPGApplication } from 'trpg/core';
 import FileImageDefinition from './models/image';
 import BasePackage from 'lib/package';
 
-function deleteAll(path: string) {
-  var files = [];
-  if (fs.existsSync(path)) {
-    files = fs.readdirSync(path);
-    files.forEach(function (file, index) {
-      var curPath = path + '/' + file;
-      if (fs.statSync(curPath).isDirectory()) {
-        // recurse
-        deleteAll(curPath);
-      } else {
-        // delete file
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(path);
-  }
-}
-
-async function removeFileAsync(path) {
-  let exists = await fs.pathExists(path);
-  if (exists) {
-    await fs.remove(path);
-    debug('remove file:', path);
-  }
-}
-
 function checkDir() {
   fs.ensureDir('public/uploads/temporary');
   fs.ensureDir('public/uploads/persistence');
@@ -82,10 +56,3 @@ export default class File extends BasePackage {
     this.regSocketEvent('getFileInfo', event.getFileInfo);
   }
 }
-
-module.exports = function FileComponent(app: TRPGApplication) {
-  return {
-    name: 'File',
-    require: ['Player'],
-  };
-};
