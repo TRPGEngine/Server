@@ -1,6 +1,6 @@
 import type { TRPGApplication } from 'trpg/core';
 import Player from '../packages/Player';
-// import File from '../packages/File';
+import File from '../packages/File';
 import Actor from '../packages/Actor';
 import Chat from '../packages/Chat';
 import ChatEmotion from '../packages/ChatEmotion';
@@ -20,7 +20,6 @@ import Bot from '../packages/Bot';
 // import Dashboard from '../packages/Dashboard';
 
 // TODO: 等待转换成新的包
-const file = require('../packages/File');
 const dashboard = require('../packages/Dashboard');
 const qqconnect = require('../packages/QQConnect');
 const notify = require('../packages/Notify');
@@ -28,7 +27,7 @@ const notify = require('../packages/Notify');
 // TODO: 使用dependency-helper的方法进行排序
 module.exports = function loadModules(app: TRPGApplication) {
   app.load(Player);
-  app.load(file);
+  app.load(File);
   app.load(Actor);
   app.load(Chat);
   app.load(ChatEmotion);
