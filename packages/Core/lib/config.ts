@@ -85,7 +85,7 @@ class Etcd3Config extends AppConfig {
         try {
           const key = String(kv.key).replace(this.prefix, '');
           const value = String(kv.value);
-          debug(`[etcd3]: update ${key}: ${value}`);
+          debug(`[etcd3]: update local ${key}: ${value}`);
 
           _.set(this.config, key, tryParseJSON(value));
         } catch (err) {
