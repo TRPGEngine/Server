@@ -4,11 +4,9 @@ import * as event from './event';
 import BasePackage from 'lib/package';
 import GroupGroupDefinition, { GroupGroup } from './models/group';
 import GroupInviteDefinition from './models/invite';
-import GroupActorDefinition from './models/actor';
 import GroupRequestDefinition from './models/request';
 import GroupDetailDefinition from './models/detail';
 import GroupInviteCodeDefinition from './models/invite-code';
-import actorRouter from './routers/actor';
 import groupRouter from './routers/group';
 import GroupChannelDefinition, { GroupChannel } from './models/channel';
 import { regRoomGather } from 'packages/Player/lib/managers/socketroom-manager';
@@ -32,7 +30,6 @@ export default class Group extends BasePackage {
   onInit(): void {
     this.regModel(GroupGroupDefinition);
     this.regModel(GroupInviteDefinition);
-    this.regModel(GroupActorDefinition);
     this.regModel(GroupRequestDefinition);
     this.regModel(GroupDetailDefinition);
     this.regModel(GroupChannelDefinition);
@@ -73,21 +70,6 @@ export default class Group extends BasePackage {
     this.regSocketEvent('getGroupInviteDetail', event.getGroupInviteDetail);
     this.regSocketEvent('getGroupList', event.getGroupList);
     this.regSocketEvent('getGroupMembers', event.getGroupMembers);
-    this.regSocketEvent('getGroupActors', event.getGroupActors);
-    this.regSocketEvent('getGroupActorMapping', event.getGroupActorMapping);
-    this.regSocketEvent('addGroupActor', event.addGroupActor);
-    this.regSocketEvent('removeGroupActor', event.removeGroupActor);
-    this.regSocketEvent('agreeGroupActor', event.agreeGroupActor);
-    this.regSocketEvent('refuseGroupActor', event.refuseGroupActor);
-    this.regSocketEvent('updateGroupActorInfo', event.updateGroupActorInfo);
-    this.regSocketEvent(
-      'setPlayerSelectedGroupActor',
-      event.setPlayerSelectedGroupActor
-    );
-    this.regSocketEvent(
-      'getPlayerSelectedGroupActor',
-      event.getPlayerSelectedGroupActor
-    );
     this.regSocketEvent('quitGroup', event.quitGroup);
     this.regSocketEvent('dismissGroup', event.dismissGroup);
     this.regSocketEvent('tickMember', event.tickMember);
@@ -101,7 +83,6 @@ export default class Group extends BasePackage {
     this.regSocketEvent('chat::startWriting', startWriting);
     this.regSocketEvent('chat::stopWriting', stopWriting);
 
-    this.regRoute(actorRouter);
     this.regRoute(groupRouter);
     this.regRoute(panelRouter);
     this.regRoute(inviteRouter);

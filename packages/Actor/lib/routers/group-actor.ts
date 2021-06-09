@@ -1,6 +1,5 @@
 import { TRPGRouter, ModelAccess } from 'trpg/core';
-import { GroupGroup } from '../models/group';
-import { GroupActor } from '../models/actor';
+import { GroupActor } from '../models/group-actor';
 import { ssoAuth, ssoInfo } from 'packages/Player/lib/middleware/auth';
 import { PlayerJWTPayload } from 'packages/Player/types/player';
 import _ from 'lodash';
@@ -15,7 +14,7 @@ const actorRouter = new TRPGRouter<{
 actorRouter.get('/:groupUUID/actor/list', async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
 
-  const actors = await GroupGroup.findGroupActorsByUUID(groupUUID);
+  const actors = await GroupActor.findGroupActorsByUUID(groupUUID);
 
   ctx.body = { list: actors };
 });

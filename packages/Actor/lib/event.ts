@@ -5,6 +5,8 @@ import { ActorTemplate } from './models/template';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ActorActor } from './models/actor';
 import { FileAvatar } from 'packages/File/lib/models/avatar';
+import { GroupActor } from './models/group-actor';
+import { GroupGroup } from 'packages/Group/lib/models/group';
 const debug = Debug('trpg:component:actor:event');
 
 export const getTemplate: EventFunc<{
@@ -429,4 +431,313 @@ export const forkActor: EventFunc<{
   const actor = await ActorActor.forkActor(targetActorUUID, player.uuid);
 
   return { actor };
+};
+
+export const getGroupActors: EventFunc<{
+  groupUUID: string;
+}> = async function getGroupActors(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  let groupUUID = data.groupUUID;
+  if (!groupUUID) {
+    throw new Error('缺少必要参数');
+  }
+
+  const groupActors = await GroupActor.getAllGroupActors(groupUUID);
+  return { actors: groupActors };
+};
+
+/**
+ * 获取团所有成员选择的人物卡的uuid
+ * 返回一个mapping: {成员UUID: 团人物卡UUID}
+ */
+export const getGroupActorMapping: EventFunc<{
+  groupUUID: string;
+}> = async function (data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const selfUUID = player.uuid;
+  const { groupUUID } = data;
+
+  const group = await GroupGroup.findByUUID(groupUUID);
+  if (!group) {
+    throw new Error('找不到团信息');
+  }
+
+  const mapping = await group.getGroupActorMapping(selfUUID);
+
+  return { mapping };
+};
+
+/**
+ * 添加一个待审核团人物
+ */
+export const addGroupActor: EventFunc<{
+  groupUUID: string;
+  actorUUID: string;
+}> = async function (data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const groupUUID = data.groupUUID;
+  const actorUUID = data.actorUUID;
+  await GroupActor.addApprovalGroupActor(groupUUID, actorUUID, player.uuid);
+
+  return true;
+};
+
+export const removeGroupActor: EventFunc<{
+  groupUUID: string;
+  groupActorUUID: string;
+}> = async function (data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  let groupUUID = data.groupUUID;
+  let groupActorUUID = data.groupActorUUID;
+  if (!groupUUID || !groupActorUUID) {
+    throw new Error('缺少必要参数');
+  }
+
+  let group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
+  if (!group) {
+    throw new Error('找不到团');
+  }
+
+  // 检测权限
+  if (!group.isManagerOrOwner(player.uuid)) {
+    throw new Error('权限不足');
+  }
+
+  let isGroupActorExist = await db.models.group_actor.findOne({
+    where: {
+      uuid: groupActorUUID,
+      groupId: group.id,
+    },
+  });
+  if (!isGroupActorExist) {
+    throw new Error('该角色不存在');
+  }
+
+  // 清空选择角色
+  await db.transactionAsync(async function () {
+    await db.models.group_actor.destroy({
+      where: {
+        uuid: groupActorUUID,
+        groupId: group.id,
+      },
+    });
+
+    let members = await group.getMembers();
+    for (let i = 0; i < members.length; i++) {
+      if (members[i].selected_group_actor_uuid === groupActorUUID) {
+        members[i].selected_group_actor_uuid = null;
+        await members[i].save();
+      }
+    }
+  });
+
+  return true;
+};
+
+/**
+ * 同意入团审批
+ */
+export const agreeGroupActor: EventFunc<{
+  groupActorUUID: string;
+}> = async function agreeGroupActor(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const groupActorUUID = data.groupActorUUID;
+
+  const groupActor = await GroupActor.agreeApprovalGroupActor(
+    groupActorUUID,
+    player.uuid
+  );
+
+  return { groupActor };
+};
+
+/**
+ * 拒绝团角色申请
+ * 逻辑就是直接删除该角色
+ */
+export const refuseGroupActor: EventFunc<{
+  groupActorUUID: string;
+}> = async function refuseGroupActor(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const groupActorUUID = data.groupActorUUID;
+
+  await GroupActor.refuseApprovalGroupActor(groupActorUUID, player.uuid);
+
+  return true;
+};
+
+/**
+ * 更新团成员信息
+ */
+export const updateGroupActorInfo: EventFunc<{
+  groupActorUUID: string;
+  groupActorInfo: string;
+}> = async function updateGroupActorInfo(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const groupActorUUID = data.groupActorUUID;
+  const groupActorInfo = data.groupActorInfo;
+
+  if (!groupActorUUID || !groupActorInfo) {
+    throw new Error('缺少必要参数');
+  }
+
+  const groupActor = await GroupActor.editActorInfo(
+    groupActorUUID,
+    groupActorInfo,
+    player.uuid
+  );
+
+  return { groupActor };
+};
+
+export const setPlayerSelectedGroupActor: EventFunc<{
+  groupUUID: string;
+  groupActorUUID: string;
+}> = async function setPlayerSelectedGroupActor(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const userUUID = player.uuid;
+  const groupUUID = data.groupUUID;
+  const groupActorUUID = data.groupActorUUID; // 可以为null 即取消选择
+  if (!groupUUID) {
+    throw new Error('缺少必要参数');
+  }
+
+  await GroupActor.setPlayerSelectedGroupActor(
+    groupUUID,
+    groupActorUUID,
+    userUUID,
+    userUUID
+  );
+
+  return {
+    data: { groupUUID, groupActorUUID },
+  };
+};
+
+/**
+ * 获取团指定用户当前团角色
+ */
+export const getPlayerSelectedGroupActor: EventFunc<{
+  groupUUID: string;
+  groupMemberUUID: string;
+}> = async function getPlayerSelectedGroupActor(data, cb, db) {
+  const app = this.app;
+  const socket = this.socket;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+
+  const groupUUID = data.groupUUID;
+  const groupMemberUUID = data.groupMemberUUID;
+  if (!groupUUID || !groupMemberUUID) {
+    throw new Error('缺少必要参数');
+  }
+
+  const group = await db.models.group_group.findOne({
+    where: { uuid: groupUUID },
+  });
+  if (!group) {
+    throw new Error('找不到团');
+  }
+
+  const selectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
+    group,
+    groupMemberUUID
+  );
+
+  return {
+    playerSelectedGroupActor: {
+      groupMemberUUID,
+      selectedGroupActorUUID,
+    },
+  };
+};
+
+/**
+ * 获取GroupActor的初始化信息
+ */
+export const getGroupActorInitData: EventFunc<{
+  groupUUID: string;
+}> = async function (data, cb, db) {
+  const { app, socket } = this;
+
+  const player = app.player.manager.findPlayer(socket);
+  if (!player) {
+    throw new Error('用户不存在，请检查登录状态');
+  }
+  const groupUUID = data.groupUUID;
+  if (!groupUUID) {
+    throw new Error('缺少必要参数');
+  }
+
+  // 获取团成员
+  const group = await GroupGroup.findByUUID(groupUUID);
+
+  // 获取团人物
+  const groupActors: GroupActor[] = await group.getGroupActors();
+
+  // 获取团选择人物的Mapping
+  const groupActorsMapping = await group.getGroupActorMapping(player.uuid);
+
+  return { groupActors, groupActorsMapping };
 };
