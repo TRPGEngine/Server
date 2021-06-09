@@ -1,5 +1,4 @@
 import { GroupGroup } from 'packages/Group/lib/models/group';
-import { GroupActor } from 'packages/Group/lib/models/actor';
 import _ from 'lodash';
 import { getTestUser } from 'packages/Player/test/example';
 import testExampleStack from 'test/utils/example';

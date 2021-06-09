@@ -4,6 +4,7 @@ import testExampleStack from 'test/utils/example';
 import { getTestUser } from 'packages/Player/test/example';
 import { createTestGroup } from 'packages/Group/test/example';
 import { GroupActor } from 'packages/Actor/lib/models/group-actor';
+import _ from 'lodash';
 
 export const createTestActor = async (): Promise<ActorActor> => {
   const testUser = await getTestUser();

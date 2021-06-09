@@ -1,13 +1,9 @@
 import _ from 'lodash';
 import { buildAppContext } from 'test/utils/app';
-import { ActorActor } from 'packages/Actor/lib/models/actor';
 import { GroupGroup } from 'packages/Group/lib/models/group';
-import { createTestActor } from 'packages/Actor/test/example';
 import {
   createTestGroup,
-  createTestGroupActor,
   createTestGroupDetail,
-  testGroupActorInfo,
   createTestGroupPanel,
   createTestGroupInvite,
 } from './example';
@@ -340,47 +336,6 @@ describe('group model function', () => {
 
         expect(members.length).toBeGreaterThan(0);
         expect(members[0].uuid).toBe(testUser.uuid);
-      });
-
-      test('should get member selected group actor uuid', async () => {
-        const testGroup = await createTestGroup();
-        const testUser = await getTestUser();
-        await testGroup.addMember(testUser);
-
-        // 创建测试用户并指派
-        const testGroupActor = await createTestGroupActor(testGroup.id);
-        await GroupActor.setPlayerSelectedGroupActor(
-          testGroup.uuid,
-          testGroupActor.uuid,
-          testUser.uuid,
-          testUser.uuid
-        );
-
-        const members = await testGroup.getAllGroupMember();
-        expect(members.length).toBeGreaterThan(0);
-        expect(members[0].uuid).toBe(testUser.uuid);
-        expect(members[0].selected_actor_uuid).toBe(testGroupActor.uuid);
-      });
-    });
-
-    test('group.getGroupActorMapping should be ok', async () => {
-      const testGroup = await createTestGroup();
-      const testUser = await getTestUser();
-      await testGroup.addMember(testUser);
-
-      // 创建测试用户并指派
-      const testGroupActor = await createTestGroupActor(testGroup.id);
-      await GroupActor.setPlayerSelectedGroupActor(
-        testGroup.uuid,
-        testGroupActor.uuid,
-        testUser.uuid,
-        testUser.uuid
-      );
-
-      const mapping = await testGroup.getGroupActorMapping(testUser.uuid);
-      expect(mapping).toMatchObject({
-        [testUser.uuid]: testGroupActor.uuid,
-        self: testGroupActor.uuid,
       });
     });
   });

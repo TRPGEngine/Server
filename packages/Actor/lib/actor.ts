@@ -7,6 +7,7 @@ import BasePackage from 'lib/package';
 import actorRouter from './routers/actor';
 import templateRouter from './routers/template';
 import GroupActorDefinition from './models/group-actor';
+import groupActorRouter from './routers/group-actor';
 
 export default class Actor extends BasePackage {
   public name: string = 'Actor';
@@ -60,7 +61,7 @@ export default class Actor extends BasePackage {
 
     this.regRoute(actorRouter);
     this.regRoute(templateRouter);
-    this.router.use('/group', actorRouter.routes()); // 从group包中迁移过来的
+    this.router.use('/group', groupActorRouter.routes()); // 从group包中迁移过来的
 
     this.app.registerSocketDataMask('actor::getTemplate', 'template.layout');
   }
