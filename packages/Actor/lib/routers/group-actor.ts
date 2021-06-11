@@ -1,21 +1,20 @@
 import { TRPGRouter, ModelAccess } from 'trpg/core';
-import { GroupGroup } from '../models/group';
-import { GroupActor } from '../models/actor';
+import { GroupActor } from '../models/group-actor';
 import { ssoAuth, ssoInfo } from 'packages/Player/lib/middleware/auth';
 import { PlayerJWTPayload } from 'packages/Player/types/player';
 import _ from 'lodash';
 
-const actorRouter = new TRPGRouter<{
+const groupActorRouter = new TRPGRouter<{
   player?: PlayerJWTPayload;
 }>();
 
 /**
  * 团目前人物卡列表
  */
-actorRouter.get('/:groupUUID/actor/list', async (ctx) => {
+groupActorRouter.get('/:groupUUID/actor/list', async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
 
-  const actors = await GroupGroup.findGroupActorsByUUID(groupUUID);
+  const actors = await GroupActor.findGroupActorsByUUID(groupUUID);
 
   ctx.body = { list: actors };
 });
@@ -23,7 +22,7 @@ actorRouter.get('/:groupUUID/actor/list', async (ctx) => {
 /**
  * 获取团角色详情
  */
-actorRouter.get('/actor/detail/:groupActorUUID', async (ctx) => {
+groupActorRouter.get('/actor/detail/:groupActorUUID', async (ctx) => {
   const groupActorUUID = ctx.params.groupActorUUID;
 
   const groupActor = await GroupActor.getDetailByUUID(groupActorUUID);
@@ -34,7 +33,7 @@ actorRouter.get('/actor/detail/:groupActorUUID', async (ctx) => {
 /**
  * 获取团角色权限
  */
-actorRouter.get(
+groupActorRouter.get(
   '/:groupUUID/actor/:groupActorUUID/access',
   ssoInfo(),
   async (ctx) => {
@@ -65,7 +64,7 @@ actorRouter.get(
 /**
  * 编辑团角色
  */
-actorRouter.post(
+groupActorRouter.post(
   '/:groupUUID/actor/:groupActorUUID/edit',
   ssoAuth(),
   async (ctx) => {
@@ -90,7 +89,7 @@ actorRouter.post(
 /**
  * 删除团角色
  */
-actorRouter.post(
+groupActorRouter.post(
   '/:groupUUID/actor/:groupActorUUID/remove',
   ssoAuth(),
   async (ctx) => {
@@ -110,7 +109,7 @@ actorRouter.post(
 /**
  * 申请团角色
  */
-actorRouter.post('/:groupUUID/actor/apply', ssoAuth(), async (ctx) => {
+groupActorRouter.post('/:groupUUID/actor/apply', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
   const { actorUUID } = ctx.request.body;
   const playerUUID = _.get(ctx.state, 'player.uuid');
@@ -135,7 +134,7 @@ actorRouter.post('/:groupUUID/actor/apply', ssoAuth(), async (ctx) => {
 /**
  * 同意团角色的申请
  */
-actorRouter.post('/:groupUUID/actor/agree', ssoAuth(), async (ctx) => {
+groupActorRouter.post('/:groupUUID/actor/agree', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID;
   const { groupActorUUID } = ctx.request.body;
   const player = ctx.state.player;
@@ -160,7 +159,7 @@ actorRouter.post('/:groupUUID/actor/agree', ssoAuth(), async (ctx) => {
 /**
  * 拒绝团角色申请
  */
-actorRouter.post('/:groupUUID/actor/refuse', ssoAuth(), async (ctx) => {
+groupActorRouter.post('/:groupUUID/actor/refuse', ssoAuth(), async (ctx) => {
   const groupUUID = ctx.params.groupUUID; // 这个参数暂时没有用
   const { groupActorUUID } = ctx.request.body;
   const player = ctx.state.player;
@@ -181,4 +180,4 @@ actorRouter.post('/:groupUUID/actor/refuse', ssoAuth(), async (ctx) => {
   };
 });
 
-export default actorRouter;
+export default groupActorRouter;

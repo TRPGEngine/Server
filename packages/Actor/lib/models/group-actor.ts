@@ -9,7 +9,6 @@ import {
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
-import { GroupGroup } from './group';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 import {
@@ -17,12 +16,13 @@ import {
   notifyUpdateGroupActor,
   notifyAddGroupActor,
 } from '../notify';
-import { GroupChannel } from './channel';
 import Debug from 'debug';
-import { GroupDetail } from './detail';
+import { GroupGroup } from 'packages/Group/lib/models/group';
+import { GroupDetail } from 'packages/Group/lib/models/detail';
+import { GroupChannel } from 'packages/Group/lib/models/channel';
 const debug = Debug('trpg:component:group:model:actor');
 
-declare module './group' {
+declare module 'packages/Group/lib/models/group' {
   interface GroupGroup {
     getGroupActors?: HasManyGetAssociationsMixin<GroupActor>;
   }
@@ -132,11 +132,12 @@ export class GroupActor extends Model {
     notifyUpdateGroupActorInfo(group.uuid, groupActor);
 
     // 如果配置没有禁止(默认情况) 则异步发送团消息更新角色信息
-    const disable_system_notify_on_actor_updated = await GroupDetail.getGroupDetailField(
-      group.uuid,
-      'disable_system_notify_on_actor_updated',
-      false
-    );
+    const disable_system_notify_on_actor_updated =
+      await GroupDetail.getGroupDetailField(
+        group.uuid,
+        'disable_system_notify_on_actor_updated',
+        false
+      );
     if (disable_system_notify_on_actor_updated === false) {
       console.log(
         'disable_system_notify_on_actor_updated',
@@ -226,6 +227,32 @@ export class GroupActor extends Model {
     const groupActors = await group.getGroupActors();
 
     return groupActors;
+  }
+
+  /**
+   * 根据团UUID获取团UUID列表
+   * @param groupUUID 团UUID
+   */
+  static async findGroupActorsByUUID(groupUUID: string): Promise<GroupActor[]> {
+    const group: GroupGroup = await GroupGroup.findOne({
+      where: {
+        uuid: groupUUID,
+      },
+      include: [
+        {
+          model: GroupActor.scope(),
+          as: 'groupActors',
+          include: [
+            {
+              model: PlayerUser,
+              as: 'owner',
+            },
+          ],
+        },
+      ],
+    });
+
+    return _.get(group, 'groupActors', []);
   }
 
   /**
@@ -437,10 +464,8 @@ export class GroupActor extends Model {
     if (!_.isNil(originOwner)) {
       // 如果有原拥有者的话则通知
       // 则清理用户选择的团人物卡
-      const originOwnerSelectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
-        group,
-        originOwner.uuid
-      );
+      const originOwnerSelectedGroupActorUUID =
+        await GroupActor.getSelectedGroupActorUUID(group, originOwner.uuid);
       if (originOwnerSelectedGroupActorUUID === groupActorUUID) {
         // 如果原拥有者选择的人物卡是被重新分配的人物卡，则清除
         await GroupActor.setPlayerSelectedGroupActor(

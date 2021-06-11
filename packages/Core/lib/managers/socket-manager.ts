@@ -54,6 +54,7 @@ export abstract class SocketManager<
     this.cache = options.cache;
     this.channel = getMQChannel(channelKey);
     this.initListener();
+    this.setMaxListeners(20);
   }
 
   /**

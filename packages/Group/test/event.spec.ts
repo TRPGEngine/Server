@@ -9,10 +9,7 @@ import { generateRandomStr } from 'test/utils/utils';
 import { GroupGroup } from '../lib/models/group';
 import { GroupRequest } from '../lib/models/request';
 import { GroupInvite } from '../lib/models/invite';
-import { ActorActor } from 'packages/Actor/lib/models/actor';
-import { GroupActor } from '../lib/models/actor';
-import { createTestActor } from 'packages/Actor/test/example';
-import { createTestGroupActor, createTestGroup } from './example';
+import { createTestGroup } from './example';
 import testExampleStack from 'test/utils/example';
 
 const context = buildAppContext();
@@ -223,109 +220,6 @@ describe('group action', () => {
     }
   });
 
-  test('addGroupActor should be ok', async () => {
-    const testActor = await createTestActor();
-    const ret = await context.emitEvent('group::addGroupActor', {
-      groupUUID: testGroup.uuid,
-      actorUUID: testActor.uuid,
-    });
-
-    try {
-      expect(ret.result).toBe(true);
-    } finally {
-      await GroupActor.destroy({
-        where: {
-          actorId: testActor.id,
-        },
-      });
-
-      await testActor.destroy();
-    }
-  });
-
-  test.todo('removeGroupActor should be ok');
-
-  describe('group actor action', () => {
-    let testActor: ActorActor;
-    let testGroupActor: GroupActor;
-    beforeAll(async () => {
-      testActor = await createTestActor();
-      testGroupActor = await GroupActor.create({
-        actor_uuid: testActor.uuid,
-        ownerId: testUser.id,
-        actorId: testActor.id,
-        groupId: testGroup.id,
-      });
-    });
-
-    test.todo('agreeGroupActor should be ok');
-
-    test.todo('refuseGroupActor should be ok');
-
-    test('updateGroupActorInfo should be ok', async () => {
-      const testGroupActor = await createTestGroupActor(
-        testGroup.id,
-        testActor.id
-      );
-      const targetActorInfo = { testInfo: 'aa' };
-
-      const ret = await context.emitEvent('group::updateGroupActorInfo', {
-        groupActorUUID: testGroupActor.uuid,
-        groupActorInfo: targetActorInfo,
-      });
-      expect(ret).toBeSuccess();
-      expect(ret.groupActor).toHaveProperty('actor_info');
-      expect(ret.groupActor.actorId).toBe(testActor.id);
-      expect(ret.groupActor.actor_info).toMatchObject(targetActorInfo);
-
-      // 再检查数据库中是否确实写入了
-      expect(
-        await GroupActor.findOne({ where: { uuid: testGroupActor.uuid } })
-      ).toMatchObject({
-        actor_info: targetActorInfo,
-      });
-
-      await testGroupActor.destroy();
-    });
-
-    afterAll(async () => {
-      await testActor.destroy();
-      await testGroupActor.destroy();
-    });
-
-    test('setPlayerSelectedGroupActor should be ok', async () => {
-      let ret = await context.emitEvent('group::setPlayerSelectedGroupActor', {
-        groupUUID: testGroup.uuid,
-        groupActorUUID: testGroupActor.uuid,
-      });
-
-      expect(ret.result).toBe(true);
-      expect(ret).toHaveProperty('data');
-      expect(ret).toHaveProperty('data.groupUUID', testGroup.uuid);
-      expect(ret).toHaveProperty('data.groupActorUUID', testGroupActor.uuid);
-
-      const selectedGroupActorUUID = await GroupActor.getSelectedGroupActorUUID(
-        testGroup,
-        testUser.uuid
-      );
-      expect(selectedGroupActorUUID).toBe(testGroupActor.uuid);
-    });
-
-    test('getPlayerSelectedGroupActor should be ok', async () => {
-      let ret = await context.emitEvent('group::getPlayerSelectedGroupActor', {
-        groupUUID: testGroup.uuid,
-        groupMemberUUID: testUser.uuid,
-      });
-
-      expect(ret.result).toBe(true);
-      expect(ret).toHaveProperty('playerSelectedGroupActor');
-      expect(ret).toHaveProperty(
-        'playerSelectedGroupActor.groupMemberUUID',
-        testUser.uuid
-      );
-    });
-  });
-
   test.todo('quitGroup should be ok');
 
   test.todo('dismissGroup should be ok');
@@ -359,7 +253,5 @@ describe('group action', () => {
 
     expect(ret).toBeSuccess();
     expect(ret).toHaveProperty('members');
-    expect(ret).toHaveProperty('groupActors');
-    expect(ret).toHaveProperty('groupActorsMapping');
   });
 });

@@ -28,11 +28,11 @@ const notify = require('../packages/Notify');
 module.exports = function loadModules(app: TRPGApplication) {
   app.load(Player);
   app.load(File);
-  app.load(Actor);
   app.load(Chat);
   app.load(ChatEmotion);
   app.load(Dice);
   app.load(Group);
+  app.load(Actor);
   app.load(Note);
   app.load(Help);
   app.load(qqconnect); // 尚未测试
