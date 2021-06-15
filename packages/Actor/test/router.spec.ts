@@ -1,18 +1,21 @@
 import { buildAppContext } from 'test/utils/app';
-import { createTestGroup, createTestGroupActor } from './example';
-import { createTestActor } from 'packages/Actor/test/example';
-import { GroupGroup } from '../lib/models/group';
+import {
+  createTestActor,
+  createTestGroupActor,
+} from 'packages/Actor/test/example';
 import { ActorActor } from 'packages/Actor/lib/models/actor';
-import { GroupActor } from '../lib/models/actor';
 import { genTestPlayerJWT } from 'packages/Player/test/example';
 import _ from 'lodash';
 import testExampleStack from 'test/utils/example';
+import { GroupGroup } from 'packages/Group/lib/models/group';
+import { GroupActor } from '../lib/models/group-actor';
+import { createTestGroup } from 'packages/Group/test/example';
 
 const context = buildAppContext();
 
 testExampleStack.regAfterAll();
 
-describe('Group router', () => {
+describe('Group Actor Router', () => {
   let testGroup: GroupGroup;
   let testActor: ActorActor;
   let testGroupActor: GroupActor;

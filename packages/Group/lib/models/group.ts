@@ -13,7 +13,6 @@ import {
   BelongsToManyAddAssociationsMixin,
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
-import { GroupActor } from './actor';
 import _ from 'lodash';
 import { ChatLog } from 'packages/Chat/lib/models/log';
 import {
@@ -111,32 +110,6 @@ export class GroupGroup extends Model {
     });
 
     return group;
-  }
-
-  /**
-   * 根据团UUID获取团UUID列表
-   * @param groupUUID 团UUID
-   */
-  static async findGroupActorsByUUID(groupUUID: string): Promise<GroupActor[]> {
-    const group: GroupGroup = await GroupGroup.findOne({
-      where: {
-        uuid: groupUUID,
-      },
-      include: [
-        {
-          model: GroupActor.scope(),
-          as: 'groupActors',
-          include: [
-            {
-              model: PlayerUser,
-              as: 'owner',
-            },
-          ],
-        },
-      ],
-    });
-
-    return _.get(group, 'groupActors', []);
   }
 
   /**
@@ -356,19 +329,17 @@ export class GroupGroup extends Model {
       throw new Error('不是团成员');
     }
 
-    const {
-      rows,
-      count,
-    }: { rows: ChatLog[]; count: number } = await ChatLog.findAndCountAll({
-      where: {
-        converse_uuid: converseUUID,
-        group_uuid: groupUUID,
-        revoke: false, // 获取范围聊天记录时不返回撤回的消息
-      },
-      offset: (page - 1) * size,
-      limit: size,
-      order: [['id', 'DESC']],
-    });
+    const { rows, count }: { rows: ChatLog[]; count: number } =
+      await ChatLog.findAndCountAll({
+        where: {
+          converse_uuid: converseUUID,
+          group_uuid: groupUUID,
+          revoke: false, // 获取范围聊天记录时不返回撤回的消息
+        },
+        offset: (page - 1) * size,
+        limit: size,
+        order: [['id', 'DESC']],
+      });
 
     return { logs: rows.reverse(), count };
   }
@@ -747,9 +718,7 @@ export class GroupGroup extends Model {
    * 获取团所有团角色的设置mapping
    * @param selfUUID 用户自己的UUID
    */
-  async getGroupActorMapping(
-    selfUUID: string
-  ): Promise<{
+  async getGroupActorMapping(selfUUID: string): Promise<{
     [userUUID: string]: string;
   }> {
     const members = await this.getMembers();

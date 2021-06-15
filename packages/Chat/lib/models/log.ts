@@ -46,9 +46,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
   /**
    * 在数据库或内存中查找消息
    */
-  public static async findDeepByUUID(
-    uuid: string
-  ): Promise<{
+  public static async findDeepByUUID(uuid: string): Promise<{
     msg: ChatMessagePartial;
     inCache: boolean;
   }> {
@@ -194,7 +192,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
 
   /**
    * 切割聊天日志
-   * 将长文本的聊天消息变成2条
+   * 将长文本的聊天消息变成多条
    * @param logs 聊天日志
    */
   private static cutChatLogMessageList(

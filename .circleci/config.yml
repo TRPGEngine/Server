@@ -51,14 +51,14 @@ jobs:
       - run: yarn add -D jest-junit
 
       # 安装完整依赖。放在后面防止低版本npm把git下载的包覆盖
-      - run: npm install
+      - run: yarn install
 
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      # - run: npm run packages:install
+      # - run: yarn run packages:install
       - run: bash packages/foreach.sh 'yarn install'
 
       - run: echo 'export NODE_ENV=ci' >> $BASH_ENV

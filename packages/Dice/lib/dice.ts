@@ -8,7 +8,7 @@ import { rollPoint, roll } from './utils';
 
 export default class Dice extends BasePackage {
   public name: string = 'Dice';
-  public require: string[] = ['Player', 'Chat', 'Group'];
+  public require: string[] = ['Player', 'Chat', 'Group', 'Actor'];
   public desc: string = '投骰模块';
 
   onInit() {
@@ -29,7 +29,7 @@ export default class Dice extends BasePackage {
 
     this.regMethods({
       rollPoint,
-      roll: function(requestStr: string) {
+      roll: function (requestStr: string) {
         try {
           const { str, value } = roll(requestStr);
           return {

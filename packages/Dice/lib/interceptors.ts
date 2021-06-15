@@ -4,9 +4,9 @@ import { roll, rollFate, rollJudge, rollWW } from './utils';
 import { DiceLog } from './models/log';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import { ChatMessagePartial } from 'packages/Chat/types/message';
-import { GroupActor } from 'packages/Group/lib/models/actor';
 import { hasString } from 'lib/helper/string-helper';
 import { ChatLog } from 'packages/Chat/lib/models/log';
+import { GroupActor } from 'packages/Actor/lib/models/group-actor';
 
 const restPattern = /^[\.。]r(.*)/; // 用于获取.r后面的内容
 const dotRestPattern = /^[\.。](.*)/; // 用于获取.后面的内容
