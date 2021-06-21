@@ -30,6 +30,7 @@ module.exports = {
           'actor/tags/divider',
           'actor/tags/bar',
           'actor/tags/space',
+          'actor/tags/button',
         ],
       },
       'actor/reserved-word',

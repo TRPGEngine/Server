@@ -7,6 +7,7 @@ import {
 } from 'trpg/core';
 import { PlayerUser } from 'packages/Player/lib/models/user';
 import _ from 'lodash';
+import { NoReportError } from 'lib/error';
 
 const at = require('trpg-actor-template');
 
@@ -91,11 +92,11 @@ export class ActorTemplate extends Model {
     playerUUID: string
   ): Promise<ActorTemplate> {
     if (_.isEmpty(name)) {
-      throw new Error('缺少模板名');
+      throw new NoReportError('缺少模板名');
     }
 
     if (_.isEmpty(layout)) {
-      throw new Error('缺少模板布局');
+      throw new NoReportError('缺少模板布局');
     }
 
     const isExistTemplate = await ActorTemplate.findOne({
@@ -104,7 +105,7 @@ export class ActorTemplate extends Model {
     });
 
     if (!_.isNil(isExistTemplate)) {
-      throw new Error('该模板名字已存在');
+      throw new NoReportError('该模板名字已存在');
     }
 
     const user = await PlayerUser.findByUUID(playerUUID);
