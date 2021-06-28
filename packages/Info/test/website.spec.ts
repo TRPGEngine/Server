@@ -74,4 +74,13 @@ describe('InfoWebsite', () => {
 
     expect(await InfoWebsite.findOne({ where: { url } })).not.toBeNull();
   }, 10000);
+
+  test('getWebsiteInfo with unescaped characters', async () => {
+    const url = 'https://unnamed42.github.io/2016-06-30-官方版DnD阵营测试.html';
+    await InfoWebsite.removeWebsiteInfo(url);
+    const info = await InfoWebsite.getWebsiteInfo(url);
+
+    expect(info.title).not.toBe('');
+    expect(info.content).not.toBe('');
+  });
 });
