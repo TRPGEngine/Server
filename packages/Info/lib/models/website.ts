@@ -18,7 +18,10 @@ export class InfoWebsite extends Model {
 
   /**
    * 创建网址的网站信息
-   * 出错不抛出异常因为没有意义
+   * @param url 地址
+   * @param title 标题
+   * @param content 概述内容
+   * @param icon 图标
    */
   static async createWebsiteInfo(
     url: string,
@@ -31,7 +34,7 @@ export class InfoWebsite extends Model {
       title,
       content,
       icon,
-    }).catch((e) => {});
+    }).catch((e) => {}); // 出错不抛出异常因为没有意义
   }
 
   /**
