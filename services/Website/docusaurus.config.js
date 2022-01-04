@@ -170,7 +170,8 @@ const siteConfig = {
       trackingID: 'UA-121610011-2',
     },
     algolia: {
-      apiKey: '58b556e73444444d2e33fbae8966188c',
+      appId: 'CY6SMUG8MA',
+      apiKey: 'de1d3c9a1d40b6a50984a1424c2e4493',
       indexName: 'moonrailgun_trpgdoc',
       algoliaOptions: {}, // Optional, if provided by Algolia
     },
