@@ -17,6 +17,7 @@ export async function notifyUpdateMessage(
     ...payload,
     uuid,
   };
+
   if (!_.isEmpty(notifyPayload.to_uuid)) {
     // 该消息是发送给个人的
     await Promise.all([
