@@ -270,6 +270,7 @@ export abstract class SocketManager<
    * @param payload 消息体
    */
   async emitMessage(payload: BaseSocketMsgPayload): Promise<void> {
+    debug('向公用通道发送socket消息: %s(%s) ', payload.eventName, payload.type);
     await this.channel.produce(JSON.stringify(payload));
   }
 
