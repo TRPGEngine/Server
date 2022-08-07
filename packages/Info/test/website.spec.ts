@@ -33,7 +33,7 @@ describe('InfoWebsite', () => {
     expect(info).toHaveProperty('icon');
     expect(info.title).toBe('react');
     expect(info.content).toBe(
-      'React is a JavaScript library for building user interfaces.'
+      'React is a JavaScript library for building user interfaces.. Latest version: 18.2.0, last published: 2 months ago. Start using react in your project by running `npm i react`. There are 90403 other projects in the npm registry using react.'
     );
     expect(info.icon).toBe(
       'https://static.npmjs.com/338e4905a2684ca96e08c7780fc68412.png'
@@ -74,4 +74,13 @@ describe('InfoWebsite', () => {
 
     expect(await InfoWebsite.findOne({ where: { url } })).not.toBeNull();
   }, 10000);
+
+  test('getWebsiteInfo with unescaped characters', async () => {
+    const url = 'https://unnamed42.github.io/2016-06-30-官方版DnD阵营测试.html';
+    await InfoWebsite.removeWebsiteInfo(url);
+    const info = await InfoWebsite.getWebsiteInfo(url);
+
+    expect(info.title).not.toBe('');
+    expect(info.content).not.toBe('');
+  });
 });

@@ -35,7 +35,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
   date: string;
   revoke: boolean;
 
-  public static async findByUUID(uuid: string): Promise<ChatLog> {
+  public static async findByUUID(uuid: string): Promise<ChatLog | null> {
     return ChatLog.findOne({
       where: {
         uuid,
@@ -373,7 +373,9 @@ export class ChatLog extends Model implements ChatMessagePayload {
    * @param userUUID 操作者UUID
    */
   public static async revokeMsg(msgUUID: string, userUUID: string) {
-    let msg: ChatMessagePayload = await ChatLog.findByUUID(msgUUID);
+    let msg = (
+      await ChatLog.findByUUID(msgUUID)
+    )?.toJSON() as ChatMessagePayload;
     let isCachedMsg = false;
     let isGroupManagerRevoke = false; // 是否为团管理员的撤回(没有时间限制)
     if (_.isNil(msg)) {
@@ -391,21 +393,15 @@ export class ChatLog extends Model implements ChatMessagePayload {
     /**
      * 校验撤回权限
      */
-    if (userUUID !== msg.sender_uuid) {
-      // 如果不是发送者
-      if (!msg.is_group) {
-        // 不是团消息，直接返回错误
-        throw new Error('撤回失败, 没有撤回权限');
-      }
-
+    if (msg.is_group) {
       const groupUUID = msg.converse_uuid;
-      if (!_.isEmpty(groupUUID)) {
+      if (_.isEmpty(groupUUID)) {
         throw new Error('撤回失败, 消息内容异常');
       }
 
       if (app.hasPackage('Group')) {
         const { GroupGroup } = await import('packages/Group/lib/models/group');
-        const group = await GroupGroup.findByUUID(msg.converse_uuid);
+        const group = await GroupGroup.findByUUID(groupUUID);
         if (!group.isManagerOrOwner(userUUID)) {
           // 不是管理员
           throw new NoReportError('撤回失败, 没有撤回权限');

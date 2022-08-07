@@ -18,7 +18,10 @@ export class InfoWebsite extends Model {
 
   /**
    * 创建网址的网站信息
-   * 出错不抛出异常因为没有意义
+   * @param url 地址
+   * @param title 标题
+   * @param content 概述内容
+   * @param icon 图标
    */
   static async createWebsiteInfo(
     url: string,
@@ -31,7 +34,7 @@ export class InfoWebsite extends Model {
       title,
       content,
       icon,
-    }).catch((e) => {});
+    }).catch((e) => {}); // 出错不抛出异常因为没有意义
   }
 
   /**
@@ -71,27 +74,20 @@ export class InfoWebsite extends Model {
         throw new Error('不是一个合法的Url');
       }
 
-      const body = await app.request.get(url);
+      const body = await app.request.get(encodeURI(url));
       const $ = cheerio.load(body);
 
       const title =
         $('meta[property="og:title"]').attr('content') ||
-        $('title')
-          .first()
-          .text();
+        $('title').first().text();
 
       const content =
         $('meta[property="og:description"]').attr('content') ||
-        $('body')
-          .text()
-          .substr(0, 150)
-          .replace(/\s/g, '');
+        $('body').text().substr(0, 150).replace(/\s/g, '');
 
       let icon =
         $('meta[property="og:image"]').attr('content') ||
-        $('img[src]:not([src$=".gif"])')
-          .first()
-          .attr('src');
+        $('img[src]:not([src$=".gif"])').first().attr('src');
       if (_.isString(icon)) {
         icon = urlParser.resolve(url, icon);
       }
