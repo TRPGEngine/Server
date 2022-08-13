@@ -32,9 +32,11 @@ describe('InfoWebsite', () => {
     expect(info).toHaveProperty('content');
     expect(info).toHaveProperty('icon');
     expect(info.title).toBe('react');
-    expect(info.content).toBe(
-      'React is a JavaScript library for building user interfaces.. Latest version: 18.2.0, last published: 2 months ago. Start using react in your project by running `npm i react`. There are 90403 other projects in the npm registry using react.'
-    );
+    expect(
+      info.content.startsWith(
+        'React is a JavaScript library for building user interfaces'
+      )
+    ).toBe(true);
     expect(info.icon).toBe(
       'https://static.npmjs.com/338e4905a2684ca96e08c7780fc68412.png'
     );
