@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.53.8](https://github.com/TRPGEngine/Server/compare/v1.53.7...v1.53.8) (2022-08-13)
+
+
+### Bug Fixes
+
+* 修复频道撤回消息会报错的问题 ([b7f00dd](https://github.com/TRPGEngine/Server/commit/b7f00dd8b6543ffe9f5b2d468c25d916108e2dfd))
+
 ### [1.53.7](https://github.com/TRPGEngine/Server/compare/v1.53.6...v1.53.7) (2022-08-07)
 
 
