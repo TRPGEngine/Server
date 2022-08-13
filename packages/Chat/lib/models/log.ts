@@ -394,7 +394,7 @@ export class ChatLog extends Model implements ChatMessagePayload {
      * 校验撤回权限
      */
     if (msg.is_group) {
-      const groupUUID = msg.converse_uuid;
+      const groupUUID = msg.group_uuid;
       if (_.isEmpty(groupUUID)) {
         throw new Error('撤回失败, 消息内容异常');
       }
@@ -402,6 +402,10 @@ export class ChatLog extends Model implements ChatMessagePayload {
       if (app.hasPackage('Group')) {
         const { GroupGroup } = await import('packages/Group/lib/models/group');
         const group = await GroupGroup.findByUUID(groupUUID);
+        if (_.isEmpty(group)) {
+          throw new Error('获取群组状态异常, 请联系开发者');
+        }
+
         if (!group.isManagerOrOwner(userUUID)) {
           // 不是管理员
           throw new NoReportError('撤回失败, 没有撤回权限');

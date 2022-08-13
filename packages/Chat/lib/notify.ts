@@ -38,8 +38,18 @@ export async function notifyUpdateMessage(
         }
       ),
     ]);
-  } else if (!_.isEmpty(notifyPayload.converse_uuid)) {
+  } else if (!_.isEmpty(notifyPayload.group_uuid)) {
     // 该消息为团消息
+    await app.player.manager.roomcastSocketEvent(
+      notifyPayload.group_uuid,
+      'chat::updateMessage',
+      {
+        converseUUID: notifyPayload.converse_uuid,
+        payload: notifyPayload,
+      }
+    );
+  } else if (!_.isEmpty(notifyPayload.converse_uuid)) {
+    // 该消息为多人会话消息
     await app.player.manager.roomcastSocketEvent(
       notifyPayload.converse_uuid,
       'chat::updateMessage',
