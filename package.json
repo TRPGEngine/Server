@@ -1,6 +1,6 @@
 {
   "name": "trpg-server",
-  "version": "1.53.8",
+  "version": "1.53.9",
   "description": "TRPG 标准服务端",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,8 @@
     "test:noserver": "npm run test -- --noserver",
     "test:watch": "npm run test -- --watch",
     "test:ci": "npm run test:coverage -- --ci --reporters=default --reporters=jest-junit --detectOpenHandles",
-    "release": "standard-version -a"
+    "release": "standard-version -a",
+    "release:patch": "standard-version -a -r patch"
   },
   "husky": {
     "hooks": {
