@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.53.9](https://github.com/TRPGEngine/Server/compare/v1.53.8...v1.53.9) (2023-01-19)
+
+
+### Features
+
+* 消息拦截器增加中文适配 ([54ed47f](https://github.com/TRPGEngine/Server/commit/54ed47f75d107e2ef688b9f0459793f51464fef3))
+
 ### [1.53.8](https://github.com/TRPGEngine/Server/compare/v1.53.7...v1.53.8) (2022-08-13)
 
 
