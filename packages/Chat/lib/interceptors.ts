@@ -54,17 +54,24 @@ export const initInterceptors = _.once(() => {
       // 如果用户发送的消息是普通的消息类型
       if (
         payload.message.startsWith('/act ') === true ||
-        payload.message.startsWith('/a ') === true
+        payload.message.startsWith('/a ') === true ||
+        payload.message.startsWith('、act ') === true ||
+        payload.message.startsWith('、a ') === true
       ) {
         payload.message = getStrAfterFirstBlank(payload.message);
         payload.type = 'action';
       } else if (
         payload.message.startsWith('/speak ') === true ||
-        payload.message.startsWith('/s ') === true
+        payload.message.startsWith('/s ') === true ||
+        payload.message.startsWith('、speak ') === true ||
+        payload.message.startsWith('、s ') === true
       ) {
         payload.message = getStrAfterFirstBlank(payload.message);
         payload.type = 'speak';
-      } else if (payload.message.startsWith('/ooc ') === true) {
+      } else if (
+        payload.message.startsWith('/ooc ') === true ||
+        payload.message.startsWith('、ooc ') === true
+      ) {
         payload.message = getStrAfterFirstBlank(payload.message);
         payload.type = 'ooc';
       }
