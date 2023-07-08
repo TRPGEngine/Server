@@ -38,7 +38,7 @@ describe('InfoWebsite', () => {
       )
     ).toBe(true);
     expect(info.icon).toBe(
-      'https://static.npmjs.com/338e4905a2684ca96e08c7780fc68412.png'
+      'https://static-production.npmjs.com/338e4905a2684ca96e08c7780fc68412.png'
     );
 
     // 数据库里应当有数据
