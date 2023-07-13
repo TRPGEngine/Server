@@ -63,7 +63,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
     "memoize-one": "^5.0.4",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "mysql2": "^1.6.5",
     "nodemon": "^2.0.4",
     "request": "^2.88.0",
